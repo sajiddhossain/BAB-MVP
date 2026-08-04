@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAB · Your 4-Month Signals Journey</title>
+<style>
+  :root{
+    --bg:#0e1322; --panel:#161d30; --panel2:#1d2740; --ink:#eef2fb; --muted:#98a4c2; --soft:#c6cee0;
+    --line:#28324c; --accent:#8b83f5; --accent2:#b3aef9;
+    --m1:#ff9f45; --m2:#24b6b0; --m3:#8b83f5; --m4:#e86a92;
+    --menstrual:#e86a92; --follicular:#5fbf6b; --ovulation:#ffb84d; --luteal:#8b83f5;
+    --shadow:0 14px 38px rgba(0,0,0,.4);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef1f9; --panel:#ffffff; --panel2:#f1f4fc; --ink:#151d2f; --muted:#5c6a86; --soft:#3d4a61;
+      --line:#e3e8f4; --shadow:0 14px 38px rgba(30,45,90,.10);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 82% -12%,rgba(139,131,245,.16),transparent 60%),var(--bg);
+    color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:26px 18px 70px}
+  /* hero */
+  .hero{text-align:center;margin-bottom:8px}
+  .brand{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:850;background:var(--panel);border:1px solid var(--line);padding:6px 14px;border-radius:999px}
+  h1{font-size:30px;margin:14px 0 6px;font-weight:850;letter-spacing:-.02em}
+  .hero p{color:var(--muted);max-width:600px;margin:0 auto;font-size:15.5px}
+  /* tabs */
+  .tabs{position:sticky;top:0;z-index:20;display:flex;justify-content:center;gap:6px;margin:20px 0 22px;padding:8px 0;
+    background:linear-gradient(var(--bg),var(--bg) 70%,transparent)}
+  .tab{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:999px;padding:9px 16px;font:inherit;font-weight:750;font-size:13.5px;cursor:pointer;transition:.12s}
+  .tab:hover{border-color:var(--accent)}
+  .tab.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#14102b;border-color:transparent}
+  .view{display:none} .view.on{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* cards */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px}
+  .lede{color:var(--soft);font-size:15.5px;margin:0 0 18px}
+  /* month blocks */
+  .month{border:1px solid var(--line);border-radius:18px;margin-bottom:16px;overflow:hidden;background:var(--panel);box-shadow:var(--shadow)}
+  .mhead{display:flex;align-items:center;gap:14px;padding:18px 20px;border-left:6px solid var(--m1)}
+  .month.m2 .mhead{border-left-color:var(--m2)} .month.m3 .mhead{border-left-color:var(--m3)} .month.m4 .mhead{border-left-color:var(--m4)}
+  .mnum{font-size:11px;font-weight:850;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mtitle{font-size:20px;font-weight:850;letter-spacing:-.01em;margin:2px 0 0}
+  .mskill{font-size:12.5px;color:var(--soft);font-weight:650;margin-top:2px}
+  .mbadge{margin-left:auto;font-size:26px}
+  .weeks{padding:6px 16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media(max-width:620px){.weeks{grid-template-columns:1fr}}
+  .wk{border:1px solid var(--line);border-radius:13px;padding:13px 15px;background:var(--panel2);cursor:pointer;transition:.12s;position:relative}
+  .wk:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .wk .wn{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+  .wk h4{margin:3px 0 3px;font-size:15.5px}
+  .wk p{margin:0;font-size:13px;color:var(--muted)}
+  .wk .tick{position:absolute;top:12px;right:13px;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;color:transparent}
+  .wk.done{border-color:var(--follicular)}
+  .wk.done .tick{background:var(--follicular);border-color:var(--follicular);color:#08210f}
+  /* mission modal */
+  .scrim{position:fixed;inset:0;background:rgba(6,10,20,.66);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
+  .scrim.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:20px;max-width:520px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 30px 70px rgba(0,0,0,.5);padding:24px}
+  .modal .mtag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#14102b;background:var(--accent2);padding:4px 10px;border-radius:999px}
+  .modal h3{font-size:22px;margin:12px 0 2px;font-weight:850;letter-spacing:-.01em}
+  .modal .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+  .modal h5{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:16px 0 5px}
+  .modal p{margin:5px 0;font-size:14.5px}
+  .missionbox{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:6px;font-size:14.5px}
+  .modal .row{display:flex;gap:10px;margin-top:20px}
+  .btn{flex:1;border:none;border-radius:12px;padding:13px;font:inherit;font-weight:800;cursor:pointer;transition:.12s}
+  .btn.p{color:#14102b;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+  .btn.g{background:transparent;border:1.5px solid var(--line);color:var(--muted)}
+  .btn:hover{filter:brightness(1.05)}
+  .x{float:right;background:transparent;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;margin:-6px -6px 0 0}
+  /* patterns */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 14px}
+  .chip{border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:999px;padding:8px 15px;font:inherit;font-size:13.5px;font-weight:750;cursor:pointer;transition:.12s;display:inline-flex;align-items:center;gap:7px}
+  .chip:hover{border-color:var(--accent)}
+  .chip .dot{width:10px;height:10px;border-radius:50%}
+  .chip.on{border-color:var(--accent);background:var(--panel)}
+  .chartwrap{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px 8px 6px}
+  svg.chart{width:100%;height:auto;display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:8px;font-size:11.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:14px;height:10px;border-radius:3px;display:inline-block;opacity:.55}
+  .phasegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+  @media(max-width:560px){.phasegrid{grid-template-columns:1fr 1fr}}
+  .ptile{border:1px solid var(--line);border-radius:13px;padding:13px;text-align:center;background:var(--panel2)}
+  .ptile .pn{font-size:12px;font-weight:750;margin-bottom:8px}
+  .ptile .pv{font-size:22px;font-weight:850}
+  .ptile .bar{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+  .ptile .bar i{display:block;height:100%;border-radius:3px}
+  .insight{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:14px 16px;background:var(--panel);margin-bottom:10px}
+  .insight .ic{font-size:20px;flex:none}
+  .insight p{margin:0;font-size:14px}
+  .insight b{color:var(--ink)}
+  .note{font-size:12.5px;color:var(--muted);background:var(--panel2);border:1px dashed var(--line);border-radius:12px;padding:11px 14px;margin-top:8px}
+  /* how it works */
+  h2{font-size:20px;margin:26px 0 4px;font-weight:820;letter-spacing:-.01em}
+  .skills{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+  @media(max-width:560px){.skills{grid-template-columns:1fr}}
+  .skill{border:1px solid var(--line);border-radius:14px;padding:15px 16px;background:var(--panel)}
+  .skill h4{margin:0 0 4px;font-size:15.5px}
+  .skill p{margin:0;font-size:13.5px;color:var(--soft)}
+  .foot{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;text-align:center;line-height:1.7}
+  strong{color:var(--ink)}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <span class="brand">🏐 BAB</span>
+    <h1>Your 4-Month Signals Journey</h1>
+    <p>Over four months, one skill each, you'll learn to read the signals your body sends: to <strong>recognise</strong> them, <strong>understand</strong> them, <strong>communicate</strong> them, and <strong>manage</strong> them — so you can keep playing the sport you love, performing at your best <em>and</em> feeling your best, as you grow.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" data-view="journey">🗺️ The Journey</button>
+    <button class="tab" data-view="patterns">📈 My Patterns</button>
+    <button class="tab" data-view="how">💡 How it works</button>
+  </div>
+
+  <!-- ================= JOURNEY ================= -->
+  <div class="view on" id="journey">
+    <p class="lede">Four months, sixteen weeks, one small habit: tuning in each day. You'll move from <em>noticing</em> your signals, to <em>understanding</em> what moves them, to <em>talking about</em> them, to <em>working with</em> them like a pro. Tap any week to see the mission. <span id="progtxt" style="color:var(--accent);font-weight:700"></span></p>
+    <div id="months"></div>
+  </div>
+
+  <!-- ================= PATTERNS ================= -->
+  <div class="view" id="patterns">
+    <p class="lede">This is where it clicks. Every daily check-in becomes a dot — and over weeks, the dots reveal <strong>your</strong> patterns. Here's a sample of ~16 weeks so you can see how it works. Pick a signal, and watch how it moves across your cycle.</p>
+
+    <div class="chips" id="sigchips"></div>
+
+    <div class="card" style="padding:14px 14px 10px">
+      <div class="chartwrap">
+        <svg class="chart" id="chart" viewBox="0 0 720 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Your signal across 16 weeks, with cycle phases shaded behind"></svg>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--menstrual)"></i>Menstrual (period)</span>
+        <span><i style="background:var(--follicular)"></i>Follicular</span>
+        <span><i style="background:var(--ovulation)"></i>Ovulation</span>
+        <span><i style="background:var(--luteal)"></i>Luteal</span>
+      </div>
+    </div>
+
+    <h2 style="font-size:16px" id="phaseTitle">Your average by cycle phase</h2>
+    <div class="phasegrid" id="phasegrid"></div>
+
+    <h2 style="font-size:16px;margin-top:22px">🔎 What BAB spots for you</h2>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px">Patterns BAB has noticed so far — think of them as ideas, not facts. You're the expert on you: keep the ones that feel true, and question the ones that don't.</p>
+    <div id="insights"></div>
+
+    <div class="note">This is sample data to show how it works. In the real journey, your daily check-ins fill in the signals and the cycle bands come from the period dates you set up — so the patterns that appear are yours alone.</div>
+  </div>
+
+  <!-- ================= HOW IT WORKS ================= -->
+  <div class="view" id="how">
+    <p class="lede">BAB is built to read one athlete the tools of today mostly miss: a growing, female adolescent — on her own terms, through her cycle and her real life.</p>
+
+    <div class="card">
+      <h2 style="margin-top:2px">The four skills you'll build</h2>
+      <div class="skills">
+        <div class="skill"><h4>👀 Recognise</h4><p>Feel and name what's happening inside — energy, focus, mood, hunger, tension, pain — and where it lives in your body.</p></div>
+        <div class="skill"><h4>🧩 Understand</h4><p>Connect the signal to what caused it, and to where you are in your cycle. Predict, then check.</p></div>
+        <div class="skill"><h4>🗣️ Communicate</h4><p>Put your signals into words for coaches, physios and parents — especially pain worth protecting.</p></div>
+        <div class="skill"><h4>🧭 Manage</h4><p>Use your read to honour your effort, look after yourself in the moment, and protect a long, healthy life in sport.</p></div>
+      </div>
+      <p style="font-size:14px;color:var(--soft);margin:4px 0 0">One skill a month: Month 1 grows <strong>Recognise</strong>, Month 2 <strong>Understand</strong>, Month 3 <strong>Communicate</strong>, Month 4 <strong>Manage</strong>. Each builds on the last.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:2px">🧡 Made to be good for you</h2>
+      <p style="font-size:14.5px;color:var(--soft)">BAB never hands you a score or a verdict. Your <strong>felt sense always leads</strong> — a watch or app is only a second opinion you're learning to weigh, never the boss. The question here is always <em>"how well did I read myself today?"</em> — never "how fit or recovered am I?"</p>
+      <p style="font-size:14.5px;color:var(--soft)">And BAB works fully on its own — you don't need a smartwatch to get everything from it. If you do wear one, you can connect it whenever you like, right from the start, as an extra second opinion to weigh against how you feel.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:2px">The science, simply</h2>
+      <p style="font-size:14.5px;color:var(--soft)">There's a real name for the skill of sensing what's happening inside you: <strong>interoception</strong>. It's your body's inner sense, and — this is the good part — it's <strong>trainable</strong>, like a serve or a jump. Scientists think your teenage years may be a golden window for building it, because the brain pathways for reading your body are still developing right now (Welsh et al., 2026).</p>
+      <p style="font-size:14.5px;color:var(--soft)">The way you train it is a loop: <strong>predict</strong> how you'll feel, <strong>tune in</strong> and check, <strong>compare</strong> the two, and <strong>adjust</strong>. Being "wrong" isn't a fail — the gap between your guess and your body is exactly where learning happens. Over these four months, two things grow: your read gets accurate, and your quiet confidence that <em>you can handle whatever your body throws at you</em> — one of the strongest protectors against burnout and injury there is.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:2px">🌱 Rest is part of training — not the opposite</h2>
+      <p style="font-size:14.5px;color:var(--soft)">Here's a truth this whole journey keeps coming back to: you get stronger <em>while you recover</em>, not during the hard bit. So BAB helps you step away from the old "no pain, no gain" idea. Pushing through everything isn't toughness — it's how injuries and burnout start. Honouring a Gentle day, taking a real rest day, or easing off mid-session is a skill and a strength. The athletes who keep playing for years are the ones who learn to recover on purpose.</p>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:2px">🌙 Your rhythm, underneath it all</h2>
+      <p style="font-size:14.5px;color:var(--soft)">After your first period, your body moves through four phases, and that rhythm touches everything — energy, hunger, mood, sleep and focus. Most tools ignore it completely. This journey puts it underneath everything, so the patterns you spot actually make sense. You set your recent period dates when you first open BAB, so it can map your phases from day one — and you keep it updated as you go, since at your age your cycle is often still settling and irregular. It's about <strong>noticing</strong> your own tendencies over time — never a fixed schedule.</p>
+    </div>
+
+    <div class="foot">
+      This journey helps you understand yourself — it doesn't replace your coach, a physiotherapist, or a doctor, who can see and check things a screen can't. If anything ever feels wrong with your body or your mind, tell a trusted adult. That's always the strong move.<br><br>
+      <span style="color:var(--soft)">Method adapted from Welsh, P. S., Seshadri, D., Kiely, J., &amp; Khalsa, S. (2026). <em>Interoceptive Intelligence in Sports: A Framework for Athletic Performance and Wellbeing.</em></span>
+    </div>
+  </div>
+</div>
+
+<!-- mission modal -->
+<div class="scrim" id="scrim">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script>
+(function(){
+  /* ---------------- JOURNEY DATA ---------------- */
+  var MONTHS=[
+    {n:"Month 1",title:"Notice",skill:"Recognise your signals",badge:"👀",cls:"m1",
+     weeks:[
+      {w:1,tag:"Recognise",title:"Meet your signals",blurb:"Just tune in each day — no changing anything yet.",
+       week:"Do a daily Tune-In. Get to know your six channels — sleep, energy, fuel, hydration, muscles — plus your headspace. The goal this week isn't to feel <em>good</em>, it's just to <em>feel</em>, honestly.",
+       mission:"Check in on 5 days this week. Don't judge the answers — just notice them.",
+       bab:"BAB gives you the words and the body map, so 'I feel off' becomes something specific.",
+       reflect:"Which signal was easiest to feel? Which was hardest to put into words?"},
+      {w:2,tag:"Recognise",title:"Name it, place it",blurb:"Give each sensation a word and a spot in your body.",
+       week:"After training, use the body map: tap where you feel something and give it a name. Naming and locating a feeling is the heart of the whole skill.",
+       mission:"Every session this week, name one sensation and find exactly where it lives.",
+       bab:"BAB's body map and feeling-words turn a vague fog into clear, nameable signals.",
+       reflect:"Did putting a word to a feeling change how strong it felt?"},
+      {w:3,tag:"Recognise",title:"One battery, two drains",blurb:"Notice how school and life show up in your body.",
+       week:"Your brain and body run off the same battery. A stressful day at school can leave you flat at training even after good sleep. Start noticing where stress shows up physically.",
+       mission:"On one busy or stressful day, tune in and see what your body is doing.",
+       bab:"BAB's Headspace check links how your mind feels to how your body reads.",
+       reflect:"Where does stress seem to live in your body — shoulders, tummy, jaw, somewhere else?"},
+      {w:4,tag:"Recognise",title:"Meet your rhythm",blurb:"See which phase you're in — and what it can bring.",
+       week:"Your cycle has been running underneath since the day you set up BAB — you popped in your recent period dates, so it can already map your four phases. This week you learn to <em>see</em> it: meet the four phases, notice which one you're in right now (whatever it happens to be), and start reading your cycle as the backdrop under all your other signals.",
+       mission:"Each day this week, check which phase you're in and notice how your energy, mood and focus feel in it — no matter which phase it is.",
+       bab:"BAB turns the dates you set up into your own phase map — so your signals start to make sense against your rhythm.",
+       reflect:"Month-1 check-in: what did you learn about yourself — and did anything about your current phase surprise you?"}
+     ]},
+    {n:"Month 2",title:"Understand",skill:"Connect the dots — and your cycle",badge:"🧩",cls:"m2",
+     weeks:[
+      {w:5,tag:"Understand",title:"Predict, then check",blurb:"Guess your tempo before you tune in.",
+       week:"Each morning, guess your tempo — Upbeat, Steady or Gentle — <em>before</em> you check. Then tune in and compare. The surprises are where your inner read gets sharp.",
+       mission:"Predict your tempo every day, and notice each time your body surprises you.",
+       bab:"BAB's Predict → Compare loop turns every day into a rep for your inner sense.",
+       reflect:"Are your guesses getting closer to what your body actually says?"},
+      {w:6,tag:"Understand",title:"What's in the mix?",blurb:"Reflect on what might be shaping a signal — it's rarely one thing.",
+       week:"A high or low signal is almost never caused by a single thing — it's a <em>mix</em>: sleep, food, a hard match, a heavy day at school, where you are in your cycle. So instead of jumping to 'X caused Y', reflect on everything that <em>might</em> be in play. Real connections take time to show — and the patterns building in your dashboard help them surface, week by week.",
+       mission:"For one low (or great) signal this week, jot down a few things that might have shaped it — resist settling on just one.",
+       bab:"BAB spots possible patterns across your weeks and shows them to you — then asks, 'does this feel right?' You stay the expert on you.",
+       reflect:"Which of BAB's suggested patterns felt true to you — and which didn't match what you notice in yourself?"},
+      {w:7,tag:"Understand",title:"Reading your cycle",blurb:"See how your signals move across your phases.",
+       week:"Open your Patterns view and look at energy, mood and focus across your cycle. Remember: at your age cycles are irregular, so these are gentle tendencies, not rules.",
+       mission:"Find one signal that seems to shift with your cycle, and write it down.",
+       bab:"BAB overlays your signals on your cycle phases, so the pattern becomes visible.",
+       reflect:"What's the first cycle pattern you spotted in yourself?"},
+      {w:8,tag:"Understand",title:"Fuel your energy",blurb:"Give your body the fuel it asks for — it's what powers you, on and off the pitch.",
+       week:"Food is fuel — it's what your body turns into the energy and focus you need to train, play, think, and feel good, on and off the pitch. Your appetite shifts too (you're often hungrier before your period, and your body needs extra iron during it), so this week is about <em>noticing what your body is asking for and giving it</em>, rather than ignoring it.",
+       mission:"Notice what your body is asking for each day, and give it the fuel it needs to feel energised and focused.",
+       bab:"BAB helps you read your energy honestly, so you can notice when your body is asking to be fuelled — and fuel it.",
+       reflect:"Mid-journey check-in: which signals are you starting to spot and understand that you used to miss?"}
+     ]},
+    {n:"Month 3",title:"Communicate",skill:"Put your signals into words",badge:"🗣️",cls:"m3",
+     weeks:[
+      {w:9,tag:"Communicate",title:"Say it out loud",blurb:"Move a signal from inside your head into words.",
+       week:"You've learned to feel and name your signals for yourself. Now practise saying them <em>out loud</em> — to a friend, a parent, or even just to your journal. Speaking a feeling makes it clearer and easier to act on.",
+       mission:"Describe one signal out loud to someone you trust, most days this week.",
+       bab:"BAB's feeling-words and body map give you ready-made language to borrow.",
+       reflect:"What's the hardest part of putting a body feeling into words?"},
+      {w:10,tag:"Communicate",title:"Talk to your coach",blurb:"Share your read and your tempo with your coach.",
+       week:"Your coach can only adjust if they know how you're doing. Practise a simple line: 'I'm reading a bit low today — can we keep it Steady?' A good coach respects an athlete who knows herself.",
+       mission:"Tell your coach one honest thing about how you feel this week.",
+       bab:"BAB's tempo gives you a shared word, so 'Gentle today' means something you both understand.",
+       reflect:"How did your coach respond when you spoke up?"},
+      {w:11,tag:"Communicate",title:"Give a voice to your pain",blurb:"The words for protective pain — and why it's strength.",
+       week:"Protective pain — sharp, in a joint or bone, one-sided, or worse at night — always gets spoken about, the same day. Telling an adult isn't weakness; it's exactly what pro athletes do to protect a long career.",
+       mission:"If any protective pain shows up, tell a trusted adult that day. Rehearse the words even if it doesn't.",
+       bab:"BAB helps you tell working aches from protective pain, so you know what's worth flagging.",
+       reflect:"What makes speaking up about pain hard — and what would make it easier?"},
+      {w:12,tag:"Communicate",title:"Ask for what you need",blurb:"Advocate for your fuel, rest and support.",
+       week:"Communicating isn't only about training. It's asking for a proper meal, an earlier night, or someone to talk to when school or life feels heavy. Your needs are worthy to be voiced and listened to.",
+       mission:"Ask for one thing you need this week — on or off the pitch.",
+       bab:"BAB shows how your signals connect to what you need, so your asks come out clear.",
+       reflect:"Month check-in: who's on your support team — and who can you always talk to?"}
+     ]},
+    {n:"Month 4",title:"Manage",skill:"Work with your body",badge:"🧭",cls:"m4",
+     weeks:[
+      {w:13,tag:"Manage",title:"Honour your tempo",blurb:"Read it from your signals — then follow it.",
+       week:"Your tempo isn't something you pick out of the air — you <em>read</em> it from your signals, then honour it. Lean into an Upbeat day, dial in on a Steady day, and let a Gentle day rebuild you. Listening to what your body's telling you, and following it, is the whole skill.",
+       mission:"Each day this week, notice your tempo from your signals — then honour it by following what your body is actually asking for.",
+       bab:"BAB reads your signals into a clear, no-good-or-bad tempo, so honouring your body has a name.",
+       reflect:"How did it feel to honour a Gentle day instead of pushing through?"},
+      {w:14,tag:"Manage",title:"Manage the moment",blurb:"Try different ways to handle a signal — and learn what works for you.",
+       week:"Signals don't wait for a good time — a niggle, a wave of tiredness, cramps, nerves before a point. There are lots of ways to handle them in the moment: ease your effort, breathe out slowly, sip water or refuel, shake it out or stretch, protect a sore spot, reset your self-talk, or tell your coach you need to tweak something. This week is about <em>trying a few</em> and noticing which ones help <em>you</em> most — different situations need different tools.",
+       mission:"Each time a sensation shows up, try a way to manage it — then notice: did it help? Across the week, spot which tools work best for you, and when.",
+       bab:"BAB helps you tell a working ache from protective pain, and remembers what you try — so your own go-to tools start to stand out.",
+       reflect:"Which tool worked best for you this week — and in what kind of moment?"},
+      {w:15,tag:"Manage",title:"Your inner intelligence",blurb:"The name for what you've built — and why it matters for you.",
+       week:"Everything you've practised has a name: <strong>interoceptive intelligence</strong> — the skill of sensing, understanding and working with your body's signals. Scientists think your teenage years are a golden window to build it, and it's especially powerful for a growing female athlete whose body changes week to week. It's what lets you keep playing, perform at your best <em>and</em> feel your best — and trust that you can handle whatever your body brings.",
+       mission:"Catch one moment this week where reading your body changed what you did — that's your inner intelligence at work.",
+       bab:"BAB exists to grow this one skill with you — built for your body to move with confidence, on your terms, through your cycle and your life.",
+       reflect:"Where has your confidence in reading yourself grown most over these months?"},
+      {w:16,tag:"Manage",title:"Your map",blurb:"Your signal fingerprint — and how to keep going.",
+       week:"Look back across four months. You have a map of yourself now — how you respond to training, stress, sleep, and your cycle. This is your real superpower: not just how high you jump, but how well you listen.",
+       mission:"Write your own short 'how I work best' note — your personal signal fingerprint.",
+       bab:"BAB keeps learning with you — the habit you built here is for life.",
+       reflect:"Journey check-in: who have you become as an athlete, and as you?"}
+     ]}
+  ];
+
+  var done={}; // in-memory progress
+  var monthsEl=document.getElementById('months');
+  function renderMonths(){
+    monthsEl.innerHTML='';
+    MONTHS.forEach(function(m){
+      var el=document.createElement('div'); el.className='month '+m.cls;
+      var wkHtml=m.weeks.map(function(wk){
+        return '<div class="wk'+(done[wk.w]?' done':'')+'" data-w="'+wk.w+'">'+
+          '<div class="tick">✓</div>'+
+          '<div class="wn">Week '+wk.w+'</div>'+
+          '<h4>'+wk.title+'</h4><p>'+wk.blurb+'</p></div>';
+      }).join('');
+      el.innerHTML='<div class="mhead"><div>'+
+        '<div class="mnum">'+m.n+'</div><div class="mtitle">'+m.title+'</div>'+
+        '<div class="mskill">'+m.skill+'</div></div><div class="mbadge">'+m.badge+'</div></div>'+
+        '<div class="weeks">'+wkHtml+'</div>';
+      monthsEl.appendChild(el);
+    });
+    document.querySelectorAll('.wk').forEach(function(w){
+      w.onclick=function(){ openWeek(parseInt(w.getAttribute('data-w'),10)); };
+    });
+    var c=Object.keys(done).length;
+    document.getElementById('progtxt').textContent = c ? (c+' / 16 weeks explored') : '';
+  }
+  function weekByNum(n){ for(var i=0;i<MONTHS.length;i++){ for(var j=0;j<MONTHS[i].weeks.length;j++){ if(MONTHS[i].weeks[j].w===n) return MONTHS[i].weeks[j]; } } }
+  function openWeek(n){
+    var wk=weekByNum(n);
+    var m=document.getElementById('modal');
+    m.innerHTML=
+      '<button class="x" id="mx">×</button>'+
+      '<span class="mtag">'+wk.tag+'</span>'+
+      '<h3>Week '+wk.w+' · '+wk.title+'</h3>'+
+      '<p class="sub">'+wk.blurb+'</p>'+
+      '<h5>This week</h5><p>'+wk.week+'</p>'+
+      '<h5>Your mission</h5><div class="missionbox">🎯 '+wk.mission+'</div>'+
+      '<h5>How BAB helps</h5><p>'+wk.bab+'</p>'+
+      '<h5>Reflect</h5><p style="color:var(--soft)">'+wk.reflect+'</p>'+
+      '<div class="row"><button class="btn g" id="mclose">Close</button>'+
+      '<button class="btn p" id="mdone">'+(done[wk.w]?'✓ Done — undo':'Mark week done')+'</button></div>';
+    document.getElementById('scrim').classList.add('show');
+    document.getElementById('mx').onclick=closeModal;
+    document.getElementById('mclose').onclick=closeModal;
+    document.getElementById('mdone').onclick=function(){ if(done[wk.w]) delete done[wk.w]; else done[wk.w]=true; renderMonths(); closeModal(); };
+  }
+  function closeModal(){ document.getElementById('scrim').classList.remove('show'); }
+  document.getElementById('scrim').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+
+  /* ---------------- PATTERNS DATA (sample, deterministic) ---------------- */
+  var DAYS=112;
+  var periodStarts=[4,32,61,90]; // irregular-ish gaps (28, 29, 29)
+  function lastStart(d){ var s=-100; for(var i=0;i<periodStarts.length;i++){ if(periodStarts[i]<=d) s=periodStarts[i]; } return s; }
+  function nextStart(d){ for(var i=0;i<periodStarts.length;i++){ if(periodStarts[i]>d) return periodStarts[i]; } return 200; }
+  function phaseOf(d){
+    var cd=d-lastStart(d);
+    if(cd<0) return 'luteal';
+    if(cd<=4) return 'menstrual';
+    if(cd<=11) return 'follicular';
+    if(cd<=15) return 'ovulation';
+    return 'luteal';
+  }
+  function isPeriod(d){ var cd=d-lastStart(d); return cd>=0 && cd<=4; }
+  // deterministic pseudo-noise
+  function lcg(seed){ return function(){ seed=(seed*1103515245+12345)&0x7fffffff; return (seed/0x7fffffff)-0.5; }; }
+  var rnd=lcg(20260721);
+  var examDays={}; for(var d=21;d<=27;d++) examDays[d]=1; for(var d2=49;d2<=55;d2++) examDays[d2]=1;
+  function clamp(v){ return Math.max(1,Math.min(5,v)); }
+  var DATA=[];
+  for(var d=0; d<DAYS; d++){
+    var ph=phaseOf(d), toNext=nextStart(d)-d, lateLuteal=(ph==='luteal'&&toNext<=3);
+    var eBase=3.5,mBase=3.5,fBase=3.5,pBase=1.6;
+    if(ph==='menstrual'){ eBase-=0.9; mBase-=0.6; fBase-=0.4; pBase+=1.9; }
+    else if(ph==='follicular'){ eBase+=0.9; mBase+=0.8; fBase+=0.7; }
+    else if(ph==='ovulation'){ eBase+=1.1; mBase+=0.9; fBase+=1.2; }
+    else { eBase+=0.1; mBase+=0.0; fBase+=0.1; if(lateLuteal){ eBase-=1.2; mBase-=1.1; fBase-=0.9; pBase+=1.0; } }
+    if(examDays[d]){ eBase-=0.8; mBase-=0.7; fBase-=1.0; }
+    DATA.push({
+      day:d, phase:ph, period:isPeriod(d),
+      energy:clamp(eBase+rnd()*0.7),
+      mood:clamp(mBase+rnd()*0.7),
+      focus:clamp(fBase+rnd()*0.7),
+      pain:clamp(pBase+Math.max(0,rnd()*0.9))
+    });
+  }
+
+  var SIGNALS=[
+    {key:'energy',label:'Energy',emoji:'🔋',color:'#ff9f45'},
+    {key:'focus', label:'Focus', emoji:'🎯',color:'#24b6b0'},
+    {key:'mood',  label:'Mood',  emoji:'😊',color:'#b3aef9'},
+    {key:'pain',  label:'Pain',  emoji:'🩹',color:'#e86a92'}
+  ];
+  var phaseColor={menstrual:'var(--menstrual)',follicular:'var(--follicular)',ovulation:'var(--ovulation)',luteal:'var(--luteal)'};
+  var phaseHex={menstrual:'#e86a92',follicular:'#5fbf6b',ovulation:'#ffb84d',luteal:'#8b83f5'};
+  var active='energy';
+
+  function sigChips(){
+    var c=document.getElementById('sigchips'); c.innerHTML='';
+    SIGNALS.forEach(function(s){
+      var b=document.createElement('button'); b.className='chip'+(s.key===active?' on':'');
+      b.innerHTML='<span class="dot" style="background:'+s.color+'"></span>'+s.emoji+' '+s.label;
+      b.onclick=function(){ active=s.key; sigChips(); drawChart(); phaseTiles(); renderInsights(); };
+      c.appendChild(b);
+    });
+  }
+
+  function drawChart(){
+    var sig=SIGNALS.filter(function(s){return s.key===active;})[0];
+    var W=720,H=300, padL=34,padR=14,padT=14,padB=34;
+    var iw=W-padL-padR, ih=H-padT-padB;
+    var x=function(d){ return padL + (d/(DAYS-1))*iw; };
+    var y=function(v){ return padT + (1-(v-1)/4)*ih; };
+    var svg='';
+    // phase bands (one thin rect per day)
+    var dw=iw/(DAYS-1);
+    for(var d=0; d<DAYS; d++){
+      svg+='<rect x="'+(x(d)-dw/2).toFixed(1)+'" y="'+padT+'" width="'+(dw+0.6).toFixed(1)+'" height="'+ih+'" fill="'+phaseHex[DATA[d].phase]+'" opacity="0.16"/>';
+    }
+    // y gridlines 1..5
+    for(var g=1; g<=5; g++){
+      svg+='<line x1="'+padL+'" y1="'+y(g).toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y(g).toFixed(1)+'" stroke="var(--line)" stroke-width="1" opacity="0.5"/>';
+      svg+='<text x="'+(padL-8)+'" y="'+(y(g)+3).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--muted)">'+g+'</text>';
+    }
+    // week ticks
+    for(var wk=0; wk<=16; wk+=2){
+      var dd=Math.min(DAYS-1,wk*7);
+      svg+='<text x="'+x(dd).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle" font-size="10" fill="var(--muted)">W'+(wk||1)+'</text>';
+    }
+    // period markers (drops along bottom)
+    for(var d=0; d<DAYS; d++){ if(DATA[d].period){ svg+='<circle cx="'+x(d).toFixed(1)+'" cy="'+(padT+ih+8).toFixed(1)+'" r="3" fill="var(--menstrual)"/>'; } }
+    // area + line
+    var pts=DATA.map(function(row){ return x(row.day).toFixed(1)+','+y(row[active]).toFixed(1); });
+    var area='M'+x(0).toFixed(1)+','+y(1).toFixed(1)+' L'+pts.join(' L')+' L'+x(DAYS-1).toFixed(1)+','+y(1).toFixed(1)+' Z';
+    svg+='<path d="'+area+'" fill="'+sig.color+'" opacity="0.13"/>';
+    svg+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+sig.color+'" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>';
+    // title
+    svg+='<text x="'+padL+'" y="'+(padT-2)+'" font-size="11" fill="var(--muted)">'+sig.emoji+' '+sig.label+' · 1 (low) to 5 (high)</text>';
+    document.getElementById('chart').innerHTML=svg;
+  }
+
+  function phaseTiles(){
+    var sig=SIGNALS.filter(function(s){return s.key===active;})[0];
+    document.getElementById('phaseTitle').textContent='Your '+sig.label.toLowerCase()+' by cycle phase';
+    var order=['menstrual','follicular','ovulation','luteal'];
+    var names={menstrual:'Menstrual',follicular:'Follicular',ovulation:'Ovulation',luteal:'Luteal'};
+    var grid=document.getElementById('phasegrid'); grid.innerHTML='';
+    order.forEach(function(ph){
+      var vals=DATA.filter(function(r){return r.phase===ph;}).map(function(r){return r[active];});
+      var avg=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+      grid.innerHTML+='<div class="ptile"><div class="pn" style="color:'+phaseHex[ph]+'">'+names[ph]+'</div>'+
+        '<div class="pv">'+avg.toFixed(1)+'</div>'+
+        '<div class="bar"><i style="width:'+((avg-1)/4*100).toFixed(0)+'%;background:'+phaseHex[ph]+'"></i></div></div>';
+    });
+  }
+
+  var INSIGHTS={
+    energy:[
+      ['🌙','Your <b>energy dips in the few days before your period</b> (late luteal) and during it — then climbs back after. That\'s your rhythm, not a slump. Plan a Gentle day or two there.'],
+      ['📚','Two of your lowest weeks lined up with <b>exam weeks</b>, not your cycle — proof that school stress spends from the same battery as training.'],
+      ['☀️','You\'re at your <b>most energised in your follicular and ovulation phases</b> — a great window to chase hard, Upbeat sessions.']
+    ],
+    focus:[
+      ['🎯','Your <b>focus is sharpest around the middle of your cycle</b> (ovulation) — brilliant timing for skill-heavy or technical sessions.'],
+      ['🌫️','Focus tends to scatter a little in your <b>late-luteal week and during exams</b> — shorter, simpler sessions land better then.']
+    ],
+    mood:[
+      ['💜','Your <b>mood tends to lift in your follicular phase</b> and ease off before your period. Knowing it\'s coming makes it easier to be kind to yourself.'],
+      ['🔗','Your mood and energy move together most days — when one dips, check the other, and check what happened off the pitch too.']
+    ],
+    pain:[
+      ['🩹','<b>Aches and cramps rise during your period and the week before</b> — warming up longer and going Steady helps you work with them.'],
+      ['🛡️','Most of your pain is the everyday kind that eases with warm-up. Keep watching for <b>protective pain</b> (sharp, joint/bone, one-sided, worse at night) — that\'s the kind to speak up about.']
+    ]
+  };
+  function renderInsights(){
+    var box=document.getElementById('insights'); box.innerHTML='';
+    (INSIGHTS[active]||[]).forEach(function(it){
+      box.innerHTML+='<div class="insight"><div class="ic">'+it[0]+'</div><p>'+it[1]+'</p></div>';
+    });
+  }
+
+  function refreshPatterns(){ drawChart(); phaseTiles(); renderInsights(); }
+
+  /* ---------------- TABS ---------------- */
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.onclick=function(){
+      document.querySelectorAll('.tab').forEach(function(o){o.classList.remove('on');});
+      document.querySelectorAll('.view').forEach(function(o){o.classList.remove('on');});
+      t.classList.add('on');
+      document.getElementById(t.getAttribute('data-view')).classList.add('on');
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+  });
+
+  /* init */
+  renderMonths();
+  sigChips();
+  refreshPatterns();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAB · Daily Tune-In</title>
+<style>
+  :root{
+    --bg:#0e1322; --panel:#161d30; --panel2:#1d2740; --ink:#eef2fb; --muted:#98a4c2; --soft:#c3ccdf;
+    --line:#293450; --accent:#ff9f45; --accent2:#ffd17a;
+    --power:#ff9f45; --sharpen:#24b6b0; --restore:#8b83f5; --care:#e86a92;
+    --powerb:rgba(255,159,69,.14); --sharpenb:rgba(36,182,176,.14); --restoreb:rgba(139,131,245,.16); --careb:rgba(232,106,146,.14);
+    --shadow:0 12px 34px rgba(0,0,0,.38);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef1f9; --panel:#ffffff; --panel2:#f1f4fc; --ink:#151d2f; --muted:#5c6a86; --soft:#3d4a61;
+      --line:#e3e8f4; --shadow:0 12px 34px rgba(30,45,90,.10);
+      --powerb:rgba(255,159,69,.13); --sharpenb:rgba(36,182,176,.12); --restoreb:rgba(139,131,245,.13); --careb:rgba(232,106,146,.12);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 640px at 85% -12%,rgba(139,131,245,.14),transparent 60%),var(--bg);
+    color:var(--ink);line-height:1.5;padding:22px 15px 64px}
+  .wrap{max-width:660px;margin:0 auto}
+  header{text-align:center;margin-bottom:18px}
+  .brand{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);font-weight:850;background:var(--panel);border:1px solid var(--line);padding:5px 13px;border-radius:999px}
+  h1{font-size:26px;margin:14px 0 5px;font-weight:850;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14.5px;max-width:520px;margin:0 auto}
+  .steps{display:flex;justify-content:center;gap:6px;margin:16px 0 4px;flex-wrap:wrap}
+  .chip{font-size:11px;font-weight:750;color:var(--muted);background:var(--panel);border:1px solid var(--line);
+    border-radius:999px;padding:5px 11px}
+  .chip b{color:var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px 18px 20px;box-shadow:var(--shadow);margin-bottom:15px}
+  .lbl{font-size:11px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+  .q{font-weight:750;font-size:16px;margin:6px 0 2px}
+  .qh{color:var(--muted);font-size:13px;margin:0 0 12px}
+  .gearpick{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .gbtn{appearance:none;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:13px;
+    padding:13px 6px;cursor:pointer;font:inherit;text-align:center;transition:.12s;display:flex;flex-direction:column;gap:4px;align-items:center}
+  .gbtn .ic{font-size:22px} .gbtn .nm{font-weight:800;font-size:13.5px} .gbtn .ds{font-size:10.5px;color:var(--muted);line-height:1.25}
+  .gbtn:hover{border-color:var(--accent)}
+  .gbtn[aria-pressed="true"][data-gear="power"]{border-color:var(--power);background:var(--powerb)}
+  .gbtn[aria-pressed="true"][data-gear="sharpen"]{border-color:var(--sharpen);background:var(--sharpenb)}
+  .gbtn[aria-pressed="true"][data-gear="restore"]{border-color:var(--restore);background:var(--restoreb)}
+  .scale{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+  .opt{appearance:none;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:11px;
+    padding:11px 3px 8px;cursor:pointer;font:inherit;transition:.12s;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .opt .em{font-size:18px;line-height:1}.opt .n{font-size:10.5px;color:var(--muted)}
+  .opt:hover{border-color:var(--accent)}
+  .opt[aria-pressed="true"]{border-color:var(--accent);background:linear-gradient(180deg,var(--powerb),transparent);box-shadow:0 0 0 2px rgba(255,159,69,.22) inset}
+  .ends{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:7px}
+  .pain{display:flex;gap:9px;margin-top:2px}
+  .pain button{flex:1;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:12px;padding:12px;font:inherit;font-weight:700;cursor:pointer;transition:.12s}
+  .pain button:hover{border-color:var(--accent)}
+  .pain button.yes[aria-pressed="true"]{border-color:var(--care);background:var(--careb);color:var(--care)}
+  .pain button.no[aria-pressed="true"]{border-color:var(--sharpen);background:var(--sharpenb);color:var(--sharpen)}
+  .cyc{display:flex;flex-wrap:wrap;gap:7px}
+  .cyc button{border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:999px;padding:8px 13px;font:inherit;font-size:13px;font-weight:650;cursor:pointer;transition:.12s}
+  .cyc button:hover{border-color:var(--accent)}
+  .cyc button[aria-pressed="true"]{border-color:var(--restore);background:var(--restoreb);color:var(--restore)}
+  .cycnote{font-size:13.5px;color:var(--soft);margin-top:11px;line-height:1.5;background:var(--restoreb);border:1px solid var(--line);border-radius:12px;padding:11px 13px}
+  .cycnote:empty{display:none}
+  details.learn{margin-top:13px;border-top:1px solid var(--line);padding-top:11px}
+  details.learn summary{cursor:pointer;font-size:13px;font-weight:750;color:var(--accent);list-style:none;user-select:none}
+  details.learn summary::-webkit-details-marker{display:none}
+  details.learn summary::before{content:"▸ "}
+  details.learn[open] summary::before{content:"▾ "}
+  details.learn .body{font-size:13px;color:var(--soft);margin-top:9px;line-height:1.55}
+  details.learn .body p{margin:8px 0}
+  details.learn .body b{color:var(--ink)}
+  .tiny{font-size:12px;color:var(--muted);margin-top:9px}
+  .go{width:100%;border:none;border-radius:14px;padding:16px;font:inherit;font-weight:850;font-size:16px;cursor:pointer;
+    color:#241300;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--shadow);transition:.12s}
+  .go:hover{filter:brightness(1.05)} .go:disabled{opacity:.45;cursor:not-allowed;filter:none}
+  .fuel{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);background:var(--panel2);border:1px dashed var(--line);border-radius:12px;padding:11px 13px;margin-top:4px}
+  .card.rhythm{background:linear-gradient(180deg,var(--restoreb),transparent),var(--panel);border-color:rgba(139,131,245,.42)}
+  .paincols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  @media(max-width:560px){.paincols{grid-template-columns:1fr}}
+  .pcol{border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+  .pcol h4{margin:0 0 7px;font-size:13.5px}
+  .pcol ul{margin:0;padding-left:16px}.pcol li{margin:5px 0;font-size:13px;line-height:1.4}
+  .pcol.work{background:var(--sharpenb);border-color:rgba(36,182,176,.4)} .pcol.work h4{color:var(--sharpen)}
+  .pcol.prot{background:var(--careb);border-color:rgba(232,106,146,.42)} .pcol.prot h4{color:var(--care)}
+  /* body map */
+  .bodymap{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+  .bodymap svg{width:150px;height:auto;flex:none}
+  .zone{fill:var(--panel2);stroke:var(--line);stroke-width:1.5;cursor:pointer;transition:.12s}
+  .zone:hover{fill:var(--restoreb);stroke:var(--restore)}
+  .zone.active{fill:var(--restore);stroke:var(--restore)}
+  .zone.logged{fill:var(--restoreb);stroke:var(--restore);stroke-width:2}
+  .deco{pointer-events:none}
+  #elseWrap{margin-top:9px;display:none}
+  #elseWrap input{width:100%;box-sizing:border-box;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;padding:9px 11px;font:inherit;font-size:13.5px}
+  #elseWrap input:focus{outline:none;border-color:var(--restore)}
+  .bmright{flex:1;min-width:210px}
+  .zbtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
+  .zbtns button{border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:999px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:650;cursor:pointer;transition:.12s}
+  .zbtns button:hover{border-color:var(--restore)}
+  .senspanel{margin-top:13px;display:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+  .senspanel.show{display:block}
+  .senspanel .where{font-size:13.5px;font-weight:750;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+  .chip2{display:inline-flex;align-items:center;gap:7px;background:var(--restoreb);border:1px solid var(--restore);color:var(--ink);border-radius:999px;padding:5px 6px 5px 11px;font-size:12.5px;font-weight:650}
+  .chip2 button{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:0 3px}
+  .chip2 button:hover{color:var(--care)}
+  .emptyhint{font-size:12.5px;color:var(--muted);margin-top:11px}
+  .viewtoggle{display:inline-flex;gap:5px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:12px}
+  .viewtoggle button{border:none;background:transparent;color:var(--muted);border-radius:999px;padding:6px 18px;font:inherit;font-size:13px;font-weight:750;cursor:pointer;transition:.12s}
+  .viewtoggle button.on{background:var(--restore);color:#14102b}
+  .bmfigure{flex:none;display:flex;flex-direction:column;align-items:center}
+  .bodyview[hidden]{display:none}
+  .bodyview{width:150px;height:auto;margin-top:8px}
+  .viewcap{text-align:center;font-size:11px;color:var(--muted);margin-top:6px;font-weight:650}
+  /* result */
+  .result{display:none} .result.show{display:block;animation:pop .3s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .gearcard{border-radius:18px;padding:22px;border:1.5px solid var(--line);box-shadow:var(--shadow);margin-bottom:14px}
+  .gearcard.power{background:var(--powerb);border-color:var(--power)}
+  .gearcard.sharpen{background:var(--sharpenb);border-color:var(--sharpen)}
+  .gearcard.restore{background:var(--restoreb);border-color:var(--restore)}
+  .gtop{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .gdial{width:52px;height:52px;border-radius:15px;flex:none;display:flex;align-items:center;justify-content:center;font-size:27px}
+  .gname{font-size:23px;font-weight:850;letter-spacing:-.01em}
+  .gtag{font-size:13px;color:var(--soft);font-weight:650}
+  .compare{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin:13px 0;font-size:14px}
+  .compare .h{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+  .result h3{margin:16px 0 6px;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+  .result ul{margin:0;padding-left:20px}.result li{margin:5px 0;font-size:15px}
+  .care{margin:14px 0;background:var(--careb);border:1.5px solid var(--care);border-radius:14px;padding:15px 17px;display:none}
+  .care.show{display:block} .care b{color:var(--care)}
+  .care h4{margin:0 0 6px;color:var(--care);font-size:16px}
+  .swap{margin-top:12px}
+  .swap .h{font-size:12px;color:var(--muted);margin-bottom:7px}
+  .swap .gearpick{grid-template-columns:repeat(3,1fr)}
+  .again{margin-top:14px;background:transparent;border:1.5px solid var(--line);color:var(--muted);border-radius:12px;padding:12px;width:100%;font:inherit;font-weight:700;cursor:pointer}
+  .again:hover{border-color:var(--accent);color:var(--ink)}
+  .foot{text-align:center;color:var(--muted);font-size:12.5px;margin-top:20px;line-height:1.6}
+  .foot b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="brand">🏐 BAB · Daily Tune-In</span>
+    <h1>Read your own signals</h1>
+    <p class="sub">Your body sends messages all day. This is how you learn to read them — not a score that judges you, a practice that teaches you. Four steps, about a minute.</p>
+    <div class="steps">
+      <span class="chip"><b>1</b> Predict</span>
+      <span class="chip"><b>2</b> Tune in</span>
+      <span class="chip"><b>3</b> Compare</span>
+      <span class="chip"><b>4</b> Adjust</span>
+    </div>
+  </header>
+
+  <div id="form">
+
+    <!-- YOUR RHYTHM · a separate space to get to know your cycle -->
+    <div class="card rhythm">
+      <span class="lbl" style="color:var(--restore)">🌙 Your Rhythm</span>
+      <p class="q">Get to know your monthly rhythm</p>
+      <p class="qh">Your body moves in a monthly rhythm, and it quietly touches everything — energy, hunger, mood, sleep, even how sore you feel. It's still finding its pattern right now, so we don't predict it; we just get to know it. Tap what feels true today, or skip it — no pressure.</p>
+      <div class="cyc" id="cycle">
+        <button data-cyc="period" aria-pressed="false">🩸 On my period</button>
+        <button data-cyc="luteal" aria-pressed="false">🍫 Hungry / cravings / moody</button>
+        <button data-cyc="strong" aria-pressed="false">☀️ Strong &amp; clear</button>
+        <button data-cyc="off" aria-pressed="false">🌫️ Tired / tender / a bit off</button>
+        <button data-cyc="notyet" aria-pressed="false">🌱 No periods yet</button>
+        <button data-cyc="none" aria-pressed="false">☁️ Nothing / rather not say</button>
+      </div>
+      <div class="cycnote" id="cycnote"></div>
+      <details class="learn">
+        <summary>What the different parts of your rhythm can feel like — all normal 👀</summary>
+        <div class="body">
+          <p>Everyone's different, and while your rhythm is still settling these are things you <em>might</em> notice — not a timetable to expect:</p>
+          <p><b>🩸 Your period (the bleeding days):</b> energy can dip and cramps can show up — or you might feel totally fine. You lose a little iron now, so iron-rich food (meat, beans, lentils, leafy greens) really helps.</p>
+          <p><b>🌤️ The days after your period:</b> energy often climbs and you may feel strong and sharp — a lovely window to push, if your channels agree.</p>
+          <p><b>🍫 The week or so before your period:</b> the luteal munchies have entered the chat. Feeling hungrier, craving more, or a bit moody or bloated isn't just a vibe — it's real: your metabolism ticks up slightly in this phase, so your body genuinely needs <em>more</em> fuel. Feed it. Being "nutritionally emotional" is simply your body asking for what it needs to train, study and have fun.</p>
+          <p><b>🌱 Not started your period yet?</b> Also completely normal — bodies begin on their own timeline, anywhere across these years.</p>
+          <p>Your rhythm isn't something to forecast (you really can't yet) — it's something to <b>notice, fuel for, and be kind to yourself across.</b> Over the months, you might start spotting your own patterns.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- STEP 1 PREDICT -->
+    <div class="card">
+      <span class="lbl">Step 1 · Predict</span>
+      <p class="q">Before you tune in — what's your tempo today?</p>
+      <p class="qh">Your "tempo" is just how much your body's got to give today. Take a guess now — you'll confirm it at the end. Guessing first trains your inner read, and being "wrong" isn't a fail, it's the whole point.</p>
+      <div class="gearpick" id="predict">
+        <button class="gbtn" data-gear="power" aria-pressed="false"><span class="ic">⚡</span><span class="nm">Upbeat</span><span class="ds">Full tank — a build day</span></button>
+        <button class="gbtn" data-gear="sharpen" aria-pressed="false"><span class="ic">🌊</span><span class="nm">Steady</span><span class="ds">Half tank — a skill day</span></button>
+        <button class="gbtn" data-gear="restore" aria-pressed="false"><span class="ic">🍃</span><span class="nm">Gentle</span><span class="ds">Low tank — a rebuild day</span></button>
+      </div>
+    </div>
+
+    <!-- STEP 2 TUNE IN · CHANNELS -->
+    <div class="card">
+      <span class="lbl">Step 2 · Tune in — your six channels</span>
+
+      <div style="margin-top:14px" data-ch="sleep">
+        <p class="q" style="font-size:15px">😴 Sleep — how rested you are from last night</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Barely slept</span><span>Deep &amp; rested</span></div>
+      </div>
+      <div style="margin-top:16px" data-ch="energy">
+        <p class="q" style="font-size:15px">🔋 Energy — your get-up-and-go right now</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Running on empty</span><span>Full of go</span></div>
+      </div>
+      <div style="margin-top:16px" data-ch="fuel">
+        <p class="q" style="font-size:15px">🍎 Fuel — how fed you feel</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Hungry / empty</span><span>Fed &amp; satisfied</span></div>
+      </div>
+      <div style="margin-top:16px" data-ch="hydrate">
+        <p class="q" style="font-size:15px">💧 Hydrate — how watered you feel</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Parched / dry</span><span>Fully watered</span></div>
+      </div>
+      <div style="margin-top:16px" data-ch="muscles">
+        <p class="q" style="font-size:15px">💪 Muscles &amp; body — heaviness vs spring</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Heavy / sore</span><span>Light &amp; springy</span></div>
+      </div>
+      <div style="margin-top:16px" data-ch="mind">
+        <p class="q" style="font-size:15px">🧠 Mind &amp; mood — your headspace</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Foggy / stressed</span><span>Clear &amp; bright</span></div>
+      </div>
+    </div>
+
+    <!-- STEP 2 · TUNE IN — pinpoint & name -->
+    <div class="card">
+      <span class="lbl">Step 2 · Tune in — pinpoint &amp; name it</span>
+      <p class="q">Where do you feel it? Give it a name.</p>
+      <p class="qh">Pausing to find <em>where</em> a sensation sits, and putting a <em>word</em> to it, is the heart of the skill — it's how a vague "I feel off" becomes something you actually understand. Tap a spot — flip between <b>front</b> and <b>back</b> — then choose what it feels like. Add as many as you notice, or none if all feels quiet.</p>
+      <div class="bodymap">
+        <div class="bmfigure">
+          <div class="viewtoggle" id="viewtoggle">
+            <button type="button" data-view="front" class="on">Front</button>
+            <button type="button" data-view="back">Back</button>
+          </div>
+          <!-- FRONT -->
+          <svg class="bodyview" data-view="front" viewBox="0 0 200 400" role="img" aria-label="Front body map — tap where you feel a sensation">
+            <circle class="zone" data-label="Head" cx="100" cy="30" r="20"><title>Head</title></circle>
+            <circle class="deco" cx="93" cy="28" r="2.1" fill="var(--muted)"/>
+            <circle class="deco" cx="107" cy="28" r="2.1" fill="var(--muted)"/>
+            <path class="deco" d="M94 37 Q100 41 106 37" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"/>
+            <rect class="zone" data-label="Neck &amp; shoulders" x="60" y="53" width="80" height="18" rx="9"><title>Neck &amp; shoulders</title></rect>
+            <rect class="zone" data-label="Chest" x="62" y="74" width="76" height="40" rx="12"><title>Chest</title></rect>
+            <rect class="zone" data-label="Left arm" x="38" y="74" width="17" height="96" rx="8"><title>Left arm</title></rect>
+            <rect class="zone" data-label="Right arm" x="145" y="74" width="17" height="96" rx="8"><title>Right arm</title></rect>
+            <ellipse class="zone" data-label="Left hand" cx="46" cy="182" rx="11" ry="13"><title>Left hand</title></ellipse>
+            <ellipse class="zone" data-label="Right hand" cx="154" cy="182" rx="11" ry="13"><title>Right hand</title></ellipse>
+            <rect class="zone" data-label="Tummy &amp; core" x="66" y="117" width="68" height="50" rx="11"><title>Tummy &amp; core</title></rect>
+            <rect class="zone" data-label="Hips" x="64" y="169" width="72" height="28" rx="11"><title>Hips</title></rect>
+            <rect class="zone" data-label="Left quad (front thigh)" x="66" y="199" width="30" height="76" rx="13"><title>Left quad</title></rect>
+            <rect class="zone" data-label="Right quad (front thigh)" x="104" y="199" width="30" height="76" rx="13"><title>Right quad</title></rect>
+            <ellipse class="zone" data-label="Left knee" cx="81" cy="284" rx="16" ry="11"><title>Left knee</title></ellipse>
+            <ellipse class="zone" data-label="Right knee" cx="119" cy="284" rx="16" ry="11"><title>Right knee</title></ellipse>
+            <rect class="zone" data-label="Left shin" x="69" y="295" width="24" height="60" rx="11"><title>Left shin</title></rect>
+            <rect class="zone" data-label="Right shin" x="107" y="295" width="24" height="60" rx="11"><title>Right shin</title></rect>
+            <ellipse class="zone" data-label="Left foot" cx="81" cy="366" rx="15" ry="10"><title>Left foot</title></ellipse>
+            <ellipse class="zone" data-label="Right foot" cx="119" cy="366" rx="15" ry="10"><title>Right foot</title></ellipse>
+          </svg>
+          <!-- BACK -->
+          <svg class="bodyview" data-view="back" viewBox="0 0 200 400" role="img" aria-label="Back body map — tap where you feel a sensation" hidden>
+            <circle class="zone" data-label="Head (back)" cx="100" cy="30" r="20"><title>Head (back)</title></circle>
+            <ellipse class="deco" cx="100" cy="15" rx="9" ry="8" fill="var(--restore)" opacity="0.6"/>
+            <rect class="zone" data-label="Neck" x="66" y="53" width="68" height="16" rx="8"><title>Neck</title></rect>
+            <rect class="zone" data-label="Upper back &amp; shoulders" x="60" y="71" width="80" height="44" rx="12"><title>Upper back &amp; shoulders</title></rect>
+            <rect class="zone" data-label="Left arm" x="38" y="74" width="17" height="96" rx="8"><title>Left arm</title></rect>
+            <rect class="zone" data-label="Right arm" x="145" y="74" width="17" height="96" rx="8"><title>Right arm</title></rect>
+            <ellipse class="zone" data-label="Left hand" cx="46" cy="182" rx="11" ry="13"><title>Left hand</title></ellipse>
+            <ellipse class="zone" data-label="Right hand" cx="154" cy="182" rx="11" ry="13"><title>Right hand</title></ellipse>
+            <rect class="zone" data-label="Lower back" x="66" y="117" width="68" height="34" rx="11"><title>Lower back</title></rect>
+            <rect class="zone" data-label="Glutes" x="64" y="153" width="72" height="34" rx="13"><title>Glutes</title></rect>
+            <rect class="zone" data-label="Left hamstring" x="66" y="189" width="30" height="74" rx="13"><title>Left hamstring</title></rect>
+            <rect class="zone" data-label="Right hamstring" x="104" y="189" width="30" height="74" rx="13"><title>Right hamstring</title></rect>
+            <ellipse class="zone" data-label="Left knee (back)" cx="81" cy="272" rx="16" ry="10"><title>Left knee (back)</title></ellipse>
+            <ellipse class="zone" data-label="Right knee (back)" cx="119" cy="272" rx="16" ry="10"><title>Right knee (back)</title></ellipse>
+            <rect class="zone" data-label="Left calf" x="69" y="283" width="24" height="60" rx="11"><title>Left calf</title></rect>
+            <rect class="zone" data-label="Right calf" x="107" y="283" width="24" height="60" rx="11"><title>Right calf</title></rect>
+            <ellipse class="zone" data-label="Left heel &amp; ankle" cx="81" cy="354" rx="15" ry="10"><title>Left heel &amp; ankle</title></ellipse>
+            <ellipse class="zone" data-label="Right heel &amp; ankle" cx="119" cy="354" rx="15" ry="10"><title>Right heel &amp; ankle</title></ellipse>
+            <line class="deco" x1="100" y1="76" x2="100" y2="148" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="4 5" stroke-linecap="round" opacity="0.8"/>
+          </svg>
+          <div class="viewcap" id="viewcap">Showing the front — tap Back to flip</div>
+        </div>
+        <div class="bmright">
+          <div class="tiny">Or all over / somewhere else?</div>
+          <div class="zbtns" id="extraZones">
+            <button type="button" data-label="All over">All over</button>
+            <button type="button" data-zone="else" data-label="Somewhere else">Somewhere else</button>
+          </div>
+          <div id="elseWrap">
+            <input id="elseInput" type="text" maxlength="40" placeholder="Type where — e.g. wrist, jaw, ribs…" aria-label="Type where you feel it">
+          </div>
+          <div class="senspanel" id="senspanel">
+            <div class="where" id="whereLbl"></div>
+            <div class="tiny" style="margin-bottom:7px">What does it feel like?</div>
+            <div class="zbtns" id="sensBtns">
+              <button type="button" data-s="Tight / stiff">Tight / stiff</button>
+              <button type="button" data-s="Sore / achy">Sore / achy</button>
+              <button type="button" data-s="Burning">Burning</button>
+              <button type="button" data-s="Heavy / tired">Heavy / tired</button>
+              <button type="button" data-s="Tender">Tender</button>
+              <button type="button" data-s="Buzzy / tingly">Buzzy / tingly</button>
+              <button type="button" data-s="Crampy">Crampy</button>
+              <button type="button" data-s="Sharp">Sharp</button>
+            </div>
+          </div>
+          <div class="chips" id="chips"></div>
+          <div class="emptyhint" id="emptyhint">Nothing added yet — tap a spot to begin.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- decode the ache (identify only — no advice here) -->
+    <div class="card">
+      <span class="lbl">Decode your ache</span>
+      <p class="q">Two very different things get called "pain"</p>
+      <p class="qh">Before deciding anything, just learn to <em>name</em> what you're feeling. Reading the sensation is the skill — what to do about it comes afterwards.</p>
+      <div class="paincols">
+        <div class="pcol work">
+          <h4>✅ Working &amp; everyday ache</h4>
+          <ul>
+            <li>The <b>burn</b> of muscles working hard, and heavy breathing</li>
+            <li>Muscles feeling <b>tight or stiff</b></li>
+            <li>Soreness that's fairly <b>even on both sides</b></li>
+            <li>An ache that <b>eases as you warm up</b></li>
+            <li>Dull, come-and-go aches — a <b>crampy tummy or lower back, or a heavy, bloated feeling</b></li>
+          </ul>
+        </div>
+        <div class="pcol prot">
+          <h4>🛡️ Protective pain</h4>
+          <ul>
+            <li><b>Sharp, stabbing or sudden</b></li>
+            <li><b>Inside a joint or a bone</b></li>
+            <li>On <b>one side only</b>, or makes you limp</li>
+            <li><b>Gets worse</b> as you go, or <b>hurts at night</b></li>
+          </ul>
+        </div>
+      </div>
+      <p class="qh" style="margin-top:12px"><b>The tell:</b> working and everyday aches ease as you warm up and settle within a day or two. Protective pain sticks, sharpens, or changes how you move. When you're not sure, call it protective.</p>
+      <p class="q" style="font-size:15px;margin-top:13px">Feeling any of the 🛡️ protective kind today?</p>
+      <div class="pain">
+        <button class="no" data-pain="0" aria-pressed="false">No</button>
+        <button class="yes" data-pain="1" aria-pressed="false">Yes</button>
+      </div>
+    </div>
+
+    <div class="fuel">🥪 <span>Quick one: eaten enough and had water today? Under-fuelling drags every channel down and stalls the growth you train for. Food is what you build with — never train hungry to "stay light."</span></div>
+
+    <div style="height:14px"></div>
+    <div class="tiny" style="text-align:center;margin-bottom:11px">Steps <b>3 · Compare</b> and <b>4 · Adjust</b> appear right after you tap below.</div>
+    <button class="go" id="go" disabled>See my tempo →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result" id="result">
+    <div class="gearcard" id="gearcard">
+      <div class="gtop">
+        <div class="gdial" id="gdial"></div>
+        <div>
+          <div class="gname" id="gname"></div>
+          <div class="gtag" id="gtag"></div>
+        </div>
+      </div>
+      <div id="gmeaning"></div>
+    </div>
+
+    <div class="compare" id="compareBox">
+      <div class="h">Step 3 · Compare — your read vs your body</div>
+      <div id="compareText"></div>
+    </div>
+
+    <div class="care" id="care">
+      <h4>🛡️ Care mode — protect it first</h4>
+      <div id="careText"></div>
+    </div>
+
+    <h3>Step 4 · Adjust — your plan today</h3>
+    <ul id="plan"></ul>
+
+    <div class="swap">
+      <div class="h">Your body, your call. Want to shift tempo? You're the driver:</div>
+      <div class="gearpick" id="swapPick">
+        <button class="gbtn" data-gear="power" aria-pressed="false"><span class="ic">⚡</span><span class="nm">Upbeat</span></button>
+        <button class="gbtn" data-gear="sharpen" aria-pressed="false"><span class="ic">🌊</span><span class="nm">Steady</span></button>
+        <button class="gbtn" data-gear="restore" aria-pressed="false"><span class="ic">🍃</span><span class="nm">Gentle</span></button>
+      </div>
+    </div>
+
+    <button class="again" id="again">↺ New tune-in</button>
+  </div>
+
+  <p class="foot">Built to read <b>you</b> — a growing, female athlete — on your own terms. A watch or app is a handy second opinion, but it was mostly built on grown men, so it never gets the final word. <b>Your felt sense leads; data just helps you calibrate.</b> And for protective pain or anything that feels off, your coach, physio and parents see what a screen can't — always loop them in.</p>
+</div>
+
+<script>
+(function(){
+  // each channel gets its own themed scale (index 0..4 = rating 1..5)
+  var EM={
+    sleep:  ["🦥","🐢","🐨","🐰","🦁"],   // zonked → wide awake
+    energy: ["🌧️","⛅","🌤️","☀️","🔥"],   // low → high vitality
+    fuel:   ["🫙","🍬","🍎","🥪","🍲"],   // empty → nourished (food)
+    hydrate:["🏜️","🌵","🌾","🌿","🌊"],   // parched → fully watered (desert → green field → sea)
+    muscles:["🪨","🪵","🍂","🪶","🦋"],   // heavy → light &amp; springy (nature only)
+    mind:   ["😵‍💫","😕","😐","🙂","😄"]    // foggy → bright
+  };
+  var channels=["sleep","energy","fuel","hydrate","muscles","mind"];
+  var answers={sleep:null,energy:null,fuel:null,hydrate:null,muscles:null,mind:null};
+  var pain=null, predicted=null, cycle=null, chosenGear=null;
+
+  var GEARS={
+    power:{name:"Upbeat",icon:"⚡",cls:"power",col:"var(--power)",tag:"A build day — go get it",
+      meaning:"Your tank reads full and nothing's guarding. This is a day your body can take real load and turn it into strength. Push into the honest burn — muscles working, lungs going, effort that's <em>earned</em>. This is where you level up.",
+      plan:["Train at full intensity — chase the hard reps and jumps.","\"Working pain\" (burning muscles, heavy breathing, even soreness) is exactly right — lean in.","Warm up properly and fuel well before and after.","Notice how this <em>feels</em> — it's your reference for reading off days."]},
+    sharpen:{name:"Steady",icon:"🌊",cls:"sharpen",col:"var(--sharpen)",tag:"A quality day — dial it in",
+      meaning:"You've got something in the tank, but not everything. This isn't a rest day and it isn't a fail — it's a <b>quality-over-quantity</b> day. Train smart and precise, and you'll often improve <em>more</em> than on a grind.",
+      plan:["Ease intensity to around 7/10 — skip all-out max efforts.","Make it a skill day: footwork, serving accuracy, passing, technique.","Warm up longer than usual; hydrate and eat well.","Stay tuned in — if a channel drops mid-session, ease your tempo down."]},
+    restore:{name:"Gentle",icon:"🍃",cls:"restore",col:"var(--restore)",tag:"A rebuild day — this is where you grow",
+      meaning:"Your signals read low across the board — and here's the secret the best athletes know: <b>you don't get stronger during hard training, you get stronger while you recover from it.</b> Today, taking it gentle <em>is</em> the training. Choosing this tempo is a power move, not a step back.",
+      plan:["Rest, or do gentle active recovery: easy walk, light mobility, stretching.","Pour energy into sleep and proper meals — that's what refills the tank.","Tell your coach you're going Gentle so they can adjust — strong athletes communicate.","Come back tomorrow and tune in again; one Gentle day protects a week of Upbeat ones."]}
+  };
+
+  function suggestGear(total){ if(total>=24) return "power"; if(total>=16) return "sharpen"; return "restore"; }
+
+  // build scales
+  document.querySelectorAll('[data-ch]').forEach(function(row){
+    var key=row.getAttribute('data-ch'); var scale=row.querySelector('.scale');
+    var em=EM[key]||["1","2","3","4","5"];
+    for(var i=1;i<=5;i++){(function(v){
+      var b=document.createElement('button'); b.className='opt'; b.type='button'; b.setAttribute('aria-pressed','false');
+      b.innerHTML='<span class="em">'+em[v-1]+'</span><span class="n">'+v+'</span>';
+      b.onclick=function(){ scale.querySelectorAll('.opt').forEach(function(o){o.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); answers[key]=v; refresh(); };
+      scale.appendChild(b);
+    })(i);}
+  });
+  // predict
+  document.querySelectorAll('#predict .gbtn').forEach(function(b){
+    b.onclick=function(){ document.querySelectorAll('#predict .gbtn').forEach(function(o){o.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); predicted=b.getAttribute('data-gear'); };
+  });
+  // pain
+  document.querySelectorAll('.pain button').forEach(function(b){
+    b.onclick=function(){ document.querySelectorAll('.pain button').forEach(function(o){o.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); pain=parseInt(b.getAttribute('data-pain'),10); refresh(); };
+  });
+  // cycle
+  document.querySelectorAll('#cycle button').forEach(function(b){
+    b.onclick=function(){ document.querySelectorAll('#cycle button').forEach(function(o){o.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); cycle=b.getAttribute('data-cyc'); document.getElementById('cycnote').innerHTML=CYC[cycle]||''; };
+  });
+
+  // ---- body map: locate & name (optional, reflective) ----
+  var entries=[]; var activeLabel=null;
+  function setActive(zoneEl,label){
+    activeLabel=label;
+    document.querySelectorAll('svg .zone').forEach(function(z){z.classList.remove('active');});
+    if(zoneEl) zoneEl.classList.add('active');
+    document.getElementById('whereLbl').innerHTML='Where: <span style="color:var(--restore)">'+label+'</span>';
+    document.getElementById('senspanel').classList.add('show');
+  }
+  function markLogged(){
+    document.querySelectorAll('svg .zone').forEach(function(z){
+      var lbl=z.getAttribute('data-label');
+      if(entries.some(function(e){return e.label===lbl;})) z.classList.add('logged'); else z.classList.remove('logged');
+    });
+  }
+  function renderChips(){
+    var c=document.getElementById('chips'); c.innerHTML='';
+    entries.forEach(function(e,i){
+      var chip=document.createElement('span'); chip.className='chip2';
+      chip.innerHTML='📍 '+e.label+' — <b>'+e.s+'</b>';
+      var x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','remove'); x.textContent='×';
+      x.onclick=function(){ entries.splice(i,1); renderChips(); markLogged(); };
+      chip.appendChild(x); c.appendChild(chip);
+    });
+    document.getElementById('emptyhint').style.display= entries.length?'none':'block';
+  }
+  function hideElse(){ var w=document.getElementById('elseWrap'); if(w) w.style.display='none'; var i=document.getElementById('elseInput'); if(i) i.value=''; }
+  document.querySelectorAll('svg .zone').forEach(function(z){
+    z.addEventListener('click',function(){ hideElse(); setActive(z, z.getAttribute('data-label')); });
+  });
+  document.querySelectorAll('#viewtoggle button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#viewtoggle button').forEach(function(o){o.classList.remove('on');});
+      b.classList.add('on');
+      var v=b.getAttribute('data-view');
+      document.querySelectorAll('.bodyview').forEach(function(sv){
+        if(sv.getAttribute('data-view')===v) sv.removeAttribute('hidden'); else sv.setAttribute('hidden','');
+      });
+      document.getElementById('viewcap').textContent = (v==='front') ? 'Showing the front — tap Back to flip' : 'Showing the back — tap Front to flip';
+    });
+  });
+  document.querySelectorAll('#extraZones button').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(b.getAttribute('data-zone')==='else'){
+        document.querySelectorAll('svg .zone').forEach(function(z){z.classList.remove('active');});
+        var w=document.getElementById('elseWrap'); w.style.display='block';
+        var inp=document.getElementById('elseInput'); inp.focus();
+        var t=inp.value.trim();
+        if(t){ activeLabel=t; document.getElementById('whereLbl').innerHTML='Where: <span style="color:var(--restore)">'+t+'</span>'; document.getElementById('senspanel').classList.add('show'); }
+        else { activeLabel=null; document.getElementById('senspanel').classList.remove('show'); }
+      } else {
+        hideElse(); setActive(null, b.getAttribute('data-label'));
+      }
+    });
+  });
+  var elseInput=document.getElementById('elseInput');
+  if(elseInput){ elseInput.addEventListener('input',function(){
+    var t=this.value.trim();
+    if(t){ activeLabel=t; document.getElementById('whereLbl').innerHTML='Where: <span style="color:var(--restore)">'+t+'</span>'; document.getElementById('senspanel').classList.add('show'); }
+    else { activeLabel=null; document.getElementById('senspanel').classList.remove('show'); }
+  }); }
+  document.querySelectorAll('#sensBtns button').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(!activeLabel) return;
+      entries.push({label:activeLabel, s:b.getAttribute('data-s')});
+      renderChips(); markLogged();
+      document.getElementById('senspanel').classList.remove('show');
+      document.querySelectorAll('svg .zone').forEach(function(z){z.classList.remove('active');});
+      hideElse();
+      activeLabel=null;
+    });
+  });
+
+  function ready(){ return channels.every(function(k){return answers[k]!==null;}) && pain!==null; }
+  function refresh(){ document.getElementById('go').disabled=!ready(); }
+
+  var CYC={
+    period:"🩸 On your period — big respect for showing up. Some days feel flat or crampy, some totally fine; both are normal. You lose a little iron right now, so lean into iron-rich fuel (meat, beans, leafy greens) and be kind to yourself if a channel or two reads low.",
+    luteal:"🍫 The luteal munchies have entered the chat. Feeling hungrier, moody or bloated in the days before your period is real, not just a vibe — your metabolism ticks up a little in this phase, so your body genuinely needs <b>more</b> fuel. Feed it: that's what helps you train, study and have fun.",
+    strong:"☀️ Feeling strong and clear — lovely. If your channels agree, this can be a great day to push. Just let the channels confirm it rather than assuming.",
+    off:"🌫️ Tired, tender or just off is totally allowed, and often part of the natural ebb across a cycle. Leaning toward Steady or Gentle today is smart self-reading, not slacking.",
+    notyet:"🌱 No periods yet is completely normal — bodies start on their own timeline. You can still tune into all your other signals; your cycle will join the conversation when it's ready.",
+    none:""
+  };
+
+  function renderGear(gearKey, total, isSwap){
+    var g=GEARS[gearKey];
+    var gc=document.getElementById('gearcard'); gc.className='gearcard '+g.cls;
+    var dial=document.getElementById('gdial'); dial.style.background=g.col; dial.textContent=g.icon;
+    document.getElementById('gname').textContent=g.icon+" "+g.name+" tempo";
+    document.getElementById('gtag').textContent=g.tag;
+    document.getElementById('gmeaning').innerHTML="<p style='margin:6px 0 0'>"+g.meaning+"</p>";
+    var ul=document.getElementById('plan'); ul.innerHTML='';
+    g.plan.forEach(function(p){var li=document.createElement('li');li.innerHTML=p;ul.appendChild(li);});
+    // reflect swap selection
+    document.querySelectorAll('#swapPick .gbtn').forEach(function(o){o.setAttribute('aria-pressed', o.getAttribute('data-gear')===gearKey?'true':'false');});
+    chosenGear=gearKey;
+  }
+
+  document.getElementById('go').onclick=function(){
+    var total=0; channels.forEach(function(k){total+=answers[k];});
+    var suggested=suggestGear(total);
+    renderGear(suggested, total, false);
+
+    // compare
+    var cmp=document.getElementById('compareText');
+    var lines=[];
+    if(predicted){
+      if(predicted===suggested){
+        lines.push("You predicted <b>"+GEARS[predicted].name+"</b> — and your body agrees. 🎉 That's your interoceptive read getting sharp: you're learning to feel what's coming before you check. Keep it up.");
+      } else {
+        lines.push("You predicted <b>"+GEARS[predicted].name+"</b>, but your channels point to <b>"+GEARS[suggested].name+"</b>. That gap is <em>gold</em> — it's exactly how you learn. Sit with it a sec: which channel surprised you? Naming the surprise is how the gap shrinks next time.");
+      }
+    } else {
+      lines.push("Next time, try guessing your tempo <em>before</em> you tune in — comparing your forecast to your body is how this whole thing trains your inner read.");
+    }
+    if(entries.length) lines.push("<span style='color:var(--muted)'>📍 You paused and named: <b>"+entries.map(function(e){return e.label+" ("+e.s+")";}).join(", ")+"</b> — that noticing is the skill itself.</span>");
+    if(cycle && CYC[cycle]) lines.push("<span style='color:var(--muted)'>"+CYC[cycle]+"</span>");
+    cmp.innerHTML=lines.map(function(l){return "<p style='margin:6px 0'>"+l+"</p>";}).join('');
+
+    // care flag
+    var care=document.getElementById('care');
+    if(pain===1){
+      care.classList.add('show');
+      document.getElementById('careText').innerHTML=
+        "<p style='margin:0 0 8px'>You flagged protective pain — smart catch. Whatever tempo your other channels show, that body part goes into Care today. This isn't being soft; it's how pros protect a long career.</p>"+
+        "<ul style='margin:0;padding-left:20px'>"+
+        "<li>Don't load through it. Stop what makes it hurt.</li>"+
+        "<li>Gentle, <em>pain-free</em> movement only — otherwise rest that area.</li>"+
+        "<li>Tell your coach and a parent <b>today</b>.</li>"+
+        "<li>If it hurts at night, makes you limp, or isn't better in a couple of days, see a physio or doctor. Your bones are still growing, so joint and bone pain gets checked, never pushed through.</li>"+
+        "</ul>";
+    } else { care.classList.remove('show'); }
+
+    document.getElementById('form').style.display='none';
+    document.getElementById('result').classList.add('show');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  // swap gear
+  document.querySelectorAll('#swapPick .gbtn').forEach(function(b){
+    b.onclick=function(){ renderGear(b.getAttribute('data-gear'), null, true); window.scrollTo({top:0,behavior:'smooth'}); };
+  });
+
+  document.getElementById('again').onclick=function(){
+    answers={sleep:null,energy:null,fuel:null,hydrate:null,muscles:null,mind:null}; pain=null; predicted=null; cycle=null; chosenGear=null;
+    entries=[]; activeLabel=null; renderChips(); markLogged(); hideElse();
+    document.getElementById('senspanel').classList.remove('show');
+    document.querySelectorAll('.opt,.pain button,#predict .gbtn,#cycle button,#swapPick .gbtn').forEach(function(o){o.setAttribute('aria-pressed','false');});
+    document.getElementById('cycnote').innerHTML='';
+    document.getElementById('result').classList.remove('show');
+    document.getElementById('form').style.display='block';
+    refresh(); window.scrollTo({top:0,behavior:'smooth'});
+  };
+})();
+</script>
+</body>
+</html>
