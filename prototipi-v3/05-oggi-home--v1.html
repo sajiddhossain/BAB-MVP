@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAB · Today</title>
+<style>
+  :root{
+    --bg:#0e1322; --panel:#161d30; --panel2:#1d2740; --ink:#eef2fb; --muted:#98a4c2; --soft:#c3ccdf;
+    --line:#293450; --accent:#ff9f45; --accent2:#ffd17a;
+    --power:#ff9f45; --sharpen:#24b6b0; --restore:#8b83f5; --care:#e86a92;
+    --powerb:rgba(255,159,69,.14); --sharpenb:rgba(36,182,176,.14); --restoreb:rgba(139,131,245,.16); --careb:rgba(232,106,146,.14);
+    --shadow:0 12px 34px rgba(0,0,0,.38);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef1f9; --panel:#ffffff; --panel2:#f1f4fc; --ink:#151d2f; --muted:#5c6a86; --soft:#3d4a61;
+      --line:#e3e8f4; --shadow:0 12px 34px rgba(30,45,90,.10);
+      --powerb:rgba(255,159,69,.13); --sharpenb:rgba(36,182,176,.12); --restoreb:rgba(139,131,245,.13); --careb:rgba(232,106,146,.12);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;padding:14px 12px 40px}
+
+  /* ── demo chrome: not part of the app ── */
+  .demo{max-width:820px;margin:0 auto 16px;background:var(--panel);border:1px dashed var(--line);
+    border-radius:14px;padding:13px 15px}
+  .demo h6{margin:0 0 8px;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:850}
+  .demo .row{display:flex;flex-wrap:wrap;gap:7px}
+  .demo button{border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:999px;
+    padding:8px 13px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.12s}
+  .demo button:hover{border-color:var(--accent)}
+  .demo button[aria-pressed="true"]{border-color:var(--accent);background:var(--powerb);color:var(--accent)}
+  .demo p{margin:9px 0 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+
+  /* ── the phone ── */
+  .phone{max-width:400px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:26px;
+    box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;min-height:660px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 16px 8px}
+  .greet .hi{font-size:20px;font-weight:850;letter-spacing:-.02em}
+  .greet .dt{font-size:12.5px;color:var(--muted)}
+  .hurtbtn{border:1.5px solid var(--care);background:var(--careb);color:var(--care);border-radius:999px;
+    padding:8px 12px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer;flex:none;min-height:40px}
+  .hurtbtn:hover{background:var(--care);color:#2a0f19}
+  .body{flex:1;padding:8px 16px 20px;overflow:auto}
+
+  /* ── the one card ── */
+  .hero{border-radius:20px;padding:22px 20px;border:1.5px solid var(--line);background:var(--panel);
+    box-shadow:var(--shadow);text-align:center}
+  .hero.power{background:var(--powerb);border-color:var(--power)}
+  .hero.sharpen{background:var(--sharpenb);border-color:var(--sharpen)}
+  .hero.restore{background:var(--restoreb);border-color:var(--restore)}
+  .hero .em{font-size:44px;line-height:1}
+  .hero h2{margin:12px 0 6px;font-size:23px;font-weight:850;letter-spacing:-.02em}
+  .hero p{margin:0 0 4px;font-size:14.5px;color:var(--soft);line-height:1.5}
+  .hero .cta{margin-top:18px;width:100%;border:none;border-radius:15px;padding:16px;font:inherit;
+    font-weight:850;font-size:16px;cursor:pointer;color:#241300;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));min-height:52px}
+  .hero .cta.calm{background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+  .hero .cta.calm:hover{border-color:var(--accent)}
+  .hero .sec{margin-top:9px;width:100%;background:none;border:none;color:var(--muted);font:inherit;
+    font-size:13px;text-decoration:underline;cursor:pointer;padding:9px;min-height:40px}
+
+  /* ── recap of a closed day ── */
+  .recap{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px}
+  .recap h4{margin:0 0 10px;font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:850}
+  .pair{display:flex;gap:9px}
+  .slot{flex:1;border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center;background:var(--panel2)}
+  .slot .k{font-size:10.5px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.06em}
+  .slot .v{font-size:17px;margin-top:3px}
+  .slot.done{border-color:var(--sharpen);background:var(--sharpenb)}
+  .learned{margin-top:11px;font-size:13.5px;color:var(--soft);line-height:1.5;
+    border-left:2px solid var(--accent);padding-left:11px}
+
+  /* ── this week's mission ── */
+  .mission{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px}
+  .mission .wk{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--restore);font-weight:850}
+  .mission h4{margin:5px 0 4px;font-size:16px;font-weight:800}
+  .mission p{margin:0;font-size:13.5px;color:var(--soft);line-height:1.5}
+  .mission .bar{display:flex;gap:4px;margin-top:11px}
+  .mission .bar i{flex:1;height:6px;border-radius:999px;background:var(--line)}
+  .mission .bar i.on{background:var(--restore)}
+  .mission .cnt{margin-top:7px;font-size:12px;color:var(--muted)}
+
+  /* ── care banner: sits above everything, deliberately calm ── */
+  .carebanner{background:var(--panel);border:1.5px solid var(--care);border-radius:16px;padding:15px;margin-bottom:14px}
+  .carebanner .h{display:flex;align-items:center;gap:9px;font-weight:850;font-size:15px;color:var(--care)}
+  .carebanner p{margin:8px 0 0;font-size:13.5px;color:var(--soft);line-height:1.5}
+  .carebanner .acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .carebanner button{flex:1;min-width:130px;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);
+    border-radius:11px;padding:11px;font:inherit;font-size:13px;font-weight:750;cursor:pointer;min-height:44px}
+  .carebanner button.main{border-color:var(--care);background:var(--careb);color:var(--care)}
+
+  /* ── rest / skipped notes ── */
+  .quiet{margin-top:14px;font-size:13px;color:var(--muted);text-align:center;line-height:1.6}
+
+  /* ── tab bar ── */
+  .tabs{display:flex;border-top:1px solid var(--line);background:var(--panel)}
+  .tabs button{flex:1;background:none;border:none;color:var(--muted);font:inherit;font-size:11px;font-weight:750;
+    padding:11px 4px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:56px}
+  .tabs button .i{font-size:19px;line-height:1}
+  .tabs button.on{color:var(--accent)}
+  .note{max-width:820px;margin:16px auto 0;font-size:12.5px;color:var(--muted);line-height:1.6;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- demo switcher — not part of the product -->
+<div class="demo">
+  <h6>Demo · the six states of Today</h6>
+  <div class="row" id="switch"></div>
+  <p id="stateWhy"></p>
+</div>
+
+<div class="phone">
+  <div class="top">
+    <div class="greet">
+      <div class="hi" id="hi">Morning, Sofia</div>
+      <div class="dt" id="dt">Thursday 15 May</div>
+    </div>
+    <button class="hurtbtn" onclick="alert('Opens the acute capture sheet.\n\nSee 01-pre-training-check-in--v3.html')">🩹 I got hurt</button>
+  </div>
+
+  <div class="body" id="view"></div>
+
+  <div class="tabs">
+    <button class="on"><span class="i">☀️</span>Today</button>
+    <button><span class="i">🗺️</span>Journey</button>
+    <button><span class="i">📈</span>Me</button>
+  </div>
+</div>
+
+<p class="note">One screen, one obvious next thing. Everything else lives a level down.</p>
+
+<script>
+(function(){
+  var MISSION={
+    week:'Week 3 · Notice',
+    title:'One battery, two drains',
+    text:'On one busy or stressful day, tune in and see what your body is doing.',
+    done:3, target:5
+  };
+
+  function missionCard(){
+    var bars='';
+    for(var i=0;i<MISSION.target;i++) bars+='<i class="'+(i<MISSION.done?'on':'')+'"></i>';
+    return '<div class="mission">'+
+      '<div class="wk">'+MISSION.week+'</div>'+
+      '<h4>'+MISSION.title+'</h4>'+
+      '<p>🎯 '+MISSION.text+'</p>'+
+      '<div class="bar">'+bars+'</div>'+
+      '<div class="cnt">'+MISSION.done+' of '+MISSION.target+' check-ins this week</div>'+
+      '</div>';
+  }
+
+  var STATES={
+    /* 1 ─ the default: nothing done yet */
+    fresh:{
+      why:'The normal morning. One card, one button. Nothing else competes with it.',
+      hi:'Morning, Sofia', dt:'Thursday 15 May',
+      html:function(){
+        return '<div class="hero">'+
+          '<div class="em">☀️</div>'+
+          '<h2>Tune in before you go</h2>'+
+          '<p>Guess how today will feel, then check. About a minute.</p>'+
+          '<button class="cta">Start my tune-in →</button>'+
+          '<button class="sec">Not training today</button>'+
+          '</div>'+ missionCard();
+      }
+    },
+    /* 2 ─ pre done, waiting on the session */
+    mid:{
+      why:'She has tuned in and is training. The card becomes a reminder of her own call — and the next step is quieter, because it isn\'t time yet.',
+      hi:'Morning, Sofia', dt:'Thursday 15 May',
+      html:function(){
+        return '<div class="hero sharpen">'+
+          '<div class="em">🌊</div>'+
+          '<h2>Steady today</h2>'+
+          '<p>Your call this morning. Quality over quantity — and you predicted it right.</p>'+
+          '<button class="cta calm">Close the loop after training →</button>'+
+          '<button class="sec">Change my tempo</button>'+
+          '</div>'+
+          '<div class="quiet">Come back a few minutes after you finish — that\'s when your signals are loudest.</div>'+
+          missionCard();
+      }
+    },
+    /* 3 ─ both done */
+    closed:{
+      why:'Both check-ins done. Nothing left to do — and the app says so instead of inventing a task.',
+      hi:'Evening, Sofia', dt:'Thursday 15 May',
+      html:function(){
+        return '<div class="hero">'+
+          '<div class="em">✅</div>'+
+          '<h2>That\'s today done</h2>'+
+          '<p>You read yourself, trained, and closed the loop. Nothing else to do here.</p>'+
+          '</div>'+
+          '<div class="recap">'+
+            '<h4>Today</h4>'+
+            '<div class="pair">'+
+              '<div class="slot done"><div class="k">Predicted</div><div class="v">🌊 Steady</div></div>'+
+              '<div class="slot done"><div class="k">Trained</div><div class="v">🌊 Steady</div></div>'+
+            '</div>'+
+            '<div class="learned">Nicely judged Steady day — controlled effort, body in good shape. '+
+            'Your read and your body agreed. 🎯</div>'+
+          '</div>'+ missionCard();
+      }
+    },
+    /* 4 ─ rest day: one optional reflection, never the full flow (§5) */
+    rest:{
+      why:'Master doc §5: a rest day gets <b>one optional reflection</b>, never the full pre/post pair. The button is calm, not orange — it isn\'t a task.',
+      hi:'Hi Sofia', dt:'Sunday 18 May · rest day',
+      html:function(){
+        return '<div class="hero">'+
+          '<div class="em">🌱</div>'+
+          '<h2>Rest day</h2>'+
+          '<p>Nothing to do today. If you feel like it, one quick look at how you\'re recovering — that\'s all.</p>'+
+          '<button class="cta calm">A quick reflection</button>'+
+          '<button class="sec">Skip — enjoy the day off</button>'+
+          '</div>'+
+          '<div class="quiet">Rest is where the training actually works. 🌿</div>'+
+          missionCard();
+      }
+    },
+    /* 5 ─ came back after missing days */
+    back:{
+      why:'She missed days. No streak broken, no guilt, no counter reset — the copy just opens the door again.',
+      hi:'Hey, good to see you', dt:'Tuesday 27 May',
+      html:function(){
+        return '<div class="hero">'+
+          '<div class="em">👋</div>'+
+          '<h2>Welcome back</h2>'+
+          '<p>You\'ve been away a bit — that\'s completely fine. Nothing is lost, and nothing resets. '+
+          'Let\'s just start from today.</p>'+
+          '<button class="cta">Tune in →</button>'+
+          '</div>'+
+          '<div class="quiet">Your week 3 mission is still waiting, exactly where you left it.</div>'+
+          missionCard();
+      }
+    },
+    /* 6 ─ care active: sits above everything until resolved */
+    care:{
+      why:'A red flag is live. Care sits <b>above</b> everything and stays until it\'s resolved — but it\'s deliberately calm, not loud. An alarmed teenager reports <em>less</em>, not more (§10).',
+      hi:'Morning, Sofia', dt:'Friday 16 May',
+      html:function(){
+        return '<div class="carebanner">'+
+          '<div class="h">🛡️ Your left knee is in Care</div>'+
+          '<p>You named <b>gives way / unstable</b> yesterday. Until it settles, that knee doesn\'t get loaded — '+
+          'and this stays here so it doesn\'t get forgotten.</p>'+
+          '<div class="acts">'+
+            '<button class="main">Have you told an adult?</button>'+
+            '<button>How is it today?</button>'+
+          '</div>'+
+          '</div>'+
+          '<div class="hero">'+
+          '<div class="em">☀️</div>'+
+          '<h2>Tune in before you go</h2>'+
+          '<p>You can still train around it — your tune-in will take the knee into account.</p>'+
+          '<button class="cta">Start my tune-in →</button>'+
+          '</div>'+ missionCard();
+      }
+    }
+  };
+
+  var ORDER=[
+    ['fresh','☀️ Nothing done yet'],
+    ['mid','🌊 Tuned in, training'],
+    ['closed','✅ Day complete'],
+    ['rest','🌱 Rest day'],
+    ['back','👋 Back after a gap'],
+    ['care','🛡️ Care active']
+  ];
+
+  var sw=document.getElementById('switch');
+  ORDER.forEach(function(o,i){
+    var b=document.createElement('button'); b.type='button'; b.textContent=o[1];
+    b.setAttribute('aria-pressed', i===0?'true':'false');
+    b.onclick=function(){
+      sw.querySelectorAll('button').forEach(function(x){x.setAttribute('aria-pressed','false');});
+      b.setAttribute('aria-pressed','true'); show(o[0]);
+    };
+    sw.appendChild(b);
+  });
+
+  function show(k){
+    var s=STATES[k];
+    document.getElementById('hi').textContent=s.hi;
+    document.getElementById('dt').textContent=s.dt;
+    document.getElementById('view').innerHTML=s.html();
+    document.getElementById('stateWhy').innerHTML=s.why;
+  }
+  show('fresh');
+})();
+</script>
+</body>
+</html>

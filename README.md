@@ -20,7 +20,7 @@ fonti/          il materiale originale, mai modificato
   immagini/     i 2 schemi
   prototipi/    i 5 HTML, rinominati per versione
 docs/           tutto il lavoro di riorganizzazione e progettazione
-prototipi-v3/   prototipi funzionanti: check-in v3, onboarding, body-story
+prototipi-v3/   6 prototipi funzionanti: check-in, onboarding, body-story, home, Me
 ```
 
 👉 **[Inizia da `docs/README.md`](docs/README.md)** — è l'indice completo.

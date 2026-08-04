@@ -16,6 +16,8 @@ prodotto non regge: l'onboarding e la body-story.
 | `02-post-training-reflect--v3.html` | Look back → Sense → Learn → Recover |
 | `03-onboarding--v1.html` | Le 6 schermate di setup — **nuovo, non esisteva nel materiale** |
 | `04-body-story--v1.html` | La story settimanale condivisibile (§11) — **nuovo, non esisteva nel materiale** |
+| `05-oggi-home--v1.html` | La home "Oggi" e i suoi 6 stati — **nuovo** |
+| `06-me-patterns--v1.html` | La vista "Me" nei tre stadi di maturità dei dati — **nuovo** |
 
 Lingua: **inglese**, come la v2 — così il lavoro non è bloccato dalla
 [decisione D1 sulla lingua](../docs/04-brainstorming/03-decisioni-aperte.md).
@@ -213,6 +215,82 @@ Questo chiude il cerchio dello schema strategico della founder: **DECODE → DEC
 
 ---
 
+---
+
+# 05 · La home "Oggi"
+
+L'unica schermata che l'atleta vede ogni giorno, e nessun prototipo del materiale la aveva.
+Il file ha uno **switcher demo** in cima per passare tra i sei stati.
+
+**La regola che tiene in piedi la schermata:** in qualsiasi momento c'è **una sola cosa
+ovvia da fare**. Tutto il resto sta un livello sotto.
+
+| Stato | Cosa mostra |
+|---|---|
+| ☀️ **Niente fatto** | Una card, un bottone. Il default. |
+| 🌊 **Sintonizzata, si allena** | Il tempo che ha scelto lei, e il passo successivo in tono più calmo — perché non è ancora ora |
+| ✅ **Giornata chiusa** | Previsto vs allenato, cosa ha imparato, e **niente da fare**: l'app lo dice invece di inventarsi un compito |
+| 🌱 **Giorno di riposo** 🔴 | Una riflessione **opzionale**, mai il flusso completo (§5). Il bottone è calmo, non arancione: non è un task. |
+| 👋 **Torna dopo un'assenza** | Nessuno streak rotto, nessun contatore azzerato, nessuna colpa. *"Non si perde niente, e niente si resetta."* |
+| 🛡️ **Care attivo** | Il banner sta **sopra** tutto e resta finché non si risolve |
+
+### Due scelte che vale la pena difendere
+
+**Il Care mode è deliberatamente calmo.** L'istinto sarebbe fare rumore visivo su una
+bandiera rossa. Ma §10 dice *"nessun punteggio nocebo, proteggi uno spazio neutro e a
+bassa attivazione"* — e un'adolescente allarmata segnala **meno**, non di più. La serietà
+si comunica con la chiarezza dell'istruzione, non col colore.
+
+**Il giorno saltato non ha conseguenze.** Nessun "hai perso la serie". La missione della
+settimana resta esattamente dov'era. È l'applicazione diretta del principio "gioco a bassa
+posta" (§7): nel momento in cui la costanza diventa una performance, il meccanismo si rompe.
+
+---
+
+# 06 · La vista "Me"
+
+Il rischio di abbandono numero uno di tutto il prodotto:
+
+> **Per tre settimane l'app non ha niente da mostrarle — ed è esattamente quando decide
+> se vale il suo tempo.**
+
+La risposta non è inventare insight su nove giorni di dati. È rendere i tre stadi
+**espliciti**, e far crescere visibilmente il valore con l'uso.
+
+| Stadio | Quando | Cosa mostra |
+|---|---|---|
+| **Collecting** | Sett. 1–3 | Nessun insight, nessun grafico. Un **contatore** (`9 di 21 check-in`), la griglia dei puntini che si riempie, e i punti che ha nominato di più — senza conclusioni. La body-story è visibilmente bloccata. |
+| **First hunches** | Sett. 4–8 | Il trend della sua lettura + **un solo** insight, formulato al condizionale (*"è presto, ma…"*), con 👍/🤔 |
+| **Your fingerprint** | Sett. 9+ | Il grafico completo con le bande di fase, le medie per fase, tre insight |
+
+### Il contatore è la mossa che risolve il problema
+
+Trasforma il vuoto da **fallimento** ("non c'è niente") a **progresso** ("ne mancano 8").
+È l'unica meccanica tipo-gioco che il prodotto può permettersi, perché **premia la presenza,
+non la performance** — e un giorno Gentle riempie un puntino esattamente come un giorno
+Upbeat.
+
+### I pollici su/giù non sono cortesia
+
+Ogni insight ha `👍 Mi sembra proprio io` / `🤔 Non mi torna`. Fanno tre lavori insieme:
+esercitano il giudizio (è letteralmente la Settimana 6 del percorso), danno al modello
+un segnale su quali insight funzionano, e rendono *cliccabile* la promessa "tu resti
+l'esperta di te".
+
+### Due dettagli che sembrano piccoli e non lo sono
+
+**Almeno un insight per segnale non parla del ciclo.** Nel prototipo è quello sulle
+settimane d'esame — che **contraddice** la lettura ciclica. Il ciclo è il differenziante
+del prodotto, il che rende tentante spiegare tutto con esso: un'app che spiega tutto di
+una ragazza con il suo ciclo fa un danno educativo.
+
+**Il trend della lettura sale, non scende.** Misura la stessa cosa del "divario che si
+accorcia", ma disegnato al contrario: una linea che scende si legge come *"sto peggiorando"*
+per una tredicenne, e questo è l'unico grafico che non deve mai sembrare un verdetto.
+Nessun asse numerico, nessuna percentuale.
+
+---
+
 ## Cosa manca ancora
 
 1. Confidenza sulla previsione, "ti ha sorpresa qualcosa", ore di sonno, stress scolastico,
@@ -220,8 +298,8 @@ Questo chiude il cerchio dello schema strategico della founder: **DECODE → DEC
 2. Mappa corporea junior per 11–13 anni (§10) — l'onboarding la *seleziona* già, ma la
    variante semplificata va ancora disegnata
 3. Rete di sicurezza RED-S (§4.4) — **blocco: firma clinica**
-4. La home "Oggi" e i suoi 6 stati
-5. La vista Patterns nei primi giorni (stadi Raccolta / Prime ipotesi)
+4. Le impostazioni (profilo, ritmo, privacy/export, notifiche, aiuto)
+5. Il percorso oltre il dettaglio settimana (settimane passate, fine mese, fine percorso)
 
 ---
 

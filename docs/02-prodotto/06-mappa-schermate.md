@@ -32,12 +32,12 @@
 
 | # | Schermata / stato | Stato | Note |
 |---|---|---|---|
-| T1 | Home — pre non fatto | 🔴 | Una card, un bottone |
-| T2 | Home — pre fatto, post no | 🔴 | Mostra il tempo scelto |
-| T3 | Home — giornata completa | 🔴 | Riepilogo + missione settimana |
-| T4 | Home — giorno di riposo | 🔴 | Riflessione opzionale (§5) |
-| T5 | Home — giorno saltato | 🔴 | Copy neutro, nessuna colpa |
-| T6 | Home — Care mode attivo | 🟠 | Il contenuto esiste, manca lo stato persistente |
+| T1 | Home — pre non fatto | ✅ | v1 |
+| T2 | Home — pre fatto, post no | ✅ | v1 |
+| T3 | Home — giornata completa | ✅ | v1 |
+| T4 | Home — giorno di riposo | ✅ | v1: riflessione opzionale, bottone calmo |
+| T5 | Home — giorno saltato | ✅ | v1: nessuno streak, nessun reset |
+| T6 | Home — Care mode attivo | ✅ | v1: banner sopra tutto, deliberatamente calmo |
 
 ### Flusso pre-allenamento
 
@@ -91,11 +91,11 @@
 
 | # | Schermata | Stato | Note |
 |---|---|---|---|
-| M1 | La mia lettura (trend prediction error) | 🔴 | Nessun asse numerico |
-| M2 | Patterns — stadio Raccolta (sett. 1–3) | 🔴 | Con contatore |
-| M3 | Patterns — stadio Prime ipotesi (4–8) | 🔴 | |
+| M1 | La mia lettura (trend prediction error) | ✅ | v1: sale invece di scendere, nessun asse |
+| M2 | Patterns — stadio Raccolta (sett. 1–3) | ✅ | v1: contatore 9/21, zero interpretazione |
+| M3 | Patterns — stadio Prime ipotesi (4–8) | ✅ | v1: un solo insight, al condizionale |
 | M4 | Patterns — stadio Fingerprint (9+) | ✅ | Grafico + fasi + insight prototipati |
-| M5 | Dettaglio insight + 👍/🤔 | 🟠 | Insight ✅, feedback 🔴 |
+| M5 | Dettaglio insight + 👍/🤔 | ✅ | v1 |
 | M6 | Body-story — composizione e selezione | ✅ | v1: 5 blocchi, ciclo off di default |
 | M7 | Body-story — anteprima e condivisione | ✅ | v1: anteprima live + frase auto-generata |
 | M8 | Card RED-S (condizionale, silenziosa) | 🔴 | Blocco: firma clinica |
@@ -120,27 +120,33 @@
 | Categoria | ✅ | 🟠 | 🔴 | Totale |
 |---|---|---|---|---|
 | Onboarding | 4 | 2 | 0 | 6 |
-| Oggi (home + stati) | 0 | 1 | 5 | 6 |
+| Oggi (home + stati) | 6 | 0 | 0 | 6 |
 | Flusso pre | 5 | 1 | 2 | 8 |
 | Flusso post | 5 | 1 | 3 | 9 |
 | Cattura acuta | 3 | 0 | 0 | 3 |
 | Percorso | 1 | 1 | 3 | 5 |
-| Me | 3 | 1 | 4 | 8 |
+| Me | 7 | 0 | 1 | 8 |
 | Impostazioni | 0 | 0 | 5 | 5 |
-| **Totale** | **21** | **8** | **21** | **50** |
+| **Totale** | **31** | **6** | **13** | **50** |
 
 > ✅ **Aggiornato dopo i [prototipi](../../prototipi-v3/)**: chiusi i tre buchi di sicurezza
-> (P3, Q2, A1–A3), più l'onboarding (O1–O5) e la body-story (M6–M7), che non esistevano
-> in nessun prototipo del materiale originale.
+> (P3, Q2, A1–A3), l'onboarding (O1–O5), la body-story (M6–M7), la home "Oggi" con tutti
+> e sei gli stati (T1–T6) e la vista "Me" nei tre stadi (M1–M3, M5). Nulla di tutto questo
+> esisteva nel materiale originale.
 
 **Lettura:** il materiale di partenza copriva bene il **cuore quotidiano** e quasi niente
 di tutto ciò che sta attorno — era ~30% dell'MVP, non il 70% che i prototipi potevano far
-sembrare. Chiusi i buchi di sicurezza, l'onboarding e la body-story, siamo attorno al
-**~50%**.
+sembrare. Ora la copertura di design è attorno al **~75%**.
 
-Quello che resta è concentrato in tre punti: la **home "Oggi"** con i suoi 6 stati (nessuno
-prototipato), la **vista Me nelle prime settimane** (il rischio di abbandono numero uno), e
-le **impostazioni**. Più il testo legale del consenso, che non è lavoro di design.
+Quello che resta è quasi tutto lavoro a bassa incertezza: le **impostazioni** (5 schermate),
+il **percorso** oltre il dettaglio settimana, e la card RED-S — che è bloccata dalla firma
+clinica, non dal design. Più il testo legale del consenso, che non è lavoro di design.
+
+⚠️ **Attenzione a come si legge questo numero.** È copertura *di design*, non di prodotto.
+Restano sei file HTML separati, senza stato condiviso, senza persistenza, senza account e
+senza backend — e ancora sul tema scuro dei prototipi, non sul sistema visivo della landing
+che ho raccomandato. Come prodotto spedibile siamo molto più indietro: vedi il
+[piano MVP](../05-roadmap/01-piano-mvp.md).
 
 ---
 
