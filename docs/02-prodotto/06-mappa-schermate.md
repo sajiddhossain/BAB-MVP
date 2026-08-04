@@ -19,11 +19,11 @@
 
 | # | Schermata | Stato | Note |
 |---|---|---|---|
-| O1 | Benvenuto — cosa fa e cosa non fa BAB | 🔴 | Copy adattabile dal journey ("Fatto per farti bene") |
-| O2 | Consenso tutore + atleta | 🔴 | Requisito legale §9. Serve testo legale reale. |
-| O3 | Età | 🔴 | Determina la mappa corporea junior/full |
-| O4 | Sport e giorni di allenamento | 🔴 | Determina i default dei check |
-| O5 | Il tuo ritmo (ciclo: sì / non ancora / preferisco non dirlo → date + contraccezione) | 🔴 | Copy proposto in [architettura](01-architettura-informativa.md) |
+| O1 | Benvenuto — cosa fa e cosa non fa BAB | ✅ | v1: due colonne è/non è |
+| O2 | Consenso tutore + atleta | 🟠 | v1: flusso e gate pronti; **manca il testo legale reale** |
+| O3 | Età | ✅ | v1: seleziona già junior/full |
+| O4 | Sport e giorni di allenamento | ✅ | v1 |
+| O5 | Il tuo ritmo (ciclo: sì / non ancora / preferisco non dirlo → date + contraccezione) | ✅ | v1: 3 stati, date, contraccezione, blocco privacy |
 | O6 | Primo check-in guidato | 🟠 | Riusa il flusso pre con overlay esplicativi |
 
 ---
@@ -96,8 +96,8 @@
 | M3 | Patterns — stadio Prime ipotesi (4–8) | 🔴 | |
 | M4 | Patterns — stadio Fingerprint (9+) | ✅ | Grafico + fasi + insight prototipati |
 | M5 | Dettaglio insight + 👍/🤔 | 🟠 | Insight ✅, feedback 🔴 |
-| M6 | Body-story — composizione e selezione | 🔴 | **Feature strategica mancante** |
-| M7 | Body-story — anteprima e condivisione | 🔴 | |
+| M6 | Body-story — composizione e selezione | ✅ | v1: 5 blocchi, ciclo off di default |
+| M7 | Body-story — anteprima e condivisione | ✅ | v1: anteprima live + frase auto-generata |
 | M8 | Card RED-S (condizionale, silenziosa) | 🔴 | Blocco: firma clinica |
 
 ---
@@ -119,27 +119,28 @@
 
 | Categoria | ✅ | 🟠 | 🔴 | Totale |
 |---|---|---|---|---|
-| Onboarding | 0 | 1 | 5 | 6 |
+| Onboarding | 4 | 2 | 0 | 6 |
 | Oggi (home + stati) | 0 | 1 | 5 | 6 |
 | Flusso pre | 5 | 1 | 2 | 8 |
 | Flusso post | 5 | 1 | 3 | 9 |
 | Cattura acuta | 3 | 0 | 0 | 3 |
 | Percorso | 1 | 1 | 3 | 5 |
-| Me | 1 | 1 | 6 | 8 |
+| Me | 3 | 1 | 4 | 8 |
 | Impostazioni | 0 | 0 | 5 | 5 |
-| **Totale** | **15** | **6** | **29** | **50** |
+| **Totale** | **21** | **8** | **21** | **50** |
 
-> ✅ **Aggiornato dopo i [prototipi v3](../../prototipi-v3/)**, che hanno chiuso i tre
-> buchi di sicurezza: mappa corporea completa (P3, Q2) e cattura acuta (A1–A3).
+> ✅ **Aggiornato dopo i [prototipi](../../prototipi-v3/)**: chiusi i tre buchi di sicurezza
+> (P3, Q2, A1–A3), più l'onboarding (O1–O5) e la body-story (M6–M7), che non esistevano
+> in nessun prototipo del materiale originale.
 
-**Lettura:** il materiale copre già molto bene il **cuore quotidiano** (i due check-in:
-10 schermate su 17 pronte, il resto da completare). Quello che manca quasi interamente è
-**tutto ciò che sta attorno**: onboarding, stati della home, la vista Me nei primi giorni,
-la body-story, le impostazioni.
+**Lettura:** il materiale di partenza copriva bene il **cuore quotidiano** e quasi niente
+di tutto ciò che sta attorno — era ~30% dell'MVP, non il 70% che i prototipi potevano far
+sembrare. Chiusi i buchi di sicurezza, l'onboarding e la body-story, siamo attorno al
+**~50%**.
 
-È un profilo tipico e non preoccupante: significa che il pensiero è andato dove serviva
-prima — sul valore. Ma va detto chiaramente che **la parte "già fatta" è ~30% dell'MVP**,
-non il 70% che i prototipi possono far sembrare.
+Quello che resta è concentrato in tre punti: la **home "Oggi"** con i suoi 6 stati (nessuno
+prototipato), la **vista Me nelle prime settimane** (il rischio di abbandono numero uno), e
+le **impostazioni**. Più il testo legale del consenso, che non è lavoro di design.
 
 ---
 
