@@ -20,6 +20,7 @@ fonti/          il materiale originale, mai modificato
   immagini/     i 2 schemi
   prototipi/    i 5 HTML, rinominati per versione
 docs/           tutto il lavoro di riorganizzazione e progettazione
+prototipi-v3/   prototipi funzionanti che chiudono i 3 buchi di sicurezza
 ```
 
 👉 **[Inizia da `docs/README.md`](docs/README.md)** — è l'indice completo.
@@ -59,6 +60,7 @@ scarto si sta accorciando.
 | **10 minuti** | [Visione](docs/00-fondamenta/01-visione-e-problema.md) + [Architettura app](docs/02-prodotto/01-architettura-informativa.md) |
 | **30 minuti** | + [Principi di design](docs/00-fondamenta/03-principi-di-design.md) + [Brainstorming](docs/04-brainstorming/01-brainstorm-app-mobile.md) |
 | **Devi decidere qualcosa** | [Decisioni aperte](docs/04-brainstorming/03-decisioni-aperte.md) |
+| **Vuoi provarli** | [Prototipi v3](prototipi-v3/) — aprili nel browser |
 | **Devi costruire** | [Mappa schermate](docs/02-prodotto/06-mappa-schermate.md) + [Design system](docs/03-design/01-design-system.md) |
 | **Devi pianificare** | [Piano MVP](docs/05-roadmap/01-piano-mvp.md) |
 
@@ -71,11 +73,11 @@ scarto si sta accorciando.
 2. **Manca completamente l'onboarding**, e senza date del ciclo e contraccezione il layer
    che differenzia il prodotto non può funzionare.
 3. **Due sensazioni bandiera rossa** richieste dal documento madre (`cede/instabile`,
-   `gonfia/calda`) **non esistono nel lessico dei prototipi**.
-4. **Mancano tutte le opzioni positive** dal lessico delle sensazioni, contro un requisito
-   esplicito anti-ipervigilanza.
-5. **Il pulsante "mi sono fatta male" sempre accessibile** è richiesto dal documento madre
-   e non è implementato.
+   `gonfia/calda`) **non esistevano nel lessico dei prototipi**. ✅ *chiuso in v3*
+4. **Mancavano tutte le opzioni positive** dal lessico delle sensazioni, contro un requisito
+   esplicito anti-ipervigilanza. ✅ *chiuso in v3*
+5. **Il pulsante "mi sono fatta male" sempre accessibile**, richiesto dal documento madre,
+   non era implementato. ✅ *chiuso in v3*
 6. **La body-story condivisibile** — l'unico output che incarna il terzo pilastro dello
    schema strategico (COMMUNICATE) — non esiste in nessun prototipo. È probabilmente la
    feature più strategica non ancora disegnata.

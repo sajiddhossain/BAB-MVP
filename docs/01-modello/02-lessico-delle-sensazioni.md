@@ -1,6 +1,10 @@
 # 02 · Lessico delle sensazioni
 
 > Fonte: documento madre §4.3 + blocchi "Decode your ache" dei due prototipi.
+>
+> ✅ **I gap descritti in questo documento sono stati chiusi** nei prototipi
+> [`/prototipi-v3`](../../prototipi-v3/). Le sezioni sotto restano come traccia
+> dell'analisi e come motivazione delle scelte.
 
 ---
 

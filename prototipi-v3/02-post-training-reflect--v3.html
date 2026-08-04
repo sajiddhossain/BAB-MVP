@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAB · After-Training Reflect</title>
+<style>
+  :root{
+    --bg:#0e1322; --panel:#161d30; --panel2:#1d2740; --ink:#eef2fb; --muted:#98a4c2; --soft:#c3ccdf;
+    --line:#293450; --accent:#8b83f5; --accent2:#b3aef9;
+    --power:#ff9f45; --sharpen:#24b6b0; --restore:#8b83f5; --care:#e86a92;
+    --powerb:rgba(255,159,69,.14); --sharpenb:rgba(36,182,176,.14); --restoreb:rgba(139,131,245,.16); --careb:rgba(232,106,146,.14);
+    --shadow:0 12px 34px rgba(0,0,0,.38);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#eef1f9; --panel:#ffffff; --panel2:#f1f4fc; --ink:#151d2f; --muted:#5c6a86; --soft:#3d4a61;
+      --line:#e3e8f4; --shadow:0 12px 34px rgba(30,45,90,.10);
+      --powerb:rgba(255,159,69,.13); --sharpenb:rgba(36,182,176,.12); --restoreb:rgba(139,131,245,.13); --careb:rgba(232,106,146,.12);}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 640px at 85% -12%,rgba(139,131,245,.16),transparent 60%),var(--bg);
+    color:var(--ink);line-height:1.5;padding:22px 15px 64px}
+  .wrap{max-width:660px;margin:0 auto}
+  header{text-align:center;margin-bottom:18px}
+  .brand{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--accent);font-weight:850;background:var(--panel);border:1px solid var(--line);padding:5px 13px;border-radius:999px}
+  h1{font-size:26px;margin:14px 0 5px;font-weight:850;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:14.5px;max-width:530px;margin:0 auto}
+  .steps{display:flex;justify-content:center;gap:6px;margin:16px 0 4px;flex-wrap:wrap}
+  .chip{font-size:11px;font-weight:750;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+  .chip b{color:var(--accent)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px 18px 20px;box-shadow:var(--shadow);margin-bottom:15px}
+  .lbl{font-size:11px;font-weight:850;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+  .q{font-weight:750;font-size:16px;margin:6px 0 2px}
+  .qh{color:var(--muted);font-size:13px;margin:0 0 12px}
+  .gearpick{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .gbtn{appearance:none;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:13px;
+    padding:13px 6px;cursor:pointer;font:inherit;text-align:center;transition:.12s;display:flex;flex-direction:column;gap:4px;align-items:center}
+  .gbtn .ic{font-size:22px} .gbtn .nm{font-weight:800;font-size:13.5px} .gbtn .ds{font-size:10.5px;color:var(--muted);line-height:1.25}
+  .gbtn:hover{border-color:var(--accent)}
+  .gbtn[aria-pressed="true"][data-gear="power"]{border-color:var(--power);background:var(--powerb)}
+  .gbtn[aria-pressed="true"][data-gear="sharpen"]{border-color:var(--sharpen);background:var(--sharpenb)}
+  .gbtn[aria-pressed="true"][data-gear="restore"]{border-color:var(--restore);background:var(--restoreb)}
+  .scale{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+  .opt{appearance:none;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:11px;
+    padding:11px 3px 8px;cursor:pointer;font:inherit;transition:.12s;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .opt .em{font-size:18px;line-height:1}.opt .n{font-size:10.5px;color:var(--muted)}
+  .opt:hover{border-color:var(--accent)}
+  .opt[aria-pressed="true"]{border-color:var(--accent);background:linear-gradient(180deg,var(--restoreb),transparent);box-shadow:0 0 0 2px rgba(139,131,245,.24) inset}
+  .ends{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:7px}
+  .pain{display:flex;gap:9px;margin-top:2px}
+  .pain button{flex:1;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:12px;padding:12px;font:inherit;font-weight:700;cursor:pointer;transition:.12s}
+  .pain button:hover{border-color:var(--accent)}
+  .pain button.yes[aria-pressed="true"]{border-color:var(--care);background:var(--careb);color:var(--care)}
+  .pain button.no[aria-pressed="true"]{border-color:var(--sharpen);background:var(--sharpenb);color:var(--sharpen)}
+  .paincols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+  @media(max-width:560px){.paincols{grid-template-columns:1fr}}
+  .pcol{border:1px solid var(--line);border-radius:13px;padding:12px 14px}
+  .pcol h4{margin:0 0 7px;font-size:13.5px} .pcol ul{margin:0;padding-left:16px}.pcol li{margin:5px 0;font-size:13px;line-height:1.4}
+  .pcol.work{background:var(--sharpenb);border-color:rgba(36,182,176,.4)} .pcol.work h4{color:var(--sharpen)}
+  .pcol.prot{background:var(--careb);border-color:rgba(232,106,146,.42)} .pcol.prot h4{color:var(--care)}
+  .tiny{font-size:12px;color:var(--muted)}
+  /* body map */
+  .bodymap{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}
+  .bodymap svg{width:150px;height:auto;flex:none}
+  .zone{fill:var(--panel2);stroke:var(--line);stroke-width:1.5;cursor:pointer;transition:.12s}
+  .zone:hover{fill:var(--restoreb);stroke:var(--restore)}
+  .zone.active{fill:var(--restore);stroke:var(--restore)}
+  .zone.logged{fill:var(--restoreb);stroke:var(--restore);stroke-width:2}
+  .deco{pointer-events:none}
+  #elseWrap{margin-top:9px;display:none}
+  #elseWrap input,#hsOtherWrap input{width:100%;box-sizing:border-box;border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;padding:9px 11px;font:inherit;font-size:13.5px}
+  #elseWrap input:focus,#hsOtherWrap input:focus{outline:none;border-color:var(--restore)}
+  .cyc{display:flex;flex-wrap:wrap;gap:7px}
+  .cyc button{border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:999px;padding:8px 13px;font:inherit;font-size:13px;font-weight:650;cursor:pointer;transition:.12s}
+  .cyc button:hover{border-color:var(--accent)}
+  .cyc button[aria-pressed="true"]{border-color:var(--restore);background:var(--restoreb);color:var(--restore)}
+  .bmright{flex:1;min-width:210px}
+  .zbtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
+  .zbtns button{border:1.5px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:999px;padding:7px 12px;font:inherit;font-size:12.5px;font-weight:650;cursor:pointer;transition:.12s}
+  .zbtns button:hover{border-color:var(--restore)}
+  .senspanel{margin-top:13px;display:none;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 13px}
+  .senspanel.show{display:block}
+  .senspanel .where{font-size:13.5px;font-weight:750;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+  .chip2{display:inline-flex;align-items:center;gap:7px;background:var(--restoreb);border:1px solid var(--restore);color:var(--ink);border-radius:999px;padding:5px 6px 5px 11px;font-size:12.5px;font-weight:650}
+  .chip2 button{border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:15px;line-height:1;padding:0 3px}
+  .chip2 button:hover{color:var(--care)}
+  .emptyhint{font-size:12.5px;color:var(--muted);margin-top:11px}
+  /* --- v3: sensation lexicon in three groups --- */
+  .sensgroup{margin-top:11px}
+  .sensgroup:first-of-type{margin-top:4px}
+  .sensgroup .gl{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .sensgroup.good .gl{color:var(--sharpen)}
+  .sensgroup.note .gl{color:var(--accent)}
+  .sensgroup.flag .gl{color:var(--care)}
+  .sensgroup.good button:hover{border-color:var(--sharpen)}
+  .sensgroup.note button:hover{border-color:var(--accent)}
+  .sensgroup.flag button{border-color:rgba(232,106,146,.5);background:var(--careb)}
+  .sensgroup.flag button:hover{border-color:var(--care)}
+  /* --- v3: intensity + behaviour --- */
+  .qual{margin-top:12px;border-top:1px solid var(--line);padding-top:11px;display:none}
+  .qual.show{display:block}
+  .qual .ql{font-size:12.5px;color:var(--muted);margin:0 0 6px}
+  .qual .ql:not(:first-child){margin-top:11px}
+  .qrow{display:flex;flex-wrap:wrap;gap:7px}
+  .qrow button{border:1.5px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;
+    padding:7px 12px;font:inherit;font-size:12.5px;font-weight:650;cursor:pointer;transition:.12s}
+  .qrow button:hover{border-color:var(--restore)}
+  .qrow button[aria-pressed="true"]{border-color:var(--restore);background:var(--restoreb);color:var(--restore)}
+  .addbtn{margin-top:13px;width:100%;border:none;border-radius:12px;padding:12px;font:inherit;font-weight:800;
+    font-size:14px;cursor:pointer;color:#14102b;background:var(--restore)}
+  .addbtn:disabled{opacity:.4;cursor:not-allowed}
+  /* --- v3: always-on acute capture --- */
+  .hurtbar{position:sticky;top:0;z-index:40;display:flex;justify-content:flex-end;margin:-6px 0 8px}
+  .hurtbtn{border:1.5px solid var(--care);background:var(--careb);color:var(--care);border-radius:999px;
+    padding:8px 14px;font:inherit;font-size:13px;font-weight:800;cursor:pointer;backdrop-filter:blur(6px);transition:.12s}
+  .hurtbtn:hover{background:var(--care);color:#2a0f19}
+  .scrim{position:fixed;inset:0;background:rgba(6,9,18,.72);display:none;z-index:60;padding:18px;overflow:auto}
+  .scrim.show{display:block}
+  .sheet{max-width:520px;margin:24px auto;background:var(--panel);border:1.5px solid var(--care);
+    border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+  .sheet h3{margin:0 0 4px;font-size:20px;color:var(--care)}
+  .sheet .x{float:right;border:none;background:transparent;color:var(--muted);font-size:24px;line-height:1;cursor:pointer}
+  .sheet .step{margin-top:14px}
+  .sheet .step h5{margin:0 0 7px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .redflagnote{margin-top:11px;background:var(--careb);border:1.5px solid var(--care);border-radius:12px;
+    padding:11px 13px;font-size:13.5px;color:var(--soft);display:none}
+  .redflagnote.show{display:block}
+  .redflagnote b{color:var(--care)}
+  .viewtoggle{display:inline-flex;gap:5px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:12px}
+  .viewtoggle button{border:none;background:transparent;color:var(--muted);border-radius:999px;padding:6px 18px;font:inherit;font-size:13px;font-weight:750;cursor:pointer;transition:.12s}
+  .viewtoggle button.on{background:var(--restore);color:#14102b}
+  .bmfigure{flex:none;display:flex;flex-direction:column;align-items:center}
+  .bodyview[hidden]{display:none}
+  .bodyview{width:150px;height:auto;margin-top:8px}
+  .viewcap{text-align:center;font-size:11px;color:var(--muted);margin-top:6px;font-weight:650}
+  .viewtoggle{display:inline-flex;gap:5px;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:12px}
+  .viewtoggle button{border:none;background:transparent;color:var(--muted);border-radius:999px;padding:6px 18px;font:inherit;font-size:13px;font-weight:750;cursor:pointer;transition:.12s}
+  .viewtoggle button.on{background:var(--restore);color:#14102b}
+  .bmfigure{flex:none;display:flex;flex-direction:column;align-items:center}
+  .bodyview[hidden]{display:none}
+  .bodyview{width:150px;height:auto;margin-top:8px}
+  .viewcap{text-align:center;font-size:11px;color:var(--muted);margin-top:6px;font-weight:650}
+  .go{width:100%;border:none;border-radius:14px;padding:16px;font:inherit;font-weight:850;font-size:16px;cursor:pointer;
+    color:#14102b;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--shadow);transition:.12s}
+  .go:hover{filter:brightness(1.05)} .go:disabled{opacity:.45;cursor:not-allowed;filter:none}
+  /* result */
+  .result{display:none} .result.show{display:block;animation:pop .3s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .learncard{border-radius:18px;padding:22px;border:1.5px solid var(--restore);background:var(--restoreb);box-shadow:var(--shadow);margin-bottom:14px}
+  .learncard .lh{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .learncard .em{width:48px;height:48px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;font-size:25px;background:var(--restore)}
+  .learncard h2{font-size:20px;margin:0;font-weight:850;letter-spacing:-.01em}
+  .learncard .tag{font-size:13px;color:var(--soft);font-weight:650}
+  .result h3{margin:16px 0 6px;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+  .result ul{margin:0;padding-left:20px}.result li{margin:5px 0;font-size:15px}
+  .recap{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin:13px 0;font-size:14px;color:var(--soft)}
+  .recap b{color:var(--ink)}
+  .care{margin:14px 0;background:var(--careb);border:1.5px solid var(--care);border-radius:14px;padding:15px 17px;display:none}
+  .care.show{display:block} .care h4{margin:0 0 6px;color:var(--care);font-size:16px}
+  .again{margin-top:14px;background:transparent;border:1.5px solid var(--line);color:var(--muted);border-radius:12px;padding:12px;width:100%;font:inherit;font-weight:700;cursor:pointer}
+  .again:hover{border-color:var(--accent);color:var(--ink)}
+  .foot{text-align:center;color:var(--muted);font-size:12.5px;margin-top:20px;line-height:1.6}
+  .foot b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- v3 · acute red-flag capture is always one tap away (master doc §5) -->
+  <div class="hurtbar"><button class="hurtbtn" id="hurtBtn" type="button">🩹 I got hurt</button></div>
+  <header>
+    <span class="brand">🌙 BAB · After-Training Reflect</span>
+    <h1>Close the loop</h1>
+    <p class="sub">This morning you predicted and chose a tempo. Now — a few minutes after finishing — you check what actually happened. Comparing the two is exactly how your inner read gets sharp.</p>
+    <div class="steps">
+      <span class="chip"><b>1</b> Look back</span>
+      <span class="chip"><b>2</b> Sense</span>
+      <span class="chip"><b>3</b> Learn</span>
+      <span class="chip"><b>4</b> Recover</span>
+    </div>
+  </header>
+
+  <div id="form">
+
+    <!-- STEP 1 · LOOK BACK -->
+    <div class="card">
+      <span class="lbl">Step 1 · Look back</span>
+      <p class="q">Which tempo did you actually train in today?</p>
+      <div class="gearpick" id="gear">
+        <button class="gbtn" data-gear="power" aria-pressed="false"><span class="ic">⚡</span><span class="nm">Upbeat</span><span class="ds">Full-effort build</span></button>
+        <button class="gbtn" data-gear="sharpen" aria-pressed="false"><span class="ic">🌊</span><span class="nm">Steady</span><span class="ds">Skill / quality</span></button>
+        <button class="gbtn" data-gear="restore" aria-pressed="false"><span class="ic">🍃</span><span class="nm">Gentle</span><span class="ds">Recovery</span></button>
+      </div>
+      <p class="q" style="font-size:15px;margin-top:16px" data-ch="effort">🔥 How hard did it actually feel?</p>
+      <div data-ch="effort"><div class="scale"></div><div class="ends"><span>Gentle</span><span>Absolutely maxed</span></div></div>
+    </div>
+
+    <!-- STEP 2 · SENSE — pinpoint & name -->
+    <div class="card">
+      <span class="lbl">Step 2 · Sense — pinpoint &amp; name it</span>
+      <p class="q">Where do you feel it? Give it a name.</p>
+      <p class="qh">A few minutes after finishing, everything's still loud — a brilliant moment to learn your signals. Pausing to find <em>where</em> a sensation sits, and putting a <em>word</em> to it, is the heart of the skill: it's how a vague "I feel off" becomes something you actually understand. Tap a spot — flip between <b>front</b> and <b>back</b> — then choose what it feels like. Add as many as you notice, or none if all feels quiet.</p>
+      <div class="bodymap">
+        <div class="bmfigure">
+          <div class="viewtoggle" id="viewtoggle">
+            <button type="button" data-view="front" class="on">Front</button>
+            <button type="button" data-view="back">Back</button>
+          </div>
+          <!-- FRONT -->
+          <svg class="bodyview" data-view="front" viewBox="0 0 200 400" role="img" aria-label="Front body map — tap where you feel a sensation">
+            <circle class="zone" data-label="Head" cx="100" cy="30" r="20"><title>Head</title></circle>
+            <circle class="deco" cx="93" cy="28" r="2.1" fill="var(--muted)"/>
+            <circle class="deco" cx="107" cy="28" r="2.1" fill="var(--muted)"/>
+            <path class="deco" d="M94 37 Q100 41 106 37" fill="none" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"/>
+            <rect class="zone" data-label="Neck &amp; shoulders" x="60" y="53" width="80" height="18" rx="9"><title>Neck &amp; shoulders</title></rect>
+            <rect class="zone" data-label="Chest" x="62" y="74" width="76" height="40" rx="12"><title>Chest</title></rect>
+            <rect class="zone" data-label="Left arm" x="38" y="74" width="17" height="96" rx="8"><title>Left arm</title></rect>
+            <rect class="zone" data-label="Right arm" x="145" y="74" width="17" height="96" rx="8"><title>Right arm</title></rect>
+            <ellipse class="zone" data-label="Left hand" cx="46" cy="182" rx="11" ry="13"><title>Left hand</title></ellipse>
+            <ellipse class="zone" data-label="Right hand" cx="154" cy="182" rx="11" ry="13"><title>Right hand</title></ellipse>
+            <rect class="zone" data-label="Tummy &amp; core" x="66" y="117" width="68" height="50" rx="11"><title>Tummy &amp; core</title></rect>
+            <rect class="zone" data-label="Hips" x="64" y="169" width="72" height="28" rx="11"><title>Hips</title></rect>
+            <rect class="zone" data-label="Left quad (front thigh)" x="66" y="199" width="30" height="76" rx="13"><title>Left quad</title></rect>
+            <rect class="zone" data-label="Right quad (front thigh)" x="104" y="199" width="30" height="76" rx="13"><title>Right quad</title></rect>
+            <ellipse class="zone" data-label="Left knee" cx="81" cy="284" rx="16" ry="11"><title>Left knee</title></ellipse>
+            <ellipse class="zone" data-label="Right knee" cx="119" cy="284" rx="16" ry="11"><title>Right knee</title></ellipse>
+            <rect class="zone" data-label="Left shin" x="69" y="295" width="24" height="60" rx="11"><title>Left shin</title></rect>
+            <rect class="zone" data-label="Right shin" x="107" y="295" width="24" height="60" rx="11"><title>Right shin</title></rect>
+            <ellipse class="zone" data-label="Left foot" cx="81" cy="366" rx="15" ry="10"><title>Left foot</title></ellipse>
+            <ellipse class="zone" data-label="Right foot" cx="119" cy="366" rx="15" ry="10"><title>Right foot</title></ellipse>
+          </svg>
+          <!-- BACK -->
+          <svg class="bodyview" data-view="back" viewBox="0 0 200 400" role="img" aria-label="Back body map — tap where you feel a sensation" hidden>
+            <circle class="zone" data-label="Head (back)" cx="100" cy="30" r="20"><title>Head (back)</title></circle>
+            <ellipse class="deco" cx="100" cy="15" rx="9" ry="8" fill="var(--restore)" opacity="0.6"/>
+            <rect class="zone" data-label="Neck" x="66" y="53" width="68" height="16" rx="8"><title>Neck</title></rect>
+            <rect class="zone" data-label="Upper back &amp; shoulders" x="60" y="71" width="80" height="44" rx="12"><title>Upper back &amp; shoulders</title></rect>
+            <rect class="zone" data-label="Left arm" x="38" y="74" width="17" height="96" rx="8"><title>Left arm</title></rect>
+            <rect class="zone" data-label="Right arm" x="145" y="74" width="17" height="96" rx="8"><title>Right arm</title></rect>
+            <ellipse class="zone" data-label="Left hand" cx="46" cy="182" rx="11" ry="13"><title>Left hand</title></ellipse>
+            <ellipse class="zone" data-label="Right hand" cx="154" cy="182" rx="11" ry="13"><title>Right hand</title></ellipse>
+            <rect class="zone" data-label="Lower back" x="66" y="117" width="68" height="34" rx="11"><title>Lower back</title></rect>
+            <rect class="zone" data-label="Glutes" x="64" y="153" width="72" height="34" rx="13"><title>Glutes</title></rect>
+            <rect class="zone" data-label="Left hamstring" x="66" y="189" width="30" height="74" rx="13"><title>Left hamstring</title></rect>
+            <rect class="zone" data-label="Right hamstring" x="104" y="189" width="30" height="74" rx="13"><title>Right hamstring</title></rect>
+            <ellipse class="zone" data-label="Left knee (back)" cx="81" cy="272" rx="16" ry="10"><title>Left knee (back)</title></ellipse>
+            <ellipse class="zone" data-label="Right knee (back)" cx="119" cy="272" rx="16" ry="10"><title>Right knee (back)</title></ellipse>
+            <rect class="zone" data-label="Left calf" x="69" y="283" width="24" height="60" rx="11"><title>Left calf</title></rect>
+            <rect class="zone" data-label="Right calf" x="107" y="283" width="24" height="60" rx="11"><title>Right calf</title></rect>
+            <ellipse class="zone" data-label="Left heel &amp; ankle" cx="81" cy="354" rx="15" ry="10"><title>Left heel &amp; ankle</title></ellipse>
+            <ellipse class="zone" data-label="Right heel &amp; ankle" cx="119" cy="354" rx="15" ry="10"><title>Right heel &amp; ankle</title></ellipse>
+            <line class="deco" x1="100" y1="76" x2="100" y2="148" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="4 5" stroke-linecap="round" opacity="0.8"/>
+          </svg>
+          <div class="viewcap" id="viewcap">Showing the front — tap Back to flip</div>
+        </div>
+        <div class="bmright">
+          <div class="tiny">Or all over / somewhere else?</div>
+          <div class="zbtns" id="extraZones">
+            <button type="button" data-label="All over">All over</button>
+            <button type="button" data-zone="else" data-label="Somewhere else">Somewhere else</button>
+          </div>
+          <div id="elseWrap">
+            <input id="elseInput" type="text" maxlength="40" placeholder="Type where — e.g. wrist, jaw, ribs…" aria-label="Type where you feel it">
+          </div>
+          <div class="senspanel" id="senspanel">
+            <div class="where" id="whereLbl"></div>
+            <div class="tiny" style="margin-bottom:7px">What does it feel like?</div>
+
+            <!-- v3 · positive & neutral options included, to build literacy and avoid
+                 hypervigilance (master doc §4.3) -->
+            <div class="sensgroup good">
+              <div class="gl">Feels good</div>
+              <div class="zbtns sensrow">
+                <button type="button" data-s="Strong">💪 Strong</button>
+                <button type="button" data-s="Warm / switched on">🔥 Warm / switched on</button>
+                <button type="button" data-s="Light">🪶 Light</button>
+                <button type="button" data-s="All fine">✨ All fine</button>
+              </div>
+            </div>
+            <div class="sensgroup note">
+              <div class="gl">Worth noticing</div>
+              <div class="zbtns sensrow">
+                <button type="button" data-s="Tight / stiff">Tight / stiff</button>
+                <button type="button" data-s="Sore / achy">Sore / achy</button>
+                <button type="button" data-s="Burning">Burning</button>
+                <button type="button" data-s="Heavy / tired">Heavy / tired</button>
+                <button type="button" data-s="Tender">Tender</button>
+                <button type="button" data-s="Buzzy / tingly / numb">Buzzy / tingly / numb</button>
+                <button type="button" data-s="Crampy">Crampy</button>
+                <button type="button" data-s="Sharp">Sharp</button>
+              </div>
+            </div>
+            <!-- v3 · the two red-flag sensations from §4.3 that were missing.
+                 Tapping one routes to Care on its own — she never has to make the
+                 clinical call herself. -->
+            <div class="sensgroup flag">
+              <div class="gl">Worth showing someone</div>
+              <div class="zbtns sensrow">
+                <button type="button" data-s="Gives way / unstable" data-flag="1">Gives way / unstable</button>
+                <button type="button" data-s="Swollen / hot" data-flag="1">Swollen / hot</button>
+              </div>
+            </div>
+
+            <!-- v3 · intensity + behaviour tag (master doc §4.3) -->
+            <div class="qual" id="qual">
+              <p class="ql">How strong is it?</p>
+              <div class="qrow" id="intensity">
+                <button type="button" data-i="1">A little</button>
+                <button type="button" data-i="2">Quite a bit</button>
+                <button type="button" data-i="3">A lot</button>
+              </div>
+              <p class="ql">And what does it do?</p>
+              <div class="qrow" id="behaviour">
+                <button type="button" data-b="eases">Eases as I warm up</button>
+                <button type="button" data-b="worse">Worse under load</button>
+                <button type="button" data-b="rest">There even at rest</button>
+              </div>
+              <button class="addbtn" id="addEntry" type="button" disabled>Add this</button>
+            </div>
+          </div>
+          <div class="redflagnote" id="redflagnote">
+            <b>Good catch.</b> You've named something that's worth showing to an adult today —
+            a coach, a parent, or a physio. It doesn't mean anything is wrong; it means this
+            is the kind of signal that gets looked at rather than trained through. You'll
+            find what to do at the end.
+          </div>
+          <div class="chips" id="chips"></div>
+          <div class="emptyhint" id="emptyhint">Nothing added yet — tap a spot to begin.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 · SENSE — quick read -->
+    <div class="card">
+      <span class="lbl">Step 2 · Sense — a quick read</span>
+
+      <div style="margin-top:14px" data-ch="legs">
+        <p class="q" style="font-size:15px">💪 Legs &amp; muscles</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Trashed / heavy</span><span>Light &amp; fine</span></div>
+      </div>
+      <div style="margin-top:16px" data-ch="breath">
+        <p class="q" style="font-size:15px">🫁 Breathing &amp; heart</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Still pounding</span><span>Settled &amp; calm</span></div>
+      </div>
+      <div style="margin-top:16px" data-ch="energy">
+        <p class="q" style="font-size:15px">🔋 Energy right now</p>
+        <div class="scale"></div>
+        <div class="ends"><span>Drained</span><span>Still buzzing</span></div>
+      </div>
+      <div style="margin-top:18px">
+        <p class="q" style="font-size:15px">🧠 Headspace <span style="font-weight:600;color:var(--muted);font-size:12.5px">· tap any that fit</span></p>
+        <div class="cyc" id="headspace" style="margin-top:6px">
+          <button type="button" data-feel="distracted" aria-pressed="false">🌀 Distracted</button>
+          <button type="button" data-feel="insecure" aria-pressed="false">🫣 Insecure</button>
+          <button type="button" data-feel="stressed" aria-pressed="false">😣 Stressed</button>
+          <button type="button" data-feel="overwhelmed" aria-pressed="false">😵‍💫 Overwhelmed</button>
+          <button type="button" data-feel="calm" aria-pressed="false">😌 Calm</button>
+          <button type="button" data-feel="focused" aria-pressed="false">🎯 Focused</button>
+          <button type="button" data-feel="confident" aria-pressed="false">😎 Confident</button>
+          <button type="button" data-feel="__other" aria-pressed="false">➕ Other</button>
+        </div>
+        <div id="hsOtherWrap" style="display:none;margin-top:9px">
+          <input id="hsOther" type="text" maxlength="60" placeholder="In your own words…" aria-label="Describe your headspace">
+        </div>
+      </div>
+    </div>
+
+    <!-- niggle check (decode only) -->
+    <div class="card">
+      <span class="lbl">Decode any ache</span>
+      <p class="q">Anything show up during or after?</p>
+      <p class="qh">Some things only appear once you stop. Just name the sensation — deciding what to do comes next.</p>
+      <div class="paincols">
+        <div class="pcol work">
+          <h4>✅ Working &amp; everyday ache</h4>
+          <ul>
+            <li>The <b>burn</b> or tiredness of muscles that worked hard</li>
+            <li>Muscles feeling <b>tight or stiff</b></li>
+            <li>Soreness that's fairly <b>even on both sides</b></li>
+            <li>Dull, come-and-go aches — a <b>crampy tummy or lower back, or a heavy, bloated feeling</b></li>
+          </ul>
+        </div>
+        <div class="pcol prot">
+          <h4>🛡️ Protective pain</h4>
+          <ul>
+            <li><b>Sharp, stabbing or sudden</b></li>
+            <li><b>Inside a joint or a bone</b></li>
+            <li>On <b>one side only</b>, or makes you limp</li>
+            <li>New, and <b>not easing</b> as you cool down</li>
+          </ul>
+        </div>
+      </div>
+      <p class="q" style="font-size:15px;margin-top:13px">Feeling any of the 🛡️ protective kind?</p>
+      <div class="pain">
+        <button class="no" data-pain="0" aria-pressed="false">No</button>
+        <button class="yes" data-pain="1" aria-pressed="false">Yes</button>
+      </div>
+    </div>
+
+    <div style="height:6px"></div>
+    <div class="tiny" style="text-align:center;margin-bottom:11px">Steps <b>3 · Learn</b> and <b>4 · Recover</b> appear right after you tap below.</div>
+    <button class="go" id="go" disabled>See what today taught me →</button>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result" id="result">
+    <div class="learncard">
+      <div class="lh">
+        <div class="em">🧭</div>
+        <div>
+          <h2 id="lhead"></h2>
+          <div class="tag">Step 3 · Learn — your read vs what happened</div>
+        </div>
+      </div>
+      <div id="lbody"></div>
+    </div>
+
+    <div class="recap" id="recap"></div>
+
+    <div class="care" id="care">
+      <h4>🛡️ Care mode — protect it first</h4>
+      <div id="careText"></div>
+    </div>
+
+    <h3>Step 4 · Recover — what your body's asking for now</h3>
+    <ul id="recover"></ul>
+
+    <p class="tiny" style="margin-top:14px">Every time you compare your morning read to what actually happened, your predictions get a little sharper. That's the whole game — you're learning to trust yourself. 🌱</p>
+
+    <button class="again" id="again">↺ New reflection</button>
+  </div>
+
+  <p class="foot">Recovery isn't the boring bit after training — it's <b>where the training actually works.</b> Listening to what your body asks for now is you being your own best coach. For protective pain or anything that feels off, always loop in your coach, physio or parents.</p>
+</div>
+
+<!-- v3 · acute capture sheet — reachable from any screen, any time -->
+<div class="scrim" id="hurtScrim">
+  <div class="sheet">
+    <button class="x" id="hurtClose" type="button" aria-label="Close">×</button>
+    <h3>🩹 Something happened</h3>
+    <p class="qh" style="margin:0">You don't have to wait for a check-in. Tell me where, and
+    what it feels like — that's enough to know what to do next.</p>
+
+    <div class="step">
+      <h5>Where is it?</h5>
+      <div class="zbtns" id="hurtZones"></div>
+      <div style="margin-top:9px"><input id="hurtElse" type="text" maxlength="40"
+        placeholder="Or type where — e.g. wrist, jaw, ribs…" aria-label="Type where it hurts"
+        style="width:100%;box-sizing:border-box;border:1.5px solid var(--line);background:var(--panel2);
+        color:var(--ink);border-radius:10px;padding:9px 11px;font:inherit;font-size:13.5px"></div>
+    </div>
+
+    <div class="step">
+      <h5>What does it feel like?</h5>
+      <div class="zbtns" id="hurtSens">
+        <button type="button" data-s="Sharp / stabbing" data-flag="1">Sharp / stabbing</button>
+        <button type="button" data-s="Gives way / unstable" data-flag="1">Gives way / unstable</button>
+        <button type="button" data-s="Swollen / hot" data-flag="1">Swollen / hot</button>
+        <button type="button" data-s="Deep in a joint or bone" data-flag="1">Deep in a joint or bone</button>
+        <button type="button" data-s="Numb / pins and needles" data-flag="1">Numb / pins and needles</button>
+        <button type="button" data-s="Sore / achy">Sore / achy</button>
+        <button type="button" data-s="Tight / stiff">Tight / stiff</button>
+      </div>
+    </div>
+
+    <div class="care show" id="hurtCare" style="margin-top:16px;display:none">
+      <h4>🛡️ Care mode — protect it first</h4>
+      <div id="hurtCareText"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var EM={
+    effort: ["😌","🙂","😅","🥵","🥴"],          // easy → maxed
+    legs:   ["🪨","🪵","🍂","🪶","🦋"],          // trashed → light (nature)
+    breath: ["🌩️","🌧️","🌥️","🌤️","☀️"],          // pounding → settled
+    energy: ["🪫","🔅","🔆","✨","⚡"]            // drained → buzzing
+  };
+  // scale channels used for the "how recovered" average (effort handled separately; headspace folded in)
+  var body=["legs","breath","energy"];
+  var vals={effort:null,legs:null,breath:null,energy:null};
+  var gear=null, pain=null;
+  // headspace = multi-select feelings (matches the morning check-in)
+  var headspaceSel=[]; var headspaceOther="";
+  var HS_POS=["calm","focused","confident"], HS_NEG=["distracted","insecure","stressed","overwhelmed"];
+  var HS_LABEL={distracted:"distracted",insecure:"insecure",stressed:"stressed",overwhelmed:"overwhelmed",calm:"calm",focused:"focused",confident:"confident"};
+  function headspaceValue(){
+    if(headspaceSel.length===0) return headspaceOther.trim()?3:null;
+    var p=headspaceSel.filter(function(x){return HS_POS.indexOf(x)>=0;}).length;
+    var n=headspaceSel.filter(function(x){return HS_NEG.indexOf(x)>=0;}).length;
+    return Math.max(1,Math.min(5,3+p-n));
+  }
+  function headspaceReady(){ return headspaceSel.length>0 || headspaceOther.trim().length>0; }
+
+  var GNAME={power:"Upbeat",sharpen:"Steady",restore:"Gentle"};
+
+  document.querySelectorAll('[data-ch] .scale').forEach(function(scale){
+    var key=scale.parentElement.getAttribute('data-ch'); var em=EM[key]||["1","2","3","4","5"];
+    for(var i=1;i<=5;i++){(function(v){
+      var b=document.createElement('button'); b.className='opt'; b.type='button'; b.setAttribute('aria-pressed','false');
+      b.innerHTML='<span class="em">'+em[v-1]+'</span><span class="n">'+v+'</span>';
+      b.onclick=function(){ scale.querySelectorAll('.opt').forEach(function(o){o.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); vals[key]=v; refresh(); };
+      scale.appendChild(b);
+    })(i);}
+  });
+
+  document.querySelectorAll('#gear .gbtn').forEach(function(b){
+    b.onclick=function(){ document.querySelectorAll('#gear .gbtn').forEach(function(o){o.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); gear=b.getAttribute('data-gear'); refresh(); };
+  });
+  document.querySelectorAll('.pain button').forEach(function(b){
+    b.onclick=function(){ document.querySelectorAll('.pain button').forEach(function(o){o.setAttribute('aria-pressed','false')}); b.setAttribute('aria-pressed','true'); pain=parseInt(b.getAttribute('data-pain'),10); refresh(); };
+  });
+
+  // headspace (multi-select feelings + Other)
+  document.querySelectorAll('#headspace button').forEach(function(b){
+    b.onclick=function(){
+      var feel=b.getAttribute('data-feel');
+      var pressed=b.getAttribute('aria-pressed')==='true';
+      if(feel==='__other'){
+        var wrap=document.getElementById('hsOtherWrap');
+        if(pressed){ b.setAttribute('aria-pressed','false'); wrap.style.display='none'; document.getElementById('hsOther').value=''; headspaceOther=''; }
+        else { b.setAttribute('aria-pressed','true'); wrap.style.display='block'; document.getElementById('hsOther').focus(); }
+        refresh(); return;
+      }
+      if(pressed){ b.setAttribute('aria-pressed','false'); headspaceSel=headspaceSel.filter(function(x){return x!==feel;}); }
+      else { b.setAttribute('aria-pressed','true'); headspaceSel.push(feel); }
+      refresh();
+    };
+  });
+  var hsOther=document.getElementById('hsOther');
+  if(hsOther){ hsOther.addEventListener('input',function(){ headspaceOther=this.value; refresh(); }); }
+
+  function ready(){ return gear && pain!==null && vals.effort!==null && body.every(function(k){return vals[k]!==null;}) && headspaceReady(); }
+  function refresh(){ document.getElementById('go').disabled=!ready(); }
+
+  // ---- body map: locate & name (optional, reflective) ----
+  // v3: an entry is {label, s, flag, intensity, behaviour} — §4.3 asks for intensity
+  // and a behaviour tag on every tap, and the behaviour tag is the clinical
+  // discriminator between adaptive and protective pain.
+  var entries=[]; var activeLabel=null;
+  var draft={s:null,flag:0,intensity:null,behaviour:null};
+
+  var INTENSITY_LABEL={1:'a little',2:'quite a bit',3:'a lot'};
+  var BEHAVIOUR_LABEL={eases:'eases with warm-up',worse:'worse under load',rest:'there at rest'};
+
+  function resetDraft(){
+    draft={s:null,flag:0,intensity:null,behaviour:null};
+    document.querySelectorAll('#sensBtns button,.sensrow button,#intensity button,#behaviour button')
+      .forEach(function(b){b.setAttribute('aria-pressed','false');});
+    document.getElementById('qual').classList.remove('show');
+    document.getElementById('addEntry').disabled=true;
+  }
+  function draftReady(){ return draft.s && draft.intensity && draft.behaviour; }
+  function syncAdd(){ document.getElementById('addEntry').disabled=!draftReady(); }
+  function hasRedFlag(){ return entries.some(function(e){return e.flag;}); }
+
+  function setActive(zoneEl,label){
+    activeLabel=label;
+    document.querySelectorAll('svg .zone').forEach(function(z){z.classList.remove('active');});
+    if(zoneEl) zoneEl.classList.add('active');
+    document.getElementById('whereLbl').innerHTML='Where: <span style="color:var(--restore)">'+label+'</span>';
+    document.getElementById('senspanel').classList.add('show');
+    resetDraft();
+  }
+  function markLogged(){
+    document.querySelectorAll('svg .zone').forEach(function(z){
+      var lbl=z.getAttribute('data-label');
+      if(entries.some(function(e){return e.label===lbl;})) z.classList.add('logged'); else z.classList.remove('logged');
+    });
+  }
+  function renderChips(){
+    var c=document.getElementById('chips'); c.innerHTML='';
+    entries.forEach(function(e,i){
+      var chip=document.createElement('span'); chip.className='chip2';
+      if(e.flag) chip.style.borderColor='var(--care)';
+      chip.innerHTML=(e.flag?'🛡️ ':'📍 ')+e.label+' — <b>'+e.s+'</b>'+
+        '<span style="color:var(--muted);font-weight:600"> · '+INTENSITY_LABEL[e.intensity]+
+        ' · '+BEHAVIOUR_LABEL[e.behaviour]+'</span>';
+      var x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','remove'); x.textContent='×';
+      x.onclick=function(){ entries.splice(i,1); renderChips(); markLogged(); syncFlagNote(); refresh(); };
+      chip.appendChild(x); c.appendChild(chip);
+    });
+    document.getElementById('emptyhint').style.display= entries.length?'none':'block';
+  }
+  // v3: a red-flag sensation routes to Care on its own — the athlete is never asked
+  // to make the clinical call herself (guardrails §10).
+  function syncFlagNote(){
+    document.getElementById('redflagnote').classList.toggle('show', hasRedFlag());
+  }
+  function hideElse(){ var w=document.getElementById('elseWrap'); if(w) w.style.display='none'; var i=document.getElementById('elseInput'); if(i) i.value=''; }
+  document.querySelectorAll('svg .zone').forEach(function(z){
+    z.addEventListener('click',function(){ hideElse(); setActive(z, z.getAttribute('data-label')); });
+  });
+  // front / back toggle
+  document.querySelectorAll('#viewtoggle button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#viewtoggle button').forEach(function(o){o.classList.remove('on');});
+      b.classList.add('on');
+      var v=b.getAttribute('data-view');
+      document.querySelectorAll('.bodyview').forEach(function(sv){
+        if(sv.getAttribute('data-view')===v) sv.removeAttribute('hidden'); else sv.setAttribute('hidden','');
+      });
+      document.getElementById('viewcap').textContent = (v==='front') ? 'Showing the front — tap Back to flip' : 'Showing the back — tap Front to flip';
+    });
+  });
+  // extra zones (All over / Somewhere else)
+  document.querySelectorAll('#extraZones button').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(b.getAttribute('data-zone')==='else'){
+        document.querySelectorAll('svg .zone').forEach(function(z){z.classList.remove('active');});
+        var w=document.getElementById('elseWrap'); w.style.display='block';
+        var inp=document.getElementById('elseInput'); inp.focus();
+        var t=inp.value.trim();
+        if(t){ activeLabel=t; document.getElementById('whereLbl').innerHTML='Where: <span style="color:var(--restore)">'+t+'</span>'; document.getElementById('senspanel').classList.add('show'); }
+        else { activeLabel=null; document.getElementById('senspanel').classList.remove('show'); }
+      } else {
+        hideElse(); setActive(null, b.getAttribute('data-label'));
+      }
+    });
+  });
+  var elseInput=document.getElementById('elseInput');
+  if(elseInput){ elseInput.addEventListener('input',function(){
+    var t=this.value.trim();
+    if(t){ activeLabel=t; document.getElementById('whereLbl').innerHTML='Where: <span style="color:var(--restore)">'+t+'</span>'; document.getElementById('senspanel').classList.add('show'); }
+    else { activeLabel=null; document.getElementById('senspanel').classList.remove('show'); }
+  }); }
+  // v3: choosing a sensation no longer commits the entry — it opens intensity +
+  // behaviour, and "Add this" commits.
+  document.querySelectorAll('.sensrow button').forEach(function(b){
+    b.addEventListener('click',function(){
+      if(!activeLabel) return;
+      document.querySelectorAll('.sensrow button').forEach(function(o){o.setAttribute('aria-pressed','false');});
+      b.setAttribute('aria-pressed','true');
+      draft.s=b.getAttribute('data-s');
+      draft.flag=b.getAttribute('data-flag')?1:0;
+      document.getElementById('qual').classList.add('show');
+      syncAdd();
+    });
+  });
+  document.querySelectorAll('#intensity button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#intensity button').forEach(function(o){o.setAttribute('aria-pressed','false');});
+      b.setAttribute('aria-pressed','true');
+      draft.intensity=parseInt(b.getAttribute('data-i'),10); syncAdd();
+    });
+  });
+  document.querySelectorAll('#behaviour button').forEach(function(b){
+    b.addEventListener('click',function(){
+      document.querySelectorAll('#behaviour button').forEach(function(o){o.setAttribute('aria-pressed','false');});
+      b.setAttribute('aria-pressed','true');
+      draft.behaviour=b.getAttribute('data-b'); syncAdd();
+    });
+  });
+  document.getElementById('addEntry').onclick=function(){
+    if(!activeLabel||!draftReady()) return;
+    entries.push({label:activeLabel, s:draft.s, flag:draft.flag,
+                  intensity:draft.intensity, behaviour:draft.behaviour});
+    renderChips(); markLogged(); syncFlagNote(); refresh();
+    document.getElementById('senspanel').classList.remove('show');
+    document.querySelectorAll('svg .zone').forEach(function(z){z.classList.remove('active');});
+    hideElse(); resetDraft();
+    activeLabel=null;
+  };
+
+  document.getElementById('go').onclick=function(){
+    var hsv=headspaceValue()||3;
+    var bodyAvg=(vals.legs+vals.breath+vals.energy+hsv)/4; // headspace folded into the recovered read
+    var effort=vals.effort;
+    var head, body_html, tone="🧭";
+
+    if(gear==="power"){
+      if(bodyAvg>=3.5){ head="Spot-on read"; tone="🎯";
+        body_html="You backed yourself for an Upbeat day and your body handled it well. Lock in how this feels — it's your reference for a good, recovered Upbeat day."; }
+      else if(bodyAvg<2.5){ head="Your body took a lot today"; tone="🍃";
+        body_html="That Upbeat session cost more than usual — and noticing that gap between effort and how you feel now <em>is</em> the lesson. It's a nudge to go Steady or Gentle tomorrow. Nothing went wrong; you just learned something about today."; }
+      else { head="A solid, honest Upbeat day"; tone="⚡";
+        body_html="You pushed hard and you're pleasantly tired — that's exactly right after real work. This is the good kind of empty."; }
+    } else if(gear==="sharpen"){
+      if(effort>=4 && bodyAvg<3){ head="Steady that tipped into Upbeat"; tone="👀";
+        body_html="You called a Steady day but ended up pushing hard — and your body's feeling it. Worth a curious look: what made you go harder than planned? That's a useful thing to spot."; }
+      else if(bodyAvg>=4 && effort<=2){ head="Plenty left in the tank"; tone="🌤️";
+        body_html="Steady felt easy and you're still fresh — you may have had more today. That's not a mistake: a quality day is never wasted, and now you know your read a little better."; }
+      else { head="Nicely judged Steady day"; tone="🎯";
+        body_html="Controlled effort, body in good shape. This is skilful training — quality over quantity, exactly as intended."; }
+    } else { // gentle
+      if(effort>=4){ head="Gentle that became real work"; tone="👀";
+        body_html="This was meant to be gentle, but it turned into a proper effort. If your body needed rest, keep half an eye on that — recovery only counts when it's actually easy. No drama, just something to notice."; }
+      else { head="A real Gentle day — well played"; tone="🍃";
+        body_html="You kept it gentle and let your body rebuild. This is where your hard days quietly turn into strength. Choosing this takes more confidence than pushing does."; }
+    }
+
+    document.getElementById('lhead').textContent=head;
+    document.getElementById('lbody').innerHTML="<p style='margin:6px 0 0'>"+body_html+"</p>";
+
+    var noticed = entries.length
+      ? "You paused and named "+entries.length+" sensation"+(entries.length>1?"s":"")+": <b>"+entries.map(function(e){return e.label+" ("+e.s+")";}).join(", ")+"</b>. Doing that — locating it and giving it a word — is exactly the muscle we're building.<br><br>"
+      : "";
+    var hsList=headspaceSel.map(function(k){return HS_LABEL[k];});
+    if(headspaceOther.trim()) hsList.push('"'+headspaceOther.trim()+'"');
+    var hsEcho = hsList.length ? "🧠 Headspace after: <b>"+hsList.join(", ")+"</b>.<br><br>" : "";
+    document.getElementById('recap').innerHTML= noticed + hsEcho +
+      "You trained in <b>"+GNAME[gear]+"</b>, it felt <b>"+effort+"/5</b> hard, and right now your body reads about <b>"+bodyAvg.toFixed(1)+"/5</b>. "+
+      "<span style='color:var(--muted)'>One quiet question worth sitting with: what surprised you most about today — and which signal told you first?</span>";
+
+    // recover — listening prompts (post-exercise refuel/rehydrate/sleep is appropriate here)
+    var rec=[];
+    var hard = effort>=4 || bodyAvg<2.5;
+    if(gear==="restore" && effort<=2){
+      rec.push("Refuel with a normal, balanced meal when you're hungry, and sip water.");
+      rec.push("Let your body enjoy the easy day — light stretching if it feels nice.");
+      rec.push("A good night's sleep tonight seals in the recovery.");
+    } else {
+      rec.push("Refuel when you're hungry — a proper meal or snack tops up what you used and helps you rebuild.");
+      rec.push("Rehydrate steadily — keep sipping water.");
+      rec.push(hard ? "Today was a big effort, so <b>protect your sleep tonight</b> — that's when this training actually becomes strength." : "Sleep well tonight — that's when today's work turns into strength.");
+      rec.push("A few minutes of easy stretching or a gentle walk helps you wind down.");
+    }
+    var ul=document.getElementById('recover'); ul.innerHTML='';
+    rec.forEach(function(r){var li=document.createElement('li');li.innerHTML=r;ul.appendChild(li);});
+
+    var care=document.getElementById('care');
+    // v3: Care opens either because she flagged protective pain, or because a
+    // red-flag sensation was named on the body map — she never has to classify it.
+    if(pain===1 || hasRedFlag()){
+      care.classList.add('show');
+      var flagged=entries.filter(function(e){return e.flag;});
+      var opener = flagged.length
+        ? "<p style='margin:0 0 8px'>You named <b>"+flagged.map(function(e){return e.s.toLowerCase()+" in your "+e.label.toLowerCase();}).join(", ")+"</b> — that's the kind of signal that gets looked at rather than trained through. Good catch, especially after training when it can sneak up. That part goes into Care.</p>"
+        : "<p style='margin:0 0 8px'>You flagged protective pain — smart catch, especially after training when it can sneak up. That part goes into Care.</p>";
+      document.getElementById('careText').innerHTML= opener+
+        "<ul style='margin:0;padding-left:20px'>"+
+        "<li>Don't load it again today. Rest that area.</li>"+
+        "<li>Ice/elevate if it's swollen, and tell your coach and a parent today.</li>"+
+        "<li>If it hurts at night, makes you limp, or isn't better in a couple of days, see a physio or doctor. Growing bones get joint and bone pain checked, never pushed through.</li>"+
+        "</ul>";
+    } else { care.classList.remove('show'); }
+
+    document.getElementById('form').style.display='none';
+    document.getElementById('result').classList.add('show');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+
+  /* ---------- v3 · acute capture, always one tap away (master doc §5) ---------- */
+  (function(){
+    var scrim=document.getElementById('hurtScrim');
+    var zonesEl=document.getElementById('hurtZones');
+    var elseEl=document.getElementById('hurtElse');
+    var careEl=document.getElementById('hurtCare');
+    var where=null, what=null, isFlag=false;
+
+    // reuse the same regions as the body map, so the vocabulary stays identical
+    var seen={};
+    document.querySelectorAll('svg .zone').forEach(function(z){
+      var l=z.getAttribute('data-label');
+      var base=l.replace(/ \(back\)$/,'');
+      if(seen[base]) return; seen[base]=1;
+      var b=document.createElement('button'); b.type='button'; b.textContent=base;
+      b.onclick=function(){
+        zonesEl.querySelectorAll('button').forEach(function(o){o.setAttribute('aria-pressed','false');});
+        b.setAttribute('aria-pressed','true'); elseEl.value=''; where=base; render();
+      };
+      zonesEl.appendChild(b);
+    });
+    elseEl.addEventListener('input',function(){
+      if(this.value.trim()){
+        zonesEl.querySelectorAll('button').forEach(function(o){o.setAttribute('aria-pressed','false');});
+        where=this.value.trim();
+      } else { where=null; }
+      render();
+    });
+    document.querySelectorAll('#hurtSens button').forEach(function(b){
+      b.onclick=function(){
+        document.querySelectorAll('#hurtSens button').forEach(function(o){o.setAttribute('aria-pressed','false');});
+        b.setAttribute('aria-pressed','true');
+        what=b.getAttribute('data-s'); isFlag=!!b.getAttribute('data-flag'); render();
+      };
+    });
+
+    function render(){
+      if(!where || !what){ careEl.style.display='none'; return; }
+      careEl.style.display='block';
+      var urgent = isFlag
+        ? "<p style='margin:0 0 8px'>You've got <b>"+what.toLowerCase()+"</b> in your <b>"+where.toLowerCase()+"</b>. Stop what you're doing with it. This is the kind of thing an adult needs to know about <b>today</b> — not tomorrow.</p>"
+        : "<p style='margin:0 0 8px'>You've got <b>"+what.toLowerCase()+"</b> in your <b>"+where.toLowerCase()+"</b>. Keep an eye on it, and don't push through it if it sharpens.</p>";
+      careEl.querySelector('#hurtCareText').innerHTML = urgent +
+        "<ul style='margin:0;padding-left:20px'>"+
+        "<li>Don't load through it. Stop what makes it hurt.</li>"+
+        "<li>Gentle, <em>pain-free</em> movement only — otherwise rest that area.</li>"+
+        "<li>Tell your coach and a parent <b>"+(isFlag?"right now":"today")+"</b>.</li>"+
+        "<li>If it hurts at night, makes you limp, or isn't better in a couple of days, see a physio or doctor. Your bones are still growing, so joint and bone pain gets checked, never pushed through.</li>"+
+        "</ul>"+
+        "<p style='margin:10px 0 0;font-size:13px;color:var(--muted)'>Words you can borrow: "+
+        "<em>\"I've got "+what.toLowerCase()+" in my "+where.toLowerCase()+" — I need to stop and get it looked at.\"</em></p>";
+    }
+
+    document.getElementById('hurtBtn').onclick=function(){ scrim.classList.add('show'); document.body.style.overflow='hidden'; };
+    function close(){ scrim.classList.remove('show'); document.body.style.overflow=''; }
+    document.getElementById('hurtClose').onclick=close;
+    scrim.addEventListener('click',function(e){ if(e.target===this) close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape' && scrim.classList.contains('show')) close(); });
+  })();
+
+  document.getElementById('again').onclick=function(){
+    vals={effort:null,legs:null,breath:null,energy:null}; gear=null; pain=null;
+    headspaceSel=[]; headspaceOther='';
+    document.getElementById('hsOtherWrap').style.display='none'; document.getElementById('hsOther').value='';
+    entries=[]; activeLabel=null; renderChips(); markLogged();
+    resetDraft(); syncFlagNote();
+    document.getElementById('senspanel').classList.remove('show');
+    hideElse();
+    document.querySelectorAll('.opt,.pain button,#gear .gbtn,#headspace button').forEach(function(o){o.setAttribute('aria-pressed','false');});
+    document.getElementById('result').classList.remove('show');
+    document.getElementById('form').style.display='block';
+    refresh(); window.scrollTo({top:0,behavior:'smooth'});
+  };
+})();
+</script>
+</body>
+</html>

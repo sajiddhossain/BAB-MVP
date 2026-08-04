@@ -47,7 +47,7 @@
 | P1 | Predict + confidenza + ore sonno | 🟠 | Predict ✅; confidenza e ore 🔴 |
 | P2 | Tune in — 4 canali + Headspace | ✅ | |
 | P2b | "Ti ha sorpresa qualcosa?" | 🔴 | Segnale micro del §5 |
-| P3 | Mappa corporea + sensazione | 🟠 | Mancano intensità, tag comportamento, 2 sensazioni red flag |
+| P3 | Mappa corporea + sensazione | ✅ | v3: lessico a 14 voci in 3 gruppi, intensità, tag comportamento, red flag che instradano da sole |
 | P4 | Decode your ache + domanda dolore | ✅ | Va reso collassabile dopo 2 settimane |
 | P5 | Risultato: tempo + Compare + Adjust + swap | ✅ | Aggiungere "copia frase per il coach" |
 | P5b | Care mode (condizionale) | ✅ | |
@@ -57,7 +57,7 @@
 | # | Schermata | Stato | Note |
 |---|---|---|---|
 | Q1 | Look back — tempo + sforzo + durata | 🟠 | Durata e tipo sessione 🔴 |
-| Q2 | Mappa corporea | 🟠 | Stessi gap di P3 |
+| Q2 | Mappa corporea | ✅ | v3: stessi miglioramenti di P3 |
 | Q3 | Sense — 3 scale + Headspace | ✅ | |
 | Q4 | Decode any ache + domanda | ✅ | |
 | Q5 | Risultato: Learn (8 esiti) + Recap + Recover | ✅ | |
@@ -65,13 +65,13 @@
 | Q5c | Comunicare (opzionale) | 🔴 | Punto 7 del §5 |
 | Q5d | Care mode (condizionale) | ✅ | |
 
-### Cattura acuta — sempre accessibile 🔴
+### Cattura acuta — sempre accessibile ✅
 
 | # | Schermata | Stato | Note |
 |---|---|---|---|
-| A1 | "Mi sono fatta male" → mappa | 🔴 | Da qualsiasi schermata, 1 tocco |
-| A2 | Sensazione + intensità | 🔴 | |
-| A3 | Care mode + chi avvisare | 🟠 | Copy Care ✅ |
+| A1 | "Mi sono fatta male" → mappa | ✅ | v3: bottone sticky, 27 regioni dalla stessa mappa |
+| A2 | Sensazione + intensità | ✅ | v3: 7 sensazioni pesate verso l'acuto |
+| A3 | Care mode + chi avvisare | ✅ | v3: urgenza adattiva + frase da copiare |
 
 ---
 
@@ -121,16 +121,19 @@
 |---|---|---|---|---|
 | Onboarding | 0 | 1 | 5 | 6 |
 | Oggi (home + stati) | 0 | 1 | 5 | 6 |
-| Flusso pre | 4 | 2 | 2 | 8 |
-| Flusso post | 4 | 2 | 3 | 9 |
-| Cattura acuta | 0 | 1 | 2 | 3 |
+| Flusso pre | 5 | 1 | 2 | 8 |
+| Flusso post | 5 | 1 | 3 | 9 |
+| Cattura acuta | 3 | 0 | 0 | 3 |
 | Percorso | 1 | 1 | 3 | 5 |
 | Me | 1 | 1 | 6 | 8 |
 | Impostazioni | 0 | 0 | 5 | 5 |
-| **Totale** | **10** | **9** | **31** | **50** |
+| **Totale** | **15** | **6** | **29** | **50** |
+
+> ✅ **Aggiornato dopo i [prototipi v3](../../prototipi-v3/)**, che hanno chiuso i tre
+> buchi di sicurezza: mappa corporea completa (P3, Q2) e cattura acuta (A1–A3).
 
 **Lettura:** il materiale copre già molto bene il **cuore quotidiano** (i due check-in:
-8 schermate su 17 pronte, il resto da completare). Quello che manca quasi interamente è
+10 schermate su 17 pronte, il resto da completare). Quello che manca quasi interamente è
 **tutto ciò che sta attorno**: onboarding, stati della home, la vista Me nei primi giorni,
 la body-story, le impostazioni.
 
