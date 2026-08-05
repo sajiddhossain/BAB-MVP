@@ -63,6 +63,7 @@ scarto si sta accorciando.
 | **Vuoi provarli** | [Prototipi v3](prototipi-v3/) — aprili nel browser |
 | **Devi costruire** | [Mappa schermate](docs/02-prodotto/06-mappa-schermate.md) + [Design system](docs/03-design/01-design-system.md) |
 | **Devi pianificare** | [Piano MVP](docs/05-roadmap/01-piano-mvp.md) |
+| **Vuoi capire cosa manca, in parole semplici** | [Da prototipi ad app](docs/05-roadmap/02-da-prototipi-ad-app.md) |
 
 ---
 

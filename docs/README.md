@@ -55,6 +55,7 @@ e [`02-prodotto/01-architettura-informativa.md`](02-prodotto/01-architettura-inf
 | Doc | Contenuto |
 |---|---|
 | [01 · Piano MVP](05-roadmap/01-piano-mvp.md) | Fasi, priorità, criteri di successo del pilota |
+| [02 · Da prototipi ad app](05-roadmap/02-da-prototipi-ad-app.md) | **Spiegato semplice:** cosa manca davvero per avere una web app mobile |
 
 ---
 
