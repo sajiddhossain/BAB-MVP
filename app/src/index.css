@@ -1,0 +1,142 @@
+@import "tailwindcss";
+
+/* ════════════════════════════════════════════════════════════════════════
+   BAB design tokens — the landing's system, extended for the app.
+   See docs/03-design/01-design-system.md for why this and not the
+   dark/glassmorphism direction the prototypes used.
+   ════════════════════════════════════════════════════════════════════════ */
+@theme {
+  --font-display: "Bricolage Grotesque", sans-serif;
+  --font-body: "Space Grotesk", sans-serif;
+
+  /* Surfaces — the "paper" */
+  --color-canvas: #faf9f6;
+  --color-surface: #ffffff;
+  --color-sand: #e8e4d8;
+  --color-ink: #0f0f12;
+  --color-ink-soft: #5c6a86;
+
+  /* Brand */
+  --color-teal: #34bbc0;
+  --color-vividteal: #1f7a63;
+  --color-deepteal: #143f36;
+  --color-lime: #d4f46a;
+  --color-gold: #ffc042;
+  --color-coral: #ff6b5c;
+  --color-pink: #ff8fb1;
+  --color-lavender: #b8a9e8;
+  --color-sky: #8fd4e8;
+}
+
+:root {
+  /* ── Semantic: the three tempos ───────────────────────────────
+     Same warm → cool → soft logic as the prototypes, mapped onto the
+     BAB palette. Lavender for Gentle is deliberate: it's the system's
+     "mood / emotions" colour, and Gentle is the tempo that needs the
+     most emotional permission to choose. */
+  --tempo-upbeat: var(--color-coral);
+  --tempo-steady: var(--color-teal);
+  --tempo-gentle: var(--color-lavender);
+
+  --tempo-upbeat-tint: color-mix(in srgb, var(--color-coral) 14%, transparent);
+  --tempo-steady-tint: color-mix(in srgb, var(--color-teal) 14%, transparent);
+  --tempo-gentle-tint: color-mix(in srgb, var(--color-lavender) 18%, transparent);
+
+  /* ── Semantic: states ── */
+  --care: var(--color-coral);
+  --care-tint: color-mix(in srgb, var(--color-coral) 12%, transparent);
+  --cycle: var(--color-pink);
+  --cycle-tint: color-mix(in srgb, var(--color-pink) 14%, transparent);
+  --growth: var(--color-lime);
+
+  /* ── Cycle phases: always desaturated, they sit behind data ── */
+  --phase-menstrual: color-mix(in srgb, var(--color-pink) 22%, transparent);
+  --phase-follicular: color-mix(in srgb, var(--color-lime) 22%, transparent);
+  --phase-ovulation: color-mix(in srgb, var(--color-gold) 22%, transparent);
+  --phase-luteal: color-mix(in srgb, var(--color-lavender) 22%, transparent);
+
+  /* ── Shape: hard offset shadows, never blurred. This is the most
+        recognisable part of the brand. Scaled down for small screens:
+        4px in lists, 6px for cards, 8px reserved for the single
+        protagonist of a screen — which enforces "one dominant next
+        step" automatically. ── */
+  --bab-border: 3px;
+  --shadow-sm: 4px 4px 0 0 var(--color-ink);
+  --shadow-md: 6px 6px 0 0 var(--color-ink);
+  --shadow-lg: 8px 8px 0 0 var(--color-ink);
+
+  color-scheme: light;
+  font-family: var(--font-body);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-canvas);
+  /* The notebook: dot grid + faint rules. BAB is a body diary, not a dashboard. */
+  background-image:
+    radial-gradient(rgba(15, 15, 18, 0.13) 1.4px, transparent 0),
+    linear-gradient(to bottom, rgba(15, 15, 18, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px, 100% 32px;
+  background-position: -16px -16px, 0 0;
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+/* Accessibility is not a polish pass — for an anxious audience reduced
+   motion is care, not a fallback. (docs/03-design) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+/* Every interactive target is at least 44px. Non-negotiable. */
+button, a[role="button"], input, select {
+  min-height: 44px;
+}
+
+@utility bab-card {
+  background: var(--color-surface);
+  border: var(--bab-border) solid var(--color-ink);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+@utility bab-pill {
+  border: 2px solid var(--color-ink);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-weight: 700;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+@utility bab-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
