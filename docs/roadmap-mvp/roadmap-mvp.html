@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>BAB — Roadmap MVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Space+Grotesk:wght@400..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --canvas:#FAF9F6; --surface:#FFFFFF; --sand:#E8E4D8;
+  --ink:#0F0F12; --soft:#5C6A86;
+  --teal:#34BBC0; --vividteal:#1F7A63; --deepteal:#143F36;
+  --lime:#D4F46A; --gold:#FFC042; --coral:#FF6B5C;
+  --pink:#FF8FB1; --lavender:#B8A9E8; --sky:#8FD4E8;
+}
+*{box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+@page{ size:A4; margin:14mm 13mm 16mm; }
+html,body{margin:0;padding:0}
+body{
+  font-family:"Space Grotesk",sans-serif; color:var(--ink);
+  background:var(--canvas); font-size:9.6pt; line-height:1.55;
+}
+h1,h2,h3,h4{font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.02em;font-weight:800;margin:0}
+.mono{font-family:"Space Mono",monospace}
+
+/* ── page ── */
+.page{break-before:page}
+.page:first-of-type{break-before:auto}
+/* keep atomic blocks whole across page boundaries */
+.card,.phase,.tl,.pull,.two{break-inside:avoid}
+tr,thead{break-inside:avoid} thead{display:table-header-group}
+h2,h3{break-after:avoid}
+/* repeated on every printed page by Chrome */
+.runfoot{position:fixed;bottom:0;left:0;right:0;border-top:1.5px solid var(--ink);
+  padding-top:1.6mm;font-size:7pt;color:var(--soft);display:flex;justify-content:space-between}
+
+/* ── cover ── */
+.cover{
+  background:var(--canvas);
+  background-image:
+    radial-gradient(rgba(15,15,18,.16) 1.5px, transparent 0),
+    linear-gradient(to bottom, rgba(15,15,18,.035) 1px, transparent 1px);
+  background-size:26px 26px, 100% 26px;
+  background-position:-13px -13px, 0 0;
+  padding:26mm 4mm 0;
+}
+.badge{
+  display:inline-block; border:2.5px solid var(--ink); border-radius:999px;
+  background:var(--lime); padding:5px 15px; font-size:8.4pt; font-weight:700;
+  letter-spacing:.15em; text-transform:uppercase; box-shadow:3px 3px 0 0 var(--ink);
+}
+.cover h1{font-size:38pt; line-height:.98; margin:14mm 0 0}
+.cover h1 em{font-style:normal; color:var(--vividteal)}
+.cover .lede{font-size:12pt; line-height:1.5; max-width:135mm; margin:7mm 0 0; color:var(--ink)}
+.rule{height:4px;background:var(--ink);margin:9mm 0 6mm;border-radius:2px}
+.meta{display:flex;gap:5mm;flex-wrap:wrap;margin-top:4mm}
+.meta div{
+  border:2.5px solid var(--ink); border-radius:12px; background:var(--surface);
+  padding:7px 11px; box-shadow:3px 3px 0 0 var(--ink); flex:1; min-width:0;
+}
+.meta .k{font-size:7.4pt;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.meta .v{font-size:11pt;font-weight:700;font-family:"Bricolage Grotesque",sans-serif;margin-top:1px}
+.coverfoot{
+  margin-top:34mm;
+  border-top:2px solid var(--ink); padding-top:3mm; font-size:8pt; color:var(--soft); line-height:1.5;
+}
+
+/* ── section chrome ── */
+.sec{margin-bottom:7mm}
+.kicker{
+  display:inline-block; font-size:7.6pt; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; border:2px solid var(--ink); border-radius:999px;
+  padding:2px 11px; background:var(--surface);
+}
+.kicker.teal{background:var(--teal)} .kicker.lime{background:var(--lime)}
+.kicker.coral{background:var(--coral)} .kicker.lav{background:var(--lavender)}
+h2{font-size:20pt; margin:3mm 0 2mm; line-height:1.08}
+h3{font-size:12.5pt; margin:5mm 0 1.5mm}
+p{margin:0 0 2.6mm}
+.sub{color:var(--soft); font-size:9.4pt; margin-bottom:4mm}
+strong{font-weight:700}
+
+/* ── boxes ── */
+.card{
+  border:2.5px solid var(--ink); border-radius:14px; background:var(--surface);
+  padding:5mm 5.5mm; box-shadow:4px 4px 0 0 var(--ink); margin-bottom:5mm;
+}
+.card.tint-lime{background:#F4FBDE} .card.tint-teal{background:#E6F7F8}
+.card.tint-coral{background:#FFEEEC} .card.tint-lav{background:#F1EDFB}
+.card.tint-sand{background:var(--sand)}
+.card h4{font-size:11pt;margin:0 0 2mm}
+.card p:last-child{margin-bottom:0}
+.pull{
+  border-left:5px solid var(--vividteal); padding:1mm 0 1mm 5mm; margin:4mm 0;
+  font-size:11pt; line-height:1.45; font-weight:500;
+}
+.pull.coral{border-left-color:var(--coral)}
+
+/* ── tables ── */
+table{width:100%; border-collapse:collapse; margin:0 0 4mm; font-size:8.8pt}
+th{
+  background:var(--ink); color:var(--canvas); text-align:left; padding:3.4mm 3mm;
+  font-size:7.6pt; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+}
+th:first-child{border-top-left-radius:9px} th:last-child{border-top-right-radius:9px}
+td{padding:3mm; border-bottom:1.5px solid rgba(15,15,18,.14); vertical-align:top}
+tr:last-child td{border-bottom:none}
+tbody tr:nth-child(even){background:rgba(15,15,18,.035)}
+table.framed{border:2.5px solid var(--ink); border-radius:11px; overflow:hidden; box-shadow:4px 4px 0 0 var(--ink)}
+td.num{font-family:"Space Mono",monospace; font-weight:700; text-align:center; white-space:nowrap}
+.tag{display:inline-block;border:1.5px solid var(--ink);border-radius:999px;padding:1px 8px;font-size:7.4pt;font-weight:700;white-space:nowrap}
+.tag.ok{background:var(--lime)} .tag.part{background:var(--gold)} .tag.todo{background:var(--coral)}
+.tag.out{background:var(--sand);color:var(--soft)}
+
+/* ── timeline ── */
+.tl{border:2.5px solid var(--ink);border-radius:14px;overflow:hidden;box-shadow:4px 4px 0 0 var(--ink);margin-bottom:5mm}
+.tl .hd{display:grid;grid-template-columns:34mm 1fr 1fr 1fr;background:var(--ink);color:var(--canvas)}
+.tl .hd div{padding:2.6mm 3mm;font-size:7.4pt;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.tl .row{display:grid;grid-template-columns:34mm 1fr 1fr 1fr;border-bottom:1.5px solid rgba(15,15,18,.16);background:var(--surface)}
+.tl .row:last-child{border-bottom:none}
+.tl .row .nm{padding:3mm;font-weight:700;font-size:8.8pt;border-right:1.5px solid rgba(15,15,18,.16)}
+.tl .cell{padding:2mm;border-right:1.5px solid rgba(15,15,18,.10)}
+.tl .cell:last-child{border-right:none}
+.bar{height:7mm;border-radius:5px;border:2px solid var(--ink)}
+.bar.a{background:var(--teal)} .bar.b{background:var(--lavender)}
+.bar.c{background:var(--gold)} .bar.d{background:var(--coral)}
+.bar.e{background:var(--lime)}
+.bar.ghost{background:transparent;border:none}
+
+/* ── phase blocks ── */
+.phase{border:2.5px solid var(--ink);border-radius:14px;background:var(--surface);margin-bottom:4.5mm;overflow:hidden;box-shadow:4px 4px 0 0 var(--ink)}
+.phase .top{display:flex;align-items:center;gap:4mm;padding:3.4mm 5mm;border-bottom:2.5px solid var(--ink)}
+.phase .top .n{font-family:"Space Mono",monospace;font-weight:700;font-size:9pt;border:2px solid var(--ink);border-radius:8px;padding:1px 8px;background:var(--canvas)}
+.phase .top h4{font-size:12pt;flex:1}
+.phase .top .wk{font-size:8.2pt;font-weight:700;color:var(--soft);white-space:nowrap}
+.phase.a .top{background:var(--teal)} .phase.b .top{background:var(--lavender)}
+.phase.c .top{background:var(--gold)} .phase.d .top{background:var(--coral)}
+.phase.e .top{background:var(--lime)}
+.phase .in{padding:4mm 5mm}
+.phase ul{margin:0;padding-left:4.5mm} .phase li{margin:1.4mm 0}
+.phase .out{margin-top:3mm;padding-top:2.6mm;border-top:1.5px dashed rgba(15,15,18,.28);font-size:8.6pt}
+.phase .out b{font-family:"Bricolage Grotesque",sans-serif}
+
+/* ── two col ── */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin-bottom:5mm}
+.two ul{margin:0;padding-left:4.5mm} .two li{margin:1.5mm 0;font-size:8.8pt}
+
+/* ── footer ── */
+ul.tight{margin:0 0 3mm;padding-left:4.5mm} ul.tight li{margin:1.4mm 0}
+</style>
+</head>
+<body>
+<div class="runfoot"><span>BAB — Roadmap MVP · v1.0 · 5 agosto 2026</span><span>Specifica di prodotto, non consiglio medico</span></div>
+
+<!-- ══════════ 1 · COVER ══════════ -->
+<section class="page cover">
+  <span class="badge">Readiness &amp; Body Literacy · 11–18</span>
+  <h1>Roadmap<br>per il primo<br><em>MVP</em></h1>
+  <p class="lede">Dallo stato attuale del materiale a una web app mobile utilizzabile
+  da un gruppo pilota di atlete. Cosa esiste, cosa manca, in quanto tempo e a quali
+  condizioni.</p>
+  <div class="rule"></div>
+  <div class="meta">
+    <div><div class="k">Documento</div><div class="v">Roadmap MVP</div></div>
+    <div><div class="k">Versione</div><div class="v">1.0</div></div>
+    <div><div class="k">Data</div><div class="v">5 agosto 2026</div></div>
+    <div><div class="k">Orizzonte</div><div class="v">3 settimane</div></div>
+  </div>
+  <div class="coverfoot">
+    <strong>Specifica di prodotto, non consiglio medico.</strong> Tutte le soglie cliniche,
+    l'instradamento delle bandiere rosse e i percorsi mestruali/RED-S devono essere rivisti e
+    firmati da un medico dello sport qualificato, e l'affidabilità degli strumenti stabilita
+    per fascia d'età, prima dell'uso con minori.
+  </div>
+</section>
+
+<!-- ══════════ 2 · IL PRODOTTO ══════════ -->
+<section class="page">
+  <div class="sec">
+    <span class="kicker teal">01 · Il prodotto</span>
+    <h2>Cosa costruiamo</h2>
+    <p class="sub">Una riga sola, da cui discende ogni decisione presa in questo documento.</p>
+  </div>
+
+  <div class="pull">
+    Quasi tutta la tecnologia sportiva misura l'atleta <strong>dall'esterno</strong> e le
+    dice cosa fare. BAB fa l'opposto: insegna a una ragazza a <strong>leggere il proprio
+    corpo</strong>.
+  </div>
+
+  <p>Il meccanismo è un ciclo di calibrazione ripetuto due volte al giorno di allenamento,
+  con un tetto rigido di <strong>60–90 secondi</strong> per volta.</p>
+
+  <table class="framed">
+    <thead><tr><th style="width:26mm">Momento</th><th>Passi</th><th style="width:52mm">Cosa produce</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Prima</strong></td>
+          <td>Predict → Tune in → Compare → Adjust</td>
+          <td>Il tempo di oggi: ⚡ Upbeat, 🌊 Steady o 🍃 Gentle</td></tr>
+      <tr><td><strong>Dopo</strong></td>
+          <td>Look back → Sense → Learn → Recover</td>
+          <td>L'errore di previsione della sessione</td></tr>
+      <tr><td><strong>Sempre</strong></td>
+          <td>Cattura acuta a un tocco</td>
+          <td>Instradamento immediato in caso di bandiera rossa</td></tr>
+    </tbody>
+  </table>
+
+  <h3>La metrica del prodotto</h3>
+  <div class="card tint-teal">
+    <p>Non è la forma fisica, il recupero o l'aderenza. È il <strong>prediction error in
+    calo</strong>: quanto bene lei si legge, e se quello scarto si sta accorciando.
+    Funziona con o senza dispositivo indossabile.</p>
+    <p style="margin-top:2.5mm">Conseguenza pratica: la domanda ricorrente dell'app è
+    <em>«quanto bene mi sono letta oggi?»</em> — mai <em>«quanto sono in forma?»</em>.</p>
+  </div>
+
+  <div class="two">
+    <div>
+      <h3 style="margin-top:0">I tre output, distinti</h3>
+      <table class="framed">
+        <thead><tr><th>Output</th><th style="width:26mm">Dove vive</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Decode</strong><br><span style="color:var(--soft)">capire cos'è normale per lei</span></td><td>Vista «Me»</td></tr>
+          <tr><td><strong>Decide</strong><br><span style="color:var(--soft)">la chiamata quotidiana</span></td><td>Check-in</td></tr>
+          <tr><td><strong>Communicate</strong><br><span style="color:var(--soft)">prove per un adulto</span></td><td>Body-story</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Vincoli non negoziabili</h3>
+      <ul style="margin:0;padding-left:4.5mm">
+        <li>Nessun punteggio, percentuale o numero rosso.</li>
+        <li>Nessun confronto con altre atlete: solo lei contro sé stessa nel tempo.</li>
+        <li>Nessun riferimento a cibo, fame, sazietà, peso o corpo come forma.</li>
+        <li>Dati di proprietà dell'atleta; condivisione opt-in; ciclo mai incluso per default.</li>
+        <li>L'app supporta la decisione, non la prescrive.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 3 · STATO ══════════ -->
+<section class="page">
+  <div class="sec">
+    <span class="kicker lav">02 · Stato attuale</span>
+    <h2>Dove siamo, oggettivamente</h2>
+    <p class="sub">Misurato sull'inventario completo delle 50 schermate previste dall'MVP.</p>
+  </div>
+
+  <table class="framed">
+    <thead><tr><th>Area</th><th style="width:20mm">Pronte</th><th style="width:22mm">Parziali</th><th style="width:20mm">Da fare</th><th style="width:18mm">Tot.</th></tr></thead>
+    <tbody>
+      <tr><td>Onboarding</td><td class="num">4</td><td class="num">2</td><td class="num">0</td><td class="num">6</td></tr>
+      <tr><td>Home «Oggi» e i suoi stati</td><td class="num">6</td><td class="num">0</td><td class="num">0</td><td class="num">6</td></tr>
+      <tr><td>Flusso pre-allenamento</td><td class="num">5</td><td class="num">1</td><td class="num">2</td><td class="num">8</td></tr>
+      <tr><td>Flusso post-allenamento</td><td class="num">5</td><td class="num">1</td><td class="num">3</td><td class="num">9</td></tr>
+      <tr><td>Cattura acuta</td><td class="num">3</td><td class="num">0</td><td class="num">0</td><td class="num">3</td></tr>
+      <tr><td>Percorso 16 settimane</td><td class="num">1</td><td class="num">1</td><td class="num">3</td><td class="num">5</td></tr>
+      <tr><td>Vista «Me» e body-story</td><td class="num">7</td><td class="num">0</td><td class="num">1</td><td class="num">8</td></tr>
+      <tr><td>Impostazioni e sistema</td><td class="num">0</td><td class="num">0</td><td class="num">5</td><td class="num">5</td></tr>
+      <tr style="background:var(--lime)"><td><strong>Totale</strong></td><td class="num">31</td><td class="num">6</td><td class="num">13</td><td class="num">50</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card tint-coral">
+    <h4>⚠️ Come va letto questo 62%</h4>
+    <p>È <strong>copertura di design, non di prodotto.</strong> Quello che esiste sono sei
+    prototipi HTML separati: funzionano, ma non condividono dati, non salvano nulla, non hanno
+    account né backend, e non si parlano tra loro. Chiusa la pagina, tutto sparisce.</p>
+    <p style="margin-top:2.5mm">Come <strong>prodotto spedibile</strong> il livello reale è
+    intorno al <strong>20%</strong>. Il salto che questa roadmap descrive è esattamente quello
+    da «disegni delle stanze» a «casa con impianto elettrico e porta d'ingresso».</p>
+  </div>
+
+
+</section>
+
+<section class="page">
+  <span class="kicker lav">02 · Stato attuale</span>
+  <h3 style="margin-top:4mm">Cosa è già stato risolto</h3>
+  <table class="framed">
+    <thead><tr><th>Elemento</th><th style="width:24mm">Stato</th><th style="width:56mm">Nota</th></tr></thead>
+    <tbody>
+      <tr><td>Riorganizzazione completa del materiale</td><td><span class="tag ok">fatto</span></td><td>21 documenti, dalla visione alla mappa schermate</td></tr>
+      <tr><td>Lessico sensazioni e bandiere rosse</td><td><span class="tag ok">fatto</span></td><td>Mancavano <em>cede/instabile</em> e <em>gonfia/calda</em>; ora instradano al Care mode da sole</td></tr>
+      <tr><td>Cattura acuta sempre accessibile</td><td><span class="tag ok">fatto</span></td><td>Richiesta esplicita del documento madre</td></tr>
+      <tr><td>Onboarding con date ciclo e contraccezione</td><td><span class="tag ok">fatto</span></td><td>Non esisteva: senza, il layer ciclo non funziona</td></tr>
+      <tr><td>Body-story condivisibile</td><td><span class="tag ok">fatto</span></td><td>Non esisteva: è l'output «Communicate»</td></tr>
+      <tr><td>Scaffold della web app</td><td><span class="tag ok">fatto</span></td><td>PWA, tab, token · React 19 · Vite 8 · Supabase</td></tr>
+      <tr><td>Persistenza, account, sincronizzazione</td><td><span class="tag todo">da fare</span></td><td>Settimana 1</td></tr>
+      <tr><td>Firma clinica e testo legale</td><td><span class="tag todo">da fare</span></td><td>Dipendenza esterna, non tecnica</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════ 4 · LE 3 SETTIMANE ══════════ -->
+<section class="page">
+  <div class="sec">
+    <span class="kicker lime">03 · Il piano</span>
+    <h2>Tre settimane, cinque fasi</h2>
+    <p class="sub">Le fasi 1–4 sono in sequenza. La fase 5 corre in parallelo dal primo giorno.</p>
+  </div>
+
+  <div class="tl">
+    <div class="hd"><div>Fase</div><div>Settimana 1</div><div>Settimana 2</div><div>Settimana 3</div></div>
+    <div class="row"><div class="nm">1 · Fondamenta</div>
+      <div class="cell"><div class="bar a"></div></div><div class="cell"><div class="bar ghost"></div></div><div class="cell"><div class="bar ghost"></div></div></div>
+    <div class="row"><div class="nm">2 · Memoria</div>
+      <div class="cell"><div class="bar b"></div></div><div class="cell"><div class="bar ghost"></div></div><div class="cell"><div class="bar ghost"></div></div></div>
+    <div class="row"><div class="nm">3 · Cuore quotidiano</div>
+      <div class="cell"><div class="bar ghost"></div></div><div class="cell"><div class="bar c"></div></div><div class="cell"><div class="bar ghost"></div></div></div>
+    <div class="row"><div class="nm">4 · Contorno e tuning</div>
+      <div class="cell"><div class="bar ghost"></div></div><div class="cell"><div class="bar ghost"></div></div><div class="cell"><div class="bar d"></div></div></div>
+    <div class="row"><div class="nm">5 · Sicurezza</div>
+      <div class="cell"><div class="bar e"></div></div><div class="cell"><div class="bar e"></div></div><div class="cell"><div class="bar e"></div></div></div>
+  </div>
+
+  <div class="phase a">
+    <div class="top"><span class="n">01</span><h4>Fondamenta</h4><span class="wk">Settimana 1</span></div>
+    <div class="in">
+      <ul>
+        <li>Progetto React 19 · Vite 8 · Tailwind 4 — stesso stack della landing, nessuna scelta tecnica nuova</li>
+        <li>PWA installabile sulla schermata home, a schermo intero, con service worker</li>
+        <li>Design system sui token della landing, definiti in un punto solo</li>
+        <li>Navigazione a tre tab e cattura acuta persistente</li>
+      </ul>
+      <div class="out"><b>Risultato:</b> app vuota ma reale, installabile su telefono. <span class="tag ok">completato</span></div>
+    </div>
+  </div>
+
+  <div class="phase b">
+    <div class="top"><span class="n">02</span><h4>Memoria</h4><span class="wk">Settimana 1</span></div>
+    <div class="in">
+      <ul>
+        <li>Autenticazione con link via email — nessuna password da gestire per delle minorenni</li>
+        <li>Database Supabase, già in uso sulla landing</li>
+        <li>Salvataggio e rilettura dei check-in</li>
+        <li>Funzionamento offline con sincronizzazione differita: in palestra spesso non c'è campo</li>
+      </ul>
+      <div class="out"><b>Risultato:</b> un check-in fatto oggi si ritrova domani. È il punto in cui smette di essere una demo.</div>
+    </div>
+  </div>
+
+
+</section>
+
+<section class="page">
+  <span class="kicker lime">03 · Il piano</span>
+  <div style="height:4mm"></div>
+  <div class="phase c">
+    <div class="top"><span class="n">03</span><h4>Cuore quotidiano</h4><span class="wk">Settimana 2</span></div>
+    <div class="in">
+      <ul>
+        <li>Onboarding completo: consenso, età, sport, ritmo con date e contraccezione</li>
+        <li>Check-in pre e post completi, con salvataggio reale</li>
+        <li>Home «Oggi» con i sei stati calcolati sui dati veri</li>
+        <li>Care mode e cattura acuta collegati al database</li>
+      </ul>
+      <div class="out"><b>Risultato:</b> un'atleta può usare l'app per una giornata intera, dall'inizio alla fine.</div>
+    </div>
+  </div>
+
+  <div class="phase d">
+    <div class="top"><span class="n">04</span><h4>Contorno e messa a punto</h4><span class="wk">Settimana 3</span></div>
+    <div class="in">
+      <ul>
+        <li>Percorso, mesi 1–2, con le missioni che si spuntano dai check-in reali</li>
+        <li>Vista «Me», stadi 1 e 2: contatore di raccolta e prima ipotesi</li>
+        <li>Body-story settimanale condivisibile</li>
+        <li>Impostazioni: privacy con esporta e cancella, ritmo, notifiche, aiuto</li>
+        <li>Strumentazione del pilota, verifica di accessibilità, correzione bug</li>
+      </ul>
+      <div class="out"><b>Risultato:</b> app completa per quanto serve al pilota.</div>
+    </div>
+  </div>
+
+  <div class="phase e">
+    <div class="top"><span class="n">05</span><h4>Sicurezza e conformità</h4><span class="wk">In parallelo</span></div>
+    <div class="in">
+      <ul>
+        <li><strong>Firma del medico dello sport</strong> su Care mode, bandiere rosse, mappatura clinica, percorsi RED-S e ciclo</li>
+        <li><strong>Testo legale</strong> del consenso tutore e atleta, privacy, GDPR, trattamento dei minori</li>
+        <li>Verifica di accessibilità: contrasto AA, target ≥ 44 px, movimento ridotto</li>
+        <li>Protocollo del pilota: cosa si misura, come, chi è l'adulto responsabile</li>
+      </ul>
+      <div class="out"><b>Nessuna di queste voci è comprimibile per anticipare il pilota.</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ 5 · SCOPE ══════════ -->
+<section class="page">
+  <div class="sec">
+    <span class="kicker">04 · Scope</span>
+    <h2>Cosa entra e cosa esce</h2>
+    <p class="sub">Il criterio non è cosa si riesce a costruire, ma cosa serve per rispondere alle domande del pilota.</p>
+  </div>
+
+  <table class="framed">
+    <thead><tr><th>Escluso dalla v1</th><th style="width:16mm">Quando</th><th style="width:74mm">Perché il taglio non ha costo</th></tr></thead>
+    <tbody>
+      <tr><td>Vista «Me», stadio fingerprint</td><td>v1.1</td><td>Richiede circa 9 settimane di dati per esistere: in un pilota non sarebbe visibile prima della fine. Si costruisce durante il pilota stesso.</td></tr>
+      <tr><td>Percorso, mesi 3 e 4</td><td>v1.1</td><td>Un pilota di 8–12 settimane non arriva a coprirli. Il contenuto è già scritto per intero.</td></tr>
+      <tr><td>Mappa corporea semplificata 11–13 anni</td><td>v1.1</td><td>Il pilota è su atlete di 13–14 anni. Serve quando si allarga la fascia.</td></tr>
+      <tr><td>Tema scuro</td><td>v1.1</td><td>Non incide su nessuna delle tre domande del pilota.</td></tr>
+      <tr><td>Integrazione dispositivi indossabili</td><td>v2</td><td>Il primo principio del prodotto stabilisce che l'app è pienamente utile senza. È la parte meno differenziante.</td></tr>
+      <tr><td>Dashboard per il coach</td><td>v2 o mai</td><td>Sapere che il coach legge i dati cambia ciò che l'atleta riporta, e renderebbe non interpretabile la misura di aderenza del pilota.</td></tr>
+      <tr><td>Multi-lingua</td><td>v1.1</td><td>Si spedisce una lingua sola; l'architettura resta predisposta.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="two">
+    <div class="card tint-lime">
+      <h4>✅ Non si taglia mai</h4>
+      <ul>
+        <li>Care mode e bandiere rosse</li>
+        <li>Cattura acuta sempre a un tocco</li>
+        <li>Consenso tutore e atleta</li>
+        <li>Esporta e cancella i miei dati</li>
+        <li>Target touch ≥ 44 px e contrasto AA</li>
+        <li>Le tre misure del pilota</li>
+      </ul>
+    </div>
+    <div class="card tint-sand">
+      <h4>📐 Da strumentare prima di partire</h4>
+      <ul>
+        <li>Secondi reali per completare ogni check-in</li>
+        <li>Tempo <strong>suggerito</strong> dall'app contro tempo <strong>scelto</strong> dall'atleta</li>
+        <li>Quali domande vengono saltate</li>
+      </ul>
+      <p style="margin-top:2.5mm;font-size:8.4pt">Costano poche ore e sono irrecuperabili
+      a posteriori. Il secondo è il dato più prezioso: è l'atleta che corregge il modello.</p>
+    </div>
+  </div>
+
+
+</section>
+
+<section class="page">
+  <span class="kicker">04 · Scope</span>
+  <h3 style="margin-top:4mm">Criteri di successo del pilota</h3>
+  <table class="framed">
+    <thead><tr><th>Domanda</th><th>Misura</th><th style="width:24mm">Soglia</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3"><strong>1. Lo compilano?</strong></td><td>Giorni di allenamento con pre-check completato</td><td class="num">≥ 60%</td></tr>
+      <tr><td>Atlete ancora attive alla settimana 4</td><td class="num">≥ 70%</td></tr>
+      <tr><td>Tempo mediano di completamento</td><td class="num">≤ 90 s</td></tr>
+      <tr><td><strong>2. Il meccanismo regge?</strong></td><td>Check-in con previsione compilata</td><td class="num">≥ 85%</td></tr>
+      <tr><td><strong>3. Il divario si accorcia?</strong></td><td>Prediction error, settimane 1–2 contro 7–8</td><td class="num">in calo</td></tr>
+      <tr><td><strong>Sicurezza</strong></td><td>Bandiere rosse comunicate a un adulto</td><td class="num">100%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card tint-teal">
+    <p><strong>Nota metodologica.</strong> Con 20 atlete e 8 settimane non si valida la metrica
+    di body literacy: si validano <strong>aderenza e comprensibilità</strong>. La validazione
+    della metrica richiede l'affidabilità test–retest della mappa corporea per fascia d'età e
+    la verifica within-athlete del prediction error contro esiti reali. Va detto a chiunque
+    legga i risultati, per non trasformare un segnale incoraggiante in un'affermazione.</p>
+  </div>
+</section>
+
+<!-- ══════════ 6 · RISCHI E DECISIONI ══════════ -->
+<section class="page">
+  <div class="sec">
+    <span class="kicker coral">05 · Condizioni</span>
+    <h2>Rischi e decisioni da prendere</h2>
+    <p class="sub">Il piano a tre settimane regge solo se queste condizioni sono soddisfatte.</p>
+  </div>
+
+  <div class="card tint-coral">
+    <h4>La distinzione che precede tutto il resto</h4>
+    <p><strong>«App pronta» e «pilota partito» sono due date diverse, e solo la prima dipende
+    dal team.</strong> Il pilota con minorenni dipende dalla firma clinica e dal testo legale
+    del consenso: dipendenze esterne, che non si comprimono scrivendo codice più in fretta.</p>
+    <p style="margin-top:2.5mm">Se la firma arriva entro la settimana 3, il pilota parte. Se
+    non arriva, alla settimana 3 esiste comunque un'app completa da mostrare a club, famiglie
+    e investitori — quindi il tempo non è perso in nessuno dei due scenari.</p>
+  </div>
+
+  <h3>Decisioni richieste, in ordine di urgenza</h3>
+  <table class="framed">
+    <thead><tr><th style="width:9mm">#</th><th>Decisione</th><th style="width:20mm">Entro</th><th style="width:62mm">Cosa blocca</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><strong>Individuare l'advisor clinico</strong></td><td><span class="tag todo">oggi</span></td><td>Care mode, bandiere rosse, percorsi RED-S, contenuti sul ciclo, avvio del pilota. È l'unica voce che non si recupera accelerando dopo.</td></tr>
+      <tr><td class="num">2</td><td><strong>Lingua dell'MVP</strong></td><td><span class="tag part">sett. 1</span></td><td>Ogni riga di copy. Il materiale è in inglese, il pilota è previsto su atlete italiane di 13–14 anni.</td></tr>
+      <tr><td class="num">3</td><td><strong>Visibilità del coach</strong></td><td><span class="tag part">sett. 1</span></td><td>Struttura del database e dei permessi, e il posizionamento commerciale verso le squadre. Cambiarla dopo ha un costo.</td></tr>
+      <tr><td class="num">4</td><td>Testo legale del consenso</td><td><span class="tag part">sett. 2</span></td><td>Onboarding. Attualmente è presente un segnaposto dichiarato.</td></tr>
+      <tr><td class="num">5</td><td>Contenuto del percorso sull'alimentazione</td><td><span class="tag part">sett. 2</span></td><td>Unico contenuto che tocca il tema cibo, in tensione con un principio dichiarato del prodotto.</td></tr>
+    </tbody>
+  </table>
+
+
+</section>
+
+<section class="page">
+  <span class="kicker coral">05 · Condizioni</span>
+  <h3 style="margin-top:4mm">Registro dei rischi</h3>
+  <table class="framed">
+    <thead><tr><th>Rischio</th><th style="width:20mm">Impatto</th><th style="width:74mm">Mitigazione</th></tr></thead>
+    <tbody>
+      <tr><td>La firma clinica non arriva entro la settimana 3</td><td><span class="tag todo">alto</span></td><td>Aprire la ricerca oggi. Se slitta, slitta il pilota, non lo sviluppo: si consegna comunque l'app.</td></tr>
+      <tr><td>La lingua viene decisa tardi</td><td><span class="tag part">medio</span></td><td>Stringhe esterne al codice fin dall'inizio, così tradurre resta un'operazione meccanica.</td></tr>
+      <tr><td>Abbandono nelle prime tre settimane d'uso</td><td><span class="tag todo">alto</span></td><td>Il percorso dà una ragione per esserci che non dipende dai dati accumulati; il Compare restituisce valore già dal primo giorno; il contatore trasforma l'attesa in progresso.</td></tr>
+      <tr><td>Il check-in supera i 90 secondi</td><td><span class="tag part">medio</span></td><td>Misurare i tempi reali dalla settimana 2. Se si sfora, si rimuovono per primi gli input non strutturali.</td></tr>
+      <tr><td>Sotto-riporto dei sintomi da parte delle atlete</td><td><span class="tag part">medio</span></td><td>Rinforzo positivo esplicito nel copy quando segnalano; classificazione clinica spostata dall'atleta al sistema.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card">
+    <h4>Sintesi</h4>
+    <p>Tre settimane sono sufficienti per <strong>l'applicazione</strong>. Per il
+    <strong>pilota</strong> lo sono soltanto se la firma clinica e il testo legale procedono
+    in parallelo a partire da subito. Il percorso critico del progetto, allo stato attuale,
+    non è tecnico.</p>
+  </div>
+</section>
+
+</body>
+</html>
