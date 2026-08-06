@@ -99,7 +99,7 @@
 | M6 | Body-story — composizione e selezione | ✅ | v1: 5 blocchi, ciclo off di default |
 | M7 | Body-story — anteprima e condivisione | ✅ | v1: anteprima live + frase auto-generata |
 | M8 | Card RED-S (condizionale, silenziosa) | 🔴 | Blocco: firma clinica |
-| M9 | «Il mio ritmo» — fase corrente + cosa può voler dire | 🔴 | Contenuto già scritto; restituisce valore dal giorno uno |
+| M9 | «Il mio ritmo» — fase corrente + cosa può voler dire | ✅ | v1: 8 stati, incertezza visibile, nessun conto alla rovescia |
 
 ---
 
@@ -126,9 +126,9 @@
 | Flusso post | 5 | 1 | 3 | 9 |
 | Cattura acuta | 3 | 0 | 0 | 3 |
 | Percorso | 1 | 1 | 3 | 5 |
-| Me | 7 | 0 | 2 | 9 |
+| Me | 8 | 0 | 1 | 9 |
 | Impostazioni | 0 | 0 | 5 | 5 |
-| **Totale** | **31** | **6** | **14** | **51** |
+| **Totale** | **32** | **6** | **13** | **51** |
 
 > ✅ **Aggiornato dopo i [prototipi](../../prototipi-v3/)**: chiusi i tre buchi di sicurezza
 > (P3, Q2, A1–A3), l'onboarding (O1–O5), la body-story (M6–M7), la home "Oggi" con tutti

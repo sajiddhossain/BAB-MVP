@@ -18,6 +18,7 @@ prodotto non regge: l'onboarding e la body-story.
 | `04-body-story--v1.html` | La story settimanale condivisibile (§11) — **nuovo, non esisteva nel materiale** |
 | `05-oggi-home--v1.html` | La home "Oggi" e i suoi 6 stati — **nuovo** |
 | `06-me-patterns--v1.html` | La vista "Me" nei tre stadi di maturità dei dati — **nuovo** |
+| `07-il-mio-ritmo--v1.html` | La vista del ciclo, che restituisce valore dal giorno uno — **nuovo** |
 
 Lingua: **inglese**, come la v2 — così il lavoro non è bloccato dalla
 [decisione D1 sulla lingua](../docs/04-brainstorming/03-decisioni-aperte.md).
@@ -288,6 +289,58 @@ una ragazza con il suo ciclo fa un danno educativo.
 accorcia", ma disegnato al contrario: una linea che scende si legge come *"sto peggiorando"*
 per una tredicenne, e questo è l'unico grafico che non deve mai sembrare un verdetto.
 Nessun asse numerico, nessuna percentuale.
+
+---
+
+---
+
+# 07 · Il mio ritmo
+
+Nata da una domanda: *«ma abbiamo deciso di metterci anche le funzioni di ciclo?»*
+Sì — ma mettendo in fila cosa entra e cosa esce, saltava fuori un difetto:
+
+> Le si chiedono le date del ciclo il primo giorno, e per nove settimane non le si
+> restituisce niente.
+
+Il grafico dei segnali con le bande di fase resta fuori dalla v1 (serve ~9 settimane di
+dati). Questa vista è molto più piccola e riempie quel vuoto: **dove sei adesso, e cosa
+può voler dire.**
+
+### Le tre regole che la governano
+
+**1 · Nessun conto alla rovescia, nessuna previsione.** 🔴
+La tentazione, nella fase luteale, è scrivere *«il ciclo arriva fra 3 giorni»*. Non si fa.
+Verificato con un controllo automatico sui testi di tutti gli stati.
+
+**2 · L'incertezza si mostra, non si nasconde.**
+La sfumatura fra le fasi si **allarga** quando la lettura è meno affidabile:
+`5%` con cicli regolari · `11%` con cicli variabili · `14%` con una sola data.
+Il marcatore "oggi" è un alone morbido, non una linea. E la frase *«è una mappa, non un
+orario»* resta sempre visibile.
+
+**3 · Oltre una lunghezza intera senza una data nuova, BAB smette di indovinare.**
+Continuare sarebbe inventare. Il copy chiede la data e basta: non allarma, non insinua.
+
+### Gli otto stati
+
+| Stato | Cosa mostra |
+|---|---|
+| 🌱 Follicolare, cicli regolari | Il caso normale — fase, giorno, cosa può voler dire |
+| 🩸 Durante il ciclo | Stesso schema. Il copy parla di ferro e di andarci più piano, mai di «prestazione ridotta» |
+| 🌙 Luteale tardiva | La fase dove la tentazione del conto alla rovescia è massima |
+| 📍 Una data sola | Funziona lo stesso, ma lo dice — e la sfumatura si allarga |
+| 〰️ Cicli irregolari | Nomina la variabilità invece di nasconderla |
+| 🕰️ Nessuna data recente | Smette di indovinare e chiede |
+| 🌱 Menarca non arrivato | Nessun input, solo contenuto educativo. Non deve mai sembrare un ripiego |
+| ☁️ Preferisce non dirlo | 🔴 Il blocco **sparisce**. Non svuotato, non insistente. Riattivabile in impostazioni |
+
+### Note di implementazione
+
+- I confini delle fasi si **riscalano sulla sua lunghezza media**, non su 28 giorni fissi.
+- Il copy delle quattro fasi è **lo stesso** del blocco Rhythm dei check-in: un solo
+  vocabolario, non due.
+- Le date demo sono state calcolate, non scelte a occhio: ogni stato produce davvero la
+  fase che l'etichetta dichiara.
 
 ---
 
