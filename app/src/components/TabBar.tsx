@@ -1,23 +1,25 @@
 import { NavLink } from 'react-router-dom'
-
-const TABS = [
-  { to: '/today', icon: '☀️', label: 'Today' },
-  { to: '/journey', icon: '🗺️', label: 'Journey' },
-  { to: '/me', icon: '📈', label: 'Me' },
-] as const
+import { useCopy } from '@/copy'
 
 export default function TabBar() {
+  const t = useCopy()
+  const tabs = [
+    { to: '/today', icon: '☀️', label: t.tabs.today },
+    { to: '/journey', icon: '🗺️', label: t.tabs.journey },
+    { to: '/me', icon: '📈', label: t.tabs.me },
+  ]
+
   return (
     <nav
       className="fixed bottom-0 left-1/2 w-full max-w-[430px] -translate-x-1/2
                  border-t-[3px] border-ink bg-surface pb-[env(safe-area-inset-bottom)]"
-      aria-label="Main"
+      aria-label={t.tabs.ariaLabel}
     >
       <ul className="flex">
-        {TABS.map((t) => (
-          <li key={t.to} className="flex-1">
+        {tabs.map((tab) => (
+          <li key={tab.to} className="flex-1">
             <NavLink
-              to={t.to}
+              to={tab.to}
               className={({ isActive }) =>
                 `flex min-h-[56px] flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-bold ${
                   isActive ? 'text-ink' : 'text-ink-soft'
@@ -27,11 +29,11 @@ export default function TabBar() {
               {({ isActive }) => (
                 <>
                   <span aria-hidden className="text-xl leading-none">
-                    {t.icon}
+                    {tab.icon}
                   </span>
-                  <span>{t.label}</span>
-                  {/* The active tab is marked by shape as well as colour —
-                      meaning never rests on colour alone. */}
+                  <span>{tab.label}</span>
+                  {/* La tab attiva è marcata anche dalla FORMA: il significato
+                      non si affida mai al solo colore. */}
                   <span
                     aria-hidden
                     className={`h-1 w-6 rounded-full ${isActive ? 'bg-ink' : 'bg-transparent'}`}
