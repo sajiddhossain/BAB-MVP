@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { CopyProvider, DEFAULT_LOCALE } from './copy'
 import './index.css'
+import './lib/devtest'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
