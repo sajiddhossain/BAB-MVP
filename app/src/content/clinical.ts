@@ -1,23 +1,43 @@
 import type { Locale } from '@/copy'
 
 /**
- * ⚠️⚠️  TESTI CLINICI — NON ANCORA FIRMATI  ⚠️⚠️
+ * TESTI CLINICI — registro di revisione.
  *
- * Questo file sta separato dal resto del copy per una ragione precisa: il §10
- * del documento madre richiede che l'instradamento delle bandiere rosse, i
- * percorsi mestruali/RED-S e qualsiasi indicazione di salute siano rivisti e
- * FIRMATI DA UN MEDICO DELLO SPORT QUALIFICATO prima dell'uso con minori.
+ * R6: la firma di un medico dello sport **non è un blocco di rilascio per
+ * l'MVP**, perché si passa dalle squadre. Questo file non ferma più la
+ * spedizione; tiene traccia di chi ha guardato cosa.
  *
- * Tenerli qui rende ovvio cosa è stato firmato e cosa no. E attenzione: una
- * TRADUZIONE di un testo firmato non è più il testo firmato — va rifirmata.
+ * Resta separato dal resto del copy, e la ragione non è cambiata: questi testi
+ * li legge una tredicenne che ha male, e sono gli unici che possono farle fare
+ * la cosa sbagliata. Sapere quali sono stati rivisti e da chi vale comunque.
  *
- * STATO: ⛔ non firmato. Blocco di rilascio per il pilota.
+ * ⚠️ Una TRADUZIONE di un testo rivisto non è il testo rivisto. Le due lingue
+ * hanno stato separato apposta: R9 dice che si spedisce in italiano e inglese.
  */
-export const CLINICAL_SIGNOFF = {
-  signed: false,
-  signedBy: null as string | null,
-  signedAt: null as string | null,
-  version: 'draft-1',
+export type ReviewState = {
+  reviewedBy: string | null
+  reviewedAt: string | null
+  locales: Locale[]
+}
+
+export const CLINICAL_REVIEW: Record<string, ReviewState> = {
+  /** Lessico e mappatura sensazione → categoria clinica. */
+  sensations: {
+    reviewedBy: 'Tristin Agtarap',
+    reviewedAt: null,       // incontro fatto, testo non ancora ripassato riga per riga
+    locales: [],
+  },
+  /** Care mode, bandiere rosse, instradamento. È il testo che agisce. */
+  careRouting: { reviewedBy: null, reviewedAt: null, locales: [] },
+  /** Dolore che lavora contro dolore protettivo. */
+  painDecode:  { reviewedBy: null, reviewedAt: null, locales: [] },
+  /** Ciclo e rete di sicurezza RED-S. Seconda advisor, incontro 11 agosto 2026. */
+  cycleRedS:   { reviewedBy: null, reviewedAt: null, locales: [] },
+}
+
+/** Vero quando ogni area è stata rivista in quella lingua. Informativo, non bloccante. */
+export function fullyReviewed(locale: Locale): boolean {
+  return Object.values(CLINICAL_REVIEW).every((r) => r.locales.includes(locale))
 }
 
 /**
