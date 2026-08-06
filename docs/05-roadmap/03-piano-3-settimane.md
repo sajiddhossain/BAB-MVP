@@ -56,6 +56,9 @@ per cui il documento madre ha un'intera sezione di guardrail.
 
 - **Percorso**, Mesi 1–2, con le missioni che si spuntano dai check-in reali
 - **Me**, stadi 1 e 2 (contatore + prima ipotesi)
+- **Vista «Il mio ritmo»** — fase corrente + cosa può voler dire. Piccola, ma restituisce
+  qualcosa dal giorno uno in cambio del dato più intimo che chiediamo
+  (vedi [ciclo e RED-S](../01-modello/03-ciclo-e-red-s.md))
 - **Body-story**
 - **Impostazioni**: privacy (esporta/cancella), ritmo, notifiche, aiuto
 - **Strumentazione** del pilota, **pass di accessibilità**, correzione bug
@@ -68,7 +71,7 @@ per cui il documento madre ha un'intera sezione di guardrail.
 
 | Tagliato | Perché il taglio è gratis |
 |---|---|
-| **Patterns stadio 3** (grafico con le fasi, fingerprint) | Serve **9 settimane di dati** per esistere. In un pilota che dura 8-12 settimane non lo si vedrebbe comunque prima della fine. Si costruisce durante il pilota. |
+| **Patterns stadio 3** (grafico dei segnali con le bande di fase) | Serve **9 settimane di dati** per esistere. In un pilota di 8-12 settimane non lo si vedrebbe prima della fine. Si costruisce durante il pilota. ⚠️ Ma la **vista «Il mio ritmo»** resta dentro la v1: senza, si chiederebbero le date del ciclo il primo giorno senza restituire niente per due mesi. |
 | **Percorso Mesi 3–4** | Un pilota non ci arriva. Il contenuto è già scritto: è solo da inserire. |
 | **Mappa corporea junior (11–13)** | Il pilota è su 13–14enni. Serve quando si allarga la fascia. |
 | **Tema scuro** | Bello, irrilevante per le tre domande del pilota. |

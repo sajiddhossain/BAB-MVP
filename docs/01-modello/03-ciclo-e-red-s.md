@@ -156,6 +156,104 @@ piccolo con un significato scientifico grande.
 
 ---
 
+## Cosa entra nell'MVP, e il problema di reciprocità
+
+> Aggiunto dopo una domanda giusta: *«ma abbiamo deciso di metterci anche le funzioni di
+> ciclo?»* Sì — ma vale la pena essere precisi su **cosa** entra, perché la risposta ingenua
+> nasconde un difetto.
+
+### Dentro la v1
+
+| | Dove |
+|---|---|
+| Le tre opzioni in onboarding (`ce l'ho` / `non ancora` / `preferisco non dirlo`) | Onboarding, schermata 5 |
+| Date degli ultimi cicli (conteggio a ritroso) | Onboarding, schermata 5 |
+| Domanda sulla contraccezione ormonale | Onboarding, schermata 5 |
+| Toggle giornaliero «oggi ho il ciclo» | Blocco Rhythm nel pre-check |
+| Contenuto educativo sulle quattro fasi | Blocco Rhythm, accordion |
+| Derivazione delle fasi dalle date | `content/cycle.ts`, calcolata a runtime |
+| Tabella `cycle_events` con RLS separata | Schema, dal giorno uno |
+
+### Fuori dalla v1
+
+| | Perché |
+|---|---|
+| **Grafico dei segnali con le bande di fase** (Patterns stadio 3) | Richiede ~9 settimane di dati per esistere |
+| **Rete di sicurezza RED-S** | 🔴 Bloccata dalla firma clinica, non dal design |
+
+---
+
+### ⚠️ Il difetto che ne esce
+
+Messe insieme, quelle due righe producono questo:
+
+> **Le si chiedono le date del ciclo il primo giorno, e per nove settimane non le si
+> restituisce niente in cambio.**
+
+È un cattivo scambio, e per questa utente in particolare. Il dato più intimo che l'app
+raccoglie è anche l'unico che non produce nulla di visibile per due mesi. Su un'adolescente
+che sta decidendo se fidarsi, è esattamente il tipo di asimmetria che fa disinstallare.
+
+E c'è un secondo effetto: **rende la richiesta più difficile da giustificare**. Se un
+genitore chiede *«perché l'app vuole sapere questo?»*, la risposta non può essere
+«fra due mesi te lo dico».
+
+### 🟡 La correzione: una vista minima del ritmo, in v1
+
+Non il grafico dei pattern — quello resta fuori, e giustamente. Una cosa molto più piccola,
+dentro la tab «Me»:
+
+```
+┌─────────────────────────────────┐
+│  🌙 IL MIO RITMO                │
+│                                 │
+│  Oggi sei nella fase            │
+│  🌱 Follicolare · giorno 8      │
+│                                 │
+│  In questa fase energia e umore │
+│  di solito salgono mentre il    │
+│  corpo riparte. Potresti sentir-│
+│  ti forte e con voglia di       │
+│  spingere — se i tuoi canali    │
+│  sono d'accordo.                │
+│                                 │
+│  ○━━━●━━━━○━━━○                 │
+│  🩸   🌱   ☀️   🌙              │
+│                                 │
+│  Le date che hai messo dicono   │
+│  circa questo. Il tuo ciclo sta │
+│  ancora trovando il suo ritmo,  │
+│  quindi è una mappa, non un     │
+│  orario.                        │
+└─────────────────────────────────┘
+```
+
+**Perché regge il test delle cinque domande:**
+
+1. *Le dice cosa fare o le insegna a capirlo?* Insegna: nomina la fase e dice cosa **può**
+   voler dire, sempre con «se i tuoi canali sono d'accordo».
+2. *Aggiunge secondi al check-in?* Zero. È una vista, non un input.
+3. *La confronta con qualcun altro?* No.
+4. *Tocca cibo o corpo come forma?* No.
+5. *Produce qualcosa da dire a un adulto?* Sì — è il primo mattone di
+   *«sono nella settimana prima del ciclo, mi aspetto di essere più stanca»*.
+
+**Costo:** basso. Il contenuto educativo delle quattro fasi **è già scritto** (sta nel
+blocco Rhythm), la derivazione della fase dalle date è una ventina di righe, e la tabella
+`cycle_events` c'è già nello schema.
+
+**Valore:** restituisce qualcosa dal **giorno uno** in cambio del dato più intimo che
+chiediamo. È DECODE nella sua forma più semplice, e rende la richiesta in onboarding
+onesta invece che a credito.
+
+🔵 **Guardrail obbligatorio:** l'incertezza va mostrata, non nascosta. Mai un conto alla
+rovescia («mancano 6 giorni al ciclo»), mai una previsione. Le fasi si mostrano sfumate ai
+bordi, e la frase *«è una mappa, non un orario»* resta sempre visibile. Nei primi anni dopo
+il menarca i cicli sono irregolari (§4.4): una precisione finta qui farebbe più danno che
+non mostrare niente.
+
+---
+
 ## Riepilogo dei gap su questo layer
 
 | Gap | Gravità |
