@@ -1,6 +1,6 @@
 # 03 · Il layer ciclo e la rete di sicurezza RED-S
 
-> Fonte: documento madre §4.4, §10, §12 + prototipi (blocco "Your Rhythm", journey W4/W7).
+> Fonte: documento sorgente §4.4, §10, §12 + prototipi (blocco "Your Rhythm", journey W4/W7).
 
 Questa è la parte del prodotto che nessun competitor fa bene, ed è anche quella dove è
 più facile fare danno. Le regole qui sono tutte 🔴.
@@ -114,7 +114,7 @@ Aveva **sei bottoni** di auto-classificazione:
 `🩸 On my period · 🍫 Hungry / cravings / moody · ☀️ Strong & clear · 🌫️ Tired / tender / a bit off · 🌱 No periods yet · ☁️ Nothing / rather not say`
 
 **Perché il passaggio a v2 è giusto** 🔴: la v1 chiedeva all'atleta di auto-classificare
-il proprio stato ciclico, cioè esattamente quello che il documento madre vieta (conteggio
+il proprio stato ciclico, cioè esattamente quello che il documento sorgente vieta (conteggio
 a ritroso, non auto-report di fase). Inoltre "Hungry / cravings" viola il principio food-safe.
 
 **Perché però v2 ha perso qualcosa** ⚠️: la v1 gestiva esplicitamente due casi che v2 non

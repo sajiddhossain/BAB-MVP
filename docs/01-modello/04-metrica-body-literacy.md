@@ -1,6 +1,6 @@
 # 04 · La metrica — prediction error
 
-> Fonte: documento madre §7, §8, §9.
+> Fonte: documento sorgente §7, §8, §9.
 
 ---
 

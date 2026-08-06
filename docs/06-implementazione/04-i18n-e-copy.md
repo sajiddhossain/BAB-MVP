@@ -6,7 +6,7 @@
 
 ## Il problema
 
-Tutto il copy esistente — sei prototipi, il documento madre, il percorso di 16 settimane —
+Tutto il copy esistente — sei prototipi, il documento sorgente, il percorso di 16 settimane —
 è in **inglese**. Il pilota è previsto su venti atlete italiane di 13–14 anni.
 
 La decisione sulla lingua ([D1](../04-brainstorming/03-decisioni-aperte.md)) non è ancora

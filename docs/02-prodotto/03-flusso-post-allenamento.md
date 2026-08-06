@@ -1,6 +1,6 @@
 # 03 · Flusso post-allenamento
 
-> Fonte: `fonti/prototipi/02-post-training-reflect--v2-LATEST.html` + documento madre §5
+> Fonte: `fonti/prototipi/02-post-training-reflect--v2-LATEST.html` + documento sorgente §5
 > + `fonti/documenti/BAB before & after Training.pdf` + `fonti/immagini/note-before-after-training.jpeg`.
 >
 > **Budget: ≤ 60–90 secondi.** 🔴 **Timing: pochi minuti dopo la fine**, non la sera. 🔴

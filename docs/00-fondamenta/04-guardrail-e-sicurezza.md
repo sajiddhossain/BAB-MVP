@@ -1,6 +1,6 @@
 # 04 · Guardrail e sicurezza
 
-> Fonte: documento madre §10, §11, §12. Più il copy reale dei prototipi
+> Fonte: documento sorgente §10, §11, §12. Più il copy reale dei prototipi
 > (blocchi `Care mode`), che è la versione già scritta e testabile di queste regole.
 
 Questa è la sezione che, se sbagliata, chiude il prodotto. Va letta da chiunque tocchi
@@ -96,7 +96,7 @@ che rende il prodotto interessante anche per la squadra, senza tradire la privac
 - Partecipazione alla ricerca **opt-in**, e la ragazza **beneficia direttamente**
   del feedback — non è solo una fonte di dati.
 
-> Il documento madre lo dice esplicitamente: *"l'etica lo rende un loop virtuoso, non
+> Il documento sorgente lo dice esplicitamente: *"l'etica lo rende un loop virtuoso, non
 > estrazione"*. E aggiunge l'umiltà: la scoperta aggregata **genera ipotesi e affina i
 > prior; non diventa un claim clinico** finché non è validata indipendentemente.
 

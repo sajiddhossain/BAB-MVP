@@ -1,7 +1,7 @@
 # 05 · Patterns e insight — la vista "Me"
 
 > Fonte: `fonti/prototipi/03-journey-16-settimane--v1.html`, tab "📈 My Patterns"
-> + documento madre §8, §9.
+> + documento sorgente §8, §9.
 
 ---
 

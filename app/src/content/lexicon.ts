@@ -6,7 +6,7 @@ import type { Locale } from '@/copy'
  * 🔴 I `code` finiscono nel database (`body_signals.sensation`) e non si
  * cambiano mai.
  *
- * 🔴 `clinical` e `redFlag` derivano dalla tabella §4.3 del documento madre e
+ * 🔴 `clinical` e `redFlag` derivano dalla tabella §4.3 del documento sorgente e
  * DEVONO ESSERE FIRMATI DA UN MEDICO DELLO SPORT prima dell'uso con minori.
  * L'atleta non vede mai la categoria clinica: lei descrive, l'app non diagnostica.
  *

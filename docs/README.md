@@ -69,7 +69,7 @@ e [`02-prodotto/01-architettura-informativa.md`](02-prodotto/01-architettura-inf
 
 ## Convenzioni
 
-- 🔴 **Non negoziabile** — deriva dal documento madre o dai guardrail clinici.
+- 🔴 **Non negoziabile** — deriva dal documento sorgente o dai guardrail clinici.
 - 🟡 **Proposta di design** — mia lettura del materiale, discutibile.
 - 🔵 **Domanda aperta** — serve una decisione della founder.
 

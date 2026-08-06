@@ -28,7 +28,7 @@
 > straniere. La sotto-decisione sui nomi dei tempi è stata riaperta da
 > [B2](04-revisione-roadmap.md#b2--tempo-in-italiano-vuol-dire-tempo).
 
-**Contesto:** documento madre e tutti i prototipi sono in inglese. La landing in produzione,
+**Contesto:** documento sorgente e tutti i prototipi sono in inglese. La landing in produzione,
 il PDF originale e il piano del pilota (20 atlete italiane di atletica, 13-14 anni) sono in
 italiano.
 
@@ -103,7 +103,7 @@ popolazione.
 > Agtarap** sul nominare dolore e sensazioni, una seconda dall'11 agosto 2026.
 > Vedi [R6](04-revisione-roadmap.md#r6--niente-firma-del-medico-dello-sport-per-lmvp).
 
-**Contesto:** §10 e il disclaimer del documento madre lo richiedono esplicitamente:
+**Contesto:** §10 e il disclaimer del documento sorgente lo richiedono esplicitamente:
 *"l'instradamento delle bandiere rosse, i percorsi mestruali/RED-S e qualsiasi indicazione
 di salute devono essere firmati da un medico dello sport qualificato"*.
 

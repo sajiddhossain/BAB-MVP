@@ -1,6 +1,6 @@
 # 02 · Lessico delle sensazioni
 
-> Fonte: documento madre §4.3 + blocchi "Decode your ache" dei due prototipi.
+> Fonte: documento sorgente §4.3 + blocchi "Decode your ache" dei due prototipi.
 >
 > ✅ **I gap descritti in questo documento sono stati chiusi** nei prototipi
 > [`/prototipi-v3`](../../prototipi-v3/). Le sezioni sotto restano come traccia
@@ -32,9 +32,9 @@ diagnostica mai.** 🔴
 
 ---
 
-## ⚠️ Divergenza tra documento madre e prototipi
+## ⚠️ Divergenza tra documento sorgente e prototipi
 
-Il lessico implementato nei prototipi **non coincide** con quello del documento madre.
+Il lessico implementato nei prototipi **non coincide** con quello del documento sorgente.
 
 | Prototipi (8 opzioni) | Doc madre | Stato |
 |---|---|---|

@@ -1,6 +1,6 @@
 # 02 · Flusso pre-allenamento
 
-> Fonte: `fonti/prototipi/01-pre-training-check-in--v2-LATEST.html` + documento madre §5
+> Fonte: `fonti/prototipi/01-pre-training-check-in--v2-LATEST.html` + documento sorgente §5
 > + `fonti/documenti/BAB before & after Training.pdf`.
 >
 > **Budget: ≤ 60–90 secondi. ~10 micro-tocchi.** 🔴
@@ -12,7 +12,7 @@
 Lo stesso flusso ha tre nomi diversi nelle tre fonti. Vale la pena allinearle una volta
 per tutte.
 
-| Documento madre §5 | PDF `before & after` | Prototipo v2 | **Da usare** |
+| Documento sorgente §5 | PDF `before & after` | Prototipo v2 | **Da usare** |
 |---|---|---|---|
 | Predict the session | Fase 1 · Previsione | Step 1 · Predict | **Predict** |
 | Then sense & locate | Fase 2 · Sintonia (Tune In) | Step 2 · Tune in | **Tune in** |

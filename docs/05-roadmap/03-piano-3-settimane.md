@@ -25,7 +25,7 @@ e investitori — che è già un risultato, e non è tempo sprecato.
 
 🔴 **Quello che non si fa in nessuno scenario:** far usare l'app a delle minorenni senza
 la firma clinica e senza il consenso legale. Non è una formalità burocratica, è la ragione
-per cui il documento madre ha un'intera sezione di guardrail.
+per cui il documento sorgente ha un'intera sezione di guardrail.
 
 ---
 

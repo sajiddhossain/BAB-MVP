@@ -1,6 +1,6 @@
 # 01 · Cosa tracciamo
 
-> Fonte: documento madre §4.1, §4.2, §6 + prototipi `01-pre-training` e `02-post-training`.
+> Fonte: documento sorgente §4.1, §4.2, §6 + prototipi `01-pre-training` e `02-post-training`.
 
 ---
 
@@ -81,7 +81,7 @@ umore**, catturato su scala 1–5 dentro gli stessi check-in.
 | **Umore / motivazione** | Psico | Marker soggettivo di readiness e benessere (Beato) |
 | **FC a riposo al mattino** | Fisio (opzionale) | Readiness autonomica — solo baseline individuale (Beato) |
 
-### ⚠️ Gap rilevato tra documento madre e prototipi
+### ⚠️ Gap rilevato tra documento sorgente e prototipi
 
 | Indicatore | Nel doc madre | Nei prototipi v2 | Nota |
 |---|---|---|---|
@@ -134,7 +134,7 @@ si crea un chip `📍 Zona — Sensazione` → la zona resta marcata sulla figur
 
 ### ⚠️ Gap: intensità e tag di comportamento
 
-Il documento madre §4.3 dice: *"Ogni tap prende anche un'**intensità (1–5)** e un **tag di
+Il documento sorgente §4.3 dice: *"Ogni tap prende anche un'**intensità (1–5)** e un **tag di
 comportamento** (migliora col riscaldamento / peggiora col carico / c'è anche a riposo)."*
 
 **Nei prototipi non ci sono.** Sono due input mancanti e non banali: il tag di comportamento

@@ -1,6 +1,6 @@
 # 03 · Principi di design — il DNA
 
-> Fonte: documento madre §3. Sono dieci, li ho lasciati tutti e dieci e ho aggiunto
+> Fonte: documento sorgente §3. Sono dieci, li ho lasciati tutti e dieci e ho aggiunto
 > per ciascuno **la conseguenza concreta di UI** — perché un principio che non cambia
 > una schermata è solo un poster.
 

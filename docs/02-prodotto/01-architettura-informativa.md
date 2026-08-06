@@ -1,7 +1,7 @@
 # 01 · Architettura informativa
 
 > 🟡 Questo documento è **proposta di design**, costruita sul materiale. Le parti marcate
-> 🔴 derivano direttamente dal documento madre.
+> 🔴 derivano direttamente dal documento sorgente.
 
 ---
 

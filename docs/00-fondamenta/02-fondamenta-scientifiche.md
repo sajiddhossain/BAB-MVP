@@ -1,6 +1,6 @@
 # 02 · Fondamenta scientifiche
 
-> Fonte: documento madre §2, §7, §8, + riferimenti bibliografici in coda al PDF.
+> Fonte: documento sorgente §2, §7, §8, + riferimenti bibliografici in coda al PDF.
 
 Il modello poggia su tre fonti. Ognuna contribuisce un pilastro **diverso**, e
 soprattutto ognuna **impone dei vincoli di design**. Questa è la parte che più spesso
