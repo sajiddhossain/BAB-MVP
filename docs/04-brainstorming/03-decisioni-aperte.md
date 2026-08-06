@@ -5,12 +5,28 @@
 >
 > Per ognuna: il contesto, le opzioni concrete, e la mia raccomandazione — così la
 > decisione è un sì/no e non un tema di discussione.
+>
+> ⚠️ **Cinque di queste sono state decise il 6 agosto 2026** e restano qui solo come
+> storia del ragionamento. La decisione vale, la raccomandazione no. Il verbale è in
+> [04-revisione-roadmap](04-revisione-roadmap.md).
+
+| Decisione | Esito |
+|---|---|
+| D1 lingua | 🟢 **chiusa** — italiano *e* inglese ([R9](04-revisione-roadmap.md#r9--italiano-e-inglese-entrambi)) |
+| D2 visibilità coach | 🟢 **chiusa** — la squadra vede tutto, ciclo incluso ([R2](04-revisione-roadmap.md#r2--la-squadra-vede-i-dati-dei-due-check-in-ciclo-incluso)) |
+| D3 settimana 8 | 🟢 **chiusa** — fuori da v1 e v1.1 col percorso ([R8](04-revisione-roadmap.md#r8--il-percorso-resta-fuori-dallmvp)) |
+| D4 firma clinica | 🟢 **chiusa** — non necessaria per l'MVP ([R6](04-revisione-roadmap.md#r6--niente-firma-del-medico-dello-sport-per-lmvp)) |
+| D6 mappa junior | 🟢 **chiusa** — una sola mappa per tutte ([R4](04-revisione-roadmap.md#r4--una-sola-mappa-corporea-dai-12-anni-in-su)) |
+| D5, D7, D8–D12 | 🟠 ancora aperte |
 
 ---
 
 ## 🔴 BLOCCANTI — senza queste non si disegna
 
 ### D1 · Lingua dell'MVP
+> 🟢 **Chiusa: opzione C.** Si costruisce in italiano e in inglese — le advisor sono
+> straniere. La sotto-decisione sui nomi dei tempi è stata riaperta da
+> [B2](04-revisione-roadmap.md#b2--tempo-in-italiano-vuol-dire-tempo).
 
 **Contesto:** documento madre e tutti i prototipi sono in inglese. La landing in produzione,
 il PDF originale e il piano del pilota (20 atlete italiane di atletica, 13-14 anni) sono in
@@ -32,6 +48,10 @@ perché sono un vocabolario condiviso col coach e devono restare identici tra me
 ---
 
 ### D2 · Visibilità del coach
+> 🟢 **Chiusa: opzione C**, contro la raccomandazione qui sotto. Per l'MVP la squadra
+> vede tutti i dati dei due check-in, ciclo compreso, più la dashboard. Il journaling
+> resta privato. Le conseguenze — comprese quelle sul copy — stanno in
+> [R2](04-revisione-roadmap.md#r2--la-squadra-vede-i-dati-dei-due-check-in-ciclo-incluso).
 
 **Contesto:** è la decisione aperta esplicita del §13. *"Il safeguarding vuole che gli
 adulti vedano le bandiere rosse; l'onestà del riporto vuole che i dati siano suoi."*
@@ -55,6 +75,9 @@ sapendolo. È la lettura più coerente con "privacy, agency e safeguarding first
 ---
 
 ### D3 · La settimana 8 del percorso ("Fuel your energy")
+> 🟢 **Chiusa per sottrazione.** Il percorso non entra nell'MVP, e il contenuto
+> sull'alimentazione non entra né in v1 né in v1.1. La decisione più delicata del
+> prodotto si sposta più in là invece di essere presa di fretta.
 
 **Contesto:** è l'unico contenuto che parla esplicitamente di cibo, in un prodotto il cui
 principio 6 dice *"mai fame, sazietà o cibo"* e la cui §12 esclude esplicitamente il tema.
@@ -75,6 +98,10 @@ popolazione.
 ---
 
 ### D4 · Chi firma clinicamente
+> 🟢 **Chiusa: non serve per l'MVP**, perché si passa dalle squadre. Era marcata come
+> il primo collo di bottiglia del progetto: non lo è. Advisor effettive — **Tristin
+> Agtarap** sul nominare dolore e sensazioni, una seconda dall'11 agosto 2026.
+> Vedi [R6](04-revisione-roadmap.md#r6--niente-firma-del-medico-dello-sport-per-lmvp).
 
 **Contesto:** §10 e il disclaimer del documento madre lo richiedono esplicitamente:
 *"l'instradamento delle bandiere rosse, i percorsi mestruali/RED-S e qualsiasi indicazione
@@ -117,6 +144,8 @@ a uscire è "cosa ti sei portata a casa" (bello ma non strutturale), poi le ore 
 nel caso normale** perché appare solo dopo un report di dolore.
 
 ### D6 · La mappa corporea junior
+> 🟢 **Chiusa: una sola mappa, per tutte.** Si costruisce pensando alle 12–14enni, ma
+> il prodotto è usabile dai 12 anni in su — e va fatto provare anche ad atlete adulte.
 
 **Contesto:** §10 chiede regioni più semplici per 11–13 anni. Le 36 zone attuali sono
 probabilmente troppe per un'undicenne, e §10 chiede anche di stabilire l'affidabilità
@@ -160,14 +189,17 @@ Sì/no, e in che versione.
 
 ## Riepilogo — cosa serve dalla founder, in ordine
 
+Le sei che bloccavano sono chiuse. Restano due domande nuove, entrambe nate dal
+riscontro sulla roadmap, ed entrambe più piccole di quelle appena chiuse:
+
 ```
-1. D4 — chi firma clinicamente          → sblocca tutto il resto
-2. D1 — lingua                          → sblocca il copy
-3. D2 — visibilità coach                → sblocca l'architettura dati e il pitch ai club
-4. D3 — settimana 8                     → sblocca il contenuto del percorso
-5. D5 — quali input aggiungere          → sblocca il disegno dei flussi
-6. D6 — fascia d'età dell'MVP           → sblocca la mappa corporea
+1. B1 — wearable                        → l'onboarding non può promettere Apple Health
+                                          da una web app: non esiste l'API
+2. B2 — "tempo" o "andatura" in italiano → sblocca il copy definitivo dei tre tempi
+3. D5 — quali input aggiungere          → sblocca il disegno dei flussi
+4. D8 — "livello di soddisfazione"      → i primi due valori giudicano la prestazione
 ```
 
-Le prime quattro sono conversazioni da mezz'ora. Le ultime due sono decisioni che posso
-prendere io con un default ragionevole, se serve andare avanti.
+B1 è l'unica con una conseguenza di prodotto immediata: c'è una schermata di onboarding
+che dipende dalla risposta. Le altre le posso decidere io con un default ragionevole,
+se serve andare avanti.
