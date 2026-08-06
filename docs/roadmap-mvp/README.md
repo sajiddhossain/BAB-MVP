@@ -5,8 +5,12 @@ founder, club, advisor clinico, potenziali investitori.
 
 | File | |
 |---|---|
-| `roadmap-mvp.pdf` | Il documento, A4, 10 pagine |
+| `roadmap-mvp.pdf` | Il documento, A4, 11 pagine — **v1.1, 6 agosto 2026** |
 | `roadmap-mvp.html` | Il sorgente — si modifica questo, non il PDF |
+
+> **v1.1** recepisce il riscontro della founder sulla v1.0. Le decisioni stanno in
+> [04-revisione-roadmap](../04-brainstorming/04-revisione-roadmap.md); qui c'è la
+> versione condivisibile.
 
 ## Rigenerare il PDF
 
@@ -27,9 +31,10 @@ I font arrivano da Google Fonts, quindi serve connessione durante il rendering.
 | 1 | Copertina |
 | 2 | Il prodotto: meccanismo, metrica, i tre output, vincoli non negoziabili |
 | 3–4 | Stato attuale: inventario 50 schermate, cosa è già risolto |
-| 5–6 | Il piano: timeline e le cinque fasi |
-| 7–8 | Scope: cosa esce e perché, criteri di successo del pilota |
-| 9–10 | Condizioni: decisioni richieste e registro dei rischi |
+| 5–6 | Il piano: timeline e le fasi 1–4 |
+| 7 | Fase 5 (sicurezza, in parallelo) e l'avvertenza sullo scope cresciuto |
+| 8–9 | Scope: cosa esce e perché, criteri di successo del pilota |
+| 10–11 | Condizioni: decisioni richieste e registro dei rischi |
 
 ## Note di stile
 
