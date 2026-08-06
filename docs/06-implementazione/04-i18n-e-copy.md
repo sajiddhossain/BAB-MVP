@@ -101,13 +101,13 @@ In ogni caso vivono in **una costante sola**, così la decisione è reversibile 
 
 ---
 
-## Terminologia interna da sistemare
+## Terminologia interna
 
 Non riguarda l'app ma i documenti, e va fatta prima di condividerli fuori.
 
 | Termine attuale | Problema | 🟡 Proposta |
 |---|---|---|
-| **Cattura acuta** | Calco dal clinico inglese, incomprensibile a un genitore o a un direttore sportivo | **Segnalazione immediata** nei documenti, *«Mi sono fatta male»* nell'app |
+| ~~Cattura acuta~~ | Calco dal clinico inglese, incomprensibile a un genitore o a un direttore sportivo | ✅ **Rinominato** in *segnalazione immediata* nei documenti; nell'app resta *«Mi sono fatta male»* |
 | **Prediction error** | Corretto scientificamente, opaco per tutti gli altri | Tenerlo nei documenti tecnici; nell'app è già *«quanto bene mi leggo»* |
 | **Body literacy** | Termine del brand, si tiene | — |
 

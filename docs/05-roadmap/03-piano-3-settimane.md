@@ -48,7 +48,7 @@ per cui il documento madre ha un'intera sezione di guardrail.
 - **Onboarding** completo (consenso, età, sport, ritmo con date e contraccezione)
 - **Check-in pre** e **check-in post**, completi, che salvano davvero
 - **Home "Oggi"** con i 6 stati calcolati sui dati veri
-- **Care mode** + **cattura acuta** sempre accessibile
+- **Care mode** + **segnalazione immediata** sempre accessibile
 
 *Fine settimana 2: un'atleta può usarla per una giornata intera, dall'inizio alla fine.*
 
@@ -89,7 +89,7 @@ firma arriva entro la settimana 3, entra. Altrimenti entra appena arriva.
 🔴 Anche stringendo, queste restano:
 
 - **Care mode e bandiere rosse** — è la ragione per cui il prodotto è sicuro
-- **Cattura acuta sempre a un tocco** — un infortunio non aspetta il check-in
+- **Segnalazione immediata sempre a un tocco** — un infortunio non aspetta il check-in
 - **Consenso tutore + atleta** — requisito legale
 - **Esporta e cancella i miei dati** — requisito GDPR
 - **Target touch ≥44px e contrasto AA** — un'app che non si riesce a toccare non si usa

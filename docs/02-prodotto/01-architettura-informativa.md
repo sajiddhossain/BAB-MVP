@@ -86,7 +86,7 @@ con un bottone**, e cambiare in base allo stato della giornata.
 | **PE + allenamento lo stesso giorno** 🔴 | Comunque **due** check: pre prima della prima attività, post dopo l'ultima; si taggano le sessioni. **Mai scalare i check con il numero di sessioni.** |
 | **Giorno saltato** | Nessuna colpa, nessuno streak rotto. Copy neutro: *"Nessun problema. Ricominciamo da oggi."* |
 | **Bandiera rossa attiva** | Il Care mode sta **sopra** tutto il resto, sempre visibile fino a risoluzione |
-| **Momento acuto, in qualsiasi ora** 🔴 | *"la cattura di bandiere rosse acute (dolore acuto, cedimento) è sempre a un tocco di distanza"* → serve un **accesso permanente**, vedi sotto |
+| **Momento acuto, in qualsiasi ora** 🔴 | *"la segnalazione di bandiere rosse acute (dolore acuto, cedimento) è sempre a un tocco di distanza"* → serve un **accesso permanente**, vedi sotto |
 
 ### Il pulsante sempre presente 🔴
 

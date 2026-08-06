@@ -65,7 +65,7 @@
 | Q5c | Comunicare (opzionale) | 🔴 | Punto 7 del §5 |
 | Q5d | Care mode (condizionale) | ✅ | |
 
-### Cattura acuta — sempre accessibile ✅
+### Segnalazione immediata — sempre accessibile ✅
 
 | # | Schermata | Stato | Note |
 |---|---|---|---|
@@ -124,7 +124,7 @@
 | Oggi (home + stati) | 6 | 0 | 0 | 6 |
 | Flusso pre | 5 | 1 | 2 | 8 |
 | Flusso post | 5 | 1 | 3 | 9 |
-| Cattura acuta | 3 | 0 | 0 | 3 |
+| Segnalazione immediata | 3 | 0 | 0 | 3 |
 | Percorso | 1 | 1 | 3 | 5 |
 | Me | 8 | 0 | 1 | 9 |
 | Impostazioni | 0 | 0 | 5 | 5 |

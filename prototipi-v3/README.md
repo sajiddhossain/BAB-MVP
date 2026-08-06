@@ -76,7 +76,7 @@ attivo solo quando ci sono tutti e tre i pezzi. Il chip risultante è più ricco
 🛡️ Left knee — Gives way / unstable · quite a bit · worse under load  ×
 ```
 
-### 4 · Cattura acuta sempre a un tocco
+### 4 · Segnalazione immediata sempre a un tocco
 
 §5: *"**Anytime:** acute red-flag capture (sharp pain, giving-way) is always one tap away."*
 Nella v2 non c'era nessun modo di registrare un infortunio fuori dal flusso del check-in.
