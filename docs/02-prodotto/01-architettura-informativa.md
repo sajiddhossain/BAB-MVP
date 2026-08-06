@@ -182,7 +182,7 @@ Tre blocchi in verticale, in quest'ordine preciso:
 
 | Escluso | Perché |
 |---|---|
-| **Tab "Dashboard coach"** | Il coach non è un utente dell'app dell'atleta. 🔵 Se serve un prodotto coach, è un prodotto separato — vedi decisioni aperte. |
+| **Tab "Dashboard coach"** | ⚠️ **Il taglio resta, la conclusione no.** [R5](../04-brainstorming/04-revisione-roadmap.md#r5--la-dashboard-del-coach-entra-nella-v1) mette la dashboard squadra in v1 — ma come **prodotto separato**, non come tab dentro l'app dell'atleta. La riga qui sopra vale ancora per la navigazione dell'atleta. |
 | **Feed / social / squadra** | Nessun confronto tra atlete (principio 4). |
 | **Notifiche di streak** | Rompono il principio "gioco a bassa posta" e generano colpa. |
 | **Schermata "collega il tuo wearable"** in onboarding | Principio 1: il self-report è la spina dorsale. |

@@ -99,7 +99,8 @@ Ogni blocco è verificabile da solo. Chiudere un blocco significa poterlo dimost
 ### Blocco D · Onboarding
 - [ ] Le 6 schermate, con i gate già verificati nel prototipo
 - [ ] Scrittura del profilo e del consenso
-- [ ] Calcolo della configurazione derivata (mappa junior/full, layer ciclo, fasi)
+- [ ] Calcolo della configurazione derivata (layer ciclo, fasi, domanda contraccezione 15+)
+      — ⚠️ niente variante junior/full: [R4](../04-brainstorming/04-revisione-roadmap.md#r4--una-sola-mappa-corporea-dai-12-anni-in-su) dice una mappa sola
 
 *Verificabile:* un'atleta di 12 anni con ciclo e contraccezione ormonale ottiene la
 configurazione giusta, e quella di 16 senza ciclo non vede mai il blocco ritmo.

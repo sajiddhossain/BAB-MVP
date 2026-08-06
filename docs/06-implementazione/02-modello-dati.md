@@ -25,10 +25,19 @@ Tre conseguenze, tutte positive:
 `cycle_events` ha la sua RLS e non è mai in join con i check-in a livello di database.
 La correlazione fase ↔ segnale si fa **nell'app**, a runtime.
 
-**Perché:** l'onboarding promette che *«il tuo ciclo non è mai condiviso, mai mostrato, mai
-incluso in niente che mandi»*. Se quei dati stanno nella stessa riga dei check-in, la
-promessa dipende dall'attenzione di chi scrive la query successiva. Separati, dipende dal
-database — che non si distrae.
+**Perché:** ⚠️ la ragione originale — *«il ciclo non è mai condiviso»* — è **superata da
+[R2](../04-brainstorming/04-revisione-roadmap.md#r2--la-squadra-vede-i-dati-dei-due-check-in-ciclo-incluso)**:
+lo staff vede anche le date del ciclo, e il copy dell'onboarding è stato riscritto per
+dirlo. La tabella separata **resta comunque giusta**, per due motivi diversi da prima:
+
+1. **Lo spegnimento deve essere reale.** `cycle_status = 'undisclosed'` deve poter far
+   sparire tutto il blocco senza lasciare colonne vuote sparse nei check-in.
+2. **La correlazione fase ↔ segnale è un'inferenza**, e va calcolata a runtime. Salvarla
+   in riga la congelerebbe come se fosse un fatto, e nei primi anni dopo il menarca i
+   cicli sono troppo irregolari perché lo sia.
+
+La regola "sì ai dati, no al journaling" non vive più qui: vive nelle **viste `coach_*`**,
+che espongono le colonne strutturate e non contengono affatto il testo libero.
 
 ### 3 · Le bandiere rosse sono una tabella, non un campo
 

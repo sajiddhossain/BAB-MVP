@@ -50,9 +50,9 @@ Quando l'atleta segnala dolore protettivo, compare il blocco **Care mode**:
 | **Calibrazione, non offloading** | Successo = si legge bene **anche senza** il dispositivo. | Riflessioni periodiche "device-off". 🟡 Proposta: una settimana device-off ogni mese nel journey. |
 | **Nessun punteggio nocebo** | Niente numeri rossi "PERICOLO". Gli scarti si mostrano come apprendimento. Spazio neutro e a bassa attivazione **prima delle gare**. | 🔵 Da definire: l'app rileva il giorno-gara? Vedi decisioni aperte. |
 | **Dolore con sfumature** | Discriminazione protettivo/adattivo, non ipervigilanza. Una lettura verde del device non sovrascrive mai un report di dolore. | Il blocco "Decode your ache" precede sempre la domanda. |
-| **Privacy, agency, body-positive, trauma-aware** | Dati mestruali e di dolore sono suoi. Condivisione col coach opt-in. Linguaggio curioso, mai sorveglianza. | Nessun default di condivisione. |
-| **Scalato per età e verificato in affidabilità** | Regioni corporee **più semplici per 11–13**. Stabilire affidabilità test–retest per fascia d'età prima di fidarsi dei dati. | 🔵 Aperto: serve una variante semplificata della mappa corporea. |
-| **Supervisione clinica** | Instradamento bandiere rosse, percorsi mestruali/RED-S e qualsiasi indicazione di salute firmati da un medico dello sport. | Blocco di rilascio. Nessun pilota senza questa firma. |
+| **Privacy, agency, body-positive, trauma-aware** | Dati mestruali e di dolore sono suoi. Linguaggio curioso, mai sorveglianza. | ⚠️ **Modificato da [R2](../04-brainstorming/04-revisione-roadmap.md#r2--la-squadra-vede-i-dati-dei-due-check-in-ciclo-incluso):** lo staff vede i check-in e le date del ciclo. Resta vero il resto: il testo libero è solo suo, e lei sa chi la vede prima di scrivere. |
+| **Scalato per età e verificato in affidabilità** | Stabilire affidabilità test–retest prima di fidarsi dei dati. | ⚠️ **Modificato da [R4](../04-brainstorming/04-revisione-roadmap.md#r4--una-sola-mappa-corporea-dai-12-anni-in-su):** una sola mappa per tutte, dai 12 anni in su. Una mappa per fascia d'età renderebbe i dati non confrontabili proprio mentre lei cresce. |
+| **Supervisione clinica** | Instradamento bandiere rosse, percorsi mestruali/RED-S e qualsiasi indicazione di salute rivisti da un professionista. | ⚠️ **Modificato da [R6](../04-brainstorming/04-revisione-roadmap.md#r6--niente-firma-del-medico-dello-sport-per-lmvp):** non è più un blocco di rilascio per l'MVP, perché si passa dalle squadre. La revisione procede per area — vedi `content/clinical.ts`. |
 
 ---
 

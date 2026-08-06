@@ -10,6 +10,28 @@ e [`02-prodotto/01-architettura-informativa.md`](02-prodotto/01-architettura-inf
 
 ---
 
+## ⚠️ Leggi prima questo
+
+Il **6 agosto 2026** la founder ha rivisto la roadmap e ha preso undici decisioni, alcune
+delle quali ribaltano scelte argomentate in questi documenti. Il verbale è
+**[04-brainstorming/04-revisione-roadmap.md](04-brainstorming/04-revisione-roadmap.md)**, e
+in caso di contrasto **vince quello**.
+
+Le quattro che cambiano di più:
+
+| | Prima | Adesso |
+|---|---|---|
+| **Ciclo e coach** | Il ciclo non è mai condiviso | Lo staff vede i check-in e le date del ciclo. **Non** il testo libero |
+| **Dashboard coach** | Fuori dall'MVP, argomentata a lungo | **Dentro la v1** |
+| **Firma del medico** | Blocco di rilascio, primo collo di bottiglia | **Non serve per l'MVP**: si passa dalle squadre |
+| **90 secondi** | Tetto duro di fattibilità | Non è un tetto. Si misura, non si giudica |
+
+I documenti qui sotto conservano il ragionamento originale, con una nota ⚠️ nei punti
+diretti in cui non vale più. Non sono stati riscritti: sapere *perché* si era deciso il
+contrario serve, e cancellarlo lo farebbe ridiscutere fra sei mesi.
+
+---
+
 ## Indice
 
 ### 00 · Fondamenta — *perché esiste BAB*
