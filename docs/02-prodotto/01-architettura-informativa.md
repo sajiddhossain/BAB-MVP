@@ -65,7 +65,7 @@ con un bottone**, e cambiare in base allo stato della giornata.
    │ ⚡ Sintonizzati│ │ 🌙 Chiudi il │ │ ✅ Fatto per │
    │               │ │    cerchio    │ │     oggi     │
    │ "Un minuto,   │ │              │ │              │
-   │ prima di      │ │ "Hai previsto│ │ Il tuo tempo:│
+   │ prima di      │ │ "Hai previsto│ │ L'andatura:  │
    │ iniziare"     │ │  Steady.     │ │   🌊 Steady  │
    │               │ │  Com'è andata│ │              │
    │ [ Inizia → ]  │ │  davvero?"   │ │ + missione   │
@@ -79,7 +79,7 @@ con un bottone**, e cambiare in base allo stato della giornata.
 | Stato | Cosa mostra Oggi |
 |---|---|
 | **Prima del pre-check** | Card "Sintonizzati". Un bottone. |
-| **Pre fatto, allenamento in corso** | Card del tempo scelto + bottone secondario "Chiudi il cerchio" |
+| **Pre fatto, allenamento in corso** | Card dell'andatura scelta + bottone secondario "Chiudi il cerchio" |
 | **Entrambi fatti** | Riepilogo della giornata + la missione della settimana + niente da fare |
 | **Giorno di riposo** 🔴 | *"una riflessione opzionale (recupero, segnali persistenti, ciclo/energia)"* — mai il flusso completo |
 | **Giorno di solo PE (educazione fisica)** 🔴 | Coppia pre/post più leggera. Il PE conta come carico. |

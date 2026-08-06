@@ -20,7 +20,7 @@ Non un coach (dice cosa fare). Non un medico (diagnostica). Non un'app di wellne
 
 ### 1 · Mai giudicare, mai vincere/perdere
 
-Ogni esito ha una sua dignità. I tre tempi sono tre stati, non tre voti.
+Ogni esito ha una sua dignità. Le tre andature sono tre stati, non tre voti.
 
 | ❌ Mai | ✅ Invece |
 |---|---|
@@ -46,7 +46,7 @@ Formule ricorrenti nel materiale: *"il tuo corpo, la tua chiamata"*, *"sei tu al
 tornano"*.
 
 🔴 **Regola operativa:** ogni volta che l'app afferma qualcosa su di lei, deve esserci un
-modo di dissentire. Il bottone "cambia tempo" e i pollici su/giù sugli insight non sono
+modo di dissentire. Il bottone "cambia andatura" e i pollici su/giù sugli insight non sono
 cortesie: sono la voce del prodotto resa cliccabile.
 
 ### 4 · Spiega il perché, sempre in una riga
@@ -106,15 +106,42 @@ diluire:
 |---|---|---|
 | **Il serbatoio** | Energia disponibile | "serbatoio pieno / mezzo / basso", "quello che riempie il serbatoio" |
 | **I canali** | I domini di segnale | "i tuoi canali", "se un canale cala a metà sessione" |
-| **Il tempo** *(musicale)* | Lo stato del giorno | "qual è il tuo tempo oggi", "onora il tuo tempo" |
+| **L'andatura** | Lo stato del giorno | "qual è la tua andatura oggi", "onora la tua andatura" |
 | **La batteria condivisa** | Mente e corpo | "il tuo cervello e il tuo corpo funzionano con la stessa batteria" |
 | **La mappa, non la regola** | Il ciclo | "non è una regola — è una mappa" |
 | **Sintonizzarsi** | L'atto del check-in | "Tune in", "sintonizzati" |
 | **Leggere** | La competenza | "leggere il tuo corpo", "la tua lettura interiore" |
 
 > `Tune in` + `channels` + `tempo` compongono una **metafora radio/musica** coerente:
-> ci si sintonizza sui canali per trovare il tempo giusto. È un sistema riuscito e non
+> ci si sintonizza sui canali per trovare l'andatura giusta. È un sistema riuscito e non
 > va contaminato con metafore da altri campi (livelli, punti, batterie di gioco, ecc.).
+
+### 🟢 In italiano si dice «andatura», non «tempo»
+
+Deciso il 6 agosto 2026 ([B2](../04-brainstorming/04-revisione-roadmap.md#b2--tempo-in-italiano-vuol-dire-tempo)).
+
+Il motivo è concreto, non estetico: in italiano *tempo* vuol dire **durata**, e leggendo
+la roadmap la founder ha capito che *"tempo suggerito dall'app"* fosse una stima di quanto
+ci si mette. Se lo legge così chi il prodotto lo conosce meglio di chiunque, lo legge così
+anche una tredicenne.
+
+| | |
+|---|---|
+| In italiano, per l'atleta | **andatura** — *«qual è la tua andatura oggi?»*, *«cambia andatura»* |
+| In inglese | **tempo**, invariato: lì la parola funziona |
+| I tre nomi | **Upbeat · Steady · Gentle**, in inglese in entrambe le lingue — sono il vocabolario che condivide col coach e devono restare identici tra mercati |
+| Nel codice e nel database | `tempo` invariato (`tempo_predicted`, `Tempo`, `--tempo-*`, `tempo.ts`) |
+
+L'ultima riga non è pigrizia: quei nomi sono codici stabili, e rinominarli vorrebbe dire
+migrare i dati di tutte le atlete per una questione di lingua.
+
+⚠️ *Andatura* è femminile, *tempo* era maschile. Ogni volta che si scrive copy italiano
+gli accordi cambiano: **l'**andatura, **un'**andatura, andatura suggerit**a**, scelt**a**,
+quest**a** andatura.
+
+Si perde un pezzo di metafora musicale, ed è un costo reale. Ma *andatura* è la parola che
+in italiano si usa già nello sport per il passo con cui ci si muove, quindi il concetto
+arriva comunque — e arriva senza inciampo.
 
 ---
 
@@ -153,7 +180,7 @@ l'inglese arriva con l'internazionalizzazione. La landing ha già l'infrastruttu
 conviene riusarla e nascere multilingua fin dall'architettura, anche se si spedisce solo
 l'italiano.
 
-⚠️ **Attenzione alla traduzione dei nomi dei tempi.** `Upbeat / Steady / Gentle` funzionano
+⚠️ **Attenzione alla traduzione dei nomi delle andature.** `Upbeat / Steady / Gentle` funzionano
 bene in inglese e sono già un vocabolario condiviso atleta↔coach (Settimana 10 del percorso).
 Tradurli male li rovina.
 

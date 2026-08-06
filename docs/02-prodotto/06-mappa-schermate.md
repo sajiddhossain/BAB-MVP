@@ -49,14 +49,14 @@
 | P2b | "Ti ha sorpresa qualcosa?" | 🔴 | Segnale micro del §5 |
 | P3 | Mappa corporea + sensazione | ✅ | v3: lessico a 14 voci in 3 gruppi, intensità, tag comportamento, red flag che instradano da sole |
 | P4 | Decode your ache + domanda dolore | ✅ | Va reso collassabile dopo 2 settimane |
-| P5 | Risultato: tempo + Compare + Adjust + swap | ✅ | Aggiungere "copia frase per il coach" |
+| P5 | Risultato: andatura + Compare + Adjust + swap | ✅ | Aggiungere "copia frase per il coach" |
 | P5b | Care mode (condizionale) | ✅ | |
 
 ### Flusso post-allenamento
 
 | # | Schermata | Stato | Note |
 |---|---|---|---|
-| Q1 | Look back — tempo + sforzo + durata | 🟠 | Durata e tipo sessione 🔴 |
+| Q1 | Look back — andatura + sforzo + durata | 🟠 | Durata e tipo sessione 🔴 |
 | Q2 | Mappa corporea | ✅ | v3: stessi miglioramenti di P3 |
 | Q3 | Sense — 3 scale + Headspace | ✅ | |
 | Q4 | Decode any ache + domanda | ✅ | |

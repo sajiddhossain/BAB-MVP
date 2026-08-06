@@ -27,7 +27,7 @@ score". **Quanto bene si legge, e se sta migliorando.**
 > che nei prototipi non c'è. Attualmente si cattura solo la previsione, non quanto è
 > sicura di essa.
 >
-> 🟡 **Proposta:** dopo la scelta del tempo previsto, una micro-domanda a 3 stati:
+> 🟡 **Proposta:** dopo la scelta dell'andatura prevista, una micro-domanda a 3 stati:
 > *"Quanto sei sicura?"* → `Tiro a indovinare · Abbastanza · Sicura`. Un tocco.
 > È l'input a costo più basso e valore più alto di tutto il modello: senza, una delle
 > tre facce della metrica non è misurabile.
@@ -135,7 +135,7 @@ Il prototipo lo risolve già bene. Copy reale, da conservare:
 > Nominare la sorpresa è come il divario si accorcia la prossima volta.
 
 **Quando non ha previsto:**
-> La prossima volta prova a indovinare il tuo tempo *prima* di sintonizzarti — confrontare
+> La prossima volta prova a indovinare la tua andatura *prima* di sintonizzarti — confrontare
 > la tua previsione con il tuo corpo è tutto ciò che allena la tua lettura interiore.
 
 > **Perché funziona:** l'errore non è mai chiamato errore. È chiamato *gap*, *sorpresa*,

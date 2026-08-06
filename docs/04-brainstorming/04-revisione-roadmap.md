@@ -252,10 +252,16 @@ Se la founder, che il prodotto lo conosce meglio di chiunque, l'ha letto come un
 durata, una tredicenne lo leggerà come una durata. **La parola non funziona in
 italiano.**
 
-🔵 **Proposta:** i tre nomi restano in inglese (sono vocabolario condiviso col coach e
-devono restare identici tra mercati), ma il concetto in italiano si chiama
-**"andatura"**, non "tempo". *"Che andatura hai oggi?"* si legge senza inciampi, e
-regge anche la metafora della marcia già presente nel copy inglese.
+🟢 **Deciso: "andatura".** I tre nomi restano in inglese — sono vocabolario condiviso col
+coach e devono restare identici tra mercati — ma il concetto, in italiano, si chiama
+**andatura**. *"Che andatura hai oggi?"* si legge senza inciampi, e regge anche la metafora
+della marcia già presente nel copy inglese.
+
+Applicato ovunque: copy dell'app, 16 documenti, roadmap e README dei prototipi. **In
+inglese resta `tempo`**, che lì funziona; e restano `tempo` anche i nomi tecnici — le
+colonne `tempo_predicted` / `tempo_chosen`, il tipo `Tempo`, le variabili CSS
+`--tempo-*`, il file `tempo.ts`. Rinominarli significherebbe migrare dati per una
+questione di lingua, contro [R10](#r10--più-di-20-atlete-e-la-webapp-non-si-sostituisce).
 
 ---
 
@@ -264,7 +270,7 @@ regge anche la metafora della marcia già presente nel copy inglese.
 | # | Domanda |
 |---|---|
 | **B1** | Wearable: si rimanda, o si scelgono le integrazioni cloud? |
-| **B2** | "Tempo" → "andatura" in italiano: sì o no? |
+| ~~B2~~ | 🟢 **Chiusa: "andatura".** Applicata ovunque nell'italiano |
 | D8 | La domanda "livello di soddisfazione" — i primi due valori giudicano la prestazione |
 | D9–D12 | Avatar, badge, spec UI vecchie, tema scuro — tutte rimandabili |
 

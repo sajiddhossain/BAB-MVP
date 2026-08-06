@@ -56,7 +56,7 @@ Il passaggio a un tema chiaro non è una riscrittura, è una ri-tokenizzazione.
 
 ### Cosa si prende dagli altri due sistemi
 
-- **Da B (prototipi):** i **colori dei tre tempi**. Sono buoni e semanticamente giusti.
+- **Da B (prototipi):** i **colori delle tre andature**. Sono buoni e semanticamente giusti.
   Vanno però riportati sulla palette BAB (vedi sotto).
 - **Da C (`ui_ux_component_specs`):** la **geometria** — margini 16px, gap 24px sezione,
   16px card, 12px lista; il viewport target 360/393/430; icone 24×24 in primitive
@@ -98,7 +98,7 @@ Il passaggio a un tema chiaro non è una riscrittura, è una ri-tokenizzazione.
 Qui va fatta la mappatura, che oggi non esiste:
 
 ```css
-/* I tre tempi */
+/* Le tre andature */
 --tempo-upbeat:    var(--bab-coral);      /* ⚡ energia, spinta */
 --tempo-steady:    var(--bab-teal);       /* 🌊 controllo, qualità */
 --tempo-gentle:    var(--bab-lavender);   /* 🍃 recupero, cura */
@@ -115,10 +115,10 @@ Qui va fatta la mappatura, che oggi non esiste:
 --phase-luteal:      color-mix(in srgb, var(--bab-lavender) 22%, transparent);
 ```
 
-> **Nota sulla scelta dei tempi.** I prototipi usano arancio/teal/viola. Ho mantenuto la
+> **Nota sulla scelta dei colori.** I prototipi usano arancio/teal/viola. Ho mantenuto la
 > stessa logica cromatica (caldo → freddo → morbido) mappandola su coral/teal/lavender
 > della palette BAB. Il lavanda per Gentle è particolarmente adatto: è il colore "umore/
-> emozioni" del sistema, e Gentle è il tempo che richiede più permesso emotivo per essere
+> emozioni" del sistema, e Gentle è l'andatura che richiede più permesso emotivo per essere
 > scelto.
 >
 > 🔴 **Vincolo:** nessun rosso allarme. Il coral `#FF6B5C` è il punto più caldo consentito,
@@ -210,9 +210,9 @@ Il componente più ripetuto dell'app (7 istanze tra pre e post).
 
 Chip a bordo pieno, raggio 999px, selezione a toggle. Bordo 2px, ombra 3px quando attivo.
 
-### 3 · La card tempo (risultato)
+### 3 · La card andatura (risultato)
 
-L'elemento più grande dell'app. Fondo = tint del colore del tempo (12–16%), bordo 3px
+L'elemento più grande dell'app. Fondo = tint del colore dell'andatura (12–16%), bordo 3px
 inchiostro, ombra 8px. Icona in un quadrato di 52px con il colore pieno.
 
 ### 4 · La mappa corporea SVG
@@ -263,7 +263,7 @@ Traduzione per l'app:
 |---|---|---|---|
 | Home "Oggi" | ●●● | ● | Una card protagonista |
 | Step del check-in | ● | ●●● | Massima calma: è un lavoro di introspezione |
-| Card risultato tempo | ●●● | ● | Il momento più espressivo dell'app |
+| Card risultato andatura | ●●● | ● | Il momento più espressivo dell'app |
 | Compare / Adjust | ● | ●●● | Si legge, non si celebra |
 | **Care mode** | ● | ●●● | 🔴 Deliberatamente **calmo**. Il panico non aiuta. |
 | Percorso | ●● | ●● | |

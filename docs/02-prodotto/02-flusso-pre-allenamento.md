@@ -59,9 +59,9 @@ non ogni mattina.
 
 ### Schermata 1 · Step 1 · Predict
 
-> **Prima di sintonizzarti — qual è il tuo tempo oggi?**
+> **Prima di sintonizzarti — qual è la tua andatura oggi?**
 >
-> Il tuo "tempo" è semplicemente quanto ha da dare il tuo corpo oggi. Tira a indovinare
+> La tua "andatura" è semplicemente quanto ha da dare il tuo corpo oggi. Tira a indovinare
 > adesso — lo confermerai alla fine. Indovinare prima allena la tua lettura interiore, e
 > "sbagliare" non è un fallimento, è tutto il punto.
 
@@ -147,9 +147,9 @@ contenuto didattico si consuma, la domanda resta**.
 
 Una schermata sola, tre blocchi in ordine:
 
-#### A · La card del tempo
+#### A · La card dell'andatura
 
-Grande, colorata secondo il tempo. Contiene nome, icona, tag e il *significato*.
+Grande, colorata secondo l'andatura. Contiene nome, icona, tag e il *significato*.
 
 **I tre significati (copy reale, ottimo, da conservare):**
 
@@ -167,10 +167,10 @@ Grande, colorata secondo il tempo. Contiene nome, icona, tag e il *significato*.
 **🍃 Gentle** — *un giorno da ricostruire, è qui che cresci*
 > I tuoi segnali leggono bassi su tutta la linea — ed ecco il segreto che le migliori
 > atlete conoscono: **non diventi più forte durante l'allenamento duro, diventi più forte
-> mentre recuperi da esso.** Oggi, andarci piano *è* l'allenamento. Scegliere questo tempo
+> mentre recuperi da esso.** Oggi, andarci piano *è* l'allenamento. Scegliere questa andatura
 > è una mossa di potere, non un passo indietro.
 
-> **Perché questo copy è forte:** non c'è un tempo "buono" e uno "cattivo". Ogni tempo ha
+> **Perché questo copy è forte:** non c'è un'andatura "buona" e una "cattiva". Ogni andatura ha
 > una sua vittoria. Gentle in particolare è riformulato come atto di forza — il che è
 > l'unico modo per cui una tredicenne lo sceglierà davvero.
 
@@ -181,12 +181,12 @@ Il confronto previsione ↔ corpo. Copy completo in
 
 Aggiunge una riga sull'Headspace, con tono adattivo:
 - se prevalgono le negative: *"portarsi dietro un carico mentale è reale, e attinge dalla
-  stessa batteria dell'allenamento. Sii gentile col tuo tempo oggi."*
+  stessa batteria dell'allenamento. Sii gentile con la tua andatura oggi."*
 - se prevalgono le positive: *"una testa libera è un vantaggio vero. Godilo."*
 
 #### C · Step 4 · Adjust — il piano di oggi
 
-3–4 azioni concrete per il tempo scelto. Esempio per Gentle:
+3–4 azioni concrete per l'andatura scelta. Esempio per Gentle:
 - Riposa, o fai recupero attivo gentile: camminata facile, mobilità leggera, stretching.
 - Metti energia nel sonno e in pasti come si deve — è quello che riempie il serbatoio.
 - Di' al tuo coach che vai in Gentle così può adattare — le atlete forti comunicano.
@@ -199,11 +199,11 @@ Aggiunge una riga sull'Headspace, con tono adattivo:
 
 #### D · Lo swap — "il tuo corpo, la tua chiamata"
 
-> Vuoi cambiare tempo? Sei tu alla guida:
+> Vuoi cambiare andatura? Sei tu alla guida:
 > `⚡ Upbeat` `🌊 Steady` `🍃 Gentle`
 
 🔴 **Questo componente non si tocca.** È l'incarnazione del principio 5 (locus of control
-interno) e del principio 8 (l'app supporta, non prescrive). Un'app che calcola un tempo
+interno) e del principio 8 (l'app supporta, non prescrive). Un'app che calcola un'andatura
 e non permette di cambiarlo sta dicendo cosa fare — cioè fa esattamente ciò che BAB
 esiste per non fare.
 
@@ -236,7 +236,7 @@ soglia guidi una decisione."* Una somma non pesata con due soglie fisse **è** u
 che guida una decisione, e non è validata.
 
 🟡 **Proposta per la v1:** mantenere la formula (serve qualcosa che funzioni), ma:
-1. Loggare separatamente `totale`, ogni canale, il tempo suggerito e il tempo **scelto**.
+1. Loggare separatamente `totale`, ogni canale, l'andatura suggerita e quella **scelta**.
 2. La differenza suggerito↔scelto è un dato prezioso: è lei che corregge il modello.
    Dopo ~8 settimane, quella differenza permette di **personalizzare le soglie per atleta** —
    che è esattamente il "normale individualizzato" del principio 4.

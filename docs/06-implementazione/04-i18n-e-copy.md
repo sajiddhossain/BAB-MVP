@@ -86,10 +86,10 @@ il testo firmato**: la traduzione va sottoposta di nuovo.
 
 ---
 
-## I nomi dei tempi
+## I nomi delle andature
 
 `Upbeat / Steady / Gentle` non sono una semplice stringa: sono un **vocabolario condiviso
-tra atleta e coach** — è l'intera Settimana 10 del percorso (*«il tempo di BAB vi dà una
+tra atleta e coach** — è l'intera Settimana 10 del percorso (*«l'andatura di BAB vi dà una
 parola condivisa, così 'Gentle oggi' significa qualcosa che capite entrambi»*).
 
 🔵 Per questo la sotto-decisione «si traducono o restano in inglese?» è separata da D1.

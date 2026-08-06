@@ -1,10 +1,10 @@
 import type { Locale } from '@/copy'
 
 /**
- * I tre tempi.
+ * Le tre andature (in inglese: i tre "tempi").
  *
  * 🔵 Restano in inglese anche nella versione italiana: sono un VOCABOLARIO
- * CONDIVISO fra atleta e coach (Settimana 10 del percorso — "il tempo di BAB vi
+ * CONDIVISO fra atleta e coach (Settimana 10 del percorso — "l'andatura di BAB vi
  * dà una parola condivisa, così 'Gentle oggi' significa qualcosa che capite
  * entrambi"). Tre parole brevi che restano identiche fra mercati.
  * Se la decisione cambia, si cambia QUI e in nessun altro posto.
@@ -62,7 +62,7 @@ export const TEMPOS: Record<TempoCode, Tempo> = {
         'Abbassa l\'intensità intorno al 7/10 — niente massimali.',
         'Fanne un giorno di tecnica: piedi, battuta, ricezione, gesto.',
         'Scaldati più a lungo del solito; bevi e mangia bene.',
-        'Resta sintonizzata — se un canale cala a metà sessione, scendi di tempo.',
+        'Resta sintonizzata — se un canale cala a metà sessione, scendi di andatura.',
       ],
       en: [
         'Ease intensity to around 7/10 — skip all-out max efforts.',
@@ -79,7 +79,7 @@ export const TEMPOS: Record<TempoCode, Tempo> = {
       en: 'A rebuild day — this is where you grow',
     },
     meaning: {
-      it: 'I tuoi segnali leggono bassi su tutta la linea — ed ecco il segreto che le migliori atlete conoscono: non diventi più forte durante l\'allenamento duro, diventi più forte mentre recuperi da esso. Oggi, andarci piano è l\'allenamento. Scegliere questo tempo è una mossa di potere, non un passo indietro.',
+      it: 'I tuoi segnali leggono bassi su tutta la linea — ed ecco il segreto che le migliori atlete conoscono: non diventi più forte durante l\'allenamento duro, diventi più forte mentre recuperi da esso. Oggi, andarci piano è l\'allenamento. Scegliere questa andatura è una mossa di potere, non un passo indietro.',
       en: "Your signals read low across the board — and here's the secret the best athletes know: you don't get stronger during hard training, you get stronger while you recover from it. Today, taking it gentle is the training. Choosing this tempo is a power move, not a step back.",
     },
     plan: {

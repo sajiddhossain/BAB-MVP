@@ -180,7 +180,7 @@ squadra accesso ai dati dell'atleta.
 │  LA MIA SETTIMANA               │
 │  12–18 maggio                   │
 │                                 │
-│  Tempi:  ⚡⚡🌊🍃🌊⚡–           │
+│  Andature: ⚡⚡🌊🍃🌊⚡–        │
 │                                 │
 │  Ho segnalato più spesso:       │
 │  📍 Polpaccio destro — teso     │
@@ -192,7 +192,7 @@ squadra accesso ai dati dell'atleta.
 │                                 │
 │  ┌───────────────────────────┐  │
 │  │ Scegli cosa condividere:  │  │
-│  │ ☑ Tempi                   │  │
+│  │ ☑ Andature                │  │
 │  │ ☑ Dove sento qualcosa     │  │
 │  │ ☐ Energia e umore         │  │
 │  │ ☐ Il mio ciclo            │  │
@@ -207,4 +207,4 @@ squadra accesso ai dati dell'atleta.
 - Nessun invio automatico, mai. Lei preme il bottone, ogni volta.
 - L'output è un'immagine o un PDF, non un link a una dashboard: lei controlla cosa vede
   il destinatario e non gli dà accesso continuativo.
-- Nessun punteggio nell'immagine. Solo segnali, tempi e le sue parole.
+- Nessun punteggio nell'immagine. Solo segnali, andature e le sue parole.

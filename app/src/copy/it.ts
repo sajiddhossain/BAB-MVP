@@ -51,7 +51,7 @@ export const it = {
     mid: {
       body: 'La tua scelta di stamattina. Qualità invece che quantità.',
       cta: 'Chiudi il cerchio dopo l\'allenamento',
-      secondary: 'Cambia il mio tempo',
+      secondary: 'Cambia la mia andatura',
       hint: 'Torna qualche minuto dopo aver finito — è quando i tuoi segnali sono più forti.',
     },
     closed: {
@@ -104,8 +104,8 @@ export const it = {
       steps: ['Prevedi', 'Sintonizzati', 'Confronta', 'Aggiusta'],
       predict: {
         label: 'Passo 1 · Prevedi',
-        title: 'Prima di sintonizzarti — qual è il tuo tempo oggi?',
-        help: 'Il tuo "tempo" è quanto ha da dare il tuo corpo oggi. Tira a indovinare adesso — lo confermerai alla fine. Indovinare prima allena la tua lettura interiore, e "sbagliare" non è un fallimento: è tutto il punto.',
+        title: 'Prima di sintonizzarti — qual è la tua andatura oggi?',
+        help: 'La tua "andatura" è quanto ha da dare il tuo corpo oggi. Tira a indovinare adesso — lo confermerai alla fine. Indovinare prima allena la tua lettura interiore, e "sbagliare" non è un fallimento: è tutto il punto.',
         confidence: 'Quanto sei sicura?',
         confidenceOptions: ['Tiro a indovinare', 'Abbastanza', 'Sicura'],
         sleepHours: 'Quanto hai dormito?',
@@ -134,7 +134,7 @@ export const it = {
       result: {
         compareLabel: 'Passo 3 · Confronta — la tua lettura contro il tuo corpo',
         planLabel: 'Passo 4 · Aggiusta — il tuo piano di oggi',
-        swapLabel: 'Il tuo corpo, la tua chiamata. Vuoi cambiare tempo?',
+        swapLabel: 'Il tuo corpo, la tua chiamata. Vuoi cambiare andatura?',
         copyForCoach: 'Copia cosa dire al coach',
         again: 'Nuovo check-in',
       },
@@ -144,7 +144,7 @@ export const it = {
       steps: ['Guarda indietro', 'Senti', 'Impara', 'Recupera'],
       lookBack: {
         label: 'Passo 1 · Guarda indietro',
-        title: 'In che tempo ti sei allenata davvero?',
+        title: 'Con che andatura ti sei allenata davvero?',
         effort: 'Quanto è stata dura davvero?',
         duration: 'Quanto è durata?',
         sessionType: 'Che tipo di sessione?',
@@ -207,8 +207,8 @@ export const it = {
     chooseTitle: 'Cosa ci metti?',
     chooseHelp: 'Niente viene condiviso finché non lo dici tu. Tocca per aggiungere o togliere — la card qui sotto si aggiorna mentre scegli.',
     blocks: {
-      tempos: 'I miei tempi',
-      temposHelp: 'In che tempo ti sei allenata ogni giorno',
+      tempos: 'Le mie andature',
+      temposHelp: 'Con che andatura ti sei allenata ogni giorno',
       spots: 'Dove ho sentito cose',
       spotsHelp: 'I punti che sono venuti fuori più spesso, e come si sentivano',
       energy: 'La mia energia nella settimana',
@@ -262,7 +262,7 @@ export const it = {
 
     /** R2 · Detto prima che lei scriva qualsiasi cosa, non sepolto nelle impostazioni. */
     whoSeesTitle: 'Chi vede cosa',
-    whoSeesTeam: 'Il tuo staff vede i tuoi check-in: i tempi, i canali, dove senti le cose, e le date del ciclo. Serve a loro per allenarti meglio, e a te per non dover ripetere tutto a voce.',
+    whoSeesTeam: 'Il tuo staff vede i tuoi check-in: le andature, i canali, dove senti le cose, e le date del ciclo. Serve a loro per allenarti meglio, e a te per non dover ripetere tutto a voce.',
     whoSeesPrivate: 'Quello che scrivi con parole tue resta tuo. Le note che lasci dopo l\'allenamento non le legge nessun altro.',
     whoSeesYou: 'E i dati sono tuoi: puoi portarteli via o cancellarli tutti, quando vuoi, dalle impostazioni.',
     rhythmTitle: 'Hai già il ciclo?',

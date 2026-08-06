@@ -18,8 +18,8 @@
 | Idea | Fonte | Perché regge |
 |---|---|---|
 | **Predict → Compare** | doc madre §5 | È il meccanismo. Senza, il prodotto è un diario qualsiasi. |
-| **I tre tempi (Upbeat/Steady/Gentle)** | prototipi | Vocabolario condiviso atleta↔coach. Nessuno è "buono". |
-| **Il bottone "cambia tempo"** | prototipi | Agency resa cliccabile. |
+| **Le tre andature (Upbeat/Steady/Gentle)** | prototipi | Vocabolario condiviso atleta↔coach. Nessuno è "buono". |
+| **Il bottone "cambia andatura"** | prototipi | Agency resa cliccabile. |
 | **Mappa corporea con lessico** | doc madre §4.3 | Il cuore didattico: localizzare + nominare. |
 | **Decode your ache (2 colonne)** | prototipi | Insegna la discriminazione prima di chiedere. |
 | **Headspace multi-select** | prototipi v2 | Nominare > misurare. |
@@ -166,7 +166,7 @@ periodiche device-off"*).
 
 Una volta al mese, il check-in chiede la previsione e poi **non mostra il risultato calcolato
 finché lei non ha completato tutto**. È già così — ma la variante interessante è
-l'opposto: un giorno in cui l'app le chiede solo *"che tempo è oggi?"* e non le fa
+l'opposto: un giorno in cui l'app le chiede solo *"che andatura hai oggi?"* e non le fa
 compilare nulla, poi la sera le chiede *"avevi ragione?"*.
 
 Costa un giorno di dati e restituisce una misura pulita di quanto la competenza è

@@ -17,7 +17,7 @@ non viene tradotto in una scelta architetturale, resta un poster appeso al muro.
 | **Nessuna soglia validata** (§8) | Non si materializzano tabelle di aggregati né punteggi nel database. Si salvano **eventi grezzi**; ogni interpretazione si calcola a runtime e si può cambiare senza migrare i dati. |
 | **Normale individualizzato** | Nessuna query che confronta atlete tra loro. La RLS lo rende **impossibile per costruzione**, non solo sconsigliato. |
 | **Il ciclo non si condivide mai** | I dati di ciclo stanno in una **tabella separata con la sua RLS**. La promessa diventa strutturale, non affidata al codice applicativo. |
-| **L'app supporta, non prescrive** | Tempo **suggerito** e tempo **scelto** sono due colonne distinte. Mai una sola. |
+| **L'app supporta, non prescrive** | Andatura **suggerita** e andatura **scelta** sono due colonne distinte. Mai una sola. |
 | **Bandiere rosse mai sepolte in un trend** | Le red flag sono una tabella a sé con `resolved_at`, non un campo dentro il check-in. Devono poter essere interrogate da sole. |
 | **Dati di proprietà dell'atleta** (§9) | Export completo e cancellazione reale sono funzionalità di prima classe, previste dallo schema fin dall'inizio. |
 | **Prediction error = la metrica** | La previsione va salvata **prima** dell'esito, con il proprio timestamp. Altrimenti non si distingue una previsione da una razionalizzazione. |
@@ -33,7 +33,7 @@ app/
 │   │   ├── supabase.ts        client, tipizzato dallo schema
 │   │   ├── db.ts              coda locale IndexedDB + sincronizzazione
 │   │   ├── session.ts         atleta corrente, profilo, config derivata
-│   │   ├── tempo.ts           la formula del tempo — isolata di proposito
+│   │   ├── tempo.ts           la formula dell'andatura — isolata di proposito
 │   │   └── track.ts           strumentazione del pilota
 │   ├── copy/
 │   │   ├── it.ts              tutte le stringhe, una lingua per file
@@ -150,7 +150,7 @@ Anti-pattern che sembrano ragionevoli e non lo sono, qui.
 
 | Tentazione | Perché no |
 |---|---|
-| Salvare il tempo calcolato come unico valore | Perde il dato più prezioso: la correzione dell'atleta. Servono sempre due colonne. |
+| Salvare l'andatura calcolata come unico valore | Perde il dato più prezioso: la correzione dell'atleta. Servono sempre due colonne. |
 | Materializzare medie e aggregati nel database | Le soglie non sono validate: quando cambiano, i dati aggregati sono da rifare. Si calcola a runtime finché non c'è evidenza. |
 | Mettere il ciclo dentro la tabella dei check-in | Rende la promessa di privacy una questione di attenzione nel codice invece che una garanzia strutturale. |
 | Un endpoint «dammi i dati della squadra» | La decisione sulla visibilità del coach non è presa. Costruirlo significa averla presa. |

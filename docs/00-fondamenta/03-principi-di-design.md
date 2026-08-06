@@ -55,7 +55,7 @@ Framing curioso e di supporto, che costruisce una competenza che è **sua**, con
 of control interno.
 
 **Conseguenza UI:** il linguaggio è in seconda persona e sempre attribuisce l'agency a
-lei: *"il tuo corpo, la tua chiamata"*. Il bottone che permette di cambiare il tempo
+lei: *"il tuo corpo, la tua chiamata"*. Il bottone che permette di cambiare l'andatura
 suggerito dall'app non è un'eccezione: è una feature di principio.
 
 ---

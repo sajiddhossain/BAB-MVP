@@ -4,7 +4,7 @@ Prototipi funzionanti, self-contained, aprili nel browser.
 
 I primi due partono dalla v2 in [`../fonti/prototipi/`](../fonti/prototipi/) e chiudono i
 tre buchi di sicurezza trovati nell'analisi — **nient'altro è cambiato**: copy, flusso,
-formula del tempo e gli 8 esiti sono identici, così v2 e v3 restano confrontabili quando
+formula dell'andatura e gli 8 esiti sono identici, così v2 e v3 restano confrontabili quando
 li testi con le atlete.
 
 Gli altri due **non esistevano affatto** nel materiale, ed erano i due pezzi senza cui il
@@ -20,8 +20,17 @@ prodotto non regge: l'onboarding e la body-story.
 | `06-me-patterns--v1.html` | La vista "Me" nei tre stadi di maturità dei dati — **nuovo** |
 | `07-il-mio-ritmo--v1.html` | La vista del ciclo, che restituisce valore dal giorno uno — **nuovo** |
 
-Lingua: **inglese**, come la v2 — così il lavoro non è bloccato dalla
-[decisione D1 sulla lingua](../docs/04-brainstorming/03-decisioni-aperte.md).
+Lingua: **inglese**, come la v2. In inglese la parola per l'andatura resta `tempo`, che lì
+funziona: il cambio a *andatura* riguarda solo l'italiano.
+
+> ⚠️ **Questi prototipi sono precedenti alla revisione del 6 agosto 2026** e non sono stati
+> rifatti: servono a testare i flussi con le atlete, e rifarli renderebbe incomparabili i
+> test già svolti. Tre cose che mostrano non valgono più —
+> il blocco privacy che promette *«il tuo ciclo non viene mai condiviso con un coach»*
+> ([R2](../docs/04-brainstorming/04-revisione-roadmap.md#r2--la-squadra-vede-i-dati-dei-due-check-in-ciclo-incluso)),
+> la mappa corporea `junior` ([R4](../docs/04-brainstorming/04-revisione-roadmap.md#r4--una-sola-mappa-corporea-dai-12-anni-in-su)),
+> e i «~90 secondi» come tetto ([R1](../docs/04-brainstorming/04-revisione-roadmap.md#r1--i-90-secondi-non-sono-un-tetto)).
+> **L'app si costruisce sul copy in `app/src/copy/`, non su questi file.**
 
 ---
 
@@ -47,7 +56,7 @@ classificazione clinica. È esattamente ciò che il modello dice di non chiederl
 Ora: toccare `Gives way / unstable` o `Swollen / hot` apre il Care mode **da solo**,
 qualunque cosa lei risponda alla domanda binaria.
 
-> **Verificato:** con tutti i canali al massimo, tempo `⚡ Upbeat`, e risposta **"No"**
+> **Verificato:** con tutti i canali al massimo, andatura `⚡ Upbeat`, e risposta **"No"**
 > alla domanda sul dolore protettivo, il Care mode si attiva comunque e nomina il segnale
 > — *"You named gives way / unstable in your left knee — that's the kind of signal that
 > gets looked at rather than trained through."*
@@ -106,8 +115,8 @@ atlete:
 
 - Il copy di tutto il resto
 - I 4 canali + Headspace, e le loro emoji-scale
-- La formula del tempo e le soglie (20 / 13)
-- I 3 tempi, i loro testi, e il bottone di swap
+- La formula dell'andatura e le soglie (20 / 13)
+- Le 3 andature, i loro testi, e il bottone di swap
 - Gli 8 esiti della card Learn nel post
 - Il blocco "Decode your ache"
 - Il blocco ciclo
@@ -183,7 +192,7 @@ Cinque blocchi selezionabili, con anteprima che si aggiorna dal vivo:
 
 | Blocco | Default | |
 |---|---|---|
-| ⚡ I miei tempi | **on** | La settimana in una riga di icone |
+| ⚡ Le mie andature | **on** | La settimana in una riga di icone |
 | 📍 Dove ho sentito cose | **on** | I punti più frequenti; le bandiere rossa si distinguono |
 | 🔋 La mia energia | off | Una **forma**, senza asse e senza numeri |
 | 💬 Quello che ho scritto | off | La sua nota, tra virgolette |
@@ -229,7 +238,7 @@ ovvia da fare**. Tutto il resto sta un livello sotto.
 | Stato | Cosa mostra |
 |---|---|
 | ☀️ **Niente fatto** | Una card, un bottone. Il default. |
-| 🌊 **Sintonizzata, si allena** | Il tempo che ha scelto lei, e il passo successivo in tono più calmo — perché non è ancora ora |
+| 🌊 **Sintonizzata, si allena** | L'andatura che ha scelto lei, e il passo successivo in tono più calmo — perché non è ancora ora |
 | ✅ **Giornata chiusa** | Previsto vs allenato, cosa ha imparato, e **niente da fare**: l'app lo dice invece di inventarsi un compito |
 | 🌱 **Giorno di riposo** 🔴 | Una riflessione **opzionale**, mai il flusso completo (§5). Il bottone è calmo, non arancione: non è un task. |
 | 👋 **Torna dopo un'assenza** | Nessuno streak rotto, nessun contatore azzerato, nessuna colpa. *"Non si perde niente, e niente si resetta."* |

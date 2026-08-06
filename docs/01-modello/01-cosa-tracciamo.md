@@ -46,7 +46,7 @@ Con un campo libero (max 60 caratteri) se sceglie "Other".
 > una direzione (sonno, energia, idratazione, muscoli).
 >
 > Dietro le quinte il multi-select viene ricondotto a un valore 1–5 per il calcolo del
-> tempo: `3 + (n. positive) − (n. negative)`, clampato a [1,5]. L'atleta non lo vede mai.
+> andatura: `3 + (n. positive) − (n. negative)`, clampato a [1,5]. L'atleta non lo vede mai.
 
 **Post-allenamento (v2):**
 

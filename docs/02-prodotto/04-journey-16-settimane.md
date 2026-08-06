@@ -64,8 +64,8 @@ Ogni settimana ha 5 campi: **Titolo**, **Questa settimana**, **La tua missione**
 ### MESE 2 · 🧩 Understand — collega i puntini, e il tuo ciclo
 
 #### Settimana 5 — Prevedi, poi verifica
-- **Questa settimana:** ogni mattina, indovina il tuo tempo — Upbeat, Steady o Gentle — *prima* di controllare. Poi sintonizzati e confronta. Le sorprese sono dove la tua lettura interiore si affila.
-- **🎯 Missione:** prevedi il tuo tempo ogni giorno, e nota ogni volta che il tuo corpo ti sorprende.
+- **Questa settimana:** ogni mattina, indovina la tua andatura — Upbeat, Steady o Gentle — *prima* di controllare. Poi sintonizzati e confronta. Le sorprese sono dove la tua lettura interiore si affila.
+- **🎯 Missione:** prevedi la tua andatura ogni giorno, e nota ogni volta che il tuo corpo ti sorprende.
 - **Come BAB aiuta:** il loop Predict → Compare di BAB trasforma ogni giorno in una ripetizione per il tuo senso interiore.
 - **Rifletti:** le tue previsioni si stanno avvicinando a quello che dice davvero il tuo corpo?
 
@@ -115,11 +115,11 @@ Ogni settimana ha 5 campi: **Titolo**, **Questa settimana**, **La tua missione**
 #### Settimana 10 — Parla col tuo coach
 - **Questa settimana:** il tuo coach può adattare solo se sa come stai. Esercita una frase semplice: *"Oggi leggo un po' basso — possiamo tenerla Steady?"* Un buon coach rispetta un'atleta che si conosce.
 - **🎯 Missione:** di' al tuo coach una cosa onesta su come ti senti, questa settimana.
-- **Come BAB aiuta:** il tempo di BAB vi dà una parola condivisa, così "Gentle oggi" significa qualcosa che capite entrambi.
+- **Come BAB aiuta:** l'andatura di BAB vi dà una parola condivisa, così "Gentle oggi" significa qualcosa che capite entrambi.
 - **Rifletti:** come ha reagito il tuo coach quando hai parlato?
 
-> 🔴 *"Il tempo di BAB vi dà una parola condivisa"* — questa è la ragione strategica per
-> cui il sistema a tre tempi esiste. Non è una classificazione: è **un vocabolario
+> 🔴 *"L'andatura di BAB vi dà una parola condivisa"* — questa è la ragione strategica per
+> cui il sistema a tre andature esiste. Non è una classificazione: è **un vocabolario
 > condiviso tra atleta e coach**. È anche la porta d'ingresso commerciale verso le squadre.
 
 #### Settimana 11 — Dai voce al tuo dolore
@@ -138,10 +138,10 @@ Ogni settimana ha 5 campi: **Titolo**, **Questa settimana**, **La tua missione**
 
 ### MESE 4 · 🧭 Manage — lavora col tuo corpo
 
-#### Settimana 13 — Onora il tuo tempo
-- **Questa settimana:** il tuo tempo non è una cosa che scegli a caso — lo *leggi* dai tuoi segnali, poi lo onori. Appoggiati a un giorno Upbeat, metti a fuoco in un giorno Steady, e lascia che un giorno Gentle ti ricostruisca. Ascoltare cosa ti dice il tuo corpo, e seguirlo, è tutta la competenza.
-- **🎯 Missione:** ogni giorno questa settimana, leggi il tuo tempo dai tuoi segnali — poi onoralo seguendo quello che il tuo corpo sta davvero chiedendo.
-- **Come BAB aiuta:** BAB legge i tuoi segnali in un tempo chiaro e senza buono-o-cattivo, così onorare il tuo corpo ha un nome.
+#### Settimana 13 — Onora la tua andatura
+- **Questa settimana:** la tua andatura non è una cosa che scegli a caso — lo *leggi* dai tuoi segnali, poi lo onori. Appoggiati a un giorno Upbeat, metti a fuoco in un giorno Steady, e lascia che un giorno Gentle ti ricostruisca. Ascoltare cosa ti dice il tuo corpo, e seguirlo, è tutta la competenza.
+- **🎯 Missione:** ogni giorno questa settimana, leggi la tua andatura dai tuoi segnali — poi onoralo seguendo quello che il tuo corpo sta davvero chiedendo.
+- **Come BAB aiuta:** BAB legge i tuoi segnali in un'andatura chiara e senza buono-o-cattivo, così onorare il tuo corpo ha un nome.
 - **Rifletti:** che effetto ha fatto onorare un giorno Gentle invece di spingere?
 
 #### Settimana 14 — Gestisci il momento

@@ -24,7 +24,7 @@ Quando l'atleta segnala dolore protettivo, compare il blocco **Care mode**:
 
 > 🛡️ **Care mode — protect it first**
 >
-> Hai segnalato dolore protettivo — bella presa. Qualunque tempo mostrino gli altri
+> Hai segnalato dolore protettivo — bella presa. Qualunque andatura mostrino gli altri
 > canali, quella parte del corpo va in Care oggi. Non è essere molli; è come i pro
 > proteggono una carriera lunga.
 >

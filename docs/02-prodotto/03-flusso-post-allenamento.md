@@ -44,10 +44,10 @@ un valore diverso.
 
 Due input:
 
-**A. In quale tempo ti sei allenata davvero?**
+**A. Con che andatura ti sei allenata davvero?**
 `⚡ Upbeat` (Sforzo pieno) · `🌊 Steady` (Tecnica / qualità) · `🍃 Gentle` (Recupero)
 
-> Nota: chiede il tempo **effettivo**, non ricorda quello previsto. Giusto: chiederlo
+> Nota: chiede l'andatura **effettiva**, non ricorda quello previsto. Giusto: chiederlo
 > senza mostrare la previsione evita l'ancoraggio, e permette il confronto onesto dopo.
 
 **B. 🔥 Quanto è stata dura davvero?** — scala 1–5, `Gentle → Absolutely maxed`
@@ -114,7 +114,7 @@ Poi la domanda binaria sul dolore protettivo.
 
 #### A · La card "Learn" — il session prediction error
 
-Il prototipo genera **8 esiti diversi** incrociando tempo dichiarato × sforzo × stato del
+Il prototipo genera **8 esiti diversi** incrociando andatura dichiarata × sforzo × stato del
 corpo. È la parte più intelligente del materiale e va conservata integralmente.
 
 ```
@@ -122,7 +122,7 @@ bodyAvg = (legs + breath + energy + headspaceValue) / 4
 effort  = 1..5
 ```
 
-| Tempo | Condizione | Titolo | Messaggio |
+| Andatura | Condizione | Titolo | Messaggio |
 |---|---|---|---|
 | ⚡ Upbeat | `bodyAvg ≥ 3.5` | 🎯 **Lettura perfetta** | Ti sei fidata di te per un giorno Upbeat e il tuo corpo l'ha gestito bene. Fissa come si sente questo — è il tuo riferimento per un buon giorno Upbeat con recupero. |
 | ⚡ Upbeat | `bodyAvg < 2.5` | 🍃 **Il tuo corpo ha preso tanto oggi** | Quella sessione Upbeat è costata più del solito — e notare quel divario tra fatica e come ti senti adesso *è* la lezione. È una spinta ad andare Steady o Gentle domani. Non è andato storto niente; hai solo imparato qualcosa su oggi. |
@@ -148,7 +148,7 @@ Riecheggia quello che ha inserito, poi lascia una domanda aperta:
 >
 > 🧠 Headspace dopo: **[…]**.
 >
-> Ti sei allenata in **[tempo]**, l'hai sentita **[N]/5** dura, e adesso il tuo corpo legge
+> Ti sei allenata in **[andatura]**, l'hai sentita **[N]/5** dura, e adesso il tuo corpo legge
 > circa **[N]/5**.
 >
 > *Una domanda tranquilla su cui vale la pena fermarsi: cosa ti ha sorpresa di più di oggi
@@ -231,5 +231,5 @@ un giudizio sulla performance in un prodotto che ha deciso di non giudicare la p
 
 ## Cosa sblocca il bottone finale
 
-Nel prototipo: tempo + sforzo + tutte e 3 le scale + Headspace + domanda dolore.
+Nel prototipo: andatura + sforzo + tutte e 3 le scale + Headspace + domanda dolore.
 La mappa corporea resta facoltativa. 🟡 Corretto, stessa logica del pre-check.

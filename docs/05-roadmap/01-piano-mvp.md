@@ -102,7 +102,7 @@ Criteri di uscita completi in [scope MVP](../04-brainstorming/02-scope-mvp.md). 
 **Strumentazione da mettere prima di partire** (facile da dimenticare, impossibile da
 recuperare dopo):
 - Timestamp di apertura e chiusura di ogni check-in → per misurare i secondi reali.
-- Log del tempo **suggerito** vs tempo **scelto** → il dato più prezioso per personalizzare
+- Log dell'andatura **suggerita** vs quella **scelta** → il dato più prezioso per personalizzare
   le soglie.
 - Log dei campi saltati, dove è possibile saltarli.
 - MAIA-Y a T0, T+2 mesi, T+4 mesi come baseline di tratto.

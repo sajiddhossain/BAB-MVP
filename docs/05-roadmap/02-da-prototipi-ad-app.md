@@ -171,7 +171,7 @@ Ordine consigliato, dal più al meno importante:
 **Da mettere nel codice PRIMA di partire** — facile da dimenticare, impossibile da
 recuperare dopo:
 - quanti secondi impiega davvero ogni check-in
-- il tempo **suggerito** dall'app vs quello **scelto** da lei *(il dato più prezioso di tutti:
+- l'andatura **suggerita** dall'app vs quella **scelto** da lei *(il dato più prezioso di tutti:
   è lei che corregge il modello)*
 - quali domande salta
 

@@ -25,7 +25,7 @@
 
 ### D1 · Lingua dell'MVP
 > 🟢 **Chiusa: opzione C.** Si costruisce in italiano e in inglese — le advisor sono
-> straniere. La sotto-decisione sui nomi dei tempi è stata riaperta da
+> straniere. La sotto-decisione sui nomi è stata riaperta e poi chiusa da
 > [B2](04-revisione-roadmap.md#b2--tempo-in-italiano-vuol-dire-tempo).
 
 **Contesto:** documento sorgente e tutti i prototipi sono in inglese. La landing in produzione,
@@ -34,14 +34,14 @@ italiano.
 
 | Opzione | Implicazioni |
 |---|---|
-| **A. Italiano** | Va tradotto tutto il copy dei prototipi. Serve rivedere la traduzione dei tre tempi. |
+| **A. Italiano** | Va tradotto tutto il copy dei prototipi. Serve rivedere la traduzione delle tre andature. |
 | **B. Inglese** | Il copy esiste già. Ma il pilota italiano diventa impraticabile con tredicenni. |
 | **C. Bilingue da subito** | Doppio costo di copy, ma architettura corretta fin dall'inizio. |
 
 **🟡 Raccomandazione: A, con architettura i18n pronta (quindi C a livello tecnico, A a
 livello di contenuti).** La landing ha già l'infrastruttura. Si spedisce solo l'italiano.
 
-**Sotto-decisione:** i nomi dei tempi si traducono o restano in inglese? Vedi
+**Sotto-decisione:** i nomi delle andature si traducono o restano in inglese? Vedi
 [tono di voce](../03-design/02-tono-di-voce.md). 🟡 Mia preferenza: **restano in inglese**,
 perché sono un vocabolario condiviso col coach e devono restare identici tra mercati.
 
@@ -195,7 +195,6 @@ riscontro sulla roadmap, ed entrambe più piccole di quelle appena chiuse:
 ```
 1. B1 — wearable                        → l'onboarding non può promettere Apple Health
                                           da una web app: non esiste l'API
-2. B2 — "tempo" o "andatura" in italiano → sblocca il copy definitivo dei tre tempi
 3. D5 — quali input aggiungere          → sblocca il disegno dei flussi
 4. D8 — "livello di soddisfazione"      → i primi due valori giudicano la prestazione
 ```
