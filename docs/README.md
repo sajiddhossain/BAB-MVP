@@ -51,6 +51,14 @@ e [`02-prodotto/01-architettura-informativa.md`](02-prodotto/01-architettura-inf
 | [02 · Scope MVP](04-brainstorming/02-scope-mvp.md) | Cosa entra nella v1 e cosa no, con motivazione |
 | [03 · Decisioni aperte](04-brainstorming/03-decisioni-aperte.md) | Le domande che servono alla founder per sbloccare il design |
 
+### 06 · Implementazione — *come si costruisce*
+| Doc | Contenuto |
+|---|---|
+| [01 · Piano di implementazione](06-implementazione/01-piano-implementazione.md) | Principi → vincoli tecnici, struttura del progetto, ordine di lavoro a blocchi |
+| [02 · Modello dati](06-implementazione/02-modello-dati.md) | Le 5 decisioni che reggono lo schema, tabelle, RLS, consenso e minori |
+| [03 · Offline e sincronizzazione](06-implementazione/03-offline-e-sync.md) | Perché è un requisito, e perché gli eventi immutabili lo semplificano |
+| [04 · i18n e copy](06-implementazione/04-i18n-e-copy.md) | Togliere di mezzo il rischio lingua senza aspettare la decisione |
+
 ### 05 · Roadmap
 | Doc | Contenuto |
 |---|---|

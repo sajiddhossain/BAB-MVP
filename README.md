@@ -61,7 +61,8 @@ scarto si sta accorciando.
 | **30 minuti** | + [Principi di design](docs/00-fondamenta/03-principi-di-design.md) + [Brainstorming](docs/04-brainstorming/01-brainstorm-app-mobile.md) |
 | **Devi decidere qualcosa** | [Decisioni aperte](docs/04-brainstorming/03-decisioni-aperte.md) |
 | **Vuoi provarli** | [Prototipi v3](prototipi-v3/) — aprili nel browser |
-| **Devi costruire** | [Mappa schermate](docs/02-prodotto/06-mappa-schermate.md) + [Design system](docs/03-design/01-design-system.md) |
+| **Devi costruire** | [Piano di implementazione](docs/06-implementazione/01-piano-implementazione.md) + [Modello dati](docs/06-implementazione/02-modello-dati.md) |
+| **Devi disegnare** | [Mappa schermate](docs/02-prodotto/06-mappa-schermate.md) + [Design system](docs/03-design/01-design-system.md) |
 | **Devi pianificare** | [Piano MVP](docs/05-roadmap/01-piano-mvp.md) |
 | **Vuoi capire cosa manca, in parole semplici** | [Da prototipi ad app](docs/05-roadmap/02-da-prototipi-ad-app.md) |
 
