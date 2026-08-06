@@ -95,6 +95,9 @@ export const it = {
       remove: 'Togli',
       reviewDifference: 'Rivedi la differenza',
       nothingYet: 'Ancora niente — tocca un punto per iniziare.',
+      /** R3 · Solo nei giorni che il suo calendario segna come educazione fisica. */
+      peAsk: 'Oggi hai fatto educazione fisica?',
+      peAskHelp: 'Capita di non andarci, e cambia parecchio il carico della giornata.',
     },
     pre: {
       title: 'Leggi i tuoi segnali',
@@ -215,10 +218,10 @@ export const it = {
       cycle: 'Il mio ciclo',
       cycleHelp: 'In che fase eri — spento a meno che non lo accenda tu',
     },
-    /** 🔴 Il ciclo è escluso di default e questa nota non si tocca. */
-    cycleNote: 'Il tuo ciclo è la cosa più privata che BAB tiene. Non viene mai incluso da solo, non viaggia mai insieme ad altro, e accenderlo qui vale **solo per questa card** — mai per la prossima.',
+    /** 🔴 Il ciclo resta escluso di default dalla card: questa parte non si tocca. */
+    cycleNote: 'Il ciclo non entra mai in una card da solo, e accenderlo qui vale **solo per questa** — mai per la prossima. Il tuo staff vede comunque le date dai check-in: questa spunta riguarda solo cosa mandi tu, e a chi.',
     previewTitle: 'Questo è esattamente quello che vedranno',
-    previewHelp: 'Nessun link, nessuna dashboard, nessun accesso. Solo questa immagine — così quello che mandi è tutto quello che ricevono.',
+    previewHelp: 'Quello che mandi è un\'immagine, non un accesso. Chi la riceve vede esattamente questa — nessun link da seguire, niente altro da andare a guardare.',
     send: 'Manda',
     keep: 'Tienila per me',
     saidTitle: 'E queste sono le parole per iniziare il discorso',
@@ -236,15 +239,34 @@ export const it = {
     continue: 'Continua',
     consentTitle: 'Prima di tutto il resto',
     consentHelp: 'Hai meno di 18 anni, quindi servono due sì — il tuo e quello di un genitore o di chi si prende cura di te. Leggeteli insieme se potete.',
-    ageTitle: 'Quanti anni hai?',
-    ageHelp: 'Cambia come BAB ti parla e quanto è dettagliata la mappa del corpo — nient\'altro.',
-    sportTitle: 'Cosa fai, e quando?',
-    sportHelp: 'Così BAB sa in che giorni aspettarsi un check-in — e sta zitta negli altri.',
+
+    nameTitle: 'Come ti chiamiamo?',
+    nameHelp: 'Il nome che vuoi leggere quando apri l\'app. Puoi cambiarlo quando vuoi.',
+    namePlaceholder: 'Il tuo nome',
+    birthdayTitle: 'Quando compi gli anni?',
+    birthdayHelp: 'Serve a due cose: farti gli auguri, e sapere quali domande ha senso farti e quali no.',
+    sportTitle: 'Che sport fai?',
+    sportHelp: 'Cambia il vocabolario che BAB usa con te — gare o partite, e cosa conta come sessione.',
     sportLabel: 'Il tuo sport',
-    daysLabel: 'Giorni di allenamento',
     setUpLater: 'Lo imposto dopo',
+
+    /** R3 · "La mia settimana": il calendario, chiamato come lo chiamerebbe lei. */
+    weekTitle: 'La mia settimana',
+    weekHelp: 'Segna quando ti alleni, quando hai educazione fisica, e le gare che già sai. Così BAB sa quando aspettarti — e sta zitta negli altri giorni.',
+    weekTraining: 'Allenamenti',
+    weekTrainingHelp: 'Giorni e orario, così sa quando chiederti il prima e il dopo',
+    weekPe: 'Educazione fisica a scuola',
+    weekPeHelp: 'Conta come carico anche se non sembra',
+    weekEvents: 'Gare e partite',
+    weekEventsHelp: 'Se non sai ancora l\'orario va benissimo: lo aggiungi dopo',
+
+    /** R2 · Detto prima che lei scriva qualsiasi cosa, non sepolto nelle impostazioni. */
+    whoSeesTitle: 'Chi vede cosa',
+    whoSeesTeam: 'Il tuo staff vede i tuoi check-in: i tempi, i canali, dove senti le cose, e le date del ciclo. Serve a loro per allenarti meglio, e a te per non dover ripetere tutto a voce.',
+    whoSeesPrivate: 'Quello che scrivi con parole tue resta tuo. Le note che lasci dopo l\'allenamento non le legge nessun altro.',
+    whoSeesYou: 'E i dati sono tuoi: puoi portarteli via o cancellarli tutti, quando vuoi, dalle impostazioni.',
     rhythmTitle: 'Hai già il ciclo?',
-    rhythmBody: 'Se ce l\'hai, BAB può usarlo come sfondo dietro tutti gli altri segnali — la cosa che quasi nessuna app sportiva fa. È tuo, resta tuo, e puoi spegnerlo quando vuoi.',
+    rhythmBody: 'Se ce l\'hai, BAB può usarlo come sfondo dietro tutti gli altri segnali — la cosa che quasi nessuna app sportiva fa. Puoi spegnerlo quando vuoi, e prima di decidere ti diciamo esattamente chi lo vede.',
     rhythmYes: 'Sì, ce l\'ho',
     rhythmYesHelp: 'BAB mapperà le tue fasi dalle date che le dai',
     rhythmNotYet: 'Non ancora',
@@ -260,9 +282,14 @@ export const it = {
     contraceptionHelp: 'Pillola, impianto, spirale, cerotto, iniezione. Circa metà delle atlete lo fa, e cambia cosa significano i tuoi segnali — quindi BAB deve saperlo per leggerli bene.',
     whyDatesTitle: 'Perché BAB chiede le date invece di "in che fase sei?"',
     whyDatesBody: 'Perché ricavarlo dalle date è il modo affidabile — indovinare la propria fase non lo è, soprattutto nei primi anni. Non dovrai mai classificarti da sola.',
-    /** 🔴 Promessa contrattuale: non si annacqua. */
-    cyclePrivacy: 'Questa è la cosa più privata qui dentro. Il tuo ciclo non viene mai condiviso con un coach, non viene mai mostrato a nessuno, e non viene mai incluso in niente che mandi — a meno che non lo spunti tu, ogni singola volta.',
-    doneTitle: 'Ecco fatto — circa 90 secondi',
+    /**
+     * 🔴 Diceva "non viene mai condiviso con un coach". Con R2 non è più vero, e
+     * lo leggerebbe una tredicenne. Una promessa di privacy sbagliata è peggio
+     * di nessuna promessa: qui si dice cosa succede davvero, e dove sta lo
+     * spegnimento.
+     */
+    cyclePrivacy: 'Questa è la cosa più delicata che ti chiediamo, quindi te lo diciamo chiaro: **il tuo staff vede le date del ciclo**, insieme al resto dei tuoi check-in. Non vede quello che scrivi tu. E se preferisci di no, questa parte si spegne quando vuoi — il resto di BAB funziona esattamente uguale.',
+    doneTitle: 'Ecco fatto',
     doneBody: 'Questo è quello che BAB sa di te. Puoi cambiare tutto dalle impostazioni.',
     doneCta: 'Inizia il mio primo check-in',
   },
