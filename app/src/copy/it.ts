@@ -27,9 +27,10 @@ export const it = {
   },
 
   /**
-   * R12 · Il link via email è la strada principale, non un ripiego: Google e
-   * Apple hanno un'età minima che una dodicenne spesso non raggiunge, e gli
-   * account scolastici bloccano spesso l'accesso OAuth di terze parti.
+   * R12 · Il link via email è la strada principale, non un ripiego: Google ha
+   * un'età minima che una dodicenne spesso non raggiunge, e gli account
+   * scolastici bloccano spesso l'accesso OAuth di terze parti.
+   * Apple è stato valutato e scartato — vedi R12 nella revisione.
    */
   auth: {
     title: 'Entra in BAB',
@@ -43,10 +44,9 @@ export const it = {
     sentAgain: 'Non è arrivato? Rimandalo',
     or: 'oppure',
     google: 'Continua con Google',
-    apple: 'Continua con Apple',
     /** Detto prima di toccare il bottone, non dopo. */
-    socialNote: 'Con Google o Apple, loro sapranno che usi BAB. Con il link via email, no.',
-    ageNote: 'Google e Apple hanno un\'età minima, quindi potrebbero non funzionare per te — e va benissimo. Il link via email funziona sempre.',
+    socialNote: 'Con Google, Google saprà che usi BAB. Con il link via email, no.',
+    ageNote: 'Google ha un\'età minima, quindi potrebbe non funzionare per te — e va benissimo. Il link via email funziona sempre.',
     trouble: 'Qualcosa non funziona?',
     signOut: 'Esci',
   },

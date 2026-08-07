@@ -52,11 +52,10 @@ Dashboard → **Authentication** → **Providers**:
 
 **URL Configuration** → aggiungi `http://localhost:5180` fra i redirect consentiti.
 
-> 🔴 Questo non è un ripiego in attesa di Google e Apple: **è l'unico che funziona per
-> tutte.** Google ha un'età minima che varia da paese a paese (13–16 in Europa) e l'Apple
-> ID parte da 13 quasi ovunque, quindi una dodicenne spesso non può usarli. E gli account
+> 🔴 Questo non è un ripiego in attesa di Google: **è l'unico che funziona per tutte.** Google ha un'età minima che varia da paese a paese (13–16 in Europa),
+> quindi una dodicenne spesso non può usarlo. E gli account
 > Google della scuola sono spesso bloccati dall'amministratore per le app di terze parti.
-> Vedi [R12](../docs/04-brainstorming/04-revisione-roadmap.md#r12--accesso--il-link-via-email-resta-la-spina-dorsale-google-e-apple-si-aggiungono).
+> Vedi [R12](../docs/04-brainstorming/04-revisione-roadmap.md#r12--accesso--link-via-email-e-google-apple-no).
 
 ### 4b · Google — opzionale, gratis, ~mezza giornata
 
@@ -74,36 +73,16 @@ accedono da un portatile dove copiare un codice dalla mail è più scomodo.
 🔵 Client ID e Client Secret di Google **non vanno in `.env`**: si incollano nella
 dashboard di Supabase, che li tiene lato server. Nel frontend non ci finiscono mai.
 
-### 4c · Apple — opzionale, a pagamento, con una dipendenza esterna
+### 4c · Cosa va detto nel consenso
 
-⚠️ **Richiede l'Apple Developer Program: 99 $/anno.** Non posso iscrivermi io — la
-creazione di account resta una cosa tua.
+Entrare con Google significa dire a Google che quella persona usa BAB. Per un'app che
+parla del corpo di una minorenne è un'informazione che il link via email non rivela. Non è
+un motivo per non offrirlo — è un motivo per scriverlo, e il copy in `src/copy/it.ts`
+(`auth.socialNote`) lo dice già.
 
-🔴 **Il collo di bottiglia è l'iscrizione, non il codice.** Come persona fisica di solito
-ci vogliono 24–48 ore; **come organizzazione serve un numero D-U-N-S e possono volerci
-settimane.** Se «Accedi con Apple» deve esistere entro le tre settimane, l'account va
-aperto adesso.
-
-Una volta dentro:
-
-1. **Certificates, Identifiers & Profiles → Identifiers** → crea un **App ID** con
-   *Sign In with Apple* abilitato
-2. Crea un **Services ID** — è quello che fa da client ID per il web
-3. Configuralo con il dominio e il *Return URL* di Supabase
-4. **Keys** → nuova chiave con *Sign In with Apple* → scarica il `.p8` (**si scarica una
-   volta sola**)
-5. In Supabase → Providers → Apple, inserisci Services ID, Team ID, Key ID e la chiave
-
-⚠️ Il client secret di Apple è un **JWT che scade**: va rigenerato almeno **ogni 6 mesi**,
-altrimenti l'accesso smette di funzionare senza preavviso. Vale la pena segnarselo in
-calendario il giorno stesso in cui lo si configura.
-
-### 4d · Cosa va detto nel consenso
-
-Entrare con Google o Apple significa dire a Google o ad Apple che quella persona usa BAB.
-Per un'app che parla del corpo di una minorenne è un'informazione che il link via email
-non rivela. Non è un motivo per non offrirli — è un motivo per scriverlo, e il copy in
-`src/copy/it.ts` (`auth.socialNote`) lo dice già.
+> **«Accedi con Apple» non si fa** (R12): 99 $/anno, iscrizione con settimane di attesa se
+> come organizzazione, e un client secret JWT da rigenerare ogni 6 mesi — per una comodità
+> che il link via email copre già.
 
 ## 5 · Verifica
 
