@@ -280,7 +280,7 @@ di una settimana, oppure partire con una dashboard squadra ridotta. **Vale la se
 
 | Nella v1, entro 3 settimane | Subito dopo |
 |---|---|
-| Rosa della squadra | Grafici e andamenti |
+| L'elenco delle atlete, con chi ha fatto il check-in e chi no | Grafici e andamenti |
 | I dati dei due check-in per atleta | Confronto carico pianificato ↔ sforzo riportato |
 | Bandiere rosse, in evidenza | Inserimento di altezza e peso |
 | Piano settimanale e gare | Esportazioni |
