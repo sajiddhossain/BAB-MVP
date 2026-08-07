@@ -220,6 +220,67 @@ qualcuno proporrà una scorciatoia che lo viola.
 
 ---
 
+### R12 · Accesso — il link via email resta la spina dorsale, Google e Apple si aggiungono
+
+**Deciso:** si valutano **Google** e **Apple** come modi di accedere, *se ci si arriva*
+dentro le tre settimane. L'orizzonte resta **tre settimane**.
+
+**Il magic link non si può togliere**, e non è una preferenza tecnica — sono due muri:
+
+| | Perché blocca proprio le nostre |
+|---|---|
+| **Età minima** | Google richiede un'età minima che cambia da paese a paese (13–16 in Europa); l'Apple ID parte da 13 quasi ovunque. Una dodicenne — che è il fondo della nostra fascia — spesso **non può avere legittimamente né l'uno né l'altro.** |
+| **Account scolastici** | Molte 12–14enni italiane hanno un account Google della scuola, e gli amministratori scolastici bloccano spesso l'accesso OAuth ad app di terze parti. Fallirebbe esattamente sulle ragazze a cui puntiamo. |
+
+Quindi: Google e Apple sono una **comodità per chi già ce li ha**, mai l'unica porta.
+Il link via email funziona a qualsiasi età e senza chiedere niente a nessuno.
+
+**Dove conviene davvero: dal lato coach.** Lo staff sono adulti, hanno account veri, non
+hanno vincoli d'età, e accedono da un portatile — dove copiare un codice dalla mail è più
+fastidioso che su un telefono. **Se se ne fa uno solo, si fa per la dashboard squadra**,
+non per l'app dell'atleta.
+
+**Costo e prerequisiti:**
+
+| | Costo | Cosa serve | Lavoro |
+|---|---|---|---|
+| **Google** | gratis | Progetto Google Cloud, schermata di consenso OAuth, client ID e secret | ~mezza giornata |
+| **Apple** | **99 $/anno** | **Apple Developer Program**, Services ID, chiave privata, verifica del dominio. Il client secret è un JWT **da rigenerare almeno ogni 6 mesi** | ~1 giorno |
+
+🔴 **Il rischio di calendario è l'iscrizione ad Apple, non il codice.** L'Apple Developer
+Program non è immediato: come persona fisica di solito ci vogliono 24–48 ore, ma **come
+organizzazione serve un numero D-U-N-S e possono volerci settimane.** Se «Accedi con Apple»
+deve esistere entro tre settimane, **l'account va aperto adesso** — e non posso aprirlo io,
+la creazione di account resta una cosa tua.
+
+**🟡 Raccomandazione:** Google dentro, Apple solo se l'account sviluppatore esiste già.
+Il link via email resta la spina dorsale in ogni caso, ed è quello che va testato per primo.
+
+⚠️ **Una nota che va nel testo del consenso:** entrare con Google o Apple significa dire a
+Google o ad Apple che quella persona usa BAB. Per un'app che parla del corpo di una
+minorenne è un'informazione che il link via email non rivela. Non è un motivo per non
+farlo — è un motivo per scriverlo.
+
+---
+
+### R13 · Le tre settimane restano, quindi la dashboard parte essenziale
+
+**Deciso:** l'orizzonte non si sposta. La v1.1 lasciava aperte due strade — spostare la data
+di una settimana, oppure partire con una dashboard squadra ridotta. **Vale la seconda.**
+
+| Nella v1, entro 3 settimane | Subito dopo |
+|---|---|
+| Rosa della squadra | Grafici e andamenti |
+| I dati dei due check-in per atleta | Confronto carico pianificato ↔ sforzo riportato |
+| Bandiere rosse, in evidenza | Inserimento di altezza e peso |
+| Piano settimanale e gare | Esportazioni |
+
+Il criterio del taglio: quello che le squadre vogliono davvero vedere è **chi sta come**.
+Quello arriva nella v1. Il resto è analisi, e l'analisi ha bisogno di settimane di dati
+che nella v1 non esistono ancora comunque.
+
+---
+
 ## 🔴 Due problemi nuovi
 
 ### B1 · Apple Health non è raggiungibile da una web app
@@ -270,6 +331,7 @@ questione di lingua, contro [R10](#r10--più-di-20-atlete-e-la-webapp-non-si-sos
 | # | Domanda |
 |---|---|
 | **B1** | Wearable: si rimanda, o si scelgono le integrazioni cloud? |
+| **B3** | 🔴 **Esiste un Apple Developer Program attivo?** Se no e lo si vuole, va aperto **adesso**: come organizzazione richiede un D-U-N-S e può volerci settimane. Senza, «Accedi con Apple» non entra nelle tre settimane — e non dipende da quanto in fretta si scrive il codice. |
 | ~~B2~~ | 🟢 **Chiusa: "andatura".** Applicata ovunque nell'italiano |
 | D8 | La domanda "livello di soddisfazione" — i primi due valori giudicano la prestazione |
 | D9–D12 | Avatar, badge, spec UI vecchie, tema scuro — tutte rimandabili |

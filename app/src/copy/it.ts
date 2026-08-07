@@ -26,6 +26,31 @@ export const it = {
     ariaLabel: 'Navigazione principale',
   },
 
+  /**
+   * R12 · Il link via email è la strada principale, non un ripiego: Google e
+   * Apple hanno un'età minima che una dodicenne spesso non raggiunge, e gli
+   * account scolastici bloccano spesso l'accesso OAuth di terze parti.
+   */
+  auth: {
+    title: 'Entra in BAB',
+    lede: 'Ti mandiamo un link via email. Nessuna password da ricordare, e nessuna da farsi rubare.',
+    emailLabel: 'La tua email',
+    emailPlaceholder: 'nome@esempio.it',
+    sendLink: 'Mandami il link',
+    sending: 'Sto mandando…',
+    sentTitle: 'Guarda la posta',
+    sentBody: 'Abbiamo mandato un link a **{email}**. Aprilo da questo telefono ed è fatta.',
+    sentAgain: 'Non è arrivato? Rimandalo',
+    or: 'oppure',
+    google: 'Continua con Google',
+    apple: 'Continua con Apple',
+    /** Detto prima di toccare il bottone, non dopo. */
+    socialNote: 'Con Google o Apple, loro sapranno che usi BAB. Con il link via email, no.',
+    ageNote: 'Google e Apple hanno un\'età minima, quindi potrebbero non funzionare per te — e va benissimo. Il link via email funziona sempre.',
+    trouble: 'Qualcosa non funziona?',
+    signOut: 'Esci',
+  },
+
   /** La segnalazione immediata è sempre a un tocco, da ogni schermata (§5). */
   hurt: {
     button: 'Mi sono fatta male',

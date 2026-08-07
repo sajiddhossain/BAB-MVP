@@ -42,6 +42,8 @@ stampo mai e dimmi dove.
 
 ## 4 · Autenticazione
 
+### 4a · Il link via email — obbligatorio, è la strada principale
+
 Dashboard → **Authentication** → **Providers**:
 - **Email** attivo, con **Confirm email** attivo
 - **Disabilita** la password: si usa solo il magic link
@@ -49,6 +51,59 @@ Dashboard → **Authentication** → **Providers**:
   scelta più semplice e più sicura)*
 
 **URL Configuration** → aggiungi `http://localhost:5180` fra i redirect consentiti.
+
+> 🔴 Questo non è un ripiego in attesa di Google e Apple: **è l'unico che funziona per
+> tutte.** Google ha un'età minima che varia da paese a paese (13–16 in Europa) e l'Apple
+> ID parte da 13 quasi ovunque, quindi una dodicenne spesso non può usarli. E gli account
+> Google della scuola sono spesso bloccati dall'amministratore per le app di terze parti.
+> Vedi [R12](../docs/04-brainstorming/04-revisione-roadmap.md#r12--accesso--il-link-via-email-resta-la-spina-dorsale-google-e-apple-si-aggiungono).
+
+### 4b · Google — opzionale, gratis, ~mezza giornata
+
+Serve più per lo **staff** che per le atlete: i coach sono adulti, hanno account veri, e
+accedono da un portatile dove copiare un codice dalla mail è più scomodo.
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → nuovo progetto
+2. **APIs & Services → OAuth consent screen** → tipo *External*, nome app, email di
+   supporto. Con i soli scope di base (email, profilo) **non serve la verifica di Google**
+3. **Credentials → Create credentials → OAuth client ID** → tipo *Web application*
+4. Fra gli **Authorized redirect URIs** metti quello che Supabase ti mostra alla voce
+   Google (`https://<ref>.supabase.co/auth/v1/callback`)
+5. Copia **Client ID** e **Client Secret** in Supabase → Providers → Google
+
+🔵 Client ID e Client Secret di Google **non vanno in `.env`**: si incollano nella
+dashboard di Supabase, che li tiene lato server. Nel frontend non ci finiscono mai.
+
+### 4c · Apple — opzionale, a pagamento, con una dipendenza esterna
+
+⚠️ **Richiede l'Apple Developer Program: 99 $/anno.** Non posso iscrivermi io — la
+creazione di account resta una cosa tua.
+
+🔴 **Il collo di bottiglia è l'iscrizione, non il codice.** Come persona fisica di solito
+ci vogliono 24–48 ore; **come organizzazione serve un numero D-U-N-S e possono volerci
+settimane.** Se «Accedi con Apple» deve esistere entro le tre settimane, l'account va
+aperto adesso.
+
+Una volta dentro:
+
+1. **Certificates, Identifiers & Profiles → Identifiers** → crea un **App ID** con
+   *Sign In with Apple* abilitato
+2. Crea un **Services ID** — è quello che fa da client ID per il web
+3. Configuralo con il dominio e il *Return URL* di Supabase
+4. **Keys** → nuova chiave con *Sign In with Apple* → scarica il `.p8` (**si scarica una
+   volta sola**)
+5. In Supabase → Providers → Apple, inserisci Services ID, Team ID, Key ID e la chiave
+
+⚠️ Il client secret di Apple è un **JWT che scade**: va rigenerato almeno **ogni 6 mesi**,
+altrimenti l'accesso smette di funzionare senza preavviso. Vale la pena segnarselo in
+calendario il giorno stesso in cui lo si configura.
+
+### 4d · Cosa va detto nel consenso
+
+Entrare con Google o Apple significa dire a Google o ad Apple che quella persona usa BAB.
+Per un'app che parla del corpo di una minorenne è un'informazione che il link via email
+non rivela. Non è un motivo per non offrirli — è un motivo per scriverlo, e il copy in
+`src/copy/it.ts` (`auth.socialNote`) lo dice già.
 
 ## 5 · Verifica
 

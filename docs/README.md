@@ -12,7 +12,7 @@ e [`02-prodotto/01-architettura-informativa.md`](02-prodotto/01-architettura-inf
 
 ## ⚠️ Leggi prima questo
 
-Il **6 agosto 2026** la founder ha rivisto la roadmap e ha preso undici decisioni, alcune
+Il **6 agosto 2026** la founder ha rivisto la roadmap e ha preso tredici decisioni, alcune
 delle quali ribaltano scelte argomentate in questi documenti. Il verbale è
 **[04-brainstorming/04-revisione-roadmap.md](04-brainstorming/04-revisione-roadmap.md)**, e
 in caso di contrasto **vince quello**.

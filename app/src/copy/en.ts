@@ -18,6 +18,25 @@ export const en: Copy = {
     ariaLabel: 'Main navigation',
   },
 
+  auth: {
+    title: 'Sign in to BAB',
+    lede: "We'll email you a link. No password to remember, and none to get stolen.",
+    emailLabel: 'Your email',
+    emailPlaceholder: 'name@example.com',
+    sendLink: 'Send me the link',
+    sending: 'Sending…',
+    sentTitle: 'Check your email',
+    sentBody: "We've sent a link to **{email}**. Open it on this phone and you're in.",
+    sentAgain: "Didn't arrive? Send it again",
+    or: 'or',
+    google: 'Continue with Google',
+    apple: 'Continue with Apple',
+    socialNote: "With Google or Apple, they'll know you use BAB. With the email link, they won't.",
+    ageNote: "Google and Apple have a minimum age, so they might not work for you — which is completely fine. The email link always works.",
+    trouble: 'Something not working?',
+    signOut: 'Sign out',
+  },
+
   hurt: {
     button: 'I got hurt',
     title: 'Something happened',

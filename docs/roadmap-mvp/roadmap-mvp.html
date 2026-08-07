@@ -151,7 +151,7 @@ ul.tight{margin:0 0 3mm;padding-left:4.5mm} ul.tight li{margin:1.4mm 0}
 </style>
 </head>
 <body>
-<div class="runfoot"><span>BAB — Roadmap MVP · v1.1 · 6 agosto 2026</span><span>Specifica di prodotto, non consiglio medico</span></div>
+<div class="runfoot"><span>BAB — Roadmap MVP · v1.2 · 6 agosto 2026</span><span>Specifica di prodotto, non consiglio medico</span></div>
 
 <!-- ══════════ 1 · COVER ══════════ -->
 <section class="page cover">
@@ -163,7 +163,7 @@ ul.tight{margin:0 0 3mm;padding-left:4.5mm} ul.tight li{margin:1.4mm 0}
   <div class="rule"></div>
   <div class="meta">
     <div><div class="k">Documento</div><div class="v">Roadmap MVP</div></div>
-    <div><div class="k">Versione</div><div class="v">1.0</div></div>
+    <div><div class="k">Versione</div><div class="v">1.2</div></div>
     <div><div class="k">Data</div><div class="v">6 agosto 2026</div></div>
     <div><div class="k">Orizzonte</div><div class="v">3 settimane</div></div>
   </div>
@@ -340,7 +340,9 @@ ul.tight{margin:0 0 3mm;padding-left:4.5mm} ul.tight li{margin:1.4mm 0}
     <div class="top"><span class="n">02</span><h4>Memoria</h4><span class="wk">Settimana 1</span></div>
     <div class="in">
       <ul>
-        <li>Autenticazione con link via email — nessuna password da gestire per delle minorenni</li>
+        <li>Accesso con <strong>link via email</strong> — nessuna password da gestire per delle
+        minorenni. Più <strong>Google</strong>, e <strong>Apple</strong> se si arriva in tempo
+        (vedi il blocco accessi)</li>
         <li>Database Supabase, già in uso sulla landing</li>
         <li>Salvataggio e rilettura dei check-in</li>
         <li>Funzionamento offline con sincronizzazione differita: in palestra spesso non c'è campo</li>
@@ -406,16 +408,73 @@ ul.tight{margin:0 0 3mm;padding-left:4.5mm} ul.tight li{margin:1.4mm 0}
     </div>
   </div>
 
-  <div class="card tint-coral">
-    <h4>⚠️ Lo scope è cresciuto, le tre settimane no</h4>
-    <p>Sono entrate dashboard squadra, vista «Me», calendario e seconda lingua; è uscito il
-    percorso, che vale molto meno. E le tre settimane erano strette già prima. Le uscite
-    realistiche sono due: <strong>la data si sposta di circa una settimana</strong>, oppure
-    <strong>la v1 parte con una dashboard essenziale</strong> — rosa, check-in, bandiere
-    rosse — e il resto arriva subito dopo. Raccomando la seconda: le squadre vogliono vedere
-    <em>chi sta come</em>, non i grafici.</p>
+  <div class="card tint-lime">
+    <h4>✅ Le tre settimane restano — quindi la dashboard parte essenziale</h4>
+    <p>Lo scope è cresciuto (dashboard squadra, vista «Me», calendario, seconda lingua) e
+    l'orizzonte no. Delle due uscite possibili vale quella che tiene la data: <strong>nella
+    v1 la dashboard mostra chi c'è, i dati dei due check-in, le bandiere rosse in evidenza e
+    il piano settimanale.</strong> Grafici, confronto carico ↔ sforzo, altezza e peso ed
+    esportazioni arrivano subito dopo.</p>
+    <p style="margin-top:2.5mm">Il criterio: quello che le squadre vogliono vedere è
+    <em>chi sta come</em>, e quello c'è dal primo giorno. Il resto è analisi — e l'analisi ha
+    bisogno di settimane di dati che nella v1 non esistono ancora comunque.</p>
   </div>
 
+</section>
+
+<!-- ══════════ ACCESSI ══════════ -->
+<section class="page">
+  <div class="sec">
+    <span class="kicker lime">03 · Il piano</span>
+    <h2>Come si entra</h2>
+    <p class="sub">Il link via email è la strada principale. Google e Apple si aggiungono, se ci si arriva.</p>
+  </div>
+
+  <table class="framed">
+    <thead><tr><th style="width:32mm">Strada</th><th style="width:20mm">Costo</th><th>Cosa comporta</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Link via email</strong></td>
+          <td><span class="tag ok">fatto</span></td>
+          <td>Nessuna password da ricordare né da farsi rubare. Funziona a qualsiasi età e su qualsiasi telefono. <strong>Non si toglie mai.</strong></td></tr>
+      <tr><td><strong>Google</strong></td><td class="num">gratis</td>
+          <td>Progetto Google Cloud, schermata di consenso, client ID e secret. Con i soli dati di base non serve la verifica di Google. <strong>~mezza giornata.</strong></td></tr>
+      <tr><td><strong>Apple</strong></td><td class="num">99 $/anno</td>
+          <td>Richiede l'<strong>Apple Developer Program</strong>, un Services ID, una chiave e la verifica del dominio. Il client secret è un JWT <strong>da rigenerare ogni 6 mesi</strong>, o l'accesso smette di funzionare senza preavviso. <strong>~1 giorno.</strong></td></tr>
+    </tbody>
+  </table>
+
+  <div class="two">
+    <div class="card tint-coral">
+      <h4>⚠️ Perché non bastano da soli</h4>
+      <ul style="margin:0;padding-left:4.5mm">
+        <li><strong>Età minima.</strong> Google la fissa fra i 13 e i 16 anni a seconda del
+        paese, Apple a 13 quasi ovunque. Una <strong>dodicenne</strong> — il fondo della
+        nostra fascia — spesso non può averli.</li>
+        <li><strong>Account della scuola.</strong> Molte 12–14enni hanno un account Google
+        scolastico, e gli amministratori bloccano spesso le app di terze parti.</li>
+      </ul>
+      <p style="margin-top:2.5mm">Fallirebbero <em>proprio</em> sulle ragazze a cui puntiamo.</p>
+    </div>
+    <div class="card tint-teal">
+      <h4>💡 Dove conviene: il coach</h4>
+      <p>Lo staff sono adulti, hanno account veri, non hanno vincoli d'età, e accedono da un
+      portatile — dove copiare un codice dalla mail è più scomodo che su un telefono.</p>
+      <p style="margin-top:2.5mm"><strong>Se se ne fa uno solo, si fa per la dashboard
+      squadra</strong>, non per l'app dell'atleta.</p>
+    </div>
+  </div>
+
+  <div class="card tint-sand">
+    <h4>🔴 Il rischio è l'iscrizione ad Apple, non il codice</h4>
+    <p>L'Apple Developer Program non è immediato: come persona fisica di solito 24–48 ore, ma
+    <strong>come organizzazione serve un numero D-U-N-S e possono volerci settimane</strong>.
+    Se «Accedi con Apple» deve esistere entro le tre settimane, <strong>l'account va aperto
+    adesso</strong> — è una dipendenza esterna, non si comprime scrivendo codice più in fretta.</p>
+    <p style="margin-top:2.5mm"><strong>Da scrivere nel consenso:</strong> entrare con Google o
+    Apple significa dire a loro che quella persona usa BAB. Per un'app che parla del corpo di
+    una minorenne è un'informazione che il link via email non rivela. Non è un motivo per non
+    offrirli — è un motivo per dirlo.</p>
+  </div>
 </section>
 
 <!-- ══════════ 5 · SCOPE ══════════ -->
@@ -527,8 +586,8 @@ ul.tight{margin:0 0 3mm;padding-left:4.5mm} ul.tight li{margin:1.4mm 0}
     <thead><tr><th style="width:9mm">#</th><th>Decisione</th><th style="width:20mm">Entro</th><th style="width:62mm">Cosa blocca</th></tr></thead>
     <tbody>
       <tr><td class="num">1</td><td><strong>Testo legale del consenso</strong></td><td><span class="tag todo">sett. 1</span></td><td>Onboarding, e l'avvio del pilota. Ora deve descrivere la visibilità dello staff sui check-in e sul ciclo. È l'unica voce che non si recupera accelerando dopo.</td></tr>
-      <tr><td class="num">2</td><td><strong>Dispositivi indossabili</strong></td><td><span class="tag todo">sett. 1</span></td><td>Una schermata di onboarding. <strong>Apple Health non è raggiungibile da una web app</strong>: si rimanda, oppure si scelgono le integrazioni cloud che hanno un'API vera.</td></tr>
-      <tr><td class="num">3</td><td>Quanta dashboard squadra nella v1</td><td><span class="tag part">sett. 1</span></td><td>La data di consegna. Vedi l'avvertenza sullo scope cresciuto.</td></tr>
+      <tr><td class="num">2</td><td><strong>Apple Developer Program: c'è?</strong></td><td><span class="tag todo">oggi</span></td><td>«Accedi con Apple». Non è il codice a bloccare ma l'iscrizione: come organizzazione serve un D-U-N-S e possono volerci settimane. Se si vuole, va aperto adesso. 99 $/anno.</td></tr>
+      <tr><td class="num">3</td><td><strong>Dispositivi indossabili</strong></td><td><span class="tag todo">sett. 1</span></td><td>Una schermata di onboarding. <strong>Apple Health non è raggiungibile da una web app</strong>: si rimanda, oppure si scelgono le integrazioni cloud che hanno un'API vera.</td></tr>
       <tr><td class="num">4</td><td>«Livello di soddisfazione»</td><td><span class="tag part">sett. 2</span></td><td>Due dei cinque valori proposti giudicano la prestazione, che è ciò che il prodotto evita.</td></tr>
     </tbody>
   </table>
@@ -543,7 +602,8 @@ ul.tight{margin:0 0 3mm;padding-left:4.5mm} ul.tight li{margin:1.4mm 0}
     <thead><tr><th>Rischio</th><th style="width:20mm">Impatto</th><th style="width:74mm">Mitigazione</th></tr></thead>
     <tbody>
       <tr><td>Il testo legale non arriva entro la settimana 3</td><td><span class="tag todo">alto</span></td><td>Aprirlo subito. Se slitta, slitta il pilota, non lo sviluppo: si consegna comunque l'app.</td></tr>
-      <tr><td><strong>Lo scope è cresciuto, le settimane no</strong></td><td><span class="tag todo">alto</span></td><td>Dashboard squadra, vista «Me», calendario e seconda lingua sono entrati; è uscito il percorso, che vale molto meno. O si sposta la data di circa una settimana, o la dashboard parte ridotta all'essenziale.</td></tr>
+      <tr><td><strong>Lo scope è cresciuto, le settimane no</strong></td><td><span class="tag part">gestito</span></td><td>La data resta, quindi la dashboard squadra parte essenziale — rosa, check-in, bandiere rosse, piano. Grafici ed esportazioni subito dopo.</td></tr>
+      <tr><td><strong>«Accedi con Apple» non arriva in tempo</strong></td><td><span class="tag part">medio</span></td><td>Non dipende dal codice ma dall'iscrizione all'Apple Developer Program, che come organizzazione richiede un D-U-N-S e può volerci settimane. Mitigazione: aprire l'account subito, e in ogni caso il link via email e Google coprono tutti.</td></tr>
       <tr><td><strong>Sotto-riporto, ora che lo staff vede</strong></td><td><span class="tag todo">alto</span></td><td>Era già il rischio numero uno con le adolescenti. Mitigazioni: il journaling resta privato per costruzione, lei sa chi la vede <em>prima</em> di scrivere, e il copy la ringrazia quando segnala. Ma va sorvegliato nei dati del pilota, non dato per risolto.</td></tr>
       <tr><td>Abbandono dopo il primo mese</td><td><span class="tag todo">alto</span></td><td>È diventato il criterio di successo principale. Il Compare restituisce valore già dal primo giorno; il contatore della vista «Me» trasforma l'attesa in progresso.</td></tr>
       <tr><td>Perdita dei dati delle prime settimane</td><td><span class="tag ok">basso</span></td><td>Eventi immutabili, codici stabili nel database, nessun aggregato precalcolato, coda offline idempotente. Aggiungere è additivo per costruzione: la webapp non va sostituita, ci si aggiungono cose.</td></tr>

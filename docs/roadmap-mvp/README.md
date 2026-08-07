@@ -5,10 +5,12 @@ founder, club, advisor clinico, potenziali investitori.
 
 | File | |
 |---|---|
-| `roadmap-mvp.pdf` | Il documento, A4, 11 pagine — **v1.1, 6 agosto 2026** |
+| `roadmap-mvp.pdf` | Il documento, A4, 12 pagine — **v1.2, 6 agosto 2026** |
 | `roadmap-mvp.html` | Il sorgente — si modifica questo, non il PDF |
 
-> **v1.1** recepisce il riscontro della founder sulla v1.0. Le decisioni stanno in
+> **v1.2** — l'orizzonte resta di tre settimane, quindi la dashboard squadra parte
+> essenziale, e si aggiunge il blocco sugli accessi (link via email, Google, Apple).
+> **v1.1** aveva recepito il riscontro della founder sulla v1.0. Le decisioni stanno in
 > [04-revisione-roadmap](../04-brainstorming/04-revisione-roadmap.md); qui c'è la
 > versione condivisibile.
 
@@ -32,9 +34,10 @@ I font arrivano da Google Fonts, quindi serve connessione durante il rendering.
 | 2 | Il prodotto: meccanismo, metrica, i tre output, vincoli non negoziabili |
 | 3–4 | Stato attuale: inventario 50 schermate, cosa è già risolto |
 | 5–6 | Il piano: timeline e le fasi 1–4 |
-| 7 | Fase 5 (sicurezza, in parallelo) e l'avvertenza sullo scope cresciuto |
-| 8–9 | Scope: cosa esce e perché, criteri di successo del pilota |
-| 10–11 | Condizioni: decisioni richieste e registro dei rischi |
+| 7 | Fase 5 (sicurezza, in parallelo) e la scelta sulla dashboard essenziale |
+| 8 | Come si entra: link via email, Google, Apple — costi, età minime, il vincolo Apple |
+| 9–10 | Scope: cosa esce e perché, criteri di successo del pilota |
+| 11–12 | Condizioni: decisioni richieste e registro dei rischi |
 
 ## Note di stile
 
