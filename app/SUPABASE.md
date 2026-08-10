@@ -4,6 +4,30 @@ L'app **funziona già senza**: senza le variabili d'ambiente il client è `null`
 check-in si salvano in locale e la coda resta in attesa. Collegare è l'ultimo passo,
 non il primo.
 
+## Chi fa cosa, e perché
+
+| | Chi |
+|---|---|
+| Creare l'**account** Supabase | 🔴 **Tu.** La creazione di account è una cosa che devo lasciarti, con o senza MCP. |
+| Creare il **progetto** dentro l'account | Tu (2 minuti) — oppure io, se colleghi un MCP Supabase |
+| Applicare lo **schema** | Tu con un copia-incolla, oppure io con l'MCP |
+| Collegare l'app, verificare, generare i tipi | Io, appena ho URL e chiave anon |
+
+**Sull'MCP.** Nel registro dei connettori non c'è Supabase, quindi non è una
+cosa da aggiungere con un clic: esiste il server ufficiale
+`@supabase/mcp-server-supabase`, che si aggiunge da un terminale interattivo
+con `claude mcp add` e vuole un personal access token. Il token resta nella
+configurazione e **non passa mai da me**, che è il modo giusto di gestirlo.
+
+🟡 Detto onestamente: per una configurazione da fare **una volta sola**,
+collegare l'MCP costa più di quanto faccia risparmiare. Le due cose che
+servono sono due minuti sul sito e un copia-incolla di trenta secondi.
+L'MCP diventa utile **dopo**, per il lavoro ricorrente — migrazioni,
+ispezionare i dati, rigenerare i tipi dallo schema. Se lo colleghi per quello,
+ottimo; non aspettarlo per partire.
+
+---
+
 ## 1 · Il progetto — 2 minuti, li fai tu
 
 La creazione dell'account non posso farla io. Su [supabase.com](https://supabase.com):
@@ -84,7 +108,28 @@ un motivo per non offrirlo — è un motivo per scriverlo, e il copy in `src/cop
 > come organizzazione, e un client secret JWT da rigenerare ogni 6 mesi — per una comodità
 > che il link via email copre già.
 
-## 5 · Verifica
+## 5 · Semi di prova — per verificare la dashboard squadra
+
+Finché non esiste una squadra con dentro qualcuno, non c'è modo di sapere se le
+viste `coach_*` restituiscono le righe giuste e **nascondono davvero il testo
+libero**. [`supabase/seed-demo.sql`](supabase/seed-demo.sql) crea il minimo per
+poterlo guardare: una squadra, un coach, due atlete, una settimana di check-in
+e una bandiera rossa aperta.
+
+Prima servono degli utenti veri (Authentication → Users → Add user): le tabelle
+puntano ad `auth.users`. Poi si mettono le email in cima al file e si esegue.
+
+🔴 **Il controllo che conta**, una volta seminato:
+
+```sql
+select note from public.coach_check_ins;
+```
+
+Deve **fallire** con *column "note" does not exist*. Il seme mette apposta una
+nota privata dentro un check-in: se quella query restituisce qualcosa, la
+promessa R2 è rotta e le parole di un'atleta sono finite davanti al suo coach.
+
+## 6 · Verifica
 
 ```bash
 npm run dev --prefix app
