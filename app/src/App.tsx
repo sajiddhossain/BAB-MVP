@@ -5,6 +5,7 @@ import Today from './screens/Today'
 import Journey from './screens/Journey'
 import Me from './screens/Me'
 import CheckInPre from './screens/CheckInPre'
+import CheckInPost from './screens/CheckInPost'
 import SignIn from './screens/SignIn'
 import { useSession } from './lib/session'
 import { useCopy } from './copy'
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/journey" element={<Journey />} />
           <Route path="/me" element={<Me />} />
           <Route path="/checkin/pre" element={<CheckInPre />} />
+          <Route path="/checkin/post" element={<CheckInPost />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>

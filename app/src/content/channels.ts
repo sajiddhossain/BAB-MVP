@@ -81,3 +81,60 @@ export const HEADSPACE: Headspace[] = [
 export function channelQuestion(c: Channel, locale: Locale): string {
   return `${c.emoji} ${c.question[locale]}`
 }
+
+/**
+ * I canali del check-in POST. Sono altri: dopo l'allenamento non si chiede più
+ * "quanto hai dormito", si chiede cosa è rimasto addosso.
+ *
+ * 🔴 `effort` è la session-RPE, ed è l'unico dato del prodotto che ha una
+ * letteratura solida dietro (Temm). Ha una scala tutta sua perché non misura
+ * uno stato ma una fatica: le altre vanno dal peggio al meglio, questa dal
+ * facile al massimale.
+ */
+export type PostChannelCode = 'legs' | 'breath' | 'energy'
+
+export const EFFORT: Channel = {
+  code: 'energy', emoji: '🔥',   // `code` non usato: l'effort ha una colonna sua
+  scale: ['😌', '🙂', '😅', '🥵', '🥴'],
+  question: { it: 'Quanto è stata dura davvero?', en: 'How hard did it actually feel?' },
+  low: { it: 'Facile', en: 'Easy' },
+  high: { it: 'Al massimo', en: 'Maxed out' },
+}
+
+export const POST_CHANNELS: (Omit<Channel, 'code'> & { code: PostChannelCode })[] = [
+  {
+    code: 'legs', emoji: '💪',
+    scale: ['🪨', '🪵', '🍂', '🪶', '🦋'],
+    question: { it: 'Gambe e muscoli', en: 'Legs & muscles' },
+    low: { it: 'Distrutte, pesanti', en: 'Trashed / heavy' },
+    high: { it: 'Leggere e a posto', en: 'Light & fine' },
+  },
+  {
+    code: 'breath', emoji: '🫁',
+    scale: ['🌩️', '🌧️', '🌥️', '🌤️', '☀️'],
+    question: { it: 'Respiro e cuore', en: 'Breathing & heart' },
+    low: { it: 'Ancora a mille', en: 'Still pounding' },
+    high: { it: 'Calmi', en: 'Settled & calm' },
+  },
+  {
+    code: 'energy', emoji: '🔋',
+    scale: ['🪫', '🔅', '🔆', '✨', '⚡'],
+    question: { it: 'Energia adesso', en: 'Energy right now' },
+    low: { it: 'A terra', en: 'Drained' },
+    high: { it: 'Ancora carica', en: 'Still buzzing' },
+  },
+]
+
+/**
+ * "Cosa ti sei portata a casa?" — recuperata dal PDF originale della founder.
+ *
+ * È la domanda migliore del materiale: sposta il metro da com'è andata la
+ * prestazione a cosa ha imparato, e non c'è modo di rispondere male.
+ */
+export const BROUGHT_HOME = [
+  { code: 'learned',  emoji: '💡', label: { it: 'Ho imparato qualcosa di nuovo', en: 'Learned something new' } },
+  { code: 'listened', emoji: '👂', label: { it: 'Ho ascoltato il mio corpo',     en: 'Listened to my body' } },
+  { code: 'helped',   emoji: '🤝', label: { it: 'Ho aiutato una compagna',        en: 'Helped a teammate' } },
+  { code: 'kind',     emoji: '💛', label: { it: 'Sono stata gentile con me',      en: 'Was kind to myself' } },
+  { code: 'nailed',   emoji: '✅', label: { it: 'Ho eseguito bene un esercizio',  en: 'Nailed an exercise' } },
+]

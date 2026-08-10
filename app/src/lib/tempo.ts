@@ -66,3 +66,32 @@ export function suggest(sum: number): TempoCode {
 export function suggestWithPain(sum: number, protectivePain: boolean): TempoCode {
   return protectivePain ? 'gentle' : suggest(sum)
 }
+
+/**
+ * ── Il prediction error ───────────────────────────────────────────────────
+ *
+ * 🔴 È LA METRICA DEL PRODOTTO. Non la forma fisica, non il recupero, non
+ * l'aderenza: quanto bene lei si legge, e se quello scarto si accorcia.
+ *
+ * Le tre andature hanno un ordine (Gentle < Steady < Upbeat), quindi lo scarto
+ * è una distanza fra 0 e 2. Grezza di proposito: con tre livelli non c'è niente
+ * di più fine da misurare, e fingere precisione sarebbe peggio che non averla.
+ */
+export const TEMPO_RANK: Record<TempoCode, number> = { gentle: 1, steady: 2, upbeat: 3 }
+
+export function predictionError(predicted: TempoCode, actual: TempoCode): number {
+  return Math.abs(TEMPO_RANK[predicted] - TEMPO_RANK[actual])
+}
+
+/**
+ * Quanto è recuperata adesso: gambe, respiro, energia più l'Headspace.
+ * L'Headspace entra nella media perché dopo l'allenamento la testa fa parte
+ * dello stato del corpo quanto le gambe.
+ */
+export function bodyAverage(
+  legs: number | null, breath: number | null, energy: number | null, headspace: number | null,
+): number | null {
+  const v = [legs, breath, energy, headspace]
+  if (v.some((x) => x === null)) return null
+  return (v as number[]).reduce((a, b) => a + b, 0) / 4
+}
