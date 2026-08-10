@@ -74,6 +74,37 @@ const BACK: Partial<Record<RegionCode, Shape>> = {
 
 export const GEOMETRY = { front: FRONT, back: BACK }
 
+/**
+ * Decorazioni: non si toccano, non salvano niente, e non sono decorazione.
+ *
+ * Vengono dai prototipi originali, e servono a una cosa sola: far capire in un
+ * decimo di secondo se stai guardando il davanti o il dietro. Una faccia davanti,
+ * uno chignon e la linea della schiena dietro. Senza, le due viste sono due
+ * sagome identiche e l'atleta deve fidarsi dell'etichetta del bottone.
+ *
+ * `pointer-events: none` è obbligatorio: se intercettassero un tocco, un dito
+ * sulla faccia non registrerebbe «testa».
+ */
+function Decor({ side, ink }: { side: Side; ink: string }) {
+  if (side === 'front') {
+    return (
+      <g pointerEvents="none" aria-hidden>
+        <circle cx={93} cy={27} r={2} fill={ink} />
+        <circle cx={107} cy={27} r={2} fill={ink} />
+        <path d="M94,35 Q100,39 106,35" fill="none" stroke={ink} strokeWidth={1.6} strokeLinecap="round" />
+      </g>
+    )
+  }
+  return (
+    <g pointerEvents="none" aria-hidden>
+      {/* Lo chignon dice "questa è la nuca" senza scrivere una parola. */}
+      <ellipse cx={100} cy={11} rx={9} ry={7} fill={ink} opacity={0.5} />
+      <line x1={100} y1={98} x2={100} y2={168} stroke={ink} strokeWidth={2.2}
+            strokeDasharray="4 5" strokeLinecap="round" opacity={0.45} />
+    </g>
+  )
+}
+
 /** Vero per le zone che non reggono un dito senza aiuto. */
 function isSmall(s: Shape): boolean {
   return s.k === 'ellipse' && Math.min(s.rx, s.ry) * 2 < 26
@@ -161,6 +192,7 @@ export default function BodyMap({
             </g>
           )
         })}
+        <Decor side={side} ink="var(--color-ink-soft)" />
       </svg>
 
       <div className="flex w-full flex-col items-center gap-2">

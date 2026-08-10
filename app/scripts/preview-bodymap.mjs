@@ -50,6 +50,17 @@ const draw = (m, states = {}) =>
 const front = shapes('FRONT')
 const back = shapes('BACK')
 
+/** Le decorazioni non stanno nelle mappe di forme: si ridisegnano qui uguali. */
+const DECOR = {
+  front: `<g opacity="1">
+    <circle cx="93" cy="27" r="2" fill="#5C6A86"/><circle cx="107" cy="27" r="2" fill="#5C6A86"/>
+    <path d="M94,35 Q100,39 106,35" fill="none" stroke="#5C6A86" stroke-width="1.6" stroke-linecap="round"/></g>`,
+  back: `<g>
+    <ellipse cx="100" cy="11" rx="9" ry="7" fill="#5C6A86" opacity="0.5"/>
+    <line x1="100" y1="98" x2="100" y2="168" stroke="#5C6A86" stroke-width="2.2"
+          stroke-dasharray="4 5" stroke-linecap="round" opacity="0.45"/></g>`,
+}
+
 const html = `<!doctype html><meta charset="utf-8"><style>
 body{margin:0;background:#FAF9F6;font:12px "Helvetica Neue",system-ui;display:flex;gap:18px;padding:16px}
 svg{width:190px;height:auto}
@@ -59,11 +70,11 @@ svg{width:190px;height:auto}
 .flag{fill:color-mix(in srgb,#FF6B5C 22%,transparent);stroke:#FF6B5C;stroke-width:3}
 figure{margin:0}figcaption{text-align:center;font-weight:700;margin-top:6px}
 </style>
-<figure><svg viewBox="0 0 200 400">${draw(front)}</svg><figcaption>fronte</figcaption></figure>
-<figure><svg viewBox="0 0 200 400">${draw(back)}</svg><figcaption>retro</figcaption></figure>
-<figure><svg viewBox="0 0 200 400">${draw(front, { knee_l: 'sel', core: 'log', shoulders: 'log' })}</svg>
+<figure><svg viewBox="0 0 200 400">${draw(front)}${DECOR.front}</svg><figcaption>fronte</figcaption></figure>
+<figure><svg viewBox="0 0 200 400">${draw(back)}${DECOR.back}</svg><figcaption>retro</figcaption></figure>
+<figure><svg viewBox="0 0 200 400">${draw(front, { knee_l: 'sel', core: 'log', shoulders: 'log' })}${DECOR.front}</svg>
 <figcaption>scelta + segnate</figcaption></figure>
-<figure><svg viewBox="0 0 200 400">${draw(back, { calf_r: 'flag', lower_back: 'log' })}</svg>
+<figure><svg viewBox="0 0 200 400">${draw(back, { calf_r: 'flag', lower_back: 'log' })}${DECOR.back}</svg>
 <figcaption>🚩 bandiera rossa</figcaption></figure>`
 
 const page = join(tmpdir(), 'bab-bodymap.html')

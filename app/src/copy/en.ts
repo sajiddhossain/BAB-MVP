@@ -123,6 +123,8 @@ export const en: Copy = {
         title: 'Your channels',
         headspace: '🧠 Headspace',
         headspaceHelp: 'tap any that fit',
+        headspaceOther: '➕ Other',
+        headspaceOtherPlaceholder: 'In your own words…',
         surprise: 'Did anything surprise you?',
         surpriseOptions: ['No, as expected', 'A little', 'Quite a bit'],
         schoolLoad: "How's school right now?",

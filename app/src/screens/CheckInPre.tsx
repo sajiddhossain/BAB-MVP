@@ -60,6 +60,7 @@ export default function CheckInPre() {
   const [sleepHours, setSleepHours] = useState<string | null>(null)
   const [ch, setCh] = useState<Channels>({ sleep: null, energy: null, hydration: null, muscles: null })
   const [headspace, setHeadspace] = useState<string[]>([])
+  const [hsOther, setHsOther] = useState('')
   const [surprise, setSurprise] = useState<number | null>(null)
   const [school, setSchool] = useState<number | null>(null)
 
@@ -74,7 +75,7 @@ export default function CheckInPre() {
   const [result, setResult] = useState<{ suggested: TempoCode; chosen: TempoCode } | null>(null)
   const [saving, setSaving] = useState(false)
 
-  const hs = headspaceValue(headspace)
+  const hs = headspaceValue(headspace, hsOther)
   const sum = total(ch, hs)
   /**
    * 🔴 Due strade diverse arrivano al Care, e vanno raccontate diversamente.
@@ -108,7 +109,8 @@ export default function CheckInPre() {
           // 🔴 Sempre entrambe le colonne, anche quando coincidono.
           tempo_suggested: suggested, tempo_chosen: suggested,
           sleep: ch.sleep, energy: ch.energy, hydration: ch.hydration, muscles: ch.muscles,
-          headspace, surprise, sleep_hours: sleepHours, school_load: school,
+          headspace: headspace.filter((h) => h !== '__other'),
+          headspace_other: hsOther.trim() || null, surprise, sleep_hours: sleepHours, school_load: school,
           started_at: startedAt,
         }, signals)
       } catch { /* resta in coda locale: il check-in non si perde */ }
@@ -127,7 +129,8 @@ export default function CheckInPre() {
           tempo_predicted: predicted, prediction_confidence: confidence,
           tempo_suggested: result.suggested, tempo_chosen: to,
           sleep: ch.sleep, energy: ch.energy, hydration: ch.hydration, muscles: ch.muscles,
-          headspace, surprise, sleep_hours: sleepHours, school_load: school,
+          headspace: headspace.filter((h) => h !== '__other'),
+          headspace_other: hsOther.trim() || null, surprise, sleep_hours: sleepHours, school_load: school,
           started_at: startedAt,
         })
       } catch { /* idem */ }
@@ -254,10 +257,21 @@ export default function CheckInPre() {
         </p>
         <PillGroup
           label={t.checkin.pre.tuneIn.headspace}
-          options={HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji }))}
+          options={[...HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji })),
+                    { value: '__other', label: t.checkin.pre.tuneIn.headspaceOther }]}
           value={headspace}
           onChange={(v) => setHeadspace((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v])}
         />
+        {headspace.includes('__other') && (
+          <input
+            value={hsOther}
+            onChange={(e) => setHsOther(e.target.value)}
+            maxLength={60}
+            placeholder={t.checkin.pre.tuneIn.headspaceOtherPlaceholder}
+            aria-label={t.checkin.pre.tuneIn.headspaceOther}
+            className="bab-card px-3 py-2 text-[15px]"
+          />
+        )}
 
         <p className="bab-label">{t.checkin.pre.tuneIn.surprise}</p>
         <PillGroup

@@ -143,6 +143,8 @@ export const it = {
         /** Resta in inglese: è vocabolario del prodotto, come i nomi delle andature. */
         headspace: '🧠 Headspace',
         headspaceHelp: 'tocca quelle che ti somigliano',
+        headspaceOther: '➕ Altro',
+        headspaceOtherPlaceholder: 'Con parole tue…',
         surprise: 'Qualcosa ti ha sorpresa?',
         surpriseOptions: ['No, come pensavo', 'Sì, un po\'', 'Sì, parecchio'],
         schoolLoad: 'Com\'è la scuola in questi giorni?',

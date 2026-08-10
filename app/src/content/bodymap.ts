@@ -57,8 +57,11 @@ export const REGIONS: Region[] = [
   { code: 'ham_r',      side: 'back',  label: { it: 'Dietro coscia des.', en: 'Right hamstring' } },
   { code: 'calf_l',     side: 'back',  label: { it: 'Polpaccio sinistro', en: 'Left calf' } },
   { code: 'calf_r',     side: 'back',  label: { it: 'Polpaccio destro',   en: 'Right calf' } },
-  { code: 'ankle_l',    side: 'back',  label: { it: 'Caviglia sinistra',  en: 'Left heel & ankle' } },
-  { code: 'ankle_r',    side: 'back',  label: { it: 'Caviglia destra',    en: 'Right heel & ankle' } },
+  // 🔴 «e tallone», non solo «caviglia»: il dolore al tallone da crescita
+  // (apofisite calcaneare) è fra gli infortuni più comuni fra gli 8 e i 14 anni.
+  // Se l'etichetta non lo nomina, chi ha male al tallone non trova dove dirlo.
+  { code: 'ankle_l',    side: 'back',  label: { it: 'Caviglia e tallone sin.', en: 'Left heel & ankle' } },
+  { code: 'ankle_r',    side: 'back',  label: { it: 'Caviglia e tallone des.', en: 'Right heel & ankle' } },
   { code: 'all_over',   side: 'none',  label: { it: 'Dappertutto',        en: 'All over' } },
   { code: 'other',      side: 'none',  label: { it: 'Da un\'altra parte', en: 'Somewhere else' } },
 ]

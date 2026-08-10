@@ -66,6 +66,7 @@ export default function CheckInPost() {
   const [breath, setBreath] = useState<number | null>(null)
   const [energy, setEnergy] = useState<number | null>(null)
   const [headspace, setHeadspace] = useState<string[]>([])
+  const [hsOther, setHsOther] = useState('')
   const [brought, setBrought] = useState<string[]>([])
   const [note, setNote] = useState('')
 
@@ -95,7 +96,7 @@ export default function CheckInPost() {
     return () => { alive = false }
   }, [])
 
-  const hs = headspaceValue(headspace)
+  const hs = headspaceValue(headspace, hsOther)
   const bodyAvg = bodyAverage(legs, breath, energy, hs)
   const ready = actual !== null && effort !== null && bodyAvg !== null
 
@@ -116,7 +117,8 @@ export default function CheckInPost() {
         await saveCheckIn({
           athlete_id: userId, kind: 'post',
           tempo_predicted: predicted, tempo_chosen: actual,
-          effort, legs, breath, energy, headspace,
+          effort, legs, breath, energy, headspace: headspace.filter((h) => h !== '__other'),
+          headspace_other: hsOther.trim() || null,
           brought_home: brought, note: note.trim() || null,
           session_type: session, duration_bucket: duration,
           started_at: startedAt,
@@ -240,10 +242,21 @@ export default function CheckInPost() {
         </p>
         <PillGroup
           label={t.checkin.pre.tuneIn.headspace}
-          options={HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji }))}
+          options={[...HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji })),
+                    { value: '__other', label: t.checkin.pre.tuneIn.headspaceOther }]}
           value={headspace}
           onChange={(v) => setHeadspace((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v])}
         />
+        {headspace.includes('__other') && (
+          <input
+            value={hsOther}
+            onChange={(e) => setHsOther(e.target.value)}
+            maxLength={60}
+            placeholder={t.checkin.pre.tuneIn.headspaceOtherPlaceholder}
+            aria-label={t.checkin.pre.tuneIn.headspaceOther}
+            className="bab-card px-3 py-2 text-[15px]"
+          />
+        )}
       </Card>
 
       <Card label={t.checkin.pre.pinpoint.label}>
