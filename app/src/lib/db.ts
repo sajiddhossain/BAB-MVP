@@ -54,10 +54,31 @@ type LocalRecord = {
 
 let dbPromise: Promise<IDBDatabase> | null = null
 
+/**
+ * 🔴 Aprire IndexedDB può non finire mai.
+ *
+ * In navigazione privata, con lo storage bloccato, o quando un'altra scheda
+ * tiene aperta una versione vecchia del database, `open()` non chiama né
+ * success né error: resta lì. Senza una via d'uscita l'app mostra "un
+ * attimo…" per sempre — che è il modo peggiore di fallire, perché sembra un
+ * problema di rete e lei aspetta.
+ *
+ * Meglio fallire in fretta e dichiararlo: chi chiama ha già un `catch`, e le
+ * schermate degradano a "non c'è ancora niente" invece di girare a vuoto.
+ */
+const OPEN_TIMEOUT_MS = 5_000
+
 function open(): Promise<IDBDatabase> {
   if (dbPromise) return dbPromise
   dbPromise = new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION)
+    const bail = setTimeout(
+      () => reject(new Error('indexeddb-timeout')),
+      OPEN_TIMEOUT_MS,
+    )
+    const settle = <T,>(fn: (v: T) => void) => (v: T) => { clearTimeout(bail); fn(v) }
+    // Un'altra scheda con una versione diversa tiene la porta chiusa.
+    req.onblocked = () => { clearTimeout(bail); reject(new Error('indexeddb-blocked')) }
     req.onupgradeneeded = () => {
       const db = req.result
       if (!db.objectStoreNames.contains(RECORDS)) {
@@ -72,9 +93,12 @@ function open(): Promise<IDBDatabase> {
         s.createIndex('byCreatedAt', 'createdAt')
       }
     }
-    req.onsuccess = () => resolve(req.result)
-    req.onerror = () => reject(req.error)
+    req.onsuccess = () => settle(resolve)(req.result)
+    req.onerror = () => settle(reject)(req.error)
   })
+  // Un fallimento non deve avvelenare i tentativi successivi: la prossima
+  // chiamata riprova invece di ereditare la promessa rotta.
+  dbPromise.catch(() => { dbPromise = null })
   return dbPromise
 }
 
