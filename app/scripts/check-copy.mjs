@@ -48,10 +48,26 @@ const walk = (dir) =>
     return statSync(p).isDirectory() ? walk(p) : p.endsWith('.tsx') ? [p] : []
   })
 
-// Testo fra tag JSX: >Qualcosa di leggibile<
-const JSX_TEXT = />\s*([A-Za-zÀ-ÿ][^<>{}\n]{3,})\s*</g
+/**
+ * Testo fra tag JSX: >Qualcosa di leggibile<
+ *
+ * La prima versione pretendeva che il testo COMINCIASSE con una lettera, e così
+ * `🩹 Mi sono fatta male` passava indisturbato — cioè proprio la forma che il
+ * copy di BAB usa più spesso. Ora basta che una lettera ci sia da qualche parte.
+ */
+const JSX_TEXT = />\s*([^<>{}\n]*[A-Za-zÀ-ÿ][^<>{}\n]{2,})\s*</g
 // Attributi che finiscono davanti agli occhi di chi usa l'app
 const UI_ATTR = /\b(aria-label|placeholder|title|alt)=["']([^"']{2,})["']/g
+
+/**
+ * `>\s*` attraversa gli a capo, quindi il regex sopra sa saltare dalla fine di
+ * un tag al codice della riga dopo e leggerlo come se fosse testo. Il salto
+ * serve — il testo vero spesso sta su una riga sua — quindi invece di
+ * restringerlo si scarta ciò che è palesemente codice.
+ *
+ * Nessuna frase che legge un'atleta contiene `=>`, `===` o `.qualcosa(`.
+ */
+const CODE_ISH = /=>|===|!==|\breturn\b|\bconst\b|\blet\b|\bif\s*\(|\.\w+\(|\?\s*$/
 
 for (const file of walk(new URL('../src', import.meta.url).pathname)) {
   const src = readFileSync(file, 'utf8')
@@ -59,6 +75,7 @@ for (const file of walk(new URL('../src', import.meta.url).pathname)) {
   for (const m of src.matchAll(JSX_TEXT)) {
     const text = m[1].trim()
     if (/^[{}\s|·—–\-•]+$/.test(text)) continue
+    if (CODE_ISH.test(text)) continue
     fail(`${rel}: testo in chiaro nel JSX → "${text}"`)
   }
   for (const m of src.matchAll(UI_ATTR)) {

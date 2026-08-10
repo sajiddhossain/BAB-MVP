@@ -50,7 +50,7 @@ export const CARE = {
 
   /** Quando ha risposto "sì" alla domanda sul dolore protettivo. */
   openerSelfReported: {
-    it: 'Hai segnalato dolore protettivo — bella presa. Qualunque tempo mostrino gli altri canali, quella parte del corpo va in Care oggi. Non è essere molli; è come i pro proteggono una carriera lunga.',
+    it: 'Hai segnalato dolore protettivo — bella presa. Qualunque andatura mostrino gli altri canali, quella parte del corpo va in Care oggi. Non è essere molli; è come i pro proteggono una carriera lunga.',
     en: "You flagged protective pain — smart catch. Whatever tempo your other channels show, that body part goes into Care today. This isn't being soft; it's how pros protect a long career.",
   },
 
@@ -80,8 +80,8 @@ export const CARE = {
 
   /** "Costruito per essere detto ad alta voce" (principio 9), reso azione. */
   borrowWords: {
-    it: 'Parole da prendere in prestito: *«Ho {what} al {where} — devo fermarmi e farlo vedere.»*',
-    en: 'Words you can borrow: *"I\'ve got {what} in my {where} — I need to stop and get it looked at."*',
+    it: 'Parole da prendere in prestito: *«Il mio {where} — {what}. Devo fermarmi e farlo vedere.»*',
+    en: 'Words you can borrow: *"My {where} — {what}. I need to stop and get it looked at."*',
   },
 } satisfies Record<string, unknown>
 
