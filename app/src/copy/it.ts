@@ -287,6 +287,9 @@ export const it = {
     saidTitle: 'E queste sono le parole per iniziare il discorso',
     saidHelp: 'Copiale se ti aiutano — o dille a modo tuo, che è meglio.',
     copyWords: 'Copia queste parole',
+    copied: 'Copiate ✓',
+    saved: 'Salvata',
+    download: 'Salva l\'immagine',
     emptyState: 'Non hai ancora scelto niente — spunta almeno una cosa qui sopra e apparirà qui.',
   },
 

@@ -204,3 +204,28 @@ export async function saveAthleteEvent(
   }, `${date}:${id}`)
   void flush()
 }
+
+export async function recentSignals(limit = 200) {
+  return db.list('body_signals', { limit, desc: true })
+}
+
+/**
+ * La body-story condivisa.
+ *
+ * 🔴 NON contiene i dati: solo l'elenco dei blocchi inclusi e se il ciclo
+ * c'era. Serve a due cose — misurare se la funzione viene davvero usata, e
+ * poter dimostrare che il ciclo non è mai finito in una card senza che lei
+ * l'abbia spuntato. Salvare anche il contenuto renderebbe la prima cosa
+ * inutile e la seconda impossibile da difendere.
+ */
+export async function saveShare(
+  athleteId: string, weekStart: string, blocks: string[],
+  includedCycle: boolean, recipient?: 'coach' | 'parent' | 'physio' | 'other',
+): Promise<void> {
+  const id = newId()
+  await db.put('shares', id, {
+    athlete_id: athleteId, week_start: weekStart, blocks,
+    included_cycle: includedCycle, recipient_kind: recipient ?? null,
+  }, `${weekStart}:${id}`)
+  void flush()
+}

@@ -4,6 +4,7 @@ import HurtButton from './components/HurtButton'
 import Today from './screens/Today'
 import Journey from './screens/Journey'
 import Me from './screens/Me'
+import Story from './screens/Story'
 import CheckInPre from './screens/CheckInPre'
 import CheckInPost from './screens/CheckInPost'
 import SignIn from './screens/SignIn'
@@ -58,6 +59,7 @@ export default function App() {
           <Route path="/today" element={<Today />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/me" element={<Me />} />
+          <Route path="/story" element={<Story />} />
           <Route path="/checkin/pre" element={<CheckInPre />} />
           <Route path="/checkin/post" element={<CheckInPost />} />
           {/* Solo in sviluppo: serve a provare l'onboarding e a mostrarlo

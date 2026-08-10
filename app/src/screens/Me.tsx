@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { fill, useCopy } from '@/copy'
 import { recentCheckIns } from '@/lib/repo'
 import {
@@ -130,10 +131,10 @@ export default function Me() {
         <h2 className="font-display text-[18px]">{t.me.storyTitle}</h2>
         <p className="text-[15px] text-[var(--color-ink-soft)]">{t.me.storyBody}</p>
         {storyReady ? (
-          <button type="button" className="bab-pill self-start px-4 py-2 text-[14px]"
-                  style={{ background: 'var(--color-lime)' }}>
+          <Link to="/story" className="bab-pill self-start px-4 py-2 text-[14px]"
+                style={{ background: 'var(--color-lime)' }}>
             {t.me.storyCta}
-          </button>
+          </Link>
         ) : (
           <p className="text-[13px] text-[var(--color-ink-soft)]">{t.me.storyLocked}</p>
         )}

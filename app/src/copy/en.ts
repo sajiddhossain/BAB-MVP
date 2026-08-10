@@ -261,6 +261,9 @@ export const en: Copy = {
     saidTitle: "And here's how to open the conversation",
     saidHelp: 'Copy this if it helps — or say it your own way, which is better.',
     copyWords: 'Copy these words',
+    copied: 'Copied ✓',
+    saved: 'Saved',
+    download: 'Save the picture',
     emptyState: "Nothing selected yet — pick at least one thing above, and it'll appear here.",
   },
 
