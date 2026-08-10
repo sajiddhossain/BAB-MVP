@@ -42,18 +42,24 @@ export default function HurtPanel({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState<Step>('where')
   const [region, setRegion] = useState<RegionCode | null>(null)
   const [sensation, setSensation] = useState<string | null>(null)
+  const [freeText, setFreeText] = useState('')
 
   const red = sensation ? isRedFlag(sensation) : false
-  const where = region ? regionLabel(region, locale) : ''
+  // Se ha scritto dov'è, vale quello che ha scritto lei: «polso» dice più
+  // di «da un'altra parte», sia a lei sia a chi legge dopo.
+  const where = region === 'other' && freeText.trim()
+    ? freeText.trim()
+    : region ? regionLabel(region, locale) : ''
   const what = sensation ? SENSATIONS.find((s) => s.code === sensation)!.label[locale] : ''
 
   /**
-   * Le etichette sono scritte per stare da sole ("Ginocchio sinistro"), ma qui
-   * finiscono in mezzo a una frase — e «Il mio Ginocchio sinistro» stona.
-   * Sono tutti nomi comuni, quindi la minuscola è sempre corretta.
+   * `what` va minuscolo: sta in mezzo a una frase. `where` NO: apre una frase
+   * o segue un trattino, e sarebbe l'unico posto dove servirebbe un articolo —
+   * che in italiano andrebbe accordato al genere e su un testo scritto da lei
+   * non si può fare.
    */
   const lower = (x: string) => (x ? x.charAt(0).toLowerCase() + x.slice(1) : x)
-  const inSentence = { what: lower(what), where: lower(where) }
+  const inSentence = { what: lower(what), where }
 
   async function choose(code: string) {
     setSensation(code)
@@ -63,7 +69,8 @@ export default function HurtPanel({ onClose }: { onClose: () => void }) {
     if (userId && region) {
       try {
         await saveAcuteSignal({
-          athlete_id: userId, region, sensation: code, is_red_flag: isRedFlag(code),
+          athlete_id: userId, region, region_free: freeText.trim() || null,
+          sensation: code, is_red_flag: isRedFlag(code),
         })
       } catch { /* resta in coda locale; la sicurezza non dipende da questo */ }
     }
@@ -86,8 +93,19 @@ export default function HurtPanel({ onClose }: { onClose: () => void }) {
             <BodyMap
               tone="care"
               selected={region}
-              onSelect={(c) => { setRegion(c); setStep('what') }}
+              freeText={freeText}
+              onFreeText={setFreeText}
+              // «Da un'altra parte» non salta al passo dopo: prima deve poter
+              // scrivere dov'è, altrimenti il campo non lo vedrebbe mai.
+              onSelect={(c) => { setRegion(c); if (c !== 'other') setStep('what') }}
             />
+            {region === 'other' && (
+              <button type="button" onClick={() => setStep('what')}
+                      className="bab-pill self-center px-4 py-2 text-[14px]"
+                      style={{ background: 'var(--color-lime)' }}>
+                {t.checkin.common.next}
+              </button>
+            )}
           </>
         )}
 

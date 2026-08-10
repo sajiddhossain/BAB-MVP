@@ -54,10 +54,18 @@ export const CARE = {
     en: "You flagged protective pain — smart catch. Whatever tempo your other channels show, that body part goes into Care today. This isn't being soft; it's how pros protect a long career.",
   },
 
-  /** Quando è una bandiera rossa dal lessico: l'app la nomina al posto suo. */
+  /**
+   * Quando è una bandiera rossa dal lessico: l'app la nomina al posto suo.
+   *
+   * 🔴 Niente articoli davanti a {where}. In italiano andrebbero accordati al
+   * genere — «il ginocchio» ma «la mandibola» — e {where} può essere una parola
+   * che ha scritto lei nel campo libero, quindi il genere non si può sapere.
+   * «Il mio mandibola» è il tipo di errore che fa sembrare l'app finta proprio
+   * nel momento in cui deve essere presa sul serio.
+   */
   openerRedFlag: {
-    it: 'Hai detto **{what}** al {where} — è il tipo di segnale che si fa guardare invece di attraversare. Bella presa. Quella parte va in Care oggi.',
-    en: "You named **{what}** in your {where} — that's the kind of signal that gets looked at rather than trained through. Good catch. That body part goes into Care today.",
+    it: 'Hai segnalato **{what}** — {where}. È il tipo di segnale che si fa guardare invece di attraversare. Bella presa: quella parte va in Care oggi.',
+    en: "You flagged **{what}** — {where}. That's the kind of signal that gets looked at rather than trained through. Good catch: that body part goes into Care today.",
   },
 
   steps: {
@@ -80,8 +88,8 @@ export const CARE = {
 
   /** "Costruito per essere detto ad alta voce" (principio 9), reso azione. */
   borrowWords: {
-    it: 'Parole da prendere in prestito: *«Il mio {where} — {what}. Devo fermarmi e farlo vedere.»*',
-    en: 'Words you can borrow: *"My {where} — {what}. I need to stop and get it looked at."*',
+    it: 'Parole da prendere in prestito: *«{where} — {what}. Devo fermarmi e farlo vedere.»*',
+    en: 'Words you can borrow: *"{where} — {what}. I need to stop and get it looked at."*',
   },
 } satisfies Record<string, unknown>
 

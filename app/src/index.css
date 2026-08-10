@@ -140,3 +140,20 @@ button, a[role="button"], input, select {
   text-transform: uppercase;
   color: var(--color-ink-soft);
 }
+
+/* La mappa corporea si usa anche da tastiera: senza un anello di fuoco
+   visibile, chi naviga con il tab non sa mai dove si trova. `outline` sugli
+   elementi SVG è supportato dai browser correnti; lo spessore extra è la
+   cintura di sicurezza per quelli che non lo fanno. */
+.bab-zone:focus-visible {
+  outline: 3px solid var(--color-vividteal);
+  outline-offset: 2px;
+}
+.bab-zone:focus-visible > :is(path, ellipse) {
+  stroke-width: 3.5;
+}
+@media (hover: hover) {
+  .bab-zone:hover > :is(path, ellipse) {
+    fill: color-mix(in srgb, var(--color-teal) 12%, transparent);
+  }
+}

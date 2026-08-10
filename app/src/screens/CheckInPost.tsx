@@ -73,6 +73,7 @@ export default function CheckInPost() {
   const [sens, setSens] = useState<string | null>(null)
   const [intensity, setIntensity] = useState<number | null>(null)
   const [behaviour, setBehaviour] = useState<string | null>(null)
+  const [freeText, setFreeText] = useState('')
   const [signals, setSignals] = useState<BodySignalDraft[]>([])
 
   const [done, setDone] = useState(false)
@@ -101,10 +102,10 @@ export default function CheckInPost() {
   function addSignal() {
     if (!region || !sens) return
     setSignals((p) => [...p, {
-      athlete_id: userId ?? '', region, sensation: sens,
-      intensity, behaviour, is_red_flag: isRedFlag(sens),
+      athlete_id: userId ?? '', region, region_free: freeText.trim() || null,
+      sensation: sens, intensity, behaviour, is_red_flag: isRedFlag(sens),
     }])
-    setRegion(null); setSens(null); setIntensity(null); setBehaviour(null)
+    setRegion(null); setSens(null); setIntensity(null); setBehaviour(null); setFreeText('')
   }
 
   async function submit() {
@@ -264,10 +265,20 @@ export default function CheckInPost() {
             ))}
           </ul>
         )}
-        <BodyMap selected={region} logged={signals.map((s) => s.region as RegionCode)} onSelect={setRegion} />
+        <BodyMap
+          selected={region}
+          logged={signals.map((s) => s.region as RegionCode)}
+          flagged={signals.filter((s) => s.is_red_flag).map((s) => s.region as RegionCode)}
+          freeText={freeText}
+          onFreeText={setFreeText}
+          onSelect={setRegion}
+        />
         {region && (
           <div className="flex flex-col gap-3">
-            <p className="bab-label">{regionLabel(region, locale)} · {t.checkin.pre.pinpoint.whatLike}</p>
+            <p className="bab-label">
+              {region === 'other' && freeText.trim() ? freeText.trim() : regionLabel(region, locale)}
+              {' · '}{t.checkin.pre.pinpoint.whatLike}
+            </p>
             {(['good', 'notice', 'flag'] as const).map((g) => (
               <div key={g} className="flex flex-col gap-1.5">
                 <p className="text-[12.5px] text-[var(--color-ink-soft)]">{GROUP_LABEL[g][locale]}</p>
