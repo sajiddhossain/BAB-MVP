@@ -21,9 +21,16 @@ const RECORDS = 'records'
 /** Inserimenti non ancora arrivati al server. */
 const PENDING = 'pending'
 
+/**
+ * Solo le tabelle che l'app dell'atleta SCRIVE. Le tabelle di squadra
+ * (`teams`, `team_staff`, `athlete_measurements`…) non sono qui di proposito:
+ * l'app dell'atleta non deve poterci scrivere nemmeno per sbaglio, e altezza e
+ * peso non devono neanche transitare da questo dispositivo.
+ */
 export type TableName =
   | 'athletes' | 'consents' | 'check_ins' | 'body_signals'
   | 'red_flags' | 'cycle_events' | 'journey_progress' | 'shares' | 'ux_events'
+  | 'athlete_schedule' | 'athlete_events'
 
 export type PendingOp = {
   /** UUID generato sul client: rende l'inserimento idempotente. */

@@ -67,7 +67,7 @@ const UI_ATTR = /\b(aria-label|placeholder|title|alt)=["']([^"']{2,})["']/g
  *
  * Nessuna frase che legge un'atleta contiene `=>`, `===` o `.qualcosa(`.
  */
-const CODE_ISH = /=>|===|!==|\breturn\b|\bconst\b|\blet\b|\bif\s*\(|\.\w+\(|\?\s*$/
+const CODE_ISH = /=>|===|!==|&&|\|\||\breturn\b|\bconst\b|\blet\b|\bif\s*\(|\.\w+\(|\?\s*$|^=\s/
 
 for (const file of walk(new URL('../src', import.meta.url).pathname)) {
   const src = readFileSync(file, 'utf8')
