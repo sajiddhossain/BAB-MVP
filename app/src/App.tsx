@@ -4,6 +4,7 @@ import HurtButton from './components/HurtButton'
 import Today from './screens/Today'
 import Journey from './screens/Journey'
 import Me from './screens/Me'
+import CheckInPre from './screens/CheckInPre'
 import SignIn from './screens/SignIn'
 import { useSession } from './lib/session'
 import { useCopy } from './copy'
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/today" element={<Today />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/me" element={<Me />} />
+          <Route path="/checkin/pre" element={<CheckInPre />} />
           <Route path="*" element={<Navigate to="/today" replace />} />
         </Routes>
       </main>

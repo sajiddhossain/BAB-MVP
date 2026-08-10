@@ -135,10 +135,14 @@ export const it = {
         confidence: 'Quanto sei sicura?',
         confidenceOptions: ['Tiro a indovinare', 'Abbastanza', 'Sicura'],
         sleepHours: 'Quanto hai dormito?',
+        sleepHoursOptions: ['Meno di 6h', '6–7h', '7–8h', '8–9h', 'Più di 9h'],
       },
       tuneIn: {
         label: 'Passo 2 · Sintonizzati',
         title: 'I tuoi canali',
+        /** Resta in inglese: è vocabolario del prodotto, come i nomi delle andature. */
+        headspace: '🧠 Headspace',
+        headspaceHelp: 'tocca quelle che ti somigliano',
         surprise: 'Qualcosa ti ha sorpresa?',
         surpriseOptions: ['No, come pensavo', 'Sì, un po\'', 'Sì, parecchio'],
         schoolLoad: 'Com\'è la scuola in questi giorni?',
@@ -160,6 +164,10 @@ export const it = {
       result: {
         compareLabel: 'Passo 3 · Confronta — la tua lettura contro il tuo corpo',
         planLabel: 'Passo 4 · Aggiusta — il tuo piano di oggi',
+        /** 🔴 Sbagliare la previsione non è un errore: è il meccanismo che lavora. */
+        matched: 'Avevi indovinato: **{tempo}**.',
+        differed: 'Avevi previsto **{predicted}**, i tuoi segnali dicono **{suggested}**.',
+        gapNote: 'Questo scarto è la cosa più utile di tutto il check-in — è così che impari a leggerti. Non è un errore.',
         swapLabel: 'Il tuo corpo, la tua chiamata. Vuoi cambiare andatura?',
         copyForCoach: 'Copia cosa dire al coach',
         again: 'Nuovo check-in',
@@ -185,6 +193,8 @@ export const it = {
         notToday: 'Non oggi',
       },
       recoverLabel: 'Passo 4 · Recupera — cosa chiede il tuo corpo adesso',
+      saving: 'Salvo…',
+      saved: 'Salvato. Anche senza campo: parte da solo quando torna.',
     },
   },
 

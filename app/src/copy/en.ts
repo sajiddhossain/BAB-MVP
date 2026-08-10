@@ -116,10 +116,13 @@ export const en: Copy = {
         confidence: 'How sure are you?',
         confidenceOptions: ['Just guessing', 'Fairly sure', 'Certain'],
         sleepHours: 'How much did you sleep?',
+        sleepHoursOptions: ['Under 6h', '6–7h', '7–8h', '8–9h', 'Over 9h'],
       },
       tuneIn: {
         label: 'Step 2 · Tune in',
         title: 'Your channels',
+        headspace: '🧠 Headspace',
+        headspaceHelp: 'tap any that fit',
         surprise: 'Did anything surprise you?',
         surpriseOptions: ['No, as expected', 'A little', 'Quite a bit'],
         schoolLoad: "How's school right now?",
@@ -141,6 +144,9 @@ export const en: Copy = {
       result: {
         compareLabel: 'Step 3 · Compare — your read vs your body',
         planLabel: 'Step 4 · Adjust — your plan today',
+        matched: 'You called it: **{tempo}**.',
+        differed: 'You predicted **{predicted}**, your signals say **{suggested}**.',
+        gapNote: "That gap is the most useful thing in the whole check-in — it's how you learn to read yourself. It isn't a mistake.",
         swapLabel: 'Your body, your call. Want to shift tempo?',
         copyForCoach: 'Copy what to tell your coach',
         again: 'New tune-in',
@@ -166,6 +172,8 @@ export const en: Copy = {
         notToday: 'Not today',
       },
       recoverLabel: "Step 4 · Recover — what your body's asking for now",
+      saving: 'Saving…',
+      saved: "Saved. Even with no signal: it sends itself when you're back.",
     },
   },
 
