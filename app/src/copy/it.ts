@@ -376,6 +376,40 @@ export const it = {
     doneCta: 'Inizia il mio primo check-in',
   },
 
+  /**
+   * La dashboard squadra (R5). Il tono cambia: qui legge un adulto, e serve
+   * chiarezza, non incoraggiamento. Ma non diventa mai un cruscotto di
+   * sorveglianza: niente classifiche, niente confronti fra atlete.
+   */
+  coach: {
+    title: 'La squadra',
+    subtitle: 'Oggi, in un colpo d\'occhio',
+    notConnected: 'La dashboard ha bisogno della connessione: legge i dati di tutta la squadra dal server, non da questo dispositivo.',
+    noTeams: 'Questo account non è associato a nessuna squadra. Se dovrebbe esserlo, scrivici.',
+    redFlagsTitle: '🚩 Da guardare adesso',
+    redFlagsHelp: 'Segnalazioni aperte, dalla più vecchia. Non aspettano il prossimo allenamento.',
+    redFlagsNone: 'Nessuna segnalazione aperta.',
+    toldAdult: 'l\'ha detto a un adulto',
+    notToldAdult: 'non risulta detto a nessuno',
+    openedToday: 'oggi',
+    openedDays: 'da {n} giorni',
+    rosterTitle: 'Chi c\'è',
+    checkedInNo: 'nessun check-in oggi',
+    onlyPre: 'solo il prima',
+    predicted: 'prevista',
+    trained: 'allenata',
+    effort: 'sforzo',
+    peYes: 'ed. fisica ✓',
+    peNo: 'ed. fisica ✗',
+    back: '← La squadra',
+    historyTitle: 'Le ultime due settimane',
+    cycleTitle: 'Date del ciclo',
+    /** 🔴 Il coach le vede (R2). Come le legge non è ovvio, quindi si scrive. */
+    cycleNote: 'Sono le date che ha inserito lei, non una previsione. Alla sua età i cicli spesso non sono ancora regolari: servono come contesto per capire una giornata, mai per programmare o per farne un tema di conversazione se non è lei ad aprirlo.',
+    cycleNone: 'Nessuna data inserita.',
+    nothingYet: 'Ancora nessun check-in.',
+  },
+
   settings: {
     title: 'Impostazioni',
     profile: 'Profilo',

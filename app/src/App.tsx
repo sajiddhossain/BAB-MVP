@@ -9,13 +9,23 @@ import CheckInPre from './screens/CheckInPre'
 import CheckInPost from './screens/CheckInPost'
 import SignIn from './screens/SignIn'
 import Onboarding from './screens/Onboarding'
+import Roster from './screens/team/Roster'
+import TeamAthlete from './screens/team/Athlete'
 import { useSession } from './lib/session'
 import { getProfile } from './lib/repo'
 import { useCopy } from './copy'
 import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 export default function App() {
   const { userId, loading, connected } = useSession()
+  const { pathname } = useLocation()
+  /**
+   * 🔴 Un coach NON è un'atleta: non ha un profilo, non fa check-in, e non
+   * deve passare dall'onboarding. Senza questa deviazione il gate del
+   * profilo lo intrappolerebbe in una procedura scritta per una tredicenne.
+   */
+  const isTeam = pathname.startsWith('/team')
   const t = useCopy()
   /** `null` = non ancora controllato. */
   const [hasProfile, setHasProfile] = useState<boolean | null>(null)
@@ -40,11 +50,23 @@ export default function App() {
   // 🔴 Senza profilo non si entra: l'onboarding è dove si raccolgono il
   // consenso e lo stato del ciclo, e senza quelli metà del prodotto non può
   // funzionare — né legalmente né tecnicamente.
-  if (userId && hasProfile === false) {
+  if (userId && hasProfile === false && !isTeam) {
     return <Onboarding onDone={() => setHasProfile(true)} />
   }
-  if (userId && hasProfile === null) {
+  if (userId && hasProfile === null && !isTeam) {
     return <p className="p-8 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
+  }
+
+  // La dashboard squadra ha una sua impaginazione: niente tab dell'atleta,
+  // niente pulsante «mi sono fatta male», e più larghezza — si guarda da un
+  // portatile, non da un telefono in palestra.
+  if (isTeam) {
+    return (
+      <Routes>
+        <Route path="/team" element={<Roster />} />
+        <Route path="/team/:athleteId" element={<TeamAthlete />} />
+      </Routes>
+    )
   }
 
   return (

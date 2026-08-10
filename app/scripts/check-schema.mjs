@@ -15,7 +15,7 @@
  * Non sostituisce l'esecuzione dello schema: la sintassi la valida Postgres.
  * Serve a impedire che qualcuno aggiunga `note` alla vista senza accorgersene.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
@@ -63,6 +63,63 @@ for (const chunk of code.split(/create or replace function public\./).slice(1)) 
 // ── 4 · altezza e peso non devono mai essere leggibili dall'atleta ──────────
 if (/create policy[^;]*on public\.athlete_measurements[^;]*auth\.uid\(\)/.test(code)) {
   errors.push('athlete_measurements: una policy nomina auth.uid() — R5 dice che l\'atleta non le vede.')
+}
+
+// ── 5 · la dashboard squadra legge solo dalle viste ─────────────────────────
+// La regola R2 vive nelle colonne delle viste. Se una query dello staff
+// interroga una tabella di base, quella garanzia sparisce e nessuno se ne
+// accorge finché non finisce una nota di un'atleta davanti al suo coach.
+const coachFile = join(root, 'src/lib/coach.ts')
+if (existsSync(coachFile)) {
+  const coach = readFileSync(coachFile, 'utf8').replace(/\/\/.*$/gm, '')
+  // `team_staff` e `teams` sono ammesse: dicono di quali squadre fa parte CHI
+  // sta guardando, e non contengono nessun dato delle atlete.
+  const ALLOWED = new Set(['team_staff', 'teams', 'team_sessions', 'team_events'])
+  for (const m of coach.matchAll(/\.from\(['"](\w+)['"]\)/g)) {
+    const table = m[1]
+    if (table.startsWith('coach_') || ALLOWED.has(table)) continue
+    errors.push(`coach.ts interroga "${table}": lo staff legge solo dalle viste coach_*.`)
+  }
+  for (const col of FREE_TEXT) {
+    if (new RegExp(`['"\\s,]${col}['"\\s,]`).test(coach)) {
+      errors.push(`coach.ts nomina "${col}", che è testo libero e non deve arrivare allo staff.`)
+    }
+  }
+}
+
+// ── 6 · le colonne chieste dalla dashboard esistono davvero ────────────────
+// Non sostituisce l'esecuzione contro il database, ma prende la classe di
+// errore più probabile: una colonna scritta male o che nella vista non c'è.
+// Senza database non si scoprirebbe fino al primo coach che apre la pagina.
+if (existsSync(coachFile)) {
+  const coach = readFileSync(coachFile, 'utf8')
+  /** Le colonne di ogni vista, lette dalla sua definizione. */
+  const cols = {}
+  for (const chunk of code.split(/create or replace view public\./).slice(1)) {
+    const name = chunk.split(/\s/)[0]
+    const body = chunk.slice(chunk.indexOf('as'), chunk.indexOf(';'))
+    const selectPart = body.slice(0, body.search(/\bfrom\b/))
+    cols[name] = new Set(
+      selectPart
+        .replace(/^\s*as\s+select/i, '')
+        .split(',')
+        .map((c) => {
+          const asAlias = c.match(/\bas\s+(\w+)\s*$/i)
+          if (asAlias) return asAlias[1]
+          const last = c.trim().split(/[.\s]/).pop()
+          return (last || '').trim()
+        })
+        .filter((c) => /^\w+$/.test(c)),
+    )
+  }
+  for (const m of coach.matchAll(/\.from\(['"](coach_\w+)['"]\)\s*\n?\s*\.select\(\s*['"]([^'"]+)['"]/g)) {
+    const [, view, list] = m
+    const known = cols[view]
+    if (!known) { errors.push(`coach.ts interroga la vista "${view}", che non esiste nello schema.`); continue }
+    for (const col of list.split(',').map((c) => c.trim()).filter(Boolean)) {
+      if (!known.has(col)) errors.push(`coach.ts chiede "${col}" a ${view}, che non ce l'ha.`)
+    }
+  }
 }
 
 if (errors.length) {
