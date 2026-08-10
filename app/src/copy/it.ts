@@ -47,7 +47,8 @@ export const it = {
     /** Detto prima di toccare il bottone, non dopo. */
     socialNote: 'Con Google, Google saprà che usi BAB. Con il link via email, no.',
     ageNote: 'Google ha un\'età minima, quindi potrebbe non funzionare per te — e va benissimo. Il link via email funziona sempre.',
-    trouble: 'Qualcosa non funziona?',
+    trouble: 'Qualcosa non ha funzionato',
+    troubleBody: 'Non siamo riusciti a mandare il link. Controlla l\'indirizzo e riprova — se continua, dillo a noi.',
     signOut: 'Esci',
   },
 

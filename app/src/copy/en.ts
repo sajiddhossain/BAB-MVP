@@ -32,7 +32,8 @@ export const en: Copy = {
     google: 'Continue with Google',
     socialNote: "With Google, Google will know you use BAB. With the email link, it won't.",
     ageNote: "Google has a minimum age, so it might not work for you — which is completely fine. The email link always works.",
-    trouble: 'Something not working?',
+    trouble: 'Something went wrong',
+    troubleBody: "We couldn't send the link. Check the address and try again — if it keeps happening, tell us.",
     signOut: 'Sign out',
   },
 
