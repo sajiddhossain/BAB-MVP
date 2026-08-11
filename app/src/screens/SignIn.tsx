@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fill, useCopy } from '@/copy'
-import { googleEnabled, signInWithEmail, signInWithGoogle } from '@/lib/session'
+import { googleEnabled, signInWithCode, signInWithEmail, signInWithGoogle } from '@/lib/session'
 
 /**
  * Come si entra.
@@ -23,6 +23,8 @@ export default function SignIn() {
   const [email, setEmail] = useState('')
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [google, setGoogle] = useState(false)
+  const [code, setCode] = useState('')
+  const [codeState, setCodeState] = useState<'idle' | 'checking' | 'wrong'>('idle')
 
   useEffect(() => {
     let alive = true
@@ -39,6 +41,17 @@ export default function SignIn() {
     // "Failed to fetch" non le dice cosa fare e la fa sentire in difetto.
     console.error('[auth]', r.error)
     setState('error')
+  }
+
+  async function enterWithCode(e: React.FormEvent) {
+    e.preventDefault()
+    setCodeState('checking')
+    const r = await signInWithCode(email, code)
+    // Se è andata, `onAuthStateChange` cambia schermata da solo: qui non c'è
+    // niente da fare se non restare fermi finché non succede.
+    if (r.ok) return
+    console.error('[auth]', r.error)
+    setCodeState('wrong')
   }
 
   return (
@@ -59,6 +72,40 @@ export default function SignIn() {
           <button type="button" onClick={() => setState('idle')} className="bab-pill self-start px-4 py-2 text-[13px]">
             {t.auth.sentAgain}
           </button>
+
+          {/* Il codice, sotto il link e non al posto suo: per la maggior parte
+              il link basta, e chi ne ha bisogno lo trova senza cercarlo. */}
+          <p className="mt-1 text-[13.5px] text-[var(--color-ink-soft)]">{t.auth.codeHint}</p>
+          <form onSubmit={enterWithCode} className="flex items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <label className="bab-label" htmlFor="code">{t.auth.codeLabel}</label>
+              <input
+                id="code"
+                type="text"
+                required
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                pattern="[0-9]*"
+                maxLength={6}
+                value={code}
+                onChange={(e) => { setCode(e.target.value.replace(/\D/g, '')); setCodeState('idle') }}
+                placeholder={t.auth.codePlaceholder}
+                className="bab-card w-[11ch] px-2 py-2.5 text-center text-[17px] tracking-[0.2em]"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={codeState === 'checking' || code.length < 6}
+              className="bab-pill px-4 py-2.5 text-[14px] disabled:opacity-40"
+            >
+              {codeState === 'checking' ? t.auth.codeChecking : t.auth.codeSubmit}
+            </button>
+          </form>
+          {codeState === 'wrong' && (
+            <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
+              {t.auth.codeWrong}
+            </p>
+          )}
         </div>
       ) : (
         <form onSubmit={sendLink} className="flex flex-col gap-3">

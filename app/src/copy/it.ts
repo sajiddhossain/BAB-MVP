@@ -65,6 +65,18 @@ export const it = {
     sentTitle: 'Guarda la posta',
     sentBody: 'Abbiamo mandato un link a **{email}**. Aprilo da questo telefono ed è fatta.',
     sentAgain: 'Non è arrivato? Rimandalo',
+    /**
+     * 🔴 La seconda strada, non un dettaglio. Su iPhone il link aperto dalla
+     * posta finisce spesso in un browser diverso da quello dove c'è BAB: la
+     * sessione si apre nel posto sbagliato e da lì sembra che non funzioni
+     * niente. Il codice si copia e si incolla dove sei già.
+     */
+    codeHint: 'Il link non si apre dove vuoi tu? Nella stessa email c\'è un codice a 6 cifre.',
+    codeLabel: 'Codice',
+    codePlaceholder: '123456',
+    codeSubmit: 'Entra',
+    codeChecking: 'Controllo…',
+    codeWrong: 'Codice sbagliato o scaduto. Rimanda la mail e riprova.',
     or: 'oppure',
     google: 'Continua con Google',
     /** Detto prima di toccare il bottone, non dopo. */

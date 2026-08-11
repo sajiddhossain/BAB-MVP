@@ -130,6 +130,44 @@ un motivo per non offrirlo — è un motivo per scriverlo, e il copy in `src/cop
 > come organizzazione, e un client secret JWT da rigenerare ogni 6 mesi — per una comodità
 > che il link via email copre già.
 
+### 4c-bis · Il codice a 6 cifre — e come entrare senza aspettare l'email
+
+Sotto «Guarda la posta» c'è anche un campo per il codice. Non è un ripiego: su
+iPhone il link aperto dalla posta si apre spesso in un browser diverso da quello
+dove BAB è installata, la sessione nasce nel posto sbagliato, e da lì sembra che
+l'app sia rotta. Il codice si incolla dove sei già.
+
+🔴 Perché il codice arrivi davvero, il template deve contenerlo. Dashboard →
+**Authentication → Emails → Magic Link**: accanto al link metti anche
+
+```
+{{ .Token }}
+```
+
+Senza quella riga il campo c'è ma nell'email non c'è niente da copiare.
+
+**Per entrare senza aspettare l'email** — utile per le demo e per il primo
+accesso da admin — Supabase ha i **Test OTP**: legano un indirizzo a un codice
+fisso e non mandano niente. Dashboard → **Authentication**, cerca *Test OTPs*, e
+aggiungi una riga tipo:
+
+```
+bab@babsport.com:123456
+```
+
+Da lì: scrivi l'indirizzo → «Mandami il link» → incolli il codice fisso → dentro.
+Nessuna email, nessuna attesa.
+
+🔴 Perché così e non con una scorciatoia nel codice: `bab@babsport.com` sarà un
+account **admin**, e una riga tipo «se l'email è questa, entra» starebbe nel
+bundle JavaScript — cioè pubblica, leggibile da chiunque apra i sorgenti del
+sito. Sarebbe una porta di servizio per la console admin di un'app che tiene
+dati di minorenni. Il codice fisso invece vive nella dashboard: si cambia in
+dieci secondi, si toglie in dieci secondi, e non lo vede nessuno.
+
+🔵 Toglilo dai Test OTP prima di aprire il pilota. Finché c'è, chi conosce
+quelle sei cifre entra come te.
+
 ## 4d · Il primo admin — una riga di SQL, una volta sola
 
 `team_staff` dice chi vede una squadra. Non dice chi può *crearne* una, iscriverci
@@ -189,6 +227,48 @@ await bab.parked()       // []  ← se non è vuoto, guarda lastError
 
 Se `flush` restituisce `parked: 1`, la riga ha violato un `CHECK` o la RLS: l'errore
 è in `lastError` e la riga **non** viene ritentata all'infinito.
+
+## 7 · Vercel
+
+[`vercel.json`](vercel.json) è già nel repo. Fa due cose che senza di lui non
+succedono: rimanda ogni indirizzo a `index.html` (senza, un ricaricamento su
+`/settings/agenda` dà 404, perché quel file sul disco non esiste), e impedisce
+che `sw.js` venga messo in cache — un service worker congelato serve la vecchia
+app a chi ha già installato la PWA, e non se ne esce più.
+
+Su [vercel.com](https://vercel.com) → **Add New → Project** → importa
+`sajiddhossain/BAB-MVP`:
+
+| Campo | Valore |
+|---|---|
+| **Root Directory** | `app` 🔴 senza questo non trova niente |
+| Framework | Vite (lo riconosce da solo) |
+| Environment Variables | `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`, gli stessi di `app/.env` |
+
+Le variabili vanno messe a mano perché `.env` è gitignorato, ed è giusto così
+anche se sono pubbliche: un file di configurazione che si trascina nel repo
+prima o poi ci si porta dentro qualcos'altro.
+
+🔴 **Appena hai il dominio**, torna su Supabase → **Authentication → URL
+Configuration**:
+- **Site URL** → `https://<il-dominio>.vercel.app`
+- **Redirect URLs** → aggiungi sia `https://<il-dominio>.vercel.app` sia
+  `https://*.vercel.app` (le anteprime di ogni push hanno un indirizzo diverso;
+  senza il jolly il link via email non torna indietro da nessuna anteprima).
+
+E se hai configurato Google, aggiungi lo stesso dominio anche fra le origini
+autorizzate in Google Cloud Console.
+
+### Prima che lo veda qualcuno che non sei tu
+
+Un deploy è un indirizzo pubblico. Tre cose non ci sono ancora, e nessuna è
+bloccante per provarla in due, ma tutt'e tre lo sono per il pilota:
+
+- lo **schema** (§2), senza il quale si entra e poi non si salva niente;
+- il testo legale del **consenso**, che oggi non è scritto da nessuna parte;
+- un **SMTP vero**. Quello incluso in Supabase ha un limite basso di email
+  all'ora ed è dichiaratamente non per la produzione: con una squadra intera che
+  entra lo stesso pomeriggio, le ultime non ricevono il link.
 
 ---
 

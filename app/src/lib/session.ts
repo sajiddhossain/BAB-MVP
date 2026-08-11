@@ -52,6 +52,29 @@ export async function signInWithEmail(email: string): Promise<AuthResult> {
 }
 
 /**
+ * Lo stesso accesso, col codice invece del link.
+ *
+ * 🔴 Non è un ripiego: su iPhone il link aperto dalla posta si apre spesso in
+ * un browser diverso da quello dove BAB è installata, e la sessione nasce nel
+ * posto sbagliato — da lì sembra che l'app non funzioni. Il codice si incolla
+ * dove sei già, e quel problema non esiste.
+ *
+ * 🔵 È anche la strada per entrare **senza aspettare l'email**: i «Test OTP»
+ * della dashboard di Supabase legano un indirizzo a un codice fisso. Quel
+ * codice sta lì, non qui: metterlo nel bundle vorrebbe dire regalare
+ * quell'account a chiunque apra i sorgenti.
+ */
+export async function signInWithCode(email: string, token: string): Promise<AuthResult> {
+  if (!supabase) return { ok: false, error: 'not-connected' }
+  const { error } = await supabase.auth.verifyOtp({
+    email: email.trim(),
+    token: token.trim(),
+    type: 'email',
+  })
+  return error ? { ok: false, error: error.message } : { ok: true }
+}
+
+/**
  * Google. Comodità per chi ce l'ha già — utile soprattutto per lo staff, che
  * sono adulti senza vincoli d'età e accedono da un portatile.
  */
