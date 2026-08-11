@@ -64,6 +64,33 @@ export async function signInWithGoogle(): Promise<AuthResult> {
   return error ? { ok: false, error: error.message } : { ok: true }
 }
 
+/**
+ * Google è **acceso nella dashboard, non nel codice** (SUPABASE.md §4b), quindi
+ * il codice non può saperlo: deve chiederlo. `/auth/v1/settings` è pubblico e
+ * dice quali provider sono configurati.
+ *
+ * 🔴 Serve perché il tasto c'è comunque: senza questa risposta, un progetto in
+ * cui Google non è ancora stato configurato mostra un bottone che porta a una
+ * pagina d'errore di Supabase. A una dodicenne quell'errore sembra colpa sua —
+ * ed è esattamente quello che `ageNote` esiste per evitare.
+ *
+ * In caso di dubbio si nasconde: il link via email funziona sempre (R12), un
+ * bottone rotto no.
+ */
+export async function googleEnabled(): Promise<boolean> {
+  if (!supabase) return false
+  try {
+    const r = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/auth/v1/settings`, {
+      headers: { apikey: import.meta.env.VITE_SUPABASE_ANON_KEY as string },
+    })
+    if (!r.ok) return false
+    const s = (await r.json()) as { external?: Record<string, boolean> }
+    return s.external?.google === true
+  } catch {
+    return false
+  }
+}
+
 export async function signOut(): Promise<void> {
   await supabase?.auth.signOut()
 }

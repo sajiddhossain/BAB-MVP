@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { fill, useCopy } from '@/copy'
-import { signInWithEmail, signInWithGoogle } from '@/lib/session'
+import { googleEnabled, signInWithEmail, signInWithGoogle } from '@/lib/session'
 
 /**
  * Come si entra.
@@ -13,11 +13,22 @@ import { signInWithEmail, signInWithGoogle } from '@/lib/session'
  *
  * Per lo stesso motivo `ageNote` sta lì: se Google non funziona, deve sembrare
  * normale e non un errore suo.
+ *
+ * E se Google non è *configurato* sul progetto, tutto il blocco sparisce: le
+ * due note sotto parlano solo di Google, e senza il bottone non vogliono dire
+ * niente.
  */
 export default function SignIn() {
   const t = useCopy()
   const [email, setEmail] = useState('')
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [google, setGoogle] = useState(false)
+
+  useEffect(() => {
+    let alive = true
+    void googleEnabled().then((on) => { if (alive) setGoogle(on) })
+    return () => { alive = false }
+  }, [])
 
   async function sendLink(e: React.FormEvent) {
     e.preventDefault()
@@ -81,6 +92,8 @@ export default function SignIn() {
         </div>
       )}
 
+      {google && (
+      <>
       <div className="flex items-center gap-3 text-[13px] text-[var(--color-ink-soft)]">
         <span className="h-px flex-1" style={{ background: 'var(--color-sand)' }} />
         {t.auth.or}
@@ -103,6 +116,8 @@ export default function SignIn() {
 
       <p className="text-[13px] text-[var(--color-ink-soft)]">{t.auth.ageNote}</p>
       <p className="text-[13px] text-[var(--color-ink-soft)]">{t.auth.socialNote}</p>
+      </>
+      )}
     </div>
   )
 }

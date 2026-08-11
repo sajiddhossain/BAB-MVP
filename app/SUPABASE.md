@@ -37,7 +37,13 @@ La creazione dell'account non posso farla io. Su [supabase.com](https://supabase
    🔴 La regione conta: dati di minorenni, quindi server UE (§9).
 3. Segnati la password del database che ti fa scegliere: serve una volta sola, al passo 3.
 
-## 2 · Lo schema — 30 secondi, zero segreti condivisi
+## 2 · Lo schema — 30 secondi, zero segreti condivisi — 🔴 **da fare**
+
+> Stato al momento del collegamento: il progetto risponde (GoTrue attivo, email
+> acceso, Google spento) ma `public.athletes` e tutte le altre non esistono
+> ancora — PostgREST risponde `PGRST205`. Questo passo lo devi fare tu: con la
+> sola chiave pubblica non si crea niente, ed è giusto così.
+
 
 Nel dashboard → **SQL Editor** → **New query** → incolla tutto il contenuto di
 [`supabase/schema.sql`](supabase/schema.sql) → **Run**.
@@ -48,17 +54,27 @@ Poi verifica che la RLS sia attiva: **Table Editor** → ogni tabella deve mostr
 `RLS enabled`. Se una non ce l'ha, i dati sono leggibili da chiunque abbia la chiave
 anon — che è pubblica.
 
-## 3 · Le chiavi
+## 3 · Le chiavi — ✅ fatto
 
-Dashboard → **Project Settings** → **API**. Copia in `app/.env`:
+`app/.env` c'è ed è gitignorato; il client non è più `null` e la schermata
+d'accesso compare. Dashboard → **Project Settings** → **API**. Copia in `app/.env`:
 
 ```
 VITE_SUPABASE_URL=https://xxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOi...
 ```
 
+La chiave può chiamarsi `anon` `public` (`eyJ...`, formato vecchio) oppure
+**Publishable** (`sb_publishable_...`, formato nuovo): stessa variabile, stesso
+ruolo. Vanno tutt'e due bene con `@supabase/supabase-js` ≥ 2.
+
 Queste due sono **pubbliche per design**: finiscono nel bundle del frontend, ed è la
 RLS a proteggere i dati. Puoi passarmele senza problemi.
+
+🔴 Quella che **non** va mai in `.env` né in chat è la `service_role` /
+**Secret key** (`sb_secret_...`): scavalca tutta la RLS, quindi con quella in
+mano si leggono i dati di tutte. Se scappa, si rigenera dalla dashboard —
+cancellare il messaggio non basta.
 
 **La password del database e il personal access token non servono all'app** e non
 vanno in `.env`. Se ti serve che li usi io per qualcosa, mettili in un file che non
@@ -96,6 +112,12 @@ accedono da un portatile dove copiare un codice dalla mail è più scomodo.
 
 🔵 Client ID e Client Secret di Google **non vanno in `.env`**: si incollano nella
 dashboard di Supabase, che li tiene lato server. Nel frontend non ci finiscono mai.
+
+🔵 Non c'è niente da toccare nel codice: la schermata d'accesso chiede a
+`/auth/v1/settings` quali provider sono accesi e **mostra il bottone Google solo
+se lo è** (`session.googleEnabled`). Finché non lo configuri, il bottone non
+c'è — invece di portare a una pagina d'errore di Supabase che una dodicenne
+leggerebbe come colpa sua.
 
 ### 4c · Cosa va detto nel consenso
 
