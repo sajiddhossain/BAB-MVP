@@ -47,6 +47,16 @@ type Props = {
    * funziona.
    */
   onSkip?: () => void
+  /**
+   * Il passo occupa esattamente lo schermo e non scorre: quello che sta dentro
+   * si adatta all'altezza rimasta.
+   *
+   * 🔴 Serve dove il contenuto è una COSA DA TOCCARE, non da leggere. La mappa
+   * corporea è il caso limite: per arrivare al ginocchio bisognava far salire
+   * la figura, e la figura si sposta sotto il dito mentre lo si appoggia. Con
+   * una domanda a pillole scorrere è solo scomodo; lì fa sbagliare punto.
+   */
+  fill?: boolean
 }
 
 /**
@@ -76,7 +86,7 @@ export function Progress({ at, of }: { at: number; of: number }) {
 
 export default function Step({
   section, at, of, question, help, children,
-  onBack, onClose, dirty, onNext, nextLabel, onSkip,
+  onBack, onClose, dirty, onNext, nextLabel, onSkip, fill = false,
 }: Props) {
   const t = useCopy()
   const head = useRef<HTMLHeadingElement>(null)
@@ -94,7 +104,12 @@ export default function Step({
   }, [question])
 
   return (
-    <section className="flex min-h-[calc(100dvh-96px)] flex-col gap-5 pt-1">
+    <section className={`flex flex-col pt-1 ${
+      fill
+        // Altezza esatta e niente scorrimento: quello che c'è dentro si stringe.
+        ? 'h-[calc(100dvh-96px-env(safe-area-inset-top))] gap-3 overflow-hidden'
+        : 'min-h-[calc(100dvh-96px)] gap-5'
+    }`}>
       <header className="flex items-center gap-3">
         <button
           type="button"
@@ -141,16 +156,25 @@ export default function Step({
         </div>
       )}
 
-      <div className="flex flex-1 flex-col gap-4">
-        {section && <p className="bab-label">{section}</p>}
-        <h1 ref={head} tabIndex={-1} className="bab-heading-focus font-display text-[27px] leading-[1.12]">
+      <div className={`flex flex-1 flex-col ${fill ? 'min-h-0 gap-2' : 'gap-4'}`}>
+        {section && <p className="bab-label shrink-0">{section}</p>}
+        <h1 ref={head} tabIndex={-1}
+            className={`bab-heading-focus shrink-0 font-display leading-[1.12] ${
+              fill ? 'text-[22px]' : 'text-[27px]'
+            }`}>
           {question}
         </h1>
-        {help && <p className="text-[15px] leading-snug text-[var(--color-ink-soft)]">{help}</p>}
+        {help && (
+          <p className={`shrink-0 leading-snug text-[var(--color-ink-soft)] ${
+            fill ? 'text-[13.5px]' : 'text-[15px]'
+          }`}>
+            {help}
+          </p>
+        )}
         {children}
       </div>
 
-      <footer className="flex flex-col gap-2 pb-2">
+      <footer className={`flex shrink-0 flex-col gap-2 ${fill ? 'pb-1' : 'pb-2'}`}>
         {onSkip && (
           <button type="button" onClick={onSkip}
                   className="self-center px-3 py-2 text-[14px] underline text-[var(--color-ink-soft)]">

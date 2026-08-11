@@ -77,20 +77,27 @@ export default function HurtPanel({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[var(--color-canvas)] px-4 pb-16 pt-[calc(env(safe-area-inset-top)+16px)]">
-      <div className="mx-auto flex w-full max-w-[430px] flex-col gap-4">
-        <div className="flex items-start justify-between gap-3">
-          <h1 className="font-display text-[26px] leading-tight">{t.hurt.title}</h1>
-          <button type="button" onClick={onClose} className="bab-pill px-3 py-2 text-[13px]">
+    <div className={`fixed inset-0 z-50 bg-[var(--color-canvas)] px-4 pt-[calc(env(safe-area-inset-top)+16px)] ${
+      // 🔴 Il passo della mappa non scorre: chi si è appena fatta male indica
+      // il punto con una mano sola, spesso seduta per terra. Gli altri due
+      // passi sono da leggere, e lì scorrere va benissimo.
+      step === 'where' ? 'overflow-hidden pb-4' : 'overflow-y-auto pb-16'
+    }`}>
+      <div className={`mx-auto flex w-full max-w-[430px] flex-col gap-3 ${
+        step === 'where' ? 'h-full min-h-0' : ''
+      }`}>
+        <div className="flex shrink-0 items-start justify-between gap-3">
+          <h1 className="font-display text-[24px] leading-tight">{t.hurt.title}</h1>
+          <button type="button" onClick={onClose} className="bab-pill shrink-0 px-3 py-2 text-[13px]">
             {t.hurt.close}
           </button>
         </div>
 
         {step === 'where' && (
           <>
-            <p className="text-[15px] text-[var(--color-ink-soft)]">{t.hurt.lede}</p>
-            <h2 className="bab-label">{t.hurt.whereStep}</h2>
+            <h2 className="shrink-0 text-[14px] font-bold">{t.hurt.whereStep}</h2>
             <BodyMap
+              fit
               tone="care"
               selected={region}
               freeText={freeText}
@@ -101,7 +108,7 @@ export default function HurtPanel({ onClose }: { onClose: () => void }) {
             />
             {region === 'other' && (
               <button type="button" onClick={() => setStep('what')}
-                      className="bab-pill self-center px-4 py-2 text-[14px]"
+                      className="bab-pill shrink-0 self-center px-4 py-2 text-[14px]"
                       style={{ background: 'var(--color-lime)' }}>
                 {t.checkin.common.next}
               </button>

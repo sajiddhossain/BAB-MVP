@@ -72,6 +72,8 @@ export const en: Copy = {
     legendHeat: 'how many times you marked it',
     legendFlag: 'worth showing someone',
     listOpen: 'Prefer a list?',
+    listShort: 'List',
+    listCloseShort: 'Figure',
     listClose: 'Back to the figure',
   },
 
@@ -261,8 +263,9 @@ export const en: Copy = {
       },
       pinpoint: {
         label: 'Pinpoint & name it',
-        title: 'Where do you feel it? Give it a name.',
-        help: `Pausing to find where a sensation sits, and putting a word to it, is the heart of the skill — it's how a vague "I feel off" becomes something you actually understand. Tap a spot, flip between front and back, then choose what it feels like. Add as many as you notice, or none if all feels quiet.`,
+        title: 'Where do you feel it?',
+        mapHint: 'As many as you notice, or none if all feels quiet.',
+        help: `Pausing to find where a sensation sits, and putting a word to it, is the heart of the skill: it's how a vague "I feel off" becomes something you actually understand.`,
         front: 'Front',
         back: 'Back',
         allOver: 'All over',

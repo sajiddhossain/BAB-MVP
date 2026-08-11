@@ -314,13 +314,23 @@ export function area(s: Shape): number {
 /**
  * Il bersaglio invisibile: la forma stessa, allargata al minimo che un dito
  * riesce a prendere. 44px CSS su una mappa larga 250px sono ~35 unità qui.
+ *
+ * 🔴 «Su una mappa larga 250px» era il punto debole: la regola dei 44px sta in
+ * pixel dello schermo, questa costante in unità di disegno, e le due cose
+ * coincidono solo a quella larghezza precisa. Da quando la figura si adatta
+ * all'altezza che le resta, la larghezza cambia con il telefono — e su uno
+ * schermo corto 36 unità diventano 30px, cioè un bersaglio che il pollice
+ * manca. Chi disegna la mappa misura quanto è larga davvero e passa il minimo
+ * giusto; questo resta il valore per il caso più comodo.
  */
 export const MIN_HIT = 36
 
-export function hitBox(s: Shape): { x: number; y: number; w: number; h: number } | null {
+export function hitBox(
+  s: Shape, min: number = MIN_HIT,
+): { x: number; y: number; w: number; h: number } | null {
   const r = raw(s)
   if (!r) return null
-  const w = Math.max(r.w, MIN_HIT)
-  const h = Math.max(r.h, MIN_HIT)
+  const w = Math.max(r.w, min)
+  const h = Math.max(r.h, min)
   return { x: s.cx - w / 2, y: s.cy - h / 2, w, h }
 }

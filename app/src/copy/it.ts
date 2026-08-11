@@ -103,6 +103,9 @@ export const it = {
     legendHeat: 'quante volte l\'hai segnata',
     legendFlag: 'da far vedere',
     listOpen: 'Preferisci un elenco?',
+    /** Quando la mappa sta in una schermata sola, la riga in fondo deve restare una riga. */
+    listShort: 'Elenco',
+    listCloseShort: 'Figura',
     listClose: 'Torna alla figura',
   },
 
@@ -312,8 +315,11 @@ export const it = {
       },
       pinpoint: {
         label: 'Individua e nomina',
-        title: 'Dove lo senti? Dagli un nome.',
-        help: 'Fermarsi a trovare dove sta una sensazione, e metterci una parola sopra, è il cuore della competenza — è come un vago "mi sento strana" diventa qualcosa che capisci davvero. Tocca un punto, passa tra fronte e retro, poi scegli come si sente. Aggiungine quante ne noti, o nessuna se è tutto tranquillo.',
+        title: 'Dove lo senti?',
+        /** Sulla mappa serve una riga, non un paragrafo: lo spazio va alla figura. */
+        mapHint: 'Quante ne noti, o nessuna se è tutto tranquillo.',
+        /** Il perché sta sulla schermata dove si dà il nome, che è dove serve. */
+        help: 'Fermarsi a trovare dove sta una sensazione, e metterci una parola sopra, è il cuore della competenza: è come un vago "mi sento strana" diventa qualcosa che capisci davvero.',
         front: 'Fronte',
         back: 'Retro',
         allOver: 'Dappertutto',

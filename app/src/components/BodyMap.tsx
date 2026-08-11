@@ -1,8 +1,8 @@
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useCopy, useLocale, fill as tpl } from '@/copy'
 import { REGIONS, regionLabel, type RegionCode } from '@/content/bodymap'
 import {
-  GEOMETRY, HALF, MIRROR, SHADOW, VIEW, area, hitBox, type Shape, type Side,
+  GEOMETRY, HALF, MIN_HIT, MIRROR, SHADOW, VIEW, area, hitBox, type Shape, type Side,
 } from './body-shapes'
 
 /**
@@ -53,6 +53,17 @@ type Props = {
   heat?: Partial<Record<RegionCode, number>>
   /** Cosa c'è scritto sotto quando non ha ancora toccato niente. */
   hint?: string
+  /**
+   * La figura prende l'altezza che le resta, invece di averne una sua.
+   *
+   * 🔴 È la differenza fra una schermata e una pagina. Con una figura di
+   * altezza fissa, tutto quello che le sta intorno — il fronte/retro, la
+   * scritta di conferma, «da un'altra parte», il ripiego a elenco — spinge il
+   * resto sotto la piega, e per indicare il ginocchio bisogna scorrere. Ma
+   * scorrere mentre si punta un posto sul proprio corpo è la cosa peggiore che
+   * si possa chiedere: la figura si sposta sotto il dito.
+   */
+  fit?: boolean
 }
 
 /**
@@ -104,11 +115,35 @@ function Draw({ s, ...attrs }: { s: Shape } & React.SVGProps<SVGPathElement & SV
 
 export default function BodyMap({
   selected = null, logged = [], flagged = [], onSelect,
-  tone = 'neutral', freeText = '', onFreeText, heat, hint,
+  tone = 'neutral', freeText = '', onFreeText, heat, hint, fit = false,
 }: Props) {
   const t = useCopy()
   const locale = useLocale()
   const clipId = useId()
+  const svgRef = useRef<SVGSVGElement>(null)
+
+  /**
+   * Quanto è larga la figura DAVVERO, in pixel dello schermo.
+   *
+   * Serve a una cosa sola, e non è cosmetica: il minimo per un bersaglio è
+   * 44px CSS, e tradurlo in unità di disegno si può fare solo sapendo quanto
+   * misura la figura adesso. Con un'altezza che si adatta, quella misura
+   * cambia da telefono a telefono.
+   */
+  const [px, setPx] = useState(250)
+  useEffect(() => {
+    const el = svgRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(([e]) => {
+      const w = e?.contentRect.width ?? 0
+      if (w > 0) setPx(w)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  })
+  /** Oltre un certo punto allargare i bersagli li fa mangiare a vicenda: lì
+   *  la risposta onesta è l'elenco, non un ginocchio grande come una coscia. */
+  const minHit = Math.min(48, Math.max(MIN_HIT, (44 * VIEW.w) / px))
   const [side, setSide] = useState<Side>('front')
   const [hover, setHover] = useState<RegionCode | null>(null)
   const [list, setList] = useState(false)
@@ -235,22 +270,34 @@ export default function BodyMap({
   )
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
+    <div className={`flex w-full flex-col items-center ${
+      fit ? 'min-h-0 flex-1 gap-1.5' : 'gap-3'
+    }`}>
       {/* Nell'elenco ci sono già tutt'e due le facce, e «la tua sinistra sta a
           sinistra» non vuol dire niente su una lista di parole. */}
+      {/* 🔴 La convenzione dello specchio va DETTA. Un'atleta che indica il
+          ginocchio sbagliato manda il fisioterapista dalla parte opposta.
+          In `fit` sta di fianco al fronte/retro invece che sotto: ogni riga
+          in meno qui è una riga in più di figura. */}
       {!list && (
-        <>
-          <div className="flex gap-2" role="group" aria-label={t.bodymap.sideLabel}>
+        <div className={`flex w-full shrink-0 items-center ${
+          fit ? 'gap-2.5' : 'flex-col gap-1.5'
+        }`}>
+          <div className="flex shrink-0 gap-2" role="group" aria-label={t.bodymap.sideLabel}>
             {sideBtn('front')}{sideBtn('back')}
           </div>
-          {/* 🔴 La convenzione dello specchio va DETTA. Un'atleta che indica il
-              ginocchio sbagliato manda il fisioterapista dalla parte opposta. */}
-          <p className="text-center text-[12.5px] text-[var(--color-ink-soft)]">{t.bodymap.mirrorHint}</p>
-        </>
+          <p className={`text-[var(--color-ink-soft)] ${
+            fit ? 'flex-1 text-[11px] leading-[1.25]' : 'text-center text-[12px]'
+          }`}>
+            {t.bodymap.mirrorHint}
+          </p>
+        </div>
       )}
 
       {list ? (
-        <div className="flex w-full max-w-[330px] flex-col gap-3">
+        <div className={`flex w-full max-w-[330px] flex-col gap-3 ${
+          fit ? 'min-h-0 flex-1 overflow-y-auto' : ''
+        }`}>
           {([['front', t.checkin.pre.pinpoint.front], ['back', t.checkin.pre.pinpoint.back]] as const)
             .map(([s, label]) => (
               <fieldset key={s} className="flex flex-col gap-1.5 border-0 p-0">
@@ -277,8 +324,14 @@ export default function BodyMap({
         </div>
       ) : (
         <svg
+          ref={svgRef}
           viewBox={`0 0 ${VIEW.w} ${VIEW.h}`}
-          className="h-auto w-full max-w-[250px] touch-manipulation"
+          /* In `fit` è l'ALTEZZA a comandare e la larghezza segue: la figura
+             riempie quello che le altre righe le lasciano, su qualsiasi
+             telefono, senza che nessuno debba indovinare un numero. */
+          className={`touch-manipulation ${
+            fit ? 'min-h-0 w-auto flex-1' : 'h-auto w-full max-w-[250px]'
+          }`}
           role="group" aria-label={t.checkin.pre.pinpoint.title}
         >
           <defs>
@@ -342,7 +395,7 @@ export default function BodyMap({
           <g>
             {hitOrder.map((code) => {
               const s = shapes[code]!
-              const box = hitBox(s)
+              const box = hitBox(s, minHit)
               return (
                 <g
                   key={code} id={zoneId(code)} className="bab-zone" role="button"
@@ -378,7 +431,7 @@ export default function BodyMap({
           🔴 `elsewhere` non è un dettaglio: se sceglie la coscia e poi gira la
           figura, la scritta resterebbe vera ma la mappa sarebbe vuota — e lei
           penserebbe di aver perso la scelta. Dirle dov'è costa una riga. */}
-      <p className="min-h-[22px] text-center text-[14.5px] font-bold" aria-live="polite">
+      <p className="min-h-[22px] shrink-0 text-center text-[14.5px] font-bold" aria-live="polite">
         {chosenLabel ? (
           <>
             {/* In lettura non ha «scelto» niente: sta guardando. */}
@@ -394,8 +447,12 @@ export default function BodyMap({
         )}
       </p>
 
-      {hasMarks && (
-        <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-[var(--color-ink-soft)]">
+      {/* In `fit` la legenda non c'è: chi chiama la mappa in una schermata sola
+          elenca già le zone segnate sopra la figura, con il loro nome scritto.
+          Ripeterlo qui costa una riga, e quella riga la paga la figura — che
+          rimpicciolendosi fa rimpicciolire i bersagli. */}
+      {hasMarks && !fit && (
+        <ul className="flex shrink-0 flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-[var(--color-ink-soft)]">
           {(logged.length > 0 || heated.length > 0) && (
             <li className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: accent }} />
@@ -411,13 +468,16 @@ export default function BodyMap({
         </ul>
       )}
 
-      <div className="flex w-full flex-col items-center gap-2">
-        <div className="flex flex-wrap justify-center gap-2">
+      {/* Le tre vie di fuga della mappa, su una riga sola: le due zone che non
+          stanno sulla figura e il ripiego a elenco. In `fit` è l'ultima riga
+          della schermata, e deve restare una riga. */}
+      <div className="flex w-full shrink-0 flex-col items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {REGIONS.filter((r) => r.side === 'none').map((r) => (
             <button
               key={r.code} type="button" onClick={() => choose(r.code)}
               aria-pressed={selected === r.code}
-              className="bab-pill px-4 py-2 text-[13px]"
+              className={`bab-pill ${fit ? 'px-3.5 py-2 text-[12.5px]' : 'px-4 py-2 text-[13px]'}`}
               style={selected === r.code
                 ? { background: accent, borderColor: accent, color: 'var(--color-surface)' }
                 : undefined}
@@ -425,6 +485,17 @@ export default function BodyMap({
               {r.code === 'all_over' ? t.checkin.pre.pinpoint.allOver : t.checkin.pre.pinpoint.elsewhere}
             </button>
           ))}
+          {/* Non è un ripiego per il lettore di schermo: c'è chi tocca male, chi
+              ha le mani fredde, chi è su un pullman. L'elenco funziona sempre —
+              e con la figura rimpicciolita per stare in una schermata, funziona
+              anche meglio della figura. */}
+          {fit && (
+            <button type="button" onClick={() => setList((v) => !v)}
+                    aria-label={list ? t.bodymap.listClose : t.bodymap.listOpen}
+                    className="px-1.5 text-[12.5px] underline text-[var(--color-ink-soft)]">
+              {list ? t.bodymap.listCloseShort : t.bodymap.listShort}
+            </button>
+          )}
         </div>
 
         {/* «Da un'altra parte» senza un campo dove dirlo è un vicolo cieco:
@@ -441,12 +512,12 @@ export default function BodyMap({
           />
         )}
 
-        {/* Non è un ripiego per il lettore di schermo: c'è chi tocca male, chi
-            ha le mani fredde, chi è su un pullman. L'elenco funziona sempre. */}
-        <button type="button" onClick={() => setList((v) => !v)}
-                className="text-[13px] underline text-[var(--color-ink-soft)]">
-          {list ? t.bodymap.listClose : t.bodymap.listOpen}
-        </button>
+        {!fit && (
+          <button type="button" onClick={() => setList((v) => !v)}
+                  className="text-[13px] underline text-[var(--color-ink-soft)]">
+            {list ? t.bodymap.listClose : t.bodymap.listOpen}
+          </button>
+        )}
       </div>
     </div>
   )

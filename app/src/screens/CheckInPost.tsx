@@ -7,7 +7,7 @@ import PillGroup from '@/components/PillGroup'
 import Step, { useAdvance, useFlow } from '@/components/Step'
 import { EFFORT, POST_CHANNELS, HEADSPACE, BROUGHT_HOME, channelQuestion } from '@/content/channels'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
-import { SENSATIONS, INTENSITIES, BEHAVIOURS, GROUP_LABEL, isRedFlag, sensationsIn } from '@/content/lexicon'
+import { INTENSITIES, BEHAVIOURS, GROUP_LABEL, isRedFlag, sensationsIn } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
 import { headspaceValue, bodyAverage, predictionError } from '@/lib/tempo'
@@ -222,35 +222,45 @@ export default function CheckInPost() {
     onClose: () => navigate('/today'), dirty,
   }
 
+  /**
+   * Una schermata sola, senza scorrere — vedi la nota in `CheckInPre`.
+   * Niente etichetta di sezione: lo spazio va alla figura.
+   */
   const bodyStep = () => (
-    <Step {...frame} section={t.checkin.pre.pinpoint.label}
-          question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.help}
-          onNext={flow.onward}
-          nextLabel={signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
+    <Step {...frame} fill
+          question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.mapHint}
+          onNext={region === 'other' ? () => flow.go('body_what') : flow.onward}
+          nextLabel={region === 'other' ? t.flow.next
+            : signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
       {signals.length > 0 && (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex shrink-0 gap-2 overflow-x-auto pb-1">
           {signals.map((s, i) => (
-            <li key={i} className="bab-pill flex items-center justify-between gap-2 px-3 py-2 text-[14px]"
+            <li key={i} className="bab-pill flex shrink-0 items-center gap-1.5 py-1.5 pl-3 pr-1.5 text-[12.5px]"
                 style={s.is_red_flag ? { borderColor: 'var(--care)' } : undefined}>
-              <span>
+              <span className="whitespace-nowrap">
                 {s.is_red_flag && <span aria-hidden>🚩 </span>}
-                {regionLabel(s.region as RegionCode, locale)} — {SENSATIONS.find((x) => x.code === s.sensation)?.label[locale]}
+                {regionLabel(s.region as RegionCode, locale)}
               </span>
               <button type="button" onClick={() => setSignals((p) => p.filter((_, j) => j !== i))}
-                      className="text-[var(--color-ink-soft)]">
-                {t.checkin.common.remove}
+                      aria-label={t.checkin.common.remove}
+                      className="flex h-6 w-6 items-center justify-center rounded-full text-[13px] text-[var(--color-ink-soft)]"
+                      style={{ background: 'var(--color-sand)' }}>
+                <span aria-hidden>✕</span>
               </button>
             </li>
           ))}
         </ul>
       )}
       <BodyMap
+        fit
         selected={region}
         logged={signals.map((s) => s.region as RegionCode)}
         flagged={signals.filter((s) => s.is_red_flag).map((s) => s.region as RegionCode)}
         freeText={freeText}
         onFreeText={setFreeText}
-        onSelect={(r) => answer('body', () => setRegion(r), () => flow.go('body_what'))}
+        onSelect={(r) => r === 'other'
+          ? setRegion(r)
+          : answer('body', () => setRegion(r), () => flow.go('body_what'))}
       />
     </Step>
   )
@@ -381,6 +391,7 @@ export default function CheckInPost() {
         <Step {...frame}
               section={region === 'other' && freeText.trim() ? freeText.trim() : regionLabel(region, locale)}
               question={t.checkin.pre.pinpoint.whatLike}
+              help={t.checkin.pre.pinpoint.help}
               onNext={sens ? () => flow.go('body_strength') : null}>
           {(['good', 'notice', 'flag'] as const).map((g) => (
             <div key={g} className="flex flex-col gap-2">

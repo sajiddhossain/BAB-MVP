@@ -84,6 +84,7 @@ export default function CheckInPre() {
   const [sens, setSens] = useState<string | null>(null)
   const [intensity, setIntensity] = useState<number | null>(null)
   const [behaviour, setBehaviour] = useState<string | null>(null)
+  const [freeText, setFreeText] = useState('')
   const [signals, setSignals] = useState<BodySignalDraft[]>([])
 
   const [pain, setPain] = useState<boolean | null>(null)
@@ -120,10 +121,10 @@ export default function CheckInPre() {
   function addSignal() {
     if (!region || !sens) return
     setSignals((prev) => [...prev, {
-      athlete_id: userId ?? '', region, sensation: sens,
-      intensity, behaviour, is_red_flag: isRedFlag(sens),
+      athlete_id: userId ?? '', region, region_free: freeText.trim() || null,
+      sensation: sens, intensity, behaviour, is_red_flag: isRedFlag(sens),
     }])
-    setRegion(null); setSens(null); setIntensity(null); setBehaviour(null)
+    setRegion(null); setSens(null); setIntensity(null); setBehaviour(null); setFreeText('')
     flow.go('body')
   }
 
@@ -263,33 +264,58 @@ export default function CheckInPre() {
    * indietro-avanti col tasto del telefono, o un indirizzo incollato. Navigare
    * durante il render sarebbe l'altra strada, ed è quella che React vieta.
    */
+  /**
+   * 🔴 `fill` + `fit`: la mappa sta in UNA schermata e non scorre. Prima la
+   * figura aveva un'altezza sua e tutto il resto — il fronte/retro, le zone già
+   * segnate, «da un'altra parte», il ripiego a elenco — la spingeva sotto la
+   * piega. Per indicare il ginocchio bisognava far salire la pagina, e la
+   * figura si spostava sotto il dito mentre lo si appoggiava.
+   *
+   * Niente etichetta di sezione: la domanda la dice già, e ogni riga
+   * risparmiata qui è una riga in più di figura.
+   */
   const bodyStep = () => (
-    <Step {...frame} section={t.checkin.pre.pinpoint.label}
-          question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.help}
-          onNext={flow.onward}
-          nextLabel={signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
+    <Step {...frame} fill
+          question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.mapHint}
+          onNext={region === 'other' ? () => flow.go('body_what') : flow.onward}
+          nextLabel={region === 'other' ? t.flow.next
+            : signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
+      {/* Le zone già segnate: una riga sola che scorre di lato, così la
+          figura non perde altezza a ogni sensazione aggiunta. */}
       {signals.length > 0 && (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex shrink-0 gap-2 overflow-x-auto pb-1">
           {signals.map((s, i) => (
-            <li key={i} className="bab-pill flex items-center justify-between gap-2 px-3 py-2 text-[14px]"
+            <li key={i} className="bab-pill flex shrink-0 items-center gap-1.5 py-1.5 pl-3 pr-1.5 text-[12.5px]"
                 style={s.is_red_flag ? { borderColor: 'var(--care)' } : undefined}>
-              <span>
+              <span className="whitespace-nowrap">
                 {s.is_red_flag && <span aria-hidden>🚩 </span>}
-                {regionLabel(s.region as RegionCode, locale)} — {SENSATIONS.find((x) => x.code === s.sensation)?.label[locale]}
+                {regionLabel(s.region as RegionCode, locale)}
               </span>
               <button type="button" onClick={() => setSignals((p) => p.filter((_, j) => j !== i))}
-                      className="text-[var(--color-ink-soft)]">
-                {t.checkin.common.remove}
+                      aria-label={t.checkin.common.remove}
+                      className="flex h-6 w-6 items-center justify-center rounded-full text-[13px] text-[var(--color-ink-soft)]"
+                      style={{ background: 'var(--color-sand)' }}>
+                <span aria-hidden>✕</span>
               </button>
             </li>
           ))}
         </ul>
       )}
       <BodyMap
+        fit
         selected={region}
         logged={signals.map((s) => s.region as RegionCode)}
         flagged={signals.filter((s) => s.is_red_flag).map((s) => s.region as RegionCode)}
-        onSelect={(r) => answer('body', () => setRegion(r), () => flow.go('body_what'))}
+        freeText={freeText}
+        onFreeText={setFreeText}
+        // 🔴 «Da un'altra parte» non salta avanti: sotto la figura compare il
+        // campo dove scrivere dov'è, e saltando non lo vedrebbe mai. Era così
+        // fin dall'inizio nella segnalazione immediata, e non nei check-in:
+        // polso, mandibola e costole non stanno sulla mappa, e la colonna per
+        // accoglierle è sempre esistita.
+        onSelect={(r) => r === 'other'
+          ? setRegion(r)
+          : answer('body', () => setRegion(r), () => flow.go('body_what'))}
       />
     </Step>
   )
@@ -434,6 +460,7 @@ export default function CheckInPre() {
       return (
         <Step {...frame} section={regionLabel(region, locale)}
               question={t.checkin.pre.pinpoint.whatLike}
+              help={t.checkin.pre.pinpoint.help}
               onNext={sens ? () => flow.go('body_strength') : null}>
           {(['good', 'notice', 'flag'] as const).map((g) => (
             <div key={g} className="flex flex-col gap-2">
