@@ -43,6 +43,16 @@ type Props = {
   /** Testo per «da un'altra parte»: la colonna `region_free` esiste da sempre. */
   freeText?: string
   onFreeText?: (v: string) => void
+  /**
+   * Quanto pesa ogni zona, da 0 a 1. È la modalità LETTURA: la stessa figura
+   * che serve a raccogliere serve a rileggere, e deve essere la stessa figura
+   * o le due cose non si riconoscono come la stessa cosa.
+   *
+   * Vince su `logged`, che dice solo sì/no.
+   */
+  heat?: Partial<Record<RegionCode, number>>
+  /** Cosa c'è scritto sotto quando non ha ancora toccato niente. */
+  hint?: string
 }
 
 /**
@@ -94,7 +104,7 @@ function Draw({ s, ...attrs }: { s: Shape } & React.SVGProps<SVGPathElement & SV
 
 export default function BodyMap({
   selected = null, logged = [], flagged = [], onSelect,
-  tone = 'neutral', freeText = '', onFreeText,
+  tone = 'neutral', freeText = '', onFreeText, heat, hint,
 }: Props) {
   const t = useCopy()
   const locale = useLocale()
@@ -182,14 +192,26 @@ export default function BodyMap({
 
   function paint(code: RegionCode) {
     if (code === selected) return { fill: accent, stroke: accent, width: 2.2 }
+    /**
+     * In lettura la tinta è graduata. Il minimo è 16 e non 0: una zona segnata
+     * una volta sola deve comunque VEDERSI, altrimenti l'unica cosa che la
+     * distingue dal resto del corpo è il puntino, e il puntino da solo non dice
+     * dove finisce la zona.
+     */
+    const h = heat?.[code]
+    if (h !== undefined) {
+      const c = flagged.includes(code) ? 'var(--care)' : accent
+      return { fill: soft(c, 16 + h * 44), stroke: c, width: 1.8 }
+    }
     if (flagged.includes(code)) return { fill: soft('var(--care)', 34), stroke: 'var(--care)', width: 2 }
     if (logged.includes(code)) return { fill: soft(accent, 34), stroke: accent, width: 1.8 }
     if (code === hover) return { fill: soft(accent, 15), stroke: 'var(--color-ink)', width: 1.5 }
     return { fill: 'transparent', stroke: 'var(--color-ink)', width: 1.5 }
   }
 
-  const marked = [...new Set([...logged, ...flagged])].filter((c) => shapes[c])
-  const hasMarks = logged.length > 0 || flagged.length > 0
+  const heated = Object.keys(heat ?? {}) as RegionCode[]
+  const marked = [...new Set([...logged, ...flagged, ...heated])].filter((c) => shapes[c])
+  const hasMarks = marked.length > 0
 
   /** Quello che sta scritto sotto la figura. Non cambia mai altezza: niente salti. */
   const chosenLabel = selected === 'other' && freeText.trim()
@@ -359,7 +381,8 @@ export default function BodyMap({
       <p className="min-h-[22px] text-center text-[14.5px] font-bold" aria-live="polite">
         {chosenLabel ? (
           <>
-            {tpl(t.bodymap.chosen, { region: chosenLabel })}
+            {/* In lettura non ha «scelto» niente: sta guardando. */}
+            {heat ? chosenLabel : tpl(t.bodymap.chosen, { region: chosenLabel })}
             {elsewhere && (
               <span className="font-normal text-[var(--color-ink-soft)]">
                 {' · '}{side === 'front' ? t.bodymap.onBack : t.bodymap.onFront}
@@ -367,16 +390,16 @@ export default function BodyMap({
             )}
           </>
         ) : (
-          <span className="font-normal text-[var(--color-ink-soft)]">{t.bodymap.tapHint}</span>
+          <span className="font-normal text-[var(--color-ink-soft)]">{hint ?? t.bodymap.tapHint}</span>
         )}
       </p>
 
       {hasMarks && (
         <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-[var(--color-ink-soft)]">
-          {logged.length > 0 && (
+          {(logged.length > 0 || heated.length > 0) && (
             <li className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: accent }} />
-              {t.bodymap.legendMarked}
+              {heat ? t.bodymap.legendHeat : t.bodymap.legendMarked}
             </li>
           )}
           {flagged.length > 0 && (

@@ -156,6 +156,15 @@ Se `flush` restituisce `parked: 1`, la riga ha violato un `CHECK` o la RLS: l'er
       sa inserire e modificare, non cancellare. Serve un'operazione `delete`
       più la schermata. Finché non c'è, l'agenda si scrive all'onboarding.
 
+- [ ] **`body_signals.created_at` sulle righe già sul server.** Da adesso il
+      telefono manda sempre il proprio, ma se qualche riga fosse già stata
+      inserita lasciando fare al `default now()`, la sua data è quella
+      dell'arrivo e non quella in cui è stata sentita. Non è recuperabile: al
+      massimo si risale al `local_date` del check-in collegato, e le
+      segnalazioni immediate (`check_in_id is null`) non ce l'hanno.
+      Da controllare **prima** di aprire il pilota, quando le righe sono ancora
+      poche o zero.
+
 ## Da verificare appena il progetto esiste
 
 L'idratazione iniziale (`src/lib/hydrate.ts`) è provata contro un finto

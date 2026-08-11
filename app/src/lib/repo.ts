@@ -29,6 +29,20 @@ export function localDate(now: Date = new Date()): string {
  */
 export const newId = (): string => crypto.randomUUID()
 
+/**
+ * 🔴 Quando l'ha sentito, non quando la riga è arrivata al server.
+ *
+ * `body_signals.created_at` ha un `default now()`, e finché il telefono non
+ * mandava niente era il server a metterlo. Vuol dire che un polpaccio segnato
+ * lunedì in palestra, con la coda che parte venerdì, risultava sentito venerdì:
+ * la storia del corpo si sposta di quattro giorni e nessuno se ne accorge.
+ *
+ * Serve anche a rileggerla: senza la data DENTRO la riga, un segnale scritto
+ * qui non è databile finché non torna indietro dal server — e «Il mio corpo»
+ * mostrerebbe un mese vuoto a chi ha appena finito il check-in.
+ */
+const stamp = (): string => new Date().toISOString()
+
 export type CheckInDraft = {
   id?: string
   athlete_id: string
@@ -86,7 +100,9 @@ export async function saveCheckIn(
 
   for (const s of signals) {
     const sid = newId()
-    await db.put('body_signals', sid, { ...s, id: sid, check_in_id: id }, `${date}:${sid}`)
+    await db.put('body_signals', sid, {
+      ...s, id: sid, check_in_id: id, created_at: stamp(),
+    }, `${date}:${sid}`)
 
     // 🔴 Una bandiera rossa è una RIGA A SÉ, non un campo: §11 chiede che
     // escali a un umano subito e non finisca sepolta in un trend.
@@ -111,7 +127,9 @@ export async function saveCheckIn(
 export async function saveAcuteSignal(s: BodySignalDraft): Promise<string> {
   const id = newId()
   const date = localDate()
-  await db.put('body_signals', id, { ...s, id, check_in_id: null }, `${date}:${id}`)
+  await db.put('body_signals', id, {
+    ...s, id, check_in_id: null, created_at: stamp(),
+  }, `${date}:${id}`)
   if (s.is_red_flag) {
     const rid = newId()
     await db.put('red_flags', rid, {

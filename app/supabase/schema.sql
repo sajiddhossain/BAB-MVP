@@ -175,6 +175,10 @@ create table if not exists public.body_signals (
   id          uuid primary key default gen_random_uuid(),
   athlete_id  uuid not null references public.athletes(id) on delete cascade,
   check_in_id uuid references public.check_ins(id) on delete cascade,  -- null = segnalazione immediata
+  -- 🔴 Il DEFAULT è una rete, non la strada normale: il telefono manda sempre
+  -- il proprio `created_at`. Un polpaccio segnato lunedì in palestra, con la
+  -- coda che parte venerdì, prenderebbe qui la data di venerdì — e la storia
+  -- del corpo si sposterebbe di quattro giorni senza che nessuno se ne accorga.
   created_at  timestamptz not null default now(),
   -- CODICE stabile ('calf_r'), non l'etichetta visibile: le etichette cambiano
   -- con la lingua e col copy, i dati no.

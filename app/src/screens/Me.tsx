@@ -126,7 +126,19 @@ export default function Me() {
         <p className="text-[13px] text-[var(--color-ink-soft)]">{t.me.daysHelp}</p>
       </Card>
 
-      {/* 3 · La mia storia — l'output "Communicate". */}
+      {/* 3 · Il mio corpo — la mappa che finalmente restituisce qualcosa.
+          🔴 Sta PRIMA della storia: la storia si condivide con qualcun altro,
+          questa è per lei. Prima capisci, poi racconti. */}
+      <Card>
+        <h2 className="font-display text-[18px]">{t.me.bodyTitle}</h2>
+        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.me.bodyBody}</p>
+        <Link to="/body" className="bab-pill self-start px-4 py-2 text-[14px]"
+              style={{ background: 'var(--color-lime)' }}>
+          {t.me.bodyCta}
+        </Link>
+      </Card>
+
+      {/* 4 · La mia storia — l'output "Communicate". */}
       <Card>
         <h2 className="font-display text-[18px]">{t.me.storyTitle}</h2>
         <p className="text-[15px] text-[var(--color-ink-soft)]">{t.me.storyBody}</p>

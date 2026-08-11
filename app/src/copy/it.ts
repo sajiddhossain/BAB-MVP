@@ -99,6 +99,8 @@ export const it = {
     onFront: 'sta sul fronte',
     onBack: 'sta sul retro',
     legendMarked: 'già segnata',
+    /** In lettura la tinta è graduata, e va detto cosa vuol dire più scuro. */
+    legendHeat: 'quante volte l\'hai segnata',
     legendFlag: 'da far vedere',
     listOpen: 'Preferisci un elenco?',
     listClose: 'Torna alla figura',
@@ -122,9 +124,19 @@ export const it = {
    * cancellazione non si ammorbidisce: è per sempre e va detto così.
    */
   settings: {
-    title: 'I tuoi dati',
+    title: 'Tu e i tuoi dati',
     open: 'I tuoi dati e il tuo account',
     back: 'Indietro',
+    /** Le voci dell'indice mostrano il valore che hanno dentro, non una freccia. */
+    notSet: 'Non l\'hai ancora detto',
+    dataTitle: 'I tuoi dati',
+    dataHint: 'Scaricali, e guarda cosa non è ancora partito',
+    accountTitle: 'Il tuo account',
+    accountHint: 'Esci da questo telefono, oppure cancella tutto',
+    accountHintOffline: 'Cancella tutto',
+    indexNote: 'Quello che scrivi in BAB è tuo. Da qui te lo porti via quando vuoi, e lo fai sparire quando vuoi.',
+    langNote: 'La scelta viaggia con te: su un telefono nuovo BAB parte già in questa lingua.',
+    rhythmPrivacy: 'Le date del tuo ciclo non compaiono mai in una card che condividi, a meno che non sia tu a spuntarlo ogni volta.',
 
     profileTitle: 'Il tuo profilo',
     profileName: 'Come ti chiamiamo',
@@ -342,6 +354,41 @@ export const it = {
     },
   },
 
+  /**
+   * «Il mio corpo» — la mappa corporea riletta.
+   *
+   * 🔴 Niente soglie e niente verdetti (§7): si contano le volte e si ripetono
+   * le parole che ha scelto lei. «Quattro volte, e tre le hai chiamate fitta» è
+   * un fatto; «zona a rischio» sarebbe una diagnosi.
+   */
+  body: {
+    title: 'Il mio corpo',
+    lede: 'Dove il tuo corpo ti ha parlato, e con che parole.',
+    windowLabel: 'Quanto indietro guardare',
+    windowOption: 'Ultimi {n} giorni',
+    pickHint: 'Tocca una zona per vedere cosa ci hai sentito.',
+    heatNote: 'Più scura è la zona, più volte l\'hai segnata in questo periodo.',
+    emptyTitle: 'Ancora niente da rileggere',
+    emptyBody: 'Quando durante un check-in segni qualcosa sulla mappa, torna qui: dopo qualche giorno cominci a vedere cosa si ripete e cosa era solo di passaggio.',
+    quietTitle: 'Niente in questi {days} giorni',
+    quietBody: 'Non hai segnato nessuna sensazione. Va benissimo così: non c\'è niente da recuperare.',
+    topTitle: 'Le zone che tornano di più',
+    timesOne: 'una volta',
+    times: '{n} volte',
+    lastToday: 'oggi',
+    lastYesterday: 'ieri',
+    lastAgo: '{n} giorni fa',
+    summaryOne: 'Una volta in {days} giorni, {when}.',
+    summary: '{n} volte in {days} giorni — l\'ultima {when}.',
+    flaggedOne: 'Una volta l\'avevi segnata come da far vedere a qualcuno.',
+    flagged: '{n} volte l\'avevi segnata come da far vedere a qualcuno.',
+    wordsTitle: 'Come l\'hai chiamata',
+    entriesTitle: 'Una per una',
+    nothingHere: 'Qui non hai segnato niente in questo periodo.',
+    undatedOne: 'Un segnale più vecchio non ha una data e resta fuori da questo conto.',
+    undated: '{n} segnali più vecchi non hanno una data e restano fuori da questo conto.',
+  },
+
   rhythm: {
     title: 'Il mio ritmo',
     rightNow: 'In questo momento sei in',
@@ -387,6 +434,9 @@ export const it = {
     insightCaveat: 'Sono idee, non fatti. L\'esperta di te sei tu: tieni quelle che ti sembrano vere, e metti in dubbio quelle che non ti tornano.',
     insightYes: 'Mi sembra proprio io',
     insightNo: 'Non mi torna',
+    bodyTitle: 'Il mio corpo',
+    bodyBody: 'Quello che hai segnato sulla mappa, rimesso insieme: quali zone tornano, e con che parole le hai chiamate.',
+    bodyCta: 'Guarda la mappa',
     storyTitle: 'La tua storia della settimana',
     storyBody: 'Qualcosa da far vedere a un coach o a un genitore',
     storyCta: 'Preparane una',
