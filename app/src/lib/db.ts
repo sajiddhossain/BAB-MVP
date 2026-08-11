@@ -14,12 +14,23 @@
  */
 
 const DB_NAME = 'bab'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 /** Righe già scritte in locale, per leggere senza rete. */
 const RECORDS = 'records'
 /** Inserimenti non ancora arrivati al server. */
 const PENDING = 'pending'
+/**
+ * Qualche riga di stato dell'archivio — oggi solo: se l'idratazione iniziale è
+ * già stata fatta su questo dispositivo.
+ *
+ * 🔴 Sta QUI e non in `localStorage` di proposito. I due archivi si possono
+ * cancellare separatamente: se il segnaposto vivesse fuori e IndexedDB venisse
+ * svuotato, l'app crederebbe di aver già scaricato tutto e lascerebbe
+ * un'atleta davanti a una app vuota con tre mesi di dati sul server. Tenendolo
+ * dentro, il segnaposto muore insieme ai dati che descrive.
+ */
+const META = 'meta'
 
 /**
  * Solo le tabelle che l'app dell'atleta SCRIVE. Le tabelle di squadra
@@ -91,6 +102,12 @@ function open(): Promise<IDBDatabase> {
         // Si inviano in ordine di creazione: body_signals e red_flags
         // referenziano il check-in.
         s.createIndex('byCreatedAt', 'createdAt')
+      }
+      // v2. Gli `if` qui sopra rendono l'aggiornamento additivo: chi aveva già
+      // la v1 si ritrova il nuovo store e NON perde una riga — R10 vale anche
+      // per l'archivio locale, non solo per il server.
+      if (!db.objectStoreNames.contains(META)) {
+        db.createObjectStore(META, { keyPath: 'key' })
       }
     }
     req.onsuccess = () => settle(resolve)(req.result)
@@ -185,11 +202,18 @@ export async function markAttempt(op: PendingOp, error?: string): Promise<void> 
   await tx(PENDING, 'readwrite', (s) => s.put(next))
 }
 
-/** Righe scaricate dal server: si scrivono in locale SENZA rientrare in coda. */
+/**
+ * Righe scaricate dal server: si scrivono in locale SENZA rientrare in coda.
+ *
+ * 🔴 Una transazione sola per tabella, non una `put` per riga: se la scheda si
+ * chiude a metà, o l'archivio si riempie, o va tutto o non va niente. Mezza
+ * settimana scritta è peggio di zero, perché sembra completa.
+ */
 export async function hydrate(
   table: TableName,
   rows: { id: string; row: Record<string, unknown>; sortKey: string }[],
 ): Promise<void> {
+  if (rows.length === 0) return
   const db = await open()
   await new Promise<void>((resolve, reject) => {
     const t = db.transaction(RECORDS, 'readwrite')
@@ -202,8 +226,24 @@ export async function hydrate(
   })
 }
 
+/* ── segnaposto ─────────────────────────────────────────────────────────── */
+
+export async function getMeta(key: string): Promise<string | undefined> {
+  const r = await tx<{ key: string; value: string } | undefined>(
+    META, 'readonly', (s) => s.get(key),
+  )
+  return r?.value
+}
+
+export async function setMeta(key: string, value: string): Promise<void> {
+  await tx(META, 'readwrite', (s) => s.put({ key, value }))
+}
+
 /** Cancellazione locale: usata da "cancella il mio account" (§9). */
 export async function wipe(): Promise<void> {
   await tx(RECORDS, 'readwrite', (s) => s.clear())
   await tx(PENDING, 'readwrite', (s) => s.clear())
+  // Anche il segnaposto: altrimenti al prossimo accesso l'app crederebbe di
+  // aver già scaricato tutto e mostrerebbe un archivio vuoto per sempre.
+  await tx(META, 'readwrite', (s) => s.clear())
 }

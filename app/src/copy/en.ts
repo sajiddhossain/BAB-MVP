@@ -60,6 +60,14 @@ export const en: Copy = {
     listClose: 'Back to the figure',
   },
 
+  hydration: {
+    title: 'One moment, setting up BAB',
+    body: "I'm bringing what's already there onto this device. It only happens the first time you sign in here.",
+    errorTitle: "I can't get your data back",
+    errorBody: 'The network is only needed right now: from here on BAB works without signal too, and your check-ins save either way. Check your connection and try again.',
+    retry: 'Try again',
+  },
+
   today: {
     greetingMorning: 'Morning, {name}',
     greetingEvening: 'Evening, {name}',

@@ -2,7 +2,8 @@
 import * as db from './db'
 import * as repo from './repo'
 import { flush, parked } from './sync'
+import * as hydrate from './hydrate'
 
-export const bab = { db, repo, flush, parked }
+export const bab = { db, repo, flush, parked, hydrate }
 declare global { interface Window { bab: typeof bab } }
 if (import.meta.env.DEV) window.bab = bab

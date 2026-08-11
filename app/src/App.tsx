@@ -12,6 +12,7 @@ import Onboarding from './screens/Onboarding'
 import Roster from './screens/team/Roster'
 import TeamAthlete from './screens/team/Athlete'
 import { useSession } from './lib/session'
+import { useHydration } from './lib/hydrate'
 import { getProfile } from './lib/repo'
 import { useCopy } from './copy'
 import { useEffect, useState } from 'react'
@@ -27,17 +28,28 @@ export default function App() {
    */
   const isTeam = pathname.startsWith('/team')
   const t = useCopy()
+  /**
+   * 🔴 L'idratazione viene PRIMA del profilo, e l'ordine è tutto.
+   *
+   * Il gate qui sotto guarda se il profilo esiste in locale. Su un telefono
+   * nuovo non c'è ancora, quindi senza idratazione un'atleta che rientra
+   * verrebbe rimandata a rifare l'onboarding — consenso, data di nascita,
+   * stato del ciclo — e il profilo che ne esce finirebbe in coda come
+   * inserimento, rifiutato dal server come duplicato e messo da parte in
+   * silenzio.
+   */
+  const hydration = useHydration(userId)
   /** `null` = non ancora controllato. */
   const [hasProfile, setHasProfile] = useState<boolean | null>(null)
 
   useEffect(() => {
-    if (!userId) { setHasProfile(null); return }
+    if (!userId || hydration.state !== 'done') { setHasProfile(null); return }
     let alive = true
     getProfile(userId)
       .then((p) => { if (alive) setHasProfile(Boolean(p)) })
       .catch(() => { if (alive) setHasProfile(false) })
     return () => { alive = false }
-  }, [userId])
+  }, [userId, hydration.state])
 
   // Finché Supabase non è collegato l'app gira in locale, senza accesso: è la
   // stessa scelta di `lib/supabase.ts`, e serve a poterla sviluppare e provare
@@ -46,6 +58,32 @@ export default function App() {
     return <p className="p-8 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
   }
   if (connected && !userId) return <SignIn />
+
+  // Il primo accesso su un dispositivo scarica quello che c'è già. È l'unico
+  // momento in cui BAB pretende la rete, quindi lo dice invece di girare a
+  // vuoto — e se non ce la fa non prosegue: andare avanti significherebbe
+  // rimandare all'onboarding chi l'ha già fatto.
+  if (userId && hydration.state === 'error') {
+    return (
+      <section className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center gap-4 px-6">
+        <h1 className="font-display text-[24px]">{t.hydration.errorTitle}</h1>
+        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.hydration.errorBody}</p>
+        <button type="button" onClick={hydration.retry}
+                className="bab-pill self-start px-5 py-2.5 text-[15px]"
+                style={{ background: 'var(--color-lime)' }}>
+          {t.hydration.retry}
+        </button>
+      </section>
+    )
+  }
+  if (userId && hydration.state === 'running') {
+    return (
+      <section className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center gap-3 px-6">
+        <h1 className="font-display text-[24px]">{t.hydration.title}</h1>
+        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.hydration.body}</p>
+      </section>
+    )
+  }
 
   // 🔴 Senza profilo non si entra: l'onboarding è dove si raccolgono il
   // consenso e lo stato del ciclo, e senza quelli metà del prodotto non può

@@ -81,6 +81,18 @@ export const it = {
     listClose: 'Torna alla figura',
   },
 
+  /**
+   * Il primo accesso su un dispositivo. È l'UNICO momento in cui BAB pretende
+   * la rete, e va detto invece di lasciarla davanti a una rotella.
+   */
+  hydration: {
+    title: 'Un attimo, preparo BAB',
+    body: 'Sto portando su questo dispositivo quello che c\'è già. Succede solo la prima volta che entri da qui.',
+    errorTitle: 'Non riesco a recuperare i tuoi dati',
+    errorBody: 'Serve la rete solo adesso: da qui in poi BAB funziona anche senza campo, e i tuoi check-in si salvano comunque. Controlla la connessione e riprova.',
+    retry: 'Riprova',
+  },
+
   today: {
     greetingMorning: 'Buongiorno, {name}',
     greetingEvening: 'Buonasera, {name}',

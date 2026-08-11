@@ -60,11 +60,36 @@ returns integer language sql immutable as $$
 $$;
 
 
+-- ════════════════════════════════════════════════════════════════════════════
+-- CHIAVI: uuid generato sul CLIENT, non bigint del server
+--
+-- Ogni tabella che l'app dell'atleta scrive ha `id uuid`. Non è un gusto: è
+-- l'unica cosa che rende la coda di sincronizzazione davvero idempotente.
+--
+-- Con una chiave assegnata dal server, un inserimento che arriva ma la cui
+-- risposta si perde — capita ogni volta che il campo cade in palestra a metà
+-- richiesta — viene ritentato e crea una SECONDA riga. L'atleta si ritrova due
+-- volte lo stesso polpaccio, e nessuno se ne accorge finché non guarda i
+-- pattern. Con l'id generato prima, il ritentativo sbatte su `23505
+-- duplicate key`, che `lib/sync.ts` tratta giustamente come «è già arrivata».
+--
+-- Serve anche all'idratazione: le righe scaricate si scrivono in locale con la
+-- stessa chiave che avrebbero avuto uscendo da qui, quindi una riga creata su
+-- questo telefono e la sua copia scaricata sono LO STESSO record, non due.
+--
+-- Il `default gen_random_uuid()` è solo per gli inserimenti fatti a mano
+-- (i semi di prova): l'app manda sempre il proprio.
+--
+-- Le tabelle di squadra restano a bigint: le scrive lo staff da un portatile
+-- connesso, senza coda e senza offline, quindi il problema non esiste.
+-- ════════════════════════════════════════════════════════════════════════════
+
+
 -- ── CONSENSI ────────────────────────────────────────────────────────────────
 -- Separati per tipo, ognuno con la VERSIONE del testo accettato: se il testo
 -- legale cambia, serve sapere chi ha accettato quale versione.
 create table if not exists public.consents (
-  id           bigint generated always as identity primary key,
+  id           uuid primary key default gen_random_uuid(),
   athlete_id   uuid not null references public.athletes(id) on delete cascade,
   kind         text not null check (kind in ('athlete','guardian','research')),
   text_version text not null check (char_length(text_version) <= 20),
@@ -147,7 +172,7 @@ create index if not exists check_ins_athlete_date_idx on public.check_ins (athle
 -- questo mese ha segnalato il polpaccio destro?" è la base sia dei pattern sia
 -- della body-story, e con un JSON diventa una query che si scriverà male.
 create table if not exists public.body_signals (
-  id          bigint generated always as identity primary key,
+  id          uuid primary key default gen_random_uuid(),
   athlete_id  uuid not null references public.athletes(id) on delete cascade,
   check_in_id uuid references public.check_ins(id) on delete cascade,  -- null = segnalazione immediata
   created_at  timestamptz not null default now(),
@@ -170,9 +195,9 @@ create index if not exists body_signals_region_idx  on public.body_signals (athl
 -- interrogabili da sole, avere uno stato, e sopravvivere al check-in che le ha
 -- generate — che è anche ciò che tiene il Care mode visibile nella home.
 create table if not exists public.red_flags (
-  id            bigint generated always as identity primary key,
+  id            uuid primary key default gen_random_uuid(),
   athlete_id    uuid not null references public.athletes(id) on delete cascade,
-  body_signal_id bigint references public.body_signals(id) on delete set null,
+  body_signal_id uuid   references public.body_signals(id) on delete set null,
   opened_at     timestamptz not null default now(),
   region        text not null check (char_length(region) <= 40),
   sensation     text not null check (char_length(sensation) <= 40),
@@ -195,7 +220,7 @@ create index if not exists red_flags_open_idx on public.red_flags (athlete_id, r
 -- significherebbe congelare un'inferenza incerta come se fosse un fatto, e nei
 -- primi anni dopo il menarca i cicli sono troppo irregolari per farlo (§4.4).
 create table if not exists public.cycle_events (
-  id         bigint generated always as identity primary key,
+  id         uuid primary key default gen_random_uuid(),
   athlete_id uuid not null references public.athletes(id) on delete cascade,
   kind       text not null check (kind in ('period_start','period_end')),
   event_date date not null,
@@ -207,7 +232,7 @@ create index if not exists cycle_events_athlete_idx on public.cycle_events (athl
 
 -- ── PERCORSO ────────────────────────────────────────────────────────────────
 create table if not exists public.journey_progress (
-  id           bigint generated always as identity primary key,
+  id           uuid primary key default gen_random_uuid(),
   athlete_id   uuid not null references public.athletes(id) on delete cascade,
   week         smallint not null check (week between 1 and 16),
   completed_at timestamptz,
@@ -228,7 +253,7 @@ create table if not exists public.journey_progress (
 -- non blocca lo schema, e il coach non potrà comunque mai vedere più di quello
 -- che lei ha condiviso.
 create table if not exists public.shares (
-  id           bigint generated always as identity primary key,
+  id           uuid primary key default gen_random_uuid(),
   athlete_id   uuid not null references public.athletes(id) on delete cascade,
   created_at   timestamptz not null default now(),
   week_start   date not null,
@@ -241,7 +266,7 @@ create table if not exists public.shares (
 -- ── STRUMENTAZIONE ──────────────────────────────────────────────────────────
 -- Nessun contenuto: solo evento, schermata, durata e una meta piccola.
 create table if not exists public.ux_events (
-  id         bigint generated always as identity primary key,
+  id         uuid primary key default gen_random_uuid(),
   athlete_id uuid not null references public.athletes(id) on delete cascade,
   created_at timestamptz not null default now(),
   event      text not null check (char_length(event) <= 40),
@@ -340,7 +365,7 @@ create index if not exists team_events_team_idx on public.team_events (team_id, 
 -- fisica a scuola, che la squadra non conosce ma che è carico a tutti gli
 -- effetti — ed è il motivo per cui il check-in chiede `pe_attended`.
 create table if not exists public.athlete_schedule (
-  id           bigint generated always as identity primary key,
+  id           uuid primary key default gen_random_uuid(),
   athlete_id   uuid not null references public.athletes(id) on delete cascade,
   weekday      smallint not null check (weekday between 1 and 7),
   kind         text not null check (kind in ('pe','training','other')),
@@ -355,7 +380,7 @@ create index if not exists athlete_schedule_idx on public.athlete_schedule (athl
 -- chiederglielo comunque sarebbe un modo per bloccarla su una domanda a cui non
 -- può rispondere.
 create table if not exists public.athlete_events (
-  id         bigint generated always as identity primary key,
+  id         uuid primary key default gen_random_uuid(),
   athlete_id uuid not null references public.athletes(id) on delete cascade,
   event_date date not null,
   start_time time,

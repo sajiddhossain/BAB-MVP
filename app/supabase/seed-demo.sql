@@ -30,7 +30,7 @@ declare
   team      uuid;
   d         date;
   i         int;
-  sig       bigint;
+  sig       uuid;
 begin
   select id into coach_id from auth.users where email = coach_email;
   select id into a1       from auth.users where email = atleta1_email;

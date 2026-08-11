@@ -150,6 +150,26 @@ Se `flush` restituisce `parked: 1`, la riga ha violato un `CHECK` o la RLS: l'er
 
 ## Cosa NON è ancora fatto
 
-- [ ] Schermata di login (il client c'è, l'interfaccia no)
-- [ ] Idratazione iniziale: scaricare gli ultimi ~90 giorni al primo accesso
 - [ ] Export e cancellazione collegati alle funzioni SQL già scritte
+- [ ] Schermata impostazioni, e con essa il percorso di **aggiornamento** del
+      profilo: la coda sincronizza inserimenti, quindi oggi una modifica
+      verrebbe rifiutata come duplicato e messa da parte in silenzio
+
+## Da verificare appena il progetto esiste
+
+L'idratazione iniziale (`src/lib/hydrate.ts`) è provata contro un finto
+PostgREST, non contro Supabase. Le due cose che vanno riviste sul progetto vero,
+perché un finto server non le può dire:
+
+1. **La RLS lascia leggere le proprie righe.** Con l'utente collegato:
+
+   ```js
+   await bab.hydrate.hydrateAll('<il tuo uid>')   // { rows: n, tables: m }
+   ```
+
+   Se torna `rows: 0` con dati sul server, la policy `select` di quella tabella
+   non c'è o non guarda `auth.uid()`.
+
+2. **Il ciclo si scarica ma resta suo.** `cycle_events` finisce sul telefono
+   dell'atleta perché è la sua storia; NON deve comparire in nessuna vista
+   `coach_*` se non attraverso `coach_cycle_events`, che è filtrata (R2).

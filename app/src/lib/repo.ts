@@ -13,6 +13,20 @@ export function localDate(now: Date = new Date()): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+/**
+ * 🔴 L'`id` si genera QUI e finisce dentro la riga, non solo nella chiave
+ * locale.
+ *
+ * È quello che rende idempotente il reinvio: se l'inserimento arriva al server
+ * ma la risposta si perde — capita ogni volta che il campo cade a metà
+ * richiesta — il tentativo successivo sbatte su `23505 duplicate key`, che
+ * `sync.ts` tratta come «è già arrivata». Con la chiave assegnata dal server
+ * creerebbe invece una seconda riga, e l'atleta si ritroverebbe due volte lo
+ * stesso polpaccio senza che nessuno se ne accorga.
+ *
+ * Serve anche all'idratazione: una riga creata qui e la sua copia scaricata
+ * dal server hanno la stessa chiave, quindi sono lo stesso record.
+ */
 export const newId = (): string => crypto.randomUUID()
 
 export type CheckInDraft = {
@@ -72,13 +86,14 @@ export async function saveCheckIn(
 
   for (const s of signals) {
     const sid = newId()
-    await db.put('body_signals', sid, { ...s, check_in_id: id }, `${date}:${sid}`)
+    await db.put('body_signals', sid, { ...s, id: sid, check_in_id: id }, `${date}:${sid}`)
 
     // 🔴 Una bandiera rossa è una RIGA A SÉ, non un campo: §11 chiede che
     // escali a un umano subito e non finisca sepolta in un trend.
     if (s.is_red_flag) {
       const rid = newId()
       await db.put('red_flags', rid, {
+        id: rid,
         athlete_id: s.athlete_id,
         region: s.region,
         sensation: s.sensation,
@@ -96,11 +111,11 @@ export async function saveCheckIn(
 export async function saveAcuteSignal(s: BodySignalDraft): Promise<string> {
   const id = newId()
   const date = localDate()
-  await db.put('body_signals', id, { ...s, check_in_id: null }, `${date}:${id}`)
+  await db.put('body_signals', id, { ...s, id, check_in_id: null }, `${date}:${id}`)
   if (s.is_red_flag) {
     const rid = newId()
     await db.put('red_flags', rid, {
-      athlete_id: s.athlete_id, region: s.region, sensation: s.sensation,
+      id: rid, athlete_id: s.athlete_id, region: s.region, sensation: s.sensation,
       told_adult: false, opened_at: new Date().toISOString(),
     }, `${date}:${rid}`)
   }
@@ -110,7 +125,7 @@ export async function saveAcuteSignal(s: BodySignalDraft): Promise<string> {
 
 export async function saveCycleEvent(athleteId: string, date: string, kind: 'period_start' | 'period_end') {
   const id = newId()
-  await db.put('cycle_events', id, { athlete_id: athleteId, kind, event_date: date }, `${date}:${id}`)
+  await db.put('cycle_events', id, { id, athlete_id: athleteId, kind, event_date: date }, `${date}:${id}`)
   void flush()
   return id
 }
@@ -173,7 +188,7 @@ export async function saveConsent(
 ): Promise<void> {
   const id = newId()
   await db.put('consents', id, {
-    athlete_id: athleteId, kind, text_version: textVersion, granted,
+    id, athlete_id: athleteId, kind, text_version: textVersion, granted,
     granted_at: new Date().toISOString(),
   }, `${new Date().toISOString()}:${id}`)
   void flush()
@@ -190,7 +205,7 @@ export type ScheduleEntry = {
 export async function saveSchedule(entries: ScheduleEntry[]): Promise<void> {
   for (const e of entries) {
     const id = newId()
-    await db.put('athlete_schedule', id, e, `${e.weekday}:${e.kind}:${id}`)
+    await db.put('athlete_schedule', id, { ...e, id }, `${e.weekday}:${e.kind}:${id}`)
   }
   void flush()
 }
@@ -200,7 +215,7 @@ export async function saveAthleteEvent(
 ): Promise<void> {
   const id = newId()
   await db.put('athlete_events', id, {
-    athlete_id: athleteId, event_date: date, kind, title: title ?? null,
+    id, athlete_id: athleteId, event_date: date, kind, title: title ?? null,
   }, `${date}:${id}`)
   void flush()
 }
@@ -224,7 +239,7 @@ export async function saveShare(
 ): Promise<void> {
   const id = newId()
   await db.put('shares', id, {
-    athlete_id: athleteId, week_start: weekStart, blocks,
+    id, athlete_id: athleteId, week_start: weekStart, blocks,
     included_cycle: includedCycle, recipient_kind: recipient ?? null,
   }, `${weekStart}:${id}`)
   void flush()

@@ -38,7 +38,9 @@ export type TodayRow = {
 }
 
 export type RedFlag = {
-  id: number
+  /** uuid, non numero: le chiavi delle tabelle scritte dall'atleta sono uuid
+      generati sul client — vedi il blocco «CHIAVI» in schema.sql. */
+  id: string
   athlete_id: string
   opened_at: string
   region: string

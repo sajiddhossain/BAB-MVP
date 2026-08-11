@@ -122,6 +122,45 @@ if (existsSync(coachFile)) {
   }
 }
 
+// ── 7 · le tabelle scritte dall'atleta hanno la chiave generata sul client ──
+// La coda di sincronizzazione è idempotente SOLO se l'id nasce sul telefono.
+// Con una chiave assegnata dal server, un inserimento che arriva ma la cui
+// risposta si perde — il campo che cade a metà richiesta, in palestra —
+// viene ritentato e crea una SECONDA riga: l'atleta si ritrova due volte lo
+// stesso polpaccio e nessuno se ne accorge. È anche ciò che permette
+// all'idratazione di riconoscere una riga scaricata come la stessa riga
+// creata qui, invece che come una copia.
+const dbFile = join(root, 'src/lib/db.ts')
+if (existsSync(dbFile)) {
+  const dbSrc = readFileSync(dbFile, 'utf8')
+  const block = dbSrc.slice(dbSrc.indexOf('export type TableName'))
+  const written = [...block.slice(0, block.indexOf('\n\n')).matchAll(/'(\w+)'/g)].map((m) => m[1])
+  if (written.length === 0) errors.push('db.ts: nessuna tabella in TableName — il controllo delle chiavi non ha guardato niente.')
+
+  for (const table of written) {
+    const i = code.indexOf(`create table if not exists public.${table} (`)
+    if (i === -1) { errors.push(`db.ts scrive "${table}", che nello schema non esiste.`); continue }
+    const firstCol = code.slice(i, code.indexOf(';', i)).split('\n')[1] ?? ''
+    if (!/\buuid\b/.test(firstCol)) {
+      errors.push(`${table}: la chiave non è uuid generato sul client — un reinvio creerebbe una riga doppia.`)
+    }
+  }
+
+  // E l'id deve finire DENTRO la riga, non solo nella chiave locale: è la riga
+  // che viene spedita.
+  const repoFile = join(root, 'src/lib/repo.ts')
+  if (existsSync(repoFile)) {
+    const repo = readFileSync(repoFile, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+    for (const m of repo.matchAll(/db\.put\('(\w+)',\s*(\w+),\s*([\s\S]*?)\},/g)) {
+      const [, table, key, row] = m
+      if (table === 'athletes') continue        // la riga È il profilo, l'id ce l'ha già
+      if (!new RegExp(`(^|[{,\\s])id(\\s*[,:}]|\\s*$)`, 'm').test(row) && !row.includes(`id: ${key}`)) {
+        errors.push(`repo.ts: la riga scritta in "${table}" non contiene l'id — il server ne genererebbe uno suo.`)
+      }
+    }
+  }
+}
+
 if (errors.length) {
   console.error('\n🔴 schema.sql\n')
   for (const e of errors) console.error('  · ' + e)
