@@ -249,6 +249,24 @@ Le variabili vanno messe a mano perché `.env` è gitignorato, ed è giusto cos�
 anche se sono pubbliche: un file di configurazione che si trascina nel repo
 prima o poi ci si porta dentro qualcos'altro.
 
+### Deploy senza backend
+
+Se **non** metti le due variabili, esce una build che funziona lo stesso: niente
+schermata d'accesso, si entra dritti su Oggi, e tutto si salva sul telefono.
+Provato: check-in salvato, riletto dopo un ricaricamento, Oggi che passa allo
+stato «Chiudi il cerchio», e la coda che **tiene** la riga (`sent: 0, kept: 1`)
+invece di buttarla.
+
+🔵 Vite sostituisce `import.meta.env` con dei letterali, quindi senza le
+variabili il ramo `createClient` è morto e **`@supabase/supabase-js` sparisce
+dal bundle**: 447 KB invece di 660.
+
+🔴 Cosa vuol dire davvero: ogni persona che apre quell'indirizzo ha una copia
+sua, vuota, che non esce dal suo telefono. Nessuno vede niente di nessun altro —
+e **una bandiera rossa non arriva a nessun adulto**. Il contenuto di sicurezza
+(cosa fare quando fa male) c'è comunque, perché non ha mai dipeso dall'essere
+collegate. Va bene per far vedere il prodotto, non per darlo a un'atleta vera.
+
 🔴 **Appena hai il dominio**, torna su Supabase → **Authentication → URL
 Configuration**:
 - **Site URL** → `https://<il-dominio>.vercel.app`
