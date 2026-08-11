@@ -58,8 +58,8 @@ export type PendingOp = {
    * Assente vuol dire `insert`. Le code scritte prima che le modifiche
    * esistessero non hanno questo campo, e devono continuare a partire.
    */
-  op?: 'insert' | 'update'
-  /** Solo per `update`: la riga da modificare. */
+  op?: 'insert' | 'update' | 'delete'
+  /** Per `update` e `delete`: la riga da toccare. */
   target?: string
   table: TableName
   /** Per `update` contiene SOLO i campi cambiati, non la riga intera. */
@@ -208,6 +208,32 @@ export async function patch(
   await tx(PENDING, 'readwrite', (s) => s.put(op))
 }
 
+/**
+ * Toglie una riga: da qui e, appena c'è rete, dal server.
+ *
+ * 🔴 La terza e ultima operazione della coda, e la più tardiva: per due mesi
+ * sono bastati inserimento e modifica, perché gli eventi non si cancellano —
+ * un check-in fatto è successo, e toglierlo sarebbe riscrivere la storia. Ma
+ * l'agenda della settimana non è un evento: è una descrizione del presente, e
+ * una descrizione sbagliata si toglie. Se ha smesso di andare in palestra il
+ * martedì, il martedì deve sparire.
+ *
+ * 🔴 L'inserimento eventualmente ancora in coda NON si tocca. Cancellarlo
+ * sembrerebbe furbo — perché mandare una riga per poi toglierla? — ma
+ * l'inserimento può essere in volo proprio adesso: se la risposta si perde, la
+ * riga sul server esiste e la cancellazione che avevamo evitato di mettere in
+ * coda non arriverà mai. Un viaggio in più costa una richiesta; un fantasma
+ * sul server costa un giorno di allenamento che riappare da solo.
+ */
+export async function remove(table: TableName, id: string): Promise<void> {
+  await tx(RECORDS, 'readwrite', (s) => s.delete(`${table}:${id}`))
+  const op: PendingOp = {
+    id: crypto.randomUUID(), op: 'delete', target: id,
+    table, row: {}, createdAt: Date.now(), attempts: 0,
+  }
+  await tx(PENDING, 'readwrite', (s) => s.put(op))
+}
+
 /* ── lettura ────────────────────────────────────────────────────────────── */
 
 export async function list(
@@ -263,18 +289,49 @@ export async function markAttempt(op: PendingOp, error?: string): Promise<void> 
  * 🔴 Una transazione sola per tabella, non una `put` per riga: se la scheda si
  * chiude a metà, o l'archivio si riempie, o va tutto o non va niente. Mezza
  * settimana scritta è peggio di zero, perché sembra completa.
+ *
+ * 🔴 LA CODA VINCE SUL SERVER. Lo scarico non è solo il primo accesso: gira in
+ * sordina a ogni avvio (`refreshQuietly`), e quello che porta giù è vecchio di
+ * quanto è vecchia la coda. Senza queste due righe:
+ *
+ *   · un giorno di allenamento tolto senza campo tornerebbe da solo al primo
+ *     avvio online, prima che la cancellazione riesca a partire;
+ *   · un nome corretto senza campo tornerebbe quello di prima, e lei lo
+ *     vedrebbe cambiare sotto gli occhi senza aver toccato niente.
+ *
+ * In tutt'e due i casi la modifica poi arrivava eccome sul server — è lo
+ * SCHERMO che mentiva, ed è il posto peggiore dove mentire.
  */
 export async function hydrate(
   table: TableName,
   rows: { id: string; row: Record<string, unknown>; sortKey: string }[],
 ): Promise<void> {
   if (rows.length === 0) return
+
+  const ops = await pending()   // già in ordine di creazione
+  const doomed = new Set<string>()
+  /** Le modifiche non ancora partite, fuse nell'ordine in cui le ha fatte. */
+  const patches = new Map<string, Record<string, unknown>>()
+  for (const o of ops) {
+    if (o.table !== table || !o.target) continue
+    if (o.op === 'delete') doomed.add(o.target)
+    if (o.op === 'update') patches.set(o.target, { ...patches.get(o.target), ...o.row })
+  }
+
+  const keep = rows.filter((r) => !doomed.has(r.id))
+  if (keep.length === 0) return
+
   const db = await open()
   await new Promise<void>((resolve, reject) => {
     const t = db.transaction(RECORDS, 'readwrite')
     const s = t.objectStore(RECORDS)
-    for (const r of rows) {
-      s.put({ key: `${table}:${r.id}`, table, id: r.id, row: r.row, sortKey: r.sortKey })
+    for (const r of keep) {
+      const mine = patches.get(r.id)
+      s.put({
+        key: `${table}:${r.id}`, table, id: r.id,
+        row: mine ? { ...r.row, ...mine } : r.row,
+        sortKey: r.sortKey,
+      })
     }
     t.oncomplete = () => resolve()
     t.onerror = () => reject(t.error)

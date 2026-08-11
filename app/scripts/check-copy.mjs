@@ -54,8 +54,14 @@ const walk = (dir) =>
  * La prima versione pretendeva che il testo COMINCIASSE con una lettera, e così
  * `🩹 Mi sono fatta male` passava indisturbato — cioè proprio la forma che il
  * copy di BAB usa più spesso. Ora basta che una lettera ci sia da qualche parte.
+ *
+ * 🔴 `(?<!=)` esclude il `>` di una freccia. Senza, `(e) => e.date < today`
+ * diventa «testo fra tag»: il `>` della freccia apre, il `<` del confronto
+ * chiude, e in mezzo c'è `e.date`. Stessa cosa per `() => Promise<void>`. Sono
+ * due false accuse che si prendono solo scrivendo codice normale, e un
+ * controllo che accusa il codice normale finisce spento.
  */
-const JSX_TEXT = />\s*([^<>{}\n]*[A-Za-zÀ-ÿ][^<>{}\n]{2,})\s*</g
+const JSX_TEXT = /(?<!=)>\s*([^<>{}\n]*[A-Za-zÀ-ÿ][^<>{}\n]{2,})\s*</g
 // Attributi che finiscono davanti agli occhi di chi usa l'app
 const UI_ATTR = /\b(aria-label|placeholder|title|alt)=["']([^"']{2,})["']/g
 

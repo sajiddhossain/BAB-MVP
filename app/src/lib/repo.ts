@@ -257,6 +257,40 @@ export async function saveAthleteEvent(
   void flush()
 }
 
+/* ── L'agenda si rilegge e si corregge ──────────────────────────────────────
+ *
+ * 🔴 Sono le uniche righe del prodotto che si CANCELLANO. Un check-in non si
+ * toglie perché è successo; un martedì di allenamento a cui ha smesso di
+ * andare non è successo niente — è una descrizione sbagliata del presente, e
+ * lasciarla lì vuol dire che BAB continua a chiederle il check-in di martedì.
+ */
+
+export async function listSchedule() {
+  return db.list('athlete_schedule')
+}
+
+export async function listAthleteEvents() {
+  return db.list('athlete_events', { desc: true })
+}
+
+export async function removeSchedule(id: string): Promise<void> {
+  await db.remove('athlete_schedule', id)
+  void flush()
+}
+
+export async function removeAthleteEvent(id: string): Promise<void> {
+  await db.remove('athlete_events', id)
+  void flush()
+}
+
+/** L'orario di un allenamento già in agenda. Si corregge, non si ricrea. */
+export async function updateSchedule(
+  id: string, changes: { start_time?: string | null; duration_min?: number | null },
+): Promise<void> {
+  await db.patch('athlete_schedule', id, changes)
+  void flush()
+}
+
 export async function recentSignals(limit = 200) {
   return db.list('body_signals', { limit, desc: true })
 }

@@ -9,12 +9,19 @@ import { supabase } from './supabase'
  * stessa riga e non c'è niente da fondere. L'`id` è generato sul client,
  * quindi un reinvio è idempotente — il database rifiuta il duplicato.
  *
- * L'eccezione è il PROFILO, che per sua natura si corregge: il nome, lo sport,
- * lo stato del ciclo. Per quello serve un'operazione di modifica, ed è l'unica.
- * Finché non c'era, una modifica finiva in coda come inserimento, il server la
- * rifiutava come duplicato, e questa funzione la scambiava per «è già
- * arrivata» e la buttava: il telefono mostrava il nome nuovo, il server teneva
- * quello vecchio, e nessuno se ne accorgeva.
+ * Le eccezioni sono due, e sono le due cose che descrivono il PRESENTE invece
+ * di registrare un fatto:
+ *
+ *   · il PROFILO si corregge — il nome, lo sport, lo stato del ciclo — e per
+ *     quello serve `update`. Finché non c'era, una modifica finiva in coda come
+ *     inserimento, il server la rifiutava come duplicato, e questa funzione la
+ *     scambiava per «è già arrivata» e la buttava: il telefono mostrava il nome
+ *     nuovo, il server teneva quello vecchio, e nessuno se ne accorgeva;
+ *
+ *   · l'AGENDA della settimana si toglie — se ha smesso di allenarsi il
+ *     martedì, il martedì deve sparire — e per quello serve `delete`.
+ *
+ * Un check-in invece non si modifica e non si cancella: è successo.
  */
 
 /** Un errore di RETE è temporaneo: si riprova, la coda non si svuota mai. */
@@ -82,6 +89,29 @@ async function run(): Promise<SyncResult> {
   for (const op of ops) {
     if (op.lastError) { result.parked++; continue }
     try {
+      if (op.op === 'delete') {
+        /**
+         * 🔴 Nessun `select()` qui, al contrario della modifica — e non è una
+         * dimenticanza. Su un update, «zero righe toccate» vuol dire che la
+         * modifica non è stata applicata e va riprovata. Su una cancellazione,
+         * «zero righe toccate» vuol dire che la riga non c'è: è esattamente il
+         * risultato che si voleva. Pretendere una riga da cancellare
+         * trasformerebbe un successo in un tentativo infinito.
+         */
+        const { error } = await supabase.from(op.table).delete().eq('id', op.target!)
+        if (error) {
+          if (PERMANENT.has(error.code ?? '')) {
+            await markAttempt(op, `${error.code}: ${error.message}`)
+            result.parked++
+            continue
+          }
+          throw new Error(error.message)
+        }
+        await clearPending(op.id)
+        result.sent++
+        continue
+      }
+
       if (op.op === 'update') {
         // 🔴 `select()` non è decorativo: un update su una riga che non esiste
         // NON è un errore per Postgres, tocca zero righe e torna soddisfatto.

@@ -9,6 +9,9 @@ import Body from './screens/Body'
 import SettingsIndex from './screens/settings/Index'
 import SettingsProfile from './screens/settings/Profile'
 import SettingsRhythm from './screens/settings/Rhythm'
+import SettingsAgenda from './screens/settings/Agenda'
+import AgendaDays from './screens/settings/AgendaDays'
+import AgendaEvents from './screens/settings/AgendaEvents'
 import SettingsLanguage from './screens/settings/Language'
 import SettingsData from './screens/settings/Data'
 import SettingsAccount from './screens/settings/Account'
@@ -154,6 +157,12 @@ export default function App() {
           <Route path="/settings" element={<SettingsIndex />} />
           <Route path="/settings/profilo" element={<SettingsProfile />} />
           <Route path="/settings/ritmo" element={<SettingsRhythm />} />
+          <Route path="/settings/agenda" element={<SettingsAgenda />} />
+          {/* Una schermata sola su due indirizzi: la domanda è «quali giorni»,
+              cambia solo di cosa. */}
+          <Route path="/settings/agenda/allenamenti" element={<AgendaDays kind="training" />} />
+          <Route path="/settings/agenda/educazione-fisica" element={<AgendaDays kind="pe" />} />
+          <Route path="/settings/agenda/gare" element={<AgendaEvents />} />
           <Route path="/settings/lingua" element={<SettingsLanguage />} />
           <Route path="/settings/dati" element={<SettingsData />} />
           <Route path="/settings/account" element={<SettingsAccount />} />

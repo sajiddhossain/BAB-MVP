@@ -150,11 +150,10 @@ Se `flush` restituisce `parked: 1`, la riga ha violato un `CHECK` o la RLS: l'er
 
 ## Cosa NON è ancora fatto
 
-- [ ] **Modificare l'agenda della settimana** (giorni di allenamento, di
-      educazione fisica, le gare). Sono righe di `athlete_schedule` e
-      `athlete_events`, e correggerle vuol dire poterle togliere: la coda oggi
-      sa inserire e modificare, non cancellare. Serve un'operazione `delete`
-      più la schermata. Finché non c'è, l'agenda si scrive all'onboarding.
+- [x] ~~Modificare l'agenda della settimana~~ — fatto. La coda ha imparato a
+      cancellare (`db.remove`), ed è l'unica cosa del prodotto che si cancella
+      davvero: un check-in è successo, un martedì di allenamento a cui ha
+      smesso di andare no.
 
 - [ ] **`body_signals.created_at` sulle righe già sul server.** Da adesso il
       telefono manda sempre il proprio, ma se qualche riga fosse già stata

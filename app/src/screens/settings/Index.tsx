@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { plural, useCopy, useLocale, LOCALES } from '@/copy'
-import { getProfile } from '@/lib/repo'
+import { getProfile, listSchedule } from '@/lib/repo'
 import { useSession } from '@/lib/session'
 import { parked } from '@/lib/sync'
 import * as db from '@/lib/db'
@@ -30,6 +30,7 @@ export default function SettingsIndex() {
   const locale = useLocale()
   const { userId, connected } = useSession()
   const [profile, setProfile] = useState<Record<string, unknown> | null>(null)
+  const [schedule, setSchedule] = useState<Record<string, unknown>[]>([])
   const [queue, setQueue] = useState({ waiting: 0, stuck: 0 })
 
   useEffect(() => {
@@ -51,9 +52,23 @@ export default function SettingsIndex() {
     return () => { alive = false }
   }, [userId])
 
+  useEffect(() => {
+    let alive = true
+    listSchedule()
+      .then((r) => { if (alive) setSchedule(r) })
+      .catch(() => { /* nessuna agenda da riassumere */ })
+    return () => { alive = false }
+  }, [])
+
   const name = String(profile?.display_name ?? '').trim()
   const sport = String(profile?.sport ?? '').trim()
   const cycle = (profile?.cycle_status as Cycle) ?? null
+
+  /** I giorni occupati, di qualunque tipo: è quello che si legge in un colpo. */
+  const busy = [...new Set(schedule.map((r) => Number(r.weekday)))].sort((a, b) => a - b)
+  const week = busy.length
+    ? busy.map((d) => t.onboarding.weekdays[d - 1]).join(' · ')
+    : t.settings.agendaNone
 
   const cycleLabel = cycle === 'tracking' ? t.onboarding.rhythmYes
     : cycle === 'not_yet' ? t.onboarding.rhythmNotYet
@@ -70,6 +85,13 @@ export default function SettingsIndex() {
       to: '/settings/ritmo',
       title: t.settings.rhythmTitle,
       value: cycleLabel,
+    },
+    {
+      // Sta fra il ritmo e la lingua perché è l'ultima cosa che descrive LEI:
+      // dopo cominciano le impostazioni dell'app e dell'account.
+      to: '/settings/agenda',
+      title: t.settings.agendaTitle,
+      value: week,
     },
     {
       to: '/settings/lingua',

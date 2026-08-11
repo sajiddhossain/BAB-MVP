@@ -17,16 +17,18 @@ import * as db from '@/lib/db'
  * scorrimento.
  */
 
-export function Pane({ title, help, children }: {
+export function Pane({ title, help, children, back = '/settings' }: {
   title: string
   help?: string
   children: React.ReactNode
+  /** Dove torna la freccia. L'agenda ha un livello suo, e ci si torna dentro. */
+  back?: string
 }) {
   const t = useCopy()
   return (
     <section className="flex flex-col gap-4 pt-2">
       <div className="flex items-center gap-3">
-        <Link to="/settings" aria-label={t.settings.back}
+        <Link to={back} aria-label={t.settings.back}
               className="bab-pill flex h-11 w-11 shrink-0 items-center justify-center text-[17px]">
           <span aria-hidden>←</span>
         </Link>
@@ -97,28 +99,49 @@ export function useProfileEdit() {
     if (!userId) return
     const patch = diff(next)
     if (Object.keys(patch).length === 0) return
-    setState('saving')
-    try {
-      await updateProfile(userId, patch)
-      setSaved((p) => ({ ...(p ?? {}), ...patch }))
-      // 🔴 Si aspetta il giro di invio prima di dire com'è andata. Guardando
-      // la coda subito dopo la scrittura, l'invio è ancora in volo e lo
-      // schermo direbbe «parte appena c'è rete» anche quando la rete c'era e
-      // la modifica è già arrivata.
-      await flush().catch(() => {})
-      const mine = (await db.pending().catch(() => []))
-        .filter((o) => o.op === 'update' && o.target === userId)
-      setState(
-        mine.some((o) => o.lastError) ? 'error'
-          : mine.length > 0 ? 'queued'
-          : 'saved',
-      )
-    } catch {
-      setState('error')
-    }
+    await saveAndSettle(
+      async () => {
+        await updateProfile(userId, patch)
+        setSaved((p) => ({ ...(p ?? {}), ...patch }))
+      },
+      (o) => o.op === 'update' && o.target === userId,
+      setState,
+    )
   }
 
   return { userId, saved, state, setState, diff, commit }
+}
+
+/**
+ * Salva, aspetta il giro di invio, e poi dice com'è andata.
+ *
+ * 🔴 L'attesa non è cortesia. Guardando la coda subito dopo la scrittura,
+ * l'invio è ancora in volo e lo schermo direbbe «parte appena c'è rete» anche
+ * quando la rete c'era e la modifica è già arrivata — un messaggio falso, e
+ * proprio quello che la fa dubitare se ha salvato o no.
+ *
+ * `mine` dice quali righe della coda riguardano questa schermata: senza, una
+ * cosa rimasta indietro da tutt'altra parte farebbe dire «non è partito» a chi
+ * ha appena salvato benissimo.
+ */
+export async function saveAndSettle(
+  run: () => Promise<void>,
+  mine: (op: db.PendingOp) => boolean,
+  setState: (s: SaveState) => void,
+): Promise<void> {
+  setState('saving')
+  try {
+    await run()
+    await flush().catch(() => {})
+    const left = (await db.pending().catch(() => [])).filter(mine)
+    setState(
+      left.some((o) => o.lastError) ? 'error'
+        : left.length > 0 ? 'queued'
+        : 'saved',
+    )
+  } catch {
+    setState('error')
+  }
 }
 
 /** L'esito del salvataggio, detto allo stesso modo ovunque si salvi. */
