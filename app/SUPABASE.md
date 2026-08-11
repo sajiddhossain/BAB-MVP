@@ -249,6 +249,14 @@ Le variabili vanno messe a mano perché `.env` è gitignorato, ed è giusto cos�
 anche se sono pubbliche: un file di configurazione che si trascina nel repo
 prima o poi ci si porta dentro qualcos'altro.
 
+🔴 **`.gitignore` non protegge il deploy.** La CLI carica la cartella locale, e
+`app/.env` sale insieme al resto: al primo tentativo è uscita la build
+collegata invece di quella senza backend, con URL e chiave dentro al bundle.
+Per questo c'è [`.vercelignore`](.vercelignore) — e per questo un segreto in
+`.env` sarebbe pubblicato, non solo tenuto fuori da git. Le variabili si
+mettono dal pannello (Settings → Environment Variables), mai lasciandole
+viaggiare col file.
+
 ### Deploy senza backend
 
 Se **non** metti le due variabili, esce una build che funziona lo stesso: niente

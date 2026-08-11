@@ -1,0 +1,27 @@
+# Cosa NON sale su Vercel.
+#
+# 🔴 Serve per una riga sola: `.env`. La CLI carica la cartella locale, e
+# `.gitignore` non lo tiene fuori dall'upload — quindi il file arriva
+# all'ambiente di build, Vite lo legge, e le variabili finiscono nel bundle.
+# È già successo al primo deploy: era uscita la build collegata invece di
+# quella senza backend.
+#
+# Qui dentro oggi ci sono solo due valori pubblici per costruzione, quindi non
+# è stato un incidente. Ma il giorno che qualcuno ci mette un segreto —
+# credendo che `.gitignore` basti — quel segreto viene pubblicato. Meglio che
+# la porta sia chiusa prima.
+#
+# 🔵 Su Vercel le variabili si mettono dal pannello del progetto
+# (Settings → Environment Variables), che è l'unico posto dove distinguere
+# fra anteprima e produzione.
+.env
+.env.*
+!.env.example
+
+# Attenzione: quando questo file esiste, Vercel smette di usare `.gitignore`
+# per decidere cosa caricare. Quindi quello che prima era escluso di riflesso
+# va riscritto qui.
+node_modules
+dist
+dev-dist
+.DS_Store
