@@ -143,6 +143,12 @@ export default function Me() {
       {/* 🔴 Sopra ogni ipotesi, sempre. Vale anche quando le ipotesi non ci sono
           ancora: insegna da subito come vanno prese. */}
       <p className="px-1 text-[13px] text-[var(--color-ink-soft)]">{t.me.insightCaveat}</p>
+
+      {/* I dati sono suoi, e la porta per portarseli via sta dove stanno i
+          suoi dati — non sepolta in un menu che nessuno apre. */}
+      <Link to="/settings" className="px-1 text-[13.5px] underline text-[var(--color-ink-soft)]">
+        {t.settings.open}
+      </Link>
     </section>
   )
 }

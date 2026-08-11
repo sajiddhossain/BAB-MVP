@@ -150,10 +150,10 @@ Se `flush` restituisce `parked: 1`, la riga ha violato un `CHECK` o la RLS: l'er
 
 ## Cosa NON è ancora fatto
 
-- [ ] Export e cancellazione collegati alle funzioni SQL già scritte
-- [ ] Schermata impostazioni, e con essa il percorso di **aggiornamento** del
-      profilo: la coda sincronizza inserimenti, quindi oggi una modifica
-      verrebbe rifiutata come duplicato e messa da parte in silenzio
+- [ ] Il percorso di **aggiornamento** del profilo. La coda sincronizza
+      inserimenti: una modifica verrebbe rifiutata come duplicato e messa da
+      parte in silenzio. Finché non c'è, il profilo si scrive una volta sola —
+      all'onboarding.
 
 ## Da verificare appena il progetto esiste
 
@@ -173,3 +173,19 @@ perché un finto server non le può dire:
 2. **Il ciclo si scarica ma resta suo.** `cycle_events` finisce sul telefono
    dell'atleta perché è la sua storia; NON deve comparire in nessuna vista
    `coach_*` se non attraverso `coach_cycle_events`, che è filtrata (R2).
+
+3. **La cancellazione cancella davvero.** `delete_my_account()` è `security
+   definer` e toglie la riga da `auth.users`; tutto il resto se ne va in
+   cascata. Da riprovare sul progetto vero, perché è l'unica cosa che un finto
+   server non può dimostrare:
+
+   ```sql
+   -- come postgres, DOPO che l'atleta ha cancellato dall'app
+   select count(*) from public.check_ins    where athlete_id = '<uid>';  -- 0
+   select count(*) from public.cycle_events where athlete_id = '<uid>';  -- 0
+   select count(*) from auth.users          where id         = '<uid>';  -- 0
+   ```
+
+   Se il primo conteggio non è zero, manca un `on delete cascade` da qualche
+   parte e la cancellazione è una mezza cancellazione — la cosa peggiore, perché
+   la schermata le ha promesso che spariva tutto.

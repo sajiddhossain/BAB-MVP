@@ -334,6 +334,29 @@ colonne `tempo_predicted` / `tempo_chosen`, il tipo `Tempo`, le variabili CSS
 `--tempo-*`, il file `tempo.ts`. Rinominarli significherebbe migrare dati per una
 questione di lingua, contro [R10](#r10--più-di-20-atlete-e-la-webapp-non-si-sostituisce).
 
+### B4 · Chi può premere il pulsante di cancellazione
+
+La cancellazione dell'account è implementata come **self-service**: l'atleta scrive
+`CANCELLA`, e sparisce tutto — dal server, non solo dal telefono. È la lettura più
+semplice del diritto alla cancellazione, ed è quella che il §9 lascia intendere.
+
+Ma le utenti sono minorenni, e l'accesso passa dalle squadre. Restano due domande che
+non sono tecniche:
+
+1. **A tredici anni si cancella da sole, o serve chi ha dato il consenso?** Il consenso
+   iniziale lo firma anche un genitore (`consents.kind = 'guardian'`): se conta per
+   entrare, è difficile sostenere che non conti per uscire. Dall'altra parte, legare la
+   cancellazione a un adulto significa che un'atleta che vuole andarsene deve chiedere
+   il permesso a qualcuno — che è esattamente la situazione in cui una ragazza smette
+   di scrivere cose vere.
+
+2. **Una bandiera rossa aperta cambia qualcosa?** Se un coach ha visto un ginocchio che
+   cede e sta organizzando una visita, la cancellazione fa sparire anche quello. È
+   corretto in termini di dati e discutibile in termini di sicurezza.
+
+🟡 **Serve una risposta dal legale prima del pilota.** Il codice non cambia molto in
+nessuno dei due casi: cambia chi vede il pulsante, e cosa dice.
+
 ---
 
 ## Cosa resta aperto
@@ -343,6 +366,7 @@ questione di lingua, contro [R10](#r10--più-di-20-atlete-e-la-webapp-non-si-sos
 | **B1** | Wearable: si rimanda, o si scelgono le integrazioni cloud? |
 | ~~B2~~ | 🟢 **Chiusa: "andatura".** Applicata ovunque nell'italiano |
 | D8 | La domanda "livello di soddisfazione" — i primi due valori giudicano la prestazione |
+| **B4** | Una minorenne può cancellarsi da sola? È implementata così, e va confermata |
 | D9–D12 | Avatar, badge, spec UI vecchie, tema scuro — tutte rimandabili |
 
 D1, D2, D3, D4, D6 sono chiuse da questo giro.

@@ -133,9 +133,22 @@ if (existsSync(coachFile)) {
 const dbFile = join(root, 'src/lib/db.ts')
 if (existsSync(dbFile)) {
   const dbSrc = readFileSync(dbFile, 'utf8')
-  const block = dbSrc.slice(dbSrc.indexOf('export type TableName'))
-  const written = [...block.slice(0, block.indexOf('\n\n')).matchAll(/'(\w+)'/g)].map((m) => m[1])
-  if (written.length === 0) errors.push('db.ts: nessuna tabella in TableName — il controllo delle chiavi non ha guardato niente.')
+  const block = dbSrc.slice(dbSrc.indexOf('export const TABLES'))
+  const written = [...block.slice(0, block.indexOf(']')).matchAll(/'(\w+)'/g)].map((m) => m[1])
+  if (written.length === 0) errors.push('db.ts: nessuna tabella in TABLES — il controllo delle chiavi non ha guardato niente.')
+
+  // ── 8 · l'export porta via TUTTO ──────────────────────────────────────────
+  // §9: i dati sono suoi. Se qualcuno aggiunge una tabella e si dimentica di
+  // `export_my_data`, l'export continua a funzionare e a sembrare completo —
+  // semplicemente le restituisce meno di quello che abbiamo. È il tipo di
+  // buco che si scopre solo quando qualcuno chiede i propri dati sul serio.
+  const exp = code.slice(code.indexOf('create or replace function public.export_my_data'))
+  const body = exp.slice(0, exp.indexOf('$$;', exp.indexOf('$$') + 2))
+  for (const table of written) {
+    if (!body.includes(`public.${table} `)) {
+      errors.push(`export_my_data non esporta "${table}": l'atleta non riavrebbe tutti i suoi dati.`)
+    }
+  }
 
   for (const table of written) {
     const i = code.indexOf(`create table if not exists public.${table} (`)

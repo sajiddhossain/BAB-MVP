@@ -38,10 +38,13 @@ const META = 'meta'
  * l'app dell'atleta non deve poterci scrivere nemmeno per sbaglio, e altezza e
  * peso non devono neanche transitare da questo dispositivo.
  */
-export type TableName =
-  | 'athletes' | 'consents' | 'check_ins' | 'body_signals'
-  | 'red_flags' | 'cycle_events' | 'journey_progress' | 'shares' | 'ux_events'
-  | 'athlete_schedule' | 'athlete_events'
+export const TABLES = [
+  'athletes', 'consents', 'check_ins', 'body_signals',
+  'red_flags', 'cycle_events', 'journey_progress', 'shares', 'ux_events',
+  'athlete_schedule', 'athlete_events',
+] as const
+
+export type TableName = typeof TABLES[number]
 
 export type PendingOp = {
   /** UUID generato sul client: rende l'inserimento idempotente. */

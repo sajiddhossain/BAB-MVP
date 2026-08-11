@@ -93,6 +93,44 @@ export const it = {
     retry: 'Riprova',
   },
 
+  /**
+   * §9 · I due diritti: portarsi via i propri dati, e farli sparire.
+   * Il tono resta quello di sempre — nessuna minaccia, nessun ricatto — ma la
+   * cancellazione non si ammorbidisce: è per sempre e va detto così.
+   */
+  settings: {
+    title: 'I tuoi dati',
+    open: 'I tuoi dati e il tuo account',
+    back: 'Indietro',
+
+    queueTitle: 'In attesa di partire',
+    queueBody: '{n} cose sono salvate qui e aspettano la rete. Non si perdono.',
+    queueParked: '{n} non sono riuscite a partire. Restano salvate qui e sono dentro il file che scarichi — se la cosa non si sblocca, scrivici.',
+
+    exportTitle: 'Porta via i tuoi dati',
+    exportBody: 'Sono tuoi. Scarichi un file con tutto quello che BAB ha di te: i check-in, le sensazioni sulla mappa, le date del ciclo, i consensi che hai dato e quando.',
+    exportCta: 'Scarica tutto',
+    exportWorking: 'Preparo il file…',
+    exportDone: 'Fatto: il file è nei tuoi download.',
+    exportFromDevice: 'Non c\'era rete, quindi il file contiene quello che sta su questo dispositivo.',
+    exportPending: '{n} cose non erano ancora arrivate al server: sono nel file, in fondo, segnate come non ancora inviate.',
+    exportError: 'Non sono riuscita a preparare il file. Riprova fra poco.',
+
+    deleteTitle: 'Cancella il tuo account',
+    deleteBody: 'Sparisce tutto: i check-in, le sensazioni, le date del ciclo, il tuo profilo. Non viene archiviato da qualche parte — viene cancellato, e non possiamo recuperarlo.',
+    /** 🔴 Va detto prima, non dopo: una body-story è un\'immagine già partita. */
+    deleteShared: 'Quello che hai già mandato a qualcuno — una body-story, un messaggio — resta a chi l\'ha ricevuto: cancellare qui non lo riprende indietro.',
+    deleteExportFirst: 'Se vuoi tenerli, scaricali prima.',
+    deleteCta: 'Voglio cancellare tutto',
+    deleteConfirm: 'Scrivi {word} qui sotto per confermare.',
+    deleteWord: 'CANCELLA',
+    deleteGo: 'Cancella per sempre',
+    deleteAbort: 'Lascia stare',
+    deleteWorking: 'Sto cancellando…',
+    deleteOffline: 'Serve la rete: voglio essere sicura che sparisca davvero anche dal server, non solo da questo telefono.',
+    deleteError: 'Non sono riuscita a cancellare. I tuoi dati sono ancora al loro posto, non è successo niente a metà — riprova, o scrivici.',
+  },
+
   today: {
     greetingMorning: 'Buongiorno, {name}',
     greetingEvening: 'Buonasera, {name}',
@@ -438,19 +476,6 @@ export const it = {
     cycleNote: 'Sono le date che ha inserito lei, non una previsione. Alla sua età i cicli spesso non sono ancora regolari: servono come contesto per capire una giornata, mai per programmare o per farne un tema di conversazione se non è lei ad aprirlo.',
     cycleNone: 'Nessuna data inserita.',
     nothingYet: 'Ancora nessun check-in.',
-  },
-
-  settings: {
-    title: 'Impostazioni',
-    profile: 'Profilo',
-    rhythm: 'Il mio ritmo',
-    privacy: 'Privacy e dati',
-    notifications: 'Promemoria',
-    help: 'Aiuto',
-    exportData: 'Esporta i miei dati',
-    deleteAccount: 'Cancella il mio account',
-    deleteConfirm: 'Cancella davvero tutto? Non si torna indietro.',
-    language: 'Lingua',
   },
 
   common: {

@@ -68,6 +68,38 @@ export const en: Copy = {
     retry: 'Try again',
   },
 
+  settings: {
+    title: 'Your data',
+    open: 'Your data and your account',
+    back: 'Back',
+
+    queueTitle: 'Waiting to go',
+    queueBody: '{n} things are saved here waiting for a signal. Nothing is lost.',
+    queueParked: "{n} couldn't get through. They stay saved here and they're inside the file you download — if it doesn't clear up, tell us.",
+
+    exportTitle: 'Take your data with you',
+    exportBody: "It's yours. You'll download a file with everything BAB holds about you: your check-ins, what you marked on the body map, your cycle dates, the consents you gave and when.",
+    exportCta: 'Download everything',
+    exportWorking: 'Preparing the file…',
+    exportDone: "Done — it's in your downloads.",
+    exportFromDevice: 'There was no signal, so the file holds what is on this device.',
+    exportPending: "{n} things hadn't reached the server yet: they're in the file, at the end, marked as not yet sent.",
+    exportError: "I couldn't prepare the file. Try again in a moment.",
+
+    deleteTitle: 'Delete your account',
+    deleteBody: "Everything goes: your check-ins, what you felt, your cycle dates, your profile. It isn't archived somewhere — it's deleted, and we can't get it back.",
+    deleteShared: "Anything you already sent someone — a body story, a message — stays with whoever received it: deleting here doesn't take it back.",
+    deleteExportFirst: 'If you want to keep them, download them first.',
+    deleteCta: 'I want to delete everything',
+    deleteConfirm: 'Type {word} below to confirm.',
+    deleteWord: 'DELETE',
+    deleteGo: 'Delete forever',
+    deleteAbort: 'Never mind',
+    deleteWorking: 'Deleting…',
+    deleteOffline: "The network is needed: I want to be sure it really goes from the server too, not just from this phone.",
+    deleteError: "I couldn't delete it. Your data is still where it was — nothing happened halfway. Try again, or tell us.",
+  },
+
   today: {
     greetingMorning: 'Morning, {name}',
     greetingEvening: 'Evening, {name}',
@@ -388,19 +420,6 @@ export const en: Copy = {
     cycleNote: "These are the dates she entered, not a forecast. At her age cycles are often still irregular: use them as context for a day, never to plan around, and never as a topic unless she opens it.",
     cycleNone: 'No dates entered.',
     nothingYet: 'No check-ins yet.',
-  },
-
-  settings: {
-    title: 'Settings',
-    profile: 'Profile',
-    rhythm: 'My rhythm',
-    privacy: 'Privacy and data',
-    notifications: 'Reminders',
-    help: 'Help',
-    exportData: 'Export my data',
-    deleteAccount: 'Delete my account',
-    deleteConfirm: 'Really delete everything? There is no going back.',
-    language: 'Language',
   },
 
   common: {

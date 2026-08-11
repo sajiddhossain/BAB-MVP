@@ -615,7 +615,11 @@ returns jsonb language sql security invoker stable as $$
     'journey',      (select coalesce(jsonb_agg(to_jsonb(j)),'[]') from public.journey_progress j where j.athlete_id = auth.uid()),
     'shares',       (select coalesce(jsonb_agg(to_jsonb(s)),'[]') from public.shares s where s.athlete_id = auth.uid()),
     'schedule',     (select coalesce(jsonb_agg(to_jsonb(w)),'[]') from public.athlete_schedule w where w.athlete_id = auth.uid()),
-    'events',       (select coalesce(jsonb_agg(to_jsonb(e)),'[]') from public.athlete_events e where e.athlete_id = auth.uid())
+    'events',       (select coalesce(jsonb_agg(to_jsonb(e)),'[]') from public.athlete_events e where e.athlete_id = auth.uid()),
+    -- 🔴 Anche la strumentazione. Non serve a lei e non gliela mostriamo da
+    -- nessuna parte, ma è generata dal suo uso ed è un dato personale: tenerla
+    -- fuori da una richiesta di accesso ai propri dati sarebbe indifendibile.
+    'ux_events',    (select coalesce(jsonb_agg(to_jsonb(x)),'[]') from public.ux_events x where x.athlete_id = auth.uid())
   );
 $$;
 
