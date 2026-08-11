@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useState } from 'react'
 import { useCopy, useLocale, fill as tpl } from '@/copy'
 import { REGIONS, regionLabel, type RegionCode } from '@/content/bodymap'
 import {
-  GEOMETRY, GROUND, HALF, MIRROR, VIEW, area, hitBox, type Shape, type Side,
+  GEOMETRY, HALF, MIRROR, SHADOW, VIEW, area, hitBox, type Shape, type Side,
 } from './body-shapes'
 
 /**
@@ -78,7 +78,7 @@ function Decor({ side }: { side: Side }) {
       {/* Nuca e coda. Dicono «stai guardando il dietro» senza scrivere una
           parola — che è l'unico modo di dirlo in un decimo di secondo. */}
       <ellipse cx={100} cy={35} rx={23.4} ry={23} {...hair} />
-      <path d="M100,50 C104,57 108,71 107,88 C106.5,99 93.5,99 93,88 C92,71 96,57 100,50 Z" {...hair} />
+      <path d="M100,52 C108,60 109,74 105,90 C103,98 97,98 95,90 C91,74 92,60 100,52 Z" {...hair} />
       <path d="M100,118 L100,168" fill="none" stroke={ink} strokeWidth={2.2}
             strokeDasharray="4 6" strokeLinecap="round" opacity={0.4} />
     </g>
@@ -170,12 +170,22 @@ export default function BodyMap({
     onSelect(code)
   }
 
+  /**
+   * Le tinte sono OPACHE, non trasparenze.
+   *
+   * Il corpo è pieno di sabbia, non di bianco: una tinta al 14% su trasparente
+   * ci si mescolava e veniva fuori un colore fangoso che si vedeva appena. Un
+   * `color-mix` col bianco dà lo stesso colore chiaro qualunque cosa ci sia
+   * sotto, e resta leggibile anche su una gamba larga otto millimetri.
+   */
+  const soft = (c: string, pct: number) => `color-mix(in srgb, ${c} ${pct}%, white)`
+
   function paint(code: RegionCode) {
-    if (code === selected) return { fill: accent, stroke: accent, width: 2 }
-    if (flagged.includes(code)) return { fill: 'var(--care-tint)', stroke: 'var(--care)', width: 1.6 }
-    if (logged.includes(code)) return { fill: tint, stroke: accent, width: 1.4 }
-    if (code === hover) return { fill: tint, stroke: 'var(--color-ink)', width: 1.2 }
-    return { fill: 'transparent', stroke: 'var(--color-ink)', width: 1.2 }
+    if (code === selected) return { fill: accent, stroke: accent, width: 2.2 }
+    if (flagged.includes(code)) return { fill: soft('var(--care)', 34), stroke: 'var(--care)', width: 2 }
+    if (logged.includes(code)) return { fill: soft(accent, 34), stroke: accent, width: 1.8 }
+    if (code === hover) return { fill: soft(accent, 15), stroke: 'var(--color-ink)', width: 1.5 }
+    return { fill: 'transparent', stroke: 'var(--color-ink)', width: 1.5 }
   }
 
   const marked = [...new Set([...logged, ...flagged])].filter((c) => shapes[c])
@@ -256,21 +266,28 @@ export default function BodyMap({
             </clipPath>
           </defs>
 
-          {/* Poggia per terra. Un centimetro d'ombra e la figura smette di
-              galleggiare — è la differenza fra un corpo e un adesivo. */}
-          <ellipse cx={100} cy={GROUND.cy} rx={GROUND.rx} ry={GROUND.ry}
-                   fill="var(--color-ink)" opacity={0.09} />
+          {/* 🔴 L'ombra dura, la stessa di ogni card dell'app: la sagoma
+              disegnata una seconda volta, piena d'inchiostro e spostata.
+              BAB non sfuma mai un'ombra, e questa figura non fa eccezione —
+              prima aveva un'ellisse grigia sfumata sotto i piedi, l'unica
+              cosa in tutta l'app che assomigliasse a un'ombra vera. */}
+          <g transform={`translate(${SHADOW.dx},${SHADOW.dy})`} fill="var(--color-ink)"
+             pointerEvents="none" aria-hidden>
+            <path d={HALF} />
+            <path d={HALF} transform={MIRROR} />
+          </g>
 
           <g clipPath={`url(#${clipId})`} pointerEvents="none">
-            {/* Il corpo è pieno di bianco PRIMA delle zone: le tinte sono
-                semitrasparenti, e senza questo il quadretto della carta si
-                vedrebbe attraverso la pancia. */}
-            <rect x={0} y={0} width={VIEW.w} height={VIEW.h} fill="var(--color-surface)" />
+            {/* Il corpo è pieno PRIMA delle zone, altrimenti il quadretto della
+                carta si vedrebbe attraverso la pancia. Sabbia e non bianco: è
+                il colore "carta" del sistema, e stacca dalla tela senza
+                bisogno di un bordo in più. */}
+            <rect x={0} y={0} width={VIEW.w} height={VIEW.h} fill="var(--color-sand)" />
             {drawOrder.map((code) => {
               const p = paint(code)
               return (
                 <Draw key={code} s={shapes[code]!} fill={p.fill} stroke={p.stroke}
-                      strokeWidth={p.width} strokeOpacity={code === selected ? 1 : 0.22}
+                      strokeWidth={p.width} strokeOpacity={code === selected ? 1 : 0.3}
                       strokeLinejoin="round" />
               )
             })}

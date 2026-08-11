@@ -25,7 +25,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const out = process.argv[2] ?? join(root, '..', 'docs', 'mappa-corporea.png')
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
-const { FRONT, BACK, HALF, MIRROR, VIEW, GROUND } =
+const { FRONT, BACK, HALF, MIRROR, VIEW, SHADOW } =
   await import(join(root, 'src/components/body-shapes.ts'))
 
 const el = (s, cls) =>
@@ -42,7 +42,7 @@ const DECOR = {
     <path d="M93.5,49 Q100,53.5 106.5,49" fill="none" stroke="#5C6A86" stroke-width="1.8" stroke-linecap="round"/></g>`,
   back: `<g class="ink">
     <ellipse cx="100" cy="35" rx="23.4" ry="23" opacity="0.3"/>
-    <path opacity="0.3" d="M100,50 C104,57 108,71 107,88 C106.5,99 93.5,99 93,88 C92,71 96,57 100,50 Z"/>
+    <path opacity="0.3" d="M100,52 C108,60 109,74 105,90 C103,98 97,98 95,90 C91,74 92,60 100,52 Z"/>
     <path d="M100,118 L100,168" stroke="#5C6A86" stroke-width="2.2" stroke-dasharray="4 6"
           stroke-linecap="round" fill="none" opacity="0.4"/></g>`,
 }
@@ -53,9 +53,11 @@ const figure = (side, map, states = {}, caption) => `
     <defs><clipPath id="c-${caption.replace(/\W/g, '')}">
       <path d="${HALF}"/><path d="${HALF}" transform="${MIRROR}"/>
     </clipPath></defs>
-    <ellipse cx="100" cy="${GROUND.cy}" rx="${GROUND.rx}" ry="${GROUND.ry}" fill="#0F0F12" opacity="0.09"/>
+    <g transform="translate(${SHADOW.dx},${SHADOW.dy})" fill="#0F0F12">
+      <path d="${HALF}"/><path d="${HALF}" transform="${MIRROR}"/>
+    </g>
     <g clip-path="url(#c-${caption.replace(/\W/g, '')})">
-      <rect x="0" y="0" width="${VIEW.w}" height="${VIEW.h}" fill="#fff"/>
+      <rect x="0" y="0" width="${VIEW.w}" height="${VIEW.h}" fill="#E8E4D8"/>
       ${Object.entries(map).map(([code, s]) => el(s, `z ${states[code] ?? ''}`)).join('')}
     </g>
     <path class="edge" d="${HALF}"/><path class="edge" d="${HALF}" transform="${MIRROR}"/>
@@ -69,11 +71,11 @@ const figure = (side, map, states = {}, caption) => `
 const html = `<!doctype html><meta charset="utf-8"><style>
 body{margin:0;background:#FAF9F6;font:12px "Helvetica Neue",system-ui;display:flex;gap:10px;padding:14px}
 svg{width:200px;height:auto}
-.z{fill:none;stroke:#0F0F12;stroke-opacity:.22;stroke-width:1.2}
+.z{fill:none;stroke:#0F0F12;stroke-opacity:.3;stroke-width:1.5}
 .sel{fill:#34BBC0;stroke:#34BBC0;stroke-opacity:1}
-.log{fill:color-mix(in srgb,#34BBC0 14%,transparent);stroke:#34BBC0;stroke-opacity:.6}
-.flag{fill:color-mix(in srgb,#FF6B5C 12%,transparent);stroke:#FF6B5C;stroke-opacity:.7}
-.edge{fill:none;stroke:#0F0F12;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.log{fill:color-mix(in srgb,#34BBC0 34%,white);stroke:#34BBC0;stroke-opacity:.9;stroke-width:1.8}
+.flag{fill:color-mix(in srgb,#FF6B5C 34%,white);stroke:#FF6B5C;stroke-opacity:.9;stroke-width:2}
+.edge{fill:none;stroke:#0F0F12;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
 .ink{fill:#5C6A86}
 figure{margin:0}figcaption{text-align:center;font-weight:700;margin-top:4px}
 </style>

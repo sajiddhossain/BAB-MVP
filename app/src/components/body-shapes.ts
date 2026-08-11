@@ -112,11 +112,14 @@ const UPPER: P[] = [
   [85.8, 62], [85, 72],                                        // collo
   [77, 74], [66, 79], [55, 88],                                // trapezio
   [50, 97], [49.5, 108],                                       // deltoide
-  [48, 122], [46.5, 140], [45.5, 156],                         // braccio, fuori
-  [45, 166], [45, 172],                                        // polso
-  [39, 179], [37.5, 191], [41, 200], [49, 203], [55.5, 197],   // mano
-  [57.5, 185], [58.5, 172],                                    // polso, dentro
-  [60, 158], [62, 140], [64, 122],                             // braccio, dentro
+  // 🔴 Il braccio sta 2 più in fuori di quanto vorrebbe l'anatomia. Con
+  // l'ombra dura lo spiraglio fra braccio e fianco era largo 7 e l'ombra ne
+  // occupava 5: da fuori sembrava una sbarra nera, non un'apertura.
+  [46, 122], [44.5, 140], [43.5, 156],                         // braccio, fuori
+  [43, 166], [43, 172],                                        // polso
+  [37, 179], [35.5, 191], [39, 200], [47, 203], [53.5, 197],   // mano
+  [55.5, 185], [56.5, 172],                                    // polso, dentro
+  [58, 158], [60, 140], [62, 122],                             // braccio, dentro
   [65.5, 104],                                                 // ⟵ ASCELLA
 ]
 
@@ -144,8 +147,16 @@ export const HALF = `M100,12 ${spline(UPPER)} ${spline(LOWER)}`
 /** La trasformazione che riflette una forma sull'asse del corpo. */
 export const MIRROR = `translate(${VIEW.w},0) scale(-1,1)`
 
-/** Dove poggia la figura: l'ombra a terra, l'unica cosa che non è corpo. */
-export const GROUND = { cy: 350, rx: 48, ry: 5 }
+/**
+ * Lo scostamento dell'ombra dura.
+ *
+ * 🔴 BAB non sfuma mai un'ombra: è la cosa più riconoscibile del marchio, e
+ * vale anche qui. La figura è la stessa sagoma disegnata due volte, la copia
+ * sotto piena d'inchiostro e spostata — come ogni card dell'app. Prima c'era
+ * un'ellisse grigia sfumata sotto i piedi: teneva la figura per terra, ma era
+ * l'unica cosa in tutta l'app che assomigliasse a un'ombra vera.
+ */
+export const SHADOW = { dx: 4, dy: 5 }
 
 /* ── Le cuciture ───────────────────────────────────────────────────────────
    Una cucitura è una curva che attraversa il corpo. `sag` è di quanto cade al
