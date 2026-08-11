@@ -141,19 +141,37 @@ button, a[role="button"], input, select {
   color: var(--color-ink-soft);
 }
 
-/* La mappa corporea si usa anche da tastiera: senza un anello di fuoco
-   visibile, chi naviga con il tab non sa mai dove si trova. `outline` sugli
-   elementi SVG è supportato dai browser correnti; lo spessore extra è la
-   cintura di sicurezza per quelli che non lo fanno. */
+/* ── La mappa corporea ─────────────────────────────────────────────────────
+   Il contorno della sagoma: uno solo, spesso, sopra tutte le zone. È la cosa
+   che fa leggere venti rettangoli come un corpo invece che come un diagramma
+   di montaggio. `pointer-events: none` perché i tocchi li prende lo strato
+   sopra, non il disegno. */
+.bab-edge {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+/* Si usa anche da tastiera: senza un anello di fuoco visibile, chi naviga con
+   il tab non sa mai dove si trova. Il riquadro coincide con il bersaglio del
+   tocco, quindi mostra anche quanto è largo davvero. */
 .bab-zone:focus-visible {
   outline: 3px solid var(--color-vividteal);
-  outline-offset: 2px;
+  outline-offset: 1px;
 }
-.bab-zone:focus-visible > :is(path, ellipse) {
-  stroke-width: 3.5;
+
+/* L'onda del tocco. Vive dentro il ritaglio, quindi muore sul bordo del corpo.
+   Con «riduci le animazioni» la regola qui sopra la spegne: resta un cerchio
+   fermo per un istante, che è esattamente quello che serve a chi ha chiesto
+   meno movimento. */
+.bab-pulse {
+  animation: bab-pulse 0.55s ease-out forwards;
+  pointer-events: none;
 }
-@media (hover: hover) {
-  .bab-zone:hover > :is(path, ellipse) {
-    fill: color-mix(in srgb, var(--color-teal) 12%, transparent);
-  }
+@keyframes bab-pulse {
+  from { r: 4; opacity: 0.9; }
+  to { r: 42; opacity: 0; }
 }

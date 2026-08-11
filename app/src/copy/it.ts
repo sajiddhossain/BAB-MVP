@@ -63,6 +63,24 @@ export const it = {
     close: 'Chiudi',
   },
 
+  /** La mappa corporea. Un componente solo, usato nei due check-in e nel Care. */
+  bodymap: {
+    sideLabel: 'Fronte o retro',
+    /**
+     * 🔴 Va detto, non lasciato intuire. Se legge la figura al contrario indica
+     * il ginocchio sbagliato, e chi la ascolta guarda dalla parte opposta.
+     */
+    mirrorHint: 'Come allo specchio: la tua sinistra sta a sinistra.',
+    tapHint: 'Tocca la zona dove lo senti.',
+    chosen: 'Hai scelto: {region}',
+    onFront: 'sta sul fronte',
+    onBack: 'sta sul retro',
+    legendMarked: 'già segnata',
+    legendFlag: 'da far vedere',
+    listOpen: 'Preferisci un elenco?',
+    listClose: 'Torna alla figura',
+  },
+
   today: {
     greetingMorning: 'Buongiorno, {name}',
     greetingEvening: 'Buonasera, {name}',

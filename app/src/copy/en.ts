@@ -47,6 +47,19 @@ export const en: Copy = {
     close: 'Close',
   },
 
+  bodymap: {
+    sideLabel: 'Front or back',
+    mirrorHint: 'Like a mirror: your left is on the left.',
+    tapHint: 'Tap where you feel it.',
+    chosen: 'You picked: {region}',
+    onFront: "it's on the front",
+    onBack: "it's on the back",
+    legendMarked: 'already noted',
+    legendFlag: 'worth showing someone',
+    listOpen: 'Prefer a list?',
+    listClose: 'Back to the figure',
+  },
+
   today: {
     greetingMorning: 'Morning, {name}',
     greetingEvening: 'Evening, {name}',

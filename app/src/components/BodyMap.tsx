@@ -1,114 +1,35 @@
-import { useState } from 'react'
-import { useCopy, useLocale } from '@/copy'
+import { useEffect, useId, useMemo, useState } from 'react'
+import { useCopy, useLocale, fill as tpl } from '@/copy'
 import { REGIONS, regionLabel, type RegionCode } from '@/content/bodymap'
+import {
+  GEOMETRY, GROUND, HALF, MIRROR, VIEW, area, hitBox, type Shape, type Side,
+} from './body-shapes'
 
 /**
  * La mappa corporea. Compare in tre posti — check-in pre, check-in post e
  * segnalazione immediata — quindi vale la pena farne una sola, buona.
  *
+ * La geometria sta in `body-shapes.ts`. Qui c'è come si comporta.
+ *
+ * ── Due strati, e il motivo ─────────────────────────────────────────────────
+ *
+ * Il disegno e i bersagli dei tocchi sono due gruppi separati:
+ *
+ *   · lo strato VISIBILE è ritagliato sulla sagoma, così ogni zona finisce
+ *     esattamente sul bordo del corpo e il contorno spesso resta uno solo;
+ *
+ *   · lo strato dei TOCCHI sta sopra, invisibile e NON ritagliato, con ogni
+ *     bersaglio allargato ad almeno 44px.
+ *
+ * Se fossero la stessa cosa bisognerebbe scegliere: o un ginocchio disegnato
+ * grande come un bersaglio (e la figura non è più un corpo), o un bersaglio
+ * grande come un ginocchio — 20px, che un pollice non prende. Separandoli si
+ * ottengono tutt'e due, e il dito che manca il ginocchio di poco prende
+ * comunque il ginocchio.
+ *
  * 🔴 Convenzione sinistra/destra: **la sua sinistra sta a sinistra dello
- * schermo, in entrambe le viste.** È la convenzione dello specchio, ed è quella
- * già testata nei prototipi. Non è il disegno anatomico da manuale (dove la
- * vista frontale è speculare), ma è l'unica che non la costringe a fare un
- * ribaltamento mentale mentre ha male — e i codici salvati (`knee_l`) restano
- * corretti a prescindere da dove sono disegnati.
- *
- * Le forme stanno qui e non in `content/bodymap.ts`: lì ci sono i codici, che
- * finiscono nel database e non si toccano. La geometria è presentazione.
- *
- * Le regioni si toccano, e non è estetica: una figura fatta di scatole
- * staccate si legge come un robot, e a una ragazzina che deve indicare dove le
- * fa male serve riconoscere un corpo.
+ * schermo, in entrambe le viste** (vedi `body-shapes.ts`).
  */
-
-type Shape =
-  | { k: 'ellipse'; cx: number; cy: number; rx: number; ry: number }
-  | { k: 'path'; d: string; cx: number; cy: number }
-
-export type Side = 'front' | 'back'
-
-/** Raggio dell'area di tocco invisibile per le zone che non arrivano a 44px. */
-const SMALL_HIT = 20
-
-const FRONT: Partial<Record<RegionCode, Shape>> = {
-  head:      { k: 'ellipse', cx: 100, cy: 29, rx: 19, ry: 22 },
-  neck:      { k: 'path', cx: 100, cy: 60,  d: 'M91,48 L109,48 L111,70 L89,70 Z' },
-  shoulders: { k: 'path', cx: 100, cy: 82,  d: 'M56,92 C56,78 74,70 100,70 C126,70 144,78 144,92 Z' },
-  chest:     { k: 'path', cx: 100, cy: 113, d: 'M64,92 L136,92 L131,134 L69,134 Z' },
-  core:      { k: 'path', cx: 100, cy: 153, d: 'M69,134 L131,134 L128,172 L72,172 Z' },
-  hips:      { k: 'path', cx: 100, cy: 193, d: 'M72,172 L128,172 C137,183 140,198 138,214 L62,214 C60,198 63,183 72,172 Z' },
-  arm_l:     { k: 'path', cx: 52,  cy: 135, d: 'M56,90 C48,102 44,120 44,144 L45,177 L59,177 L60,144 C61,122 63,105 69,96 Z' },
-  arm_r:     { k: 'path', cx: 148, cy: 135, d: 'M144,90 C152,102 156,120 156,144 L155,177 L141,177 L140,144 C139,122 137,105 131,96 Z' },
-  hand_l:    { k: 'ellipse', cx: 52,  cy: 190, rx: 10, ry: 13 },
-  hand_r:    { k: 'ellipse', cx: 148, cy: 190, rx: 10, ry: 13 },
-  quad_l:    { k: 'path', cx: 84,  cy: 245, d: 'M63,214 L97,214 L95,276 L73,278 Z' },
-  quad_r:    { k: 'path', cx: 116, cy: 245, d: 'M103,214 L137,214 L127,278 L105,276 Z' },
-  knee_l:    { k: 'ellipse', cx: 84,  cy: 286, rx: 13, ry: 11 },
-  knee_r:    { k: 'ellipse', cx: 116, cy: 286, rx: 13, ry: 11 },
-  shin_l:    { k: 'path', cx: 84,  cy: 323, d: 'M76,295 L92,295 L90,352 L78,352 Z' },
-  shin_r:    { k: 'path', cx: 116, cy: 323, d: 'M108,295 L124,295 L122,352 L110,352 Z' },
-  foot_l:    { k: 'ellipse', cx: 84,  cy: 362, rx: 12, ry: 10 },
-  foot_r:    { k: 'ellipse', cx: 116, cy: 362, rx: 12, ry: 10 },
-}
-
-const BACK: Partial<Record<RegionCode, Shape>> = {
-  head:       { k: 'ellipse', cx: 100, cy: 29, rx: 19, ry: 22 },
-  neck:       { k: 'path', cx: 100, cy: 60,  d: 'M91,48 L109,48 L111,70 L89,70 Z' },
-  shoulders:  { k: 'path', cx: 100, cy: 82,  d: 'M56,92 C56,78 74,70 100,70 C126,70 144,78 144,92 Z' },
-  upper_back: { k: 'path', cx: 100, cy: 116, d: 'M64,92 L136,92 L130,140 L70,140 Z' },
-  arm_l:      { k: 'path', cx: 52,  cy: 135, d: 'M56,90 C48,102 44,120 44,144 L45,177 L59,177 L60,144 C61,122 63,105 69,96 Z' },
-  arm_r:      { k: 'path', cx: 148, cy: 135, d: 'M144,90 C152,102 156,120 156,144 L155,177 L141,177 L140,144 C139,122 137,105 131,96 Z' },
-  hand_l:     { k: 'ellipse', cx: 52,  cy: 190, rx: 10, ry: 13 },
-  hand_r:     { k: 'ellipse', cx: 148, cy: 190, rx: 10, ry: 13 },
-  lower_back: { k: 'path', cx: 100, cy: 157, d: 'M70,140 L130,140 L128,174 L72,174 Z' },
-  glutes:     { k: 'path', cx: 100, cy: 195, d: 'M72,174 L128,174 C138,185 141,200 138,216 L62,216 C59,200 62,185 72,174 Z' },
-  ham_l:      { k: 'path', cx: 84,  cy: 245, d: 'M63,216 L97,216 L95,274 L73,276 Z' },
-  ham_r:      { k: 'path', cx: 116, cy: 245, d: 'M103,216 L137,216 L127,276 L105,274 Z' },
-  knee_l:     { k: 'ellipse', cx: 84,  cy: 284, rx: 13, ry: 10 },
-  knee_r:     { k: 'ellipse', cx: 116, cy: 284, rx: 13, ry: 10 },
-  calf_l:     { k: 'path', cx: 84,  cy: 317, d: 'M76,293 C72,306 72,326 76,342 L90,342 C93,326 93,306 91,293 Z' },
-  calf_r:     { k: 'path', cx: 116, cy: 317, d: 'M109,293 C107,306 107,326 110,342 L124,342 C128,326 128,306 124,293 Z' },
-  ankle_l:    { k: 'path', cx: 84,  cy: 356, d: 'M77,342 L90,342 L89,362 C89,369 82,371 77,369 C74,368 74,362 76,358 Z' },
-  ankle_r:    { k: 'path', cx: 116, cy: 356, d: 'M110,342 L123,342 L124,358 C126,362 126,368 123,369 C118,371 111,369 111,362 Z' },
-}
-
-export const GEOMETRY = { front: FRONT, back: BACK }
-
-/**
- * Decorazioni: non si toccano, non salvano niente, e non sono decorazione.
- *
- * Vengono dai prototipi originali, e servono a una cosa sola: far capire in un
- * decimo di secondo se stai guardando il davanti o il dietro. Una faccia davanti,
- * uno chignon e la linea della schiena dietro. Senza, le due viste sono due
- * sagome identiche e l'atleta deve fidarsi dell'etichetta del bottone.
- *
- * `pointer-events: none` è obbligatorio: se intercettassero un tocco, un dito
- * sulla faccia non registrerebbe «testa».
- */
-function Decor({ side, ink }: { side: Side; ink: string }) {
-  if (side === 'front') {
-    return (
-      <g pointerEvents="none" aria-hidden>
-        <circle cx={93} cy={27} r={2} fill={ink} />
-        <circle cx={107} cy={27} r={2} fill={ink} />
-        <path d="M94,35 Q100,39 106,35" fill="none" stroke={ink} strokeWidth={1.6} strokeLinecap="round" />
-      </g>
-    )
-  }
-  return (
-    <g pointerEvents="none" aria-hidden>
-      {/* Lo chignon dice "questa è la nuca" senza scrivere una parola. */}
-      <ellipse cx={100} cy={11} rx={9} ry={7} fill={ink} opacity={0.5} />
-      <line x1={100} y1={98} x2={100} y2={168} stroke={ink} strokeWidth={2.2}
-            strokeDasharray="4 5" strokeLinecap="round" opacity={0.45} />
-    </g>
-  )
-}
-
-/** Vero per le zone che non reggono un dito senza aiuto. */
-function isSmall(s: Shape): boolean {
-  return s.k === 'ellipse' && Math.min(s.rx, s.ry) * 2 < 26
-}
 
 type Props = {
   selected?: RegionCode | null
@@ -124,82 +45,330 @@ type Props = {
   onFreeText?: (v: string) => void
 }
 
+/**
+ * Decorazioni: non si toccano, non salvano niente, e non sono decorazione.
+ *
+ * Vengono dai prototipi originali, e servono a una cosa sola: far capire in un
+ * decimo di secondo se stai guardando il davanti o il dietro. Una faccia
+ * davanti, uno chignon e la linea della schiena dietro. Senza, le due viste
+ * sono due sagome identiche e l'atleta deve fidarsi dell'etichetta del bottone.
+ *
+ * `pointer-events: none` è obbligatorio: se intercettassero un tocco, un dito
+ * sulla faccia non registrerebbe «testa».
+ */
+function Decor({ side }: { side: Side }) {
+  const ink = 'var(--color-ink-soft)'
+  if (side === 'front') {
+    return (
+      <g pointerEvents="none" aria-hidden>
+        <circle cx={92} cy={30} r={2.3} fill={ink} />
+        <circle cx={108} cy={30} r={2.3} fill={ink} />
+        <path d="M93.5,39 Q100,43.5 106.5,39" fill="none" stroke={ink}
+              strokeWidth={1.8} strokeLinecap="round" />
+      </g>
+    )
+  }
+  return (
+    <g pointerEvents="none" aria-hidden>
+      {/* Lo chignon dice «questa è la nuca» senza scrivere una parola. */}
+      <ellipse cx={100} cy={15} rx={10.5} ry={8} fill={ink} opacity={0.45} />
+      <path d="M100,112 L100,182" fill="none" stroke={ink} strokeWidth={2.2}
+            strokeDasharray="4 6" strokeLinecap="round" opacity={0.4} />
+    </g>
+  )
+}
+
+/** Rettangolo o tracciato, disegnati con gli stessi attributi. */
+function Draw({ s, ...attrs }: { s: Shape } & React.SVGProps<SVGPathElement & SVGRectElement>) {
+  return s.k === 'rect'
+    ? <rect x={s.x} y={s.y} width={s.w} height={s.h} {...attrs} />
+    : <path d={s.d} transform={s.mirror ? MIRROR : undefined} {...attrs} />
+}
+
 export default function BodyMap({
   selected = null, logged = [], flagged = [], onSelect,
   tone = 'neutral', freeText = '', onFreeText,
 }: Props) {
   const t = useCopy()
   const locale = useLocale()
+  const clipId = useId()
   const [side, setSide] = useState<Side>('front')
+  const [hover, setHover] = useState<RegionCode | null>(null)
+  const [list, setList] = useState(false)
+  /** Cambia a ogni scelta: fa ripartire l'animazione anche sulla stessa zona. */
+  const [pulse, setPulse] = useState(0)
+
   const accent = tone === 'care' ? 'var(--care)' : 'var(--color-teal)'
   const tint = tone === 'care' ? 'var(--care-tint)' : 'var(--tempo-steady-tint)'
 
+  /**
+   * Se la zona scelta vive solo sull'altra faccia, la mappa gira da sola.
+   * Succede scegliendo dall'elenco, o riaprendo un check-in: senza, lei vede
+   * una figura dove non è segnato niente e crede di aver perso la scelta.
+   */
+  useEffect(() => {
+    const r = REGIONS.find((x) => x.code === selected)
+    if (r && (r.side === 'front' || r.side === 'back')) setSide(r.side)
+  }, [selected])
+
   const shapes = GEOMETRY[side]
-  const codes = (Object.keys(shapes) as RegionCode[]).filter((c) => shapes[c])
+  /** Ordine di disegno = ordine di dichiarazione: il tronco prima, le braccia dopo. */
+  const drawOrder = useMemo(
+    () => (Object.keys(shapes) as RegionCode[]).filter((c) => shapes[c]),
+    [shapes],
+  )
+  /** Ordine dei tocchi: dal più grande al più piccolo, così i piccoli stanno sopra. */
+  const hitOrder = useMemo(
+    () => [...drawOrder].sort((a, b) => area(shapes[b]!) - area(shapes[a]!)),
+    [drawOrder, shapes],
+  )
+  /**
+   * Ordine della TASTIERA: dall'alto in basso, da sinistra a destra.
+   *
+   * Non può essere l'ordine del DOM, che è quello dei tocchi e va dal più
+   * grande al più piccolo: chi naviga col tab si troverebbe a saltare da una
+   * spalla a un piede a una mano senza logica. Quindi un solo punto di
+   * tabulazione per tutta la figura, e poi le frecce si muovono sul corpo come
+   * ci si aspetta che facciano.
+   */
+  const walkOrder = useMemo(
+    () => [...drawOrder].sort((a, b) =>
+      shapes[a]!.cy - shapes[b]!.cy || shapes[a]!.cx - shapes[b]!.cx),
+    [drawOrder, shapes],
+  )
+  const [cursor, setCursor] = useState(0)
+  useEffect(() => {
+    const i = selected ? walkOrder.indexOf(selected) : -1
+    if (i >= 0) setCursor(i)
+    else setCursor((c) => Math.min(c, walkOrder.length - 1))
+  }, [selected, walkOrder])
+
+  const zoneId = (code: RegionCode) => `${clipId}-${code}`
+
+  function walk(e: React.KeyboardEvent, at: number) {
+    const step = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key]
+    let next: number
+    if (step) next = (at + step + walkOrder.length) % walkOrder.length
+    else if (e.key === 'Home') next = 0
+    else if (e.key === 'End') next = walkOrder.length - 1
+    else return false
+    e.preventDefault()
+    setCursor(next)
+    document.getElementById(zoneId(walkOrder[next]))?.focus()
+    return true
+  }
+
+  function choose(code: RegionCode) {
+    setPulse((p) => p + 1)
+    onSelect(code)
+  }
 
   function paint(code: RegionCode) {
-    if (code === selected) return { fill: accent, stroke: accent, width: 3 }
-    if (flagged.includes(code)) return { fill: 'var(--care-tint)', stroke: 'var(--care)', width: 3 }
-    if (logged.includes(code)) return { fill: tint, stroke: accent, width: 2.5 }
-    return { fill: 'var(--color-surface)', stroke: 'var(--color-ink)', width: 1.75 }
+    if (code === selected) return { fill: accent, stroke: accent, width: 2 }
+    if (flagged.includes(code)) return { fill: 'var(--care-tint)', stroke: 'var(--care)', width: 1.6 }
+    if (logged.includes(code)) return { fill: tint, stroke: accent, width: 1.4 }
+    if (code === hover) return { fill: tint, stroke: 'var(--color-ink)', width: 1.2 }
+    return { fill: 'transparent', stroke: 'var(--color-ink)', width: 1.2 }
   }
 
-  function shapeEl(s: Shape, p: { fill: string; stroke: string; width: number }) {
-    const attrs = { fill: p.fill, stroke: p.stroke, strokeWidth: p.width, strokeLinejoin: 'round' as const }
-    return s.k === 'ellipse'
-      ? <ellipse cx={s.cx} cy={s.cy} rx={s.rx} ry={s.ry} {...attrs} />
-      : <path d={s.d} {...attrs} />
-  }
+  const marked = [...new Set([...logged, ...flagged])].filter((c) => shapes[c])
+  const hasMarks = logged.length > 0 || flagged.length > 0
+
+  /** Quello che sta scritto sotto la figura. Non cambia mai altezza: niente salti. */
+  const chosenLabel = selected === 'other' && freeText.trim()
+    ? freeText.trim()
+    : selected ? regionLabel(selected, locale) : null
+
+  /** Scelta ma non disegnata da questa parte: sta sull'altra faccia. */
+  const elsewhere = !!selected && !shapes[selected]
+    && REGIONS.find((r) => r.code === selected)?.side !== 'none'
+
+  const sideBtn = (s: Side) => (
+    <button
+      key={s} type="button" aria-pressed={side === s} onClick={() => setSide(s)}
+      className="bab-pill px-5 py-2 text-[13.5px]"
+      style={side === s
+        ? { background: accent, borderColor: accent, color: 'var(--color-surface)' }
+        : undefined}
+    >
+      {s === 'front' ? t.checkin.pre.pinpoint.front : t.checkin.pre.pinpoint.back}
+    </button>
+  )
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
-      <div className="flex gap-2">
-        {(['front', 'back'] as const).map((s) => (
-          <button
-            key={s} type="button" aria-pressed={side === s}
-            onClick={() => setSide(s)}
-            className="bab-pill px-4 py-2 text-[13px]"
-            style={side === s
-              ? { background: accent, borderColor: accent, color: 'var(--color-surface)' }
-              : undefined}
-          >
-            {s === 'front' ? t.checkin.pre.pinpoint.front : t.checkin.pre.pinpoint.back}
-          </button>
-        ))}
-      </div>
+      {/* Nell'elenco ci sono già tutt'e due le facce, e «la tua sinistra sta a
+          sinistra» non vuol dire niente su una lista di parole. */}
+      {!list && (
+        <>
+          <div className="flex gap-2" role="group" aria-label={t.bodymap.sideLabel}>
+            {sideBtn('front')}{sideBtn('back')}
+          </div>
+          {/* 🔴 La convenzione dello specchio va DETTA. Un'atleta che indica il
+              ginocchio sbagliato manda il fisioterapista dalla parte opposta. */}
+          <p className="text-center text-[12.5px] text-[var(--color-ink-soft)]">{t.bodymap.mirrorHint}</p>
+        </>
+      )}
 
-      <svg viewBox="0 0 200 400" className="h-auto w-full max-w-[250px] touch-manipulation"
-           role="group" aria-label={t.checkin.pre.pinpoint.title}>
-        {codes.map((code) => {
-          const s = shapes[code]!
-          const p = paint(code)
-          return (
-            <g
-              key={code} className="bab-zone" role="button" tabIndex={0}
-              aria-label={regionLabel(code, locale)}
-              aria-pressed={code === selected}
-              onClick={() => onSelect(code)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(code) }
-              }}
-              style={{ cursor: 'pointer' }}
-            >
-              <title>{regionLabel(code, locale)}</title>
-              {shapeEl(s, p)}
-              {/* Mani, caviglie e piedi non arrivano a 44px: un cerchio
-                  trasparente allarga il bersaglio senza toccare il disegno. */}
-              {isSmall(s) && <circle cx={s.cx} cy={s.cy} r={SMALL_HIT} fill="transparent" />}
-            </g>
-          )
-        })}
-        <Decor side={side} ink="var(--color-ink-soft)" />
-      </svg>
+      {list ? (
+        <div className="flex w-full max-w-[330px] flex-col gap-3">
+          {([['front', t.checkin.pre.pinpoint.front], ['back', t.checkin.pre.pinpoint.back]] as const)
+            .map(([s, label]) => (
+              <fieldset key={s} className="flex flex-col gap-1.5 border-0 p-0">
+                <legend className="bab-label">{label}</legend>
+                <div className="flex flex-wrap gap-1.5">
+                  {REGIONS
+                    .filter((r) => r.side === s || (s === 'front' && r.side === 'both'))
+                    .map((r) => (
+                      <button
+                        key={r.code} type="button" aria-pressed={selected === r.code}
+                        onClick={() => choose(r.code)}
+                        className="bab-pill px-3 py-1.5 text-[12.5px]"
+                        style={selected === r.code
+                          ? { background: accent, borderColor: accent, color: 'var(--color-surface)' }
+                          : logged.includes(r.code) ? { background: tint } : undefined}
+                      >
+                        {flagged.includes(r.code) && <span aria-hidden>🚩 </span>}
+                        {r.label[locale]}
+                      </button>
+                    ))}
+                </div>
+              </fieldset>
+            ))}
+        </div>
+      ) : (
+        <svg
+          viewBox={`0 0 ${VIEW.w} ${VIEW.h}`}
+          className="h-auto w-full max-w-[250px] touch-manipulation"
+          role="group" aria-label={t.checkin.pre.pinpoint.title}
+        >
+          <defs>
+            <clipPath id={clipId}>
+              <path d={HALF} />
+              <path d={HALF} transform={MIRROR} />
+            </clipPath>
+          </defs>
+
+          {/* Poggia per terra. Un centimetro d'ombra e la figura smette di
+              galleggiare — è la differenza fra un corpo e un adesivo. */}
+          <ellipse cx={100} cy={GROUND.cy} rx={GROUND.rx} ry={GROUND.ry}
+                   fill="var(--color-ink)" opacity={0.09} />
+
+          <g clipPath={`url(#${clipId})`} pointerEvents="none">
+            {/* Il corpo è pieno di bianco PRIMA delle zone: le tinte sono
+                semitrasparenti, e senza questo il quadretto della carta si
+                vedrebbe attraverso la pancia. */}
+            <rect x={0} y={0} width={VIEW.w} height={VIEW.h} fill="var(--color-surface)" />
+            {drawOrder.map((code) => {
+              const p = paint(code)
+              return (
+                <Draw key={code} s={shapes[code]!} fill={p.fill} stroke={p.stroke}
+                      strokeWidth={p.width} strokeOpacity={code === selected ? 1 : 0.22}
+                      strokeLinejoin="round" />
+              )
+            })}
+            {/* L'onda del tocco: parte da dove ha toccato e muore sul bordo del
+                corpo, perché è dentro il ritaglio. Con «riduci le animazioni»
+                sparisce da sola (index.css). */}
+            {pulse > 0 && selected && shapes[selected] && (
+              <circle key={pulse} className="bab-pulse"
+                      cx={shapes[selected]!.cx} cy={shapes[selected]!.cy}
+                      r={4} fill="none" stroke={accent} strokeWidth={2.5} />
+            )}
+          </g>
+
+          {/* Il contorno: uno solo, spesso, sopra tutto. È quello che fa
+              leggere venti zone come un corpo. */}
+          <path className="bab-edge" d={HALF} />
+          <path className="bab-edge" d={HALF} transform={MIRROR} />
+          <Decor side={side} />
+
+          {/* Un punto sulle zone già segnate: la tinta da sola, su una gamba
+              larga otto millimetri, non si vede. */}
+          <g pointerEvents="none" aria-hidden>
+            {marked.filter((c) => c !== selected).map((c) => (
+              <circle key={c} cx={shapes[c]!.cx} cy={shapes[c]!.cy} r={3.4}
+                      fill={flagged.includes(c) ? 'var(--care)' : accent}
+                      stroke="var(--color-surface)" strokeWidth={1.4} />
+            ))}
+          </g>
+
+          <g>
+            {hitOrder.map((code) => {
+              const s = shapes[code]!
+              const box = hitBox(s)
+              return (
+                <g
+                  key={code} id={zoneId(code)} className="bab-zone" role="button"
+                  // Un solo punto di tabulazione per tutta la figura: dentro ci
+                  // si muove con le frecce (vedi `walkOrder`).
+                  tabIndex={walkOrder[cursor] === code ? 0 : -1}
+                  aria-label={regionLabel(code, locale)}
+                  aria-pressed={code === selected}
+                  onClick={() => choose(code)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(code); return }
+                    walk(e, walkOrder.indexOf(code))
+                  }}
+                  onPointerEnter={() => setHover(code)}
+                  onPointerLeave={() => setHover((h) => (h === code ? null : h))}
+                  onFocus={() => setHover(code)}
+                  onBlur={() => setHover((h) => (h === code ? null : h))}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {box
+                    ? <rect x={box.x} y={box.y} width={box.w} height={box.h} fill="transparent" />
+                    : <Draw s={s} fill="transparent" />}
+                </g>
+              )
+            })}
+          </g>
+        </svg>
+      )}
+
+      {/* Conferma di quello che ha appena toccato. Altezza fissa: se comparisse
+          e sparisse, la figura ballerebbe sotto il dito.
+
+          🔴 `elsewhere` non è un dettaglio: se sceglie la coscia e poi gira la
+          figura, la scritta resterebbe vera ma la mappa sarebbe vuota — e lei
+          penserebbe di aver perso la scelta. Dirle dov'è costa una riga. */}
+      <p className="min-h-[22px] text-center text-[14.5px] font-bold" aria-live="polite">
+        {chosenLabel ? (
+          <>
+            {tpl(t.bodymap.chosen, { region: chosenLabel })}
+            {elsewhere && (
+              <span className="font-normal text-[var(--color-ink-soft)]">
+                {' · '}{side === 'front' ? t.bodymap.onBack : t.bodymap.onFront}
+              </span>
+            )}
+          </>
+        ) : (
+          <span className="font-normal text-[var(--color-ink-soft)]">{t.bodymap.tapHint}</span>
+        )}
+      </p>
+
+      {hasMarks && (
+        <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[12px] text-[var(--color-ink-soft)]">
+          {logged.length > 0 && (
+            <li className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: accent }} />
+              {t.bodymap.legendMarked}
+            </li>
+          )}
+          {flagged.length > 0 && (
+            <li className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--care)' }} />
+              {t.bodymap.legendFlag}
+            </li>
+          )}
+        </ul>
+      )}
 
       <div className="flex w-full flex-col items-center gap-2">
         <div className="flex flex-wrap justify-center gap-2">
           {REGIONS.filter((r) => r.side === 'none').map((r) => (
             <button
-              key={r.code} type="button" onClick={() => onSelect(r.code)}
+              key={r.code} type="button" onClick={() => choose(r.code)}
               aria-pressed={selected === r.code}
               className="bab-pill px-4 py-2 text-[13px]"
               style={selected === r.code
@@ -224,6 +393,13 @@ export default function BodyMap({
             className="bab-card w-full max-w-[300px] px-3 py-2 text-[15px]"
           />
         )}
+
+        {/* Non è un ripiego per il lettore di schermo: c'è chi tocca male, chi
+            ha le mani fredde, chi è su un pullman. L'elenco funziona sempre. */}
+        <button type="button" onClick={() => setList((v) => !v)}
+                className="text-[13px] underline text-[var(--color-ink-soft)]">
+          {list ? t.bodymap.listClose : t.bodymap.listOpen}
+        </button>
       </div>
     </div>
   )
