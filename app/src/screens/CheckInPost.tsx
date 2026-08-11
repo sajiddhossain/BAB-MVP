@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fill, useCopy, useLocale } from '@/copy'
+import { fill, plural, useCopy, useLocale } from '@/copy'
 import BodyMap from '@/components/BodyMap'
 import EmojiScale from '@/components/EmojiScale'
 import PillGroup from '@/components/PillGroup'
@@ -164,7 +164,7 @@ export default function CheckInPost() {
             </>
           )}
           {signals.length > 0 && (
-            <p className="text-[14px]">{fill(t.checkin.post.recapSignals, { n: signals.length })}</p>
+            <p className="text-[14px]">{plural(signals.length, t.checkin.post.recapSignalsOne, t.checkin.post.recapSignals)}</p>
           )}
         </Card>
 

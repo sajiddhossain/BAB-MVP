@@ -11,6 +11,8 @@ export const en: Copy = {
     tagline: 'Learn to read your own signals',
   },
 
+  langName: 'English',
+
   tabs: {
     today: 'Today',
     journey: 'Journey',
@@ -73,8 +75,36 @@ export const en: Copy = {
     open: 'Your data and your account',
     back: 'Back',
 
+    profileTitle: 'Your profile',
+    profileName: 'What we call you',
+    profileSport: 'Your sport',
+    profileBirth: 'Date of birth',
+    profileSave: 'Save',
+    profileSaving: 'Saving…',
+    profileSaved: 'Saved.',
+    profileQueued: 'Saved here. It goes out on its own as soon as there is a signal.',
+    profileError: "I couldn't save that. Try again.",
+
+    rhythmTitle: 'Your rhythm',
+    rhythmBody: 'You can change your mind whenever you like, either way.',
+    rhythmContraception: 'Are you on the pill or another hormonal contraceptive?',
+
+    langTitle: 'Language',
+
+    signOutTitle: 'Sign out of BAB',
+    signOutBody: 'Your data stays safe on the server: it comes back when you sign in again. It leaves this phone, so if someone else uses it they will not find your things.',
+    signOutCta: 'Sign out',
+    signOutWorking: 'Signing out…',
+    signOutPendingOne: "Hold on: one thing hasn't gone out yet. If you leave now you lose it.",
+    signOutPending: "Hold on: {n} things haven't gone out yet. If you leave now you lose them.",
+    signOutAnywayOne: 'Sign out anyway and lose it',
+    signOutAnyway: 'Sign out anyway and lose {n} things',
+    signOutWait: "I'll wait",
+
     queueTitle: 'Waiting to go',
+    queueBodyOne: 'One thing is saved here waiting for a signal. Nothing is lost.',
     queueBody: '{n} things are saved here waiting for a signal. Nothing is lost.',
+    queueParkedOne: "One couldn't get through. It stays saved here and it's inside the file you download — if it doesn't clear up, tell us.",
     queueParked: "{n} couldn't get through. They stay saved here and they're inside the file you download — if it doesn't clear up, tell us.",
 
     exportTitle: 'Take your data with you',
@@ -83,6 +113,7 @@ export const en: Copy = {
     exportWorking: 'Preparing the file…',
     exportDone: "Done — it's in your downloads.",
     exportFromDevice: 'There was no signal, so the file holds what is on this device.',
+    exportPendingOne: "One thing hadn't reached the server yet: it's in the file, at the end, marked as not yet sent.",
     exportPending: "{n} things hadn't reached the server yet: they're in the file, at the end, marked as not yet sent.",
     exportError: "I couldn't prepare the file. Try again in a moment.",
 
@@ -225,6 +256,7 @@ export const en: Copy = {
       readGap: 'This morning you predicted **{predicted}**, and you trained in **{actual}**.',
       readGapNote: "That gap isn't a mistake: it's the thing we're training. The more you notice it, the smaller it gets.",
       noPre: "I can't find this morning's check-in, so there's nothing to compare today. That's fine — what you write here still counts.",
+      recapSignalsOne: 'You stopped and named one sensation. Doing that — finding where it sits and putting a word on it — is exactly the muscle we are training.',
       recapSignals: 'You stopped and named {n} sensations. Doing that — finding where it sits and giving it a word — is exactly the muscle we are training.',
       openQuestion: "A quiet question worth sitting with: what surprised you most about today — and which signal told you first?",
       notePlaceholder: 'Write it here if you like. Only you read this.',
@@ -271,6 +303,7 @@ export const en: Copy = {
     collectingTitle: "Still learning how you're built",
     collectingBody: 'Every check-in is a dot. Once there are enough of them, the dots start showing patterns that are yours alone.',
     collectingCount: '{done} of {total} closed days',
+    collectingLeftOne: 'One more and your read starts to show.',
     collectingLeft: '{n} more and your read starts to show.',
     readingDown: "Your gap is getting smaller. You're learning to feel it before you check it.",
     readingFlat: "Your gap is holding steady. That's fine: reading yourself doesn't improve in a straight line.",
@@ -405,6 +438,7 @@ export const en: Copy = {
     toldAdult: 'told an adult',
     notToldAdult: 'no record of telling anyone',
     openedToday: 'today',
+    openedDay: 'a day ago',
     openedDays: '{n} days ago',
     rosterTitle: "Who's here",
     checkedInNo: 'no check-in today',

@@ -150,10 +150,11 @@ Se `flush` restituisce `parked: 1`, la riga ha violato un `CHECK` o la RLS: l'er
 
 ## Cosa NON è ancora fatto
 
-- [ ] Il percorso di **aggiornamento** del profilo. La coda sincronizza
-      inserimenti: una modifica verrebbe rifiutata come duplicato e messa da
-      parte in silenzio. Finché non c'è, il profilo si scrive una volta sola —
-      all'onboarding.
+- [ ] **Modificare l'agenda della settimana** (giorni di allenamento, di
+      educazione fisica, le gare). Sono righe di `athlete_schedule` e
+      `athlete_events`, e correggerle vuol dire poterle togliere: la coda oggi
+      sa inserire e modificare, non cancellare. Serve un'operazione `delete`
+      più la schermata. Finché non c'è, l'agenda si scrive all'onboarding.
 
 ## Da verificare appena il progetto esiste
 

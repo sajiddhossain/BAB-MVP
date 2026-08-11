@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fill, useCopy } from '@/copy'
+import { fill, plural, useCopy } from '@/copy'
 import { recentCheckIns } from '@/lib/repo'
 import {
   closedLoops, dayStates, errorSeries, lastDays, sparkline, trend,
@@ -82,7 +82,7 @@ export default function Me() {
             <p className="text-[14px]">{fill(t.me.collectingCount, { done, total: NEEDED })}</p>
             {done < NEEDED && (
               <p className="text-[14px] text-[var(--color-ink-soft)]">
-                {fill(t.me.collectingLeft, { n: NEEDED - done })}
+                {plural(NEEDED - done, t.me.collectingLeftOne, t.me.collectingLeft)}
               </p>
             )}
           </>

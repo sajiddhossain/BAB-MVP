@@ -162,14 +162,33 @@ export type AthleteDraft = {
   timezone?: string | null
 }
 
-/**
- * ⚠️ La coda sincronizza INSERIMENTI. Per il profilo va bene la prima volta —
- * l'onboarding — ma un aggiornamento dalle impostazioni verrebbe rifiutato come
- * duplicato e archiviato in silenzio. Quando arriveranno le impostazioni serve
- * un percorso di update vero, non questo.
- */
+/** Il profilo alla prima scrittura: l'onboarding, e solo quello. */
 export async function saveProfile(a: AthleteDraft): Promise<void> {
   await db.put('athletes', a.id, a, a.id)
+  void flush()
+}
+
+/** Quello che si può correggere dopo. `id` no: è l'utente. */
+export type ProfilePatch = Partial<Omit<AthleteDraft, 'id'>>
+
+/**
+ * Correggere il profilo.
+ *
+ * 🔴 Passa da `db.patch`, non da `db.put`. È l'unica riga del prodotto che si
+ * modifica invece di essere aggiunta, e per un po' non c'era: una modifica
+ * finiva in coda come inserimento, il server la rifiutava come duplicato, e
+ * `sync.ts` la scambiava per «è già arrivata» e la buttava. Il telefono
+ * mostrava il nome nuovo, il server teneva quello vecchio, e nessuno se ne
+ * accorgeva.
+ *
+ * Vengono spediti solo i campi cambiati: vedi `db.patch` per il perché.
+ */
+export async function updateProfile(id: string, changes: ProfilePatch): Promise<void> {
+  const clean = Object.fromEntries(
+    Object.entries(changes).filter(([, v]) => v !== undefined),
+  )
+  if (Object.keys(clean).length === 0) return
+  await db.patch('athletes', id, clean)
   void flush()
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fill, useCopy, useLocale } from '@/copy'
+import { plural, useCopy, useLocale } from '@/copy'
 import { checkInsOn, myTeams, openRedFlags, roster,
          type RedFlag, type RosterAthlete, type StaffTeam, type TodayRow } from '@/lib/coach'
 import { localDate } from '@/lib/repo'
@@ -95,7 +95,7 @@ export default function Roster() {
                       {SENSATIONS.find((s) => s.code === f.sensation)?.label[locale] ?? f.sensation}
                     </span>
                     <span className="text-[13px] text-[var(--color-ink-soft)]">
-                      {d === 0 ? t.coach.openedToday : fill(t.coach.openedDays, { n: d })}
+                      {d === 0 ? t.coach.openedToday : plural(d, t.coach.openedDay, t.coach.openedDays)}
                     </span>
                     {/* La misura di sicurezza del pilota: deve arrivare al 100%. */}
                     <span className="bab-pill px-2 py-0.5 text-[12px]"

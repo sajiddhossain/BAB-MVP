@@ -19,6 +19,12 @@ export const it = {
     tagline: 'Impara a leggere i segnali del tuo corpo',
   },
 
+  /**
+   * Il nome di questa lingua, NELLA lingua stessa. Un elenco di lingue scritto
+   * nella lingua che non capisci non serve a niente.
+   */
+  langName: 'Italiano',
+
   tabs: {
     today: 'Oggi',
     journey: 'Percorso',
@@ -103,8 +109,38 @@ export const it = {
     open: 'I tuoi dati e il tuo account',
     back: 'Indietro',
 
+    profileTitle: 'Il tuo profilo',
+    profileName: 'Come ti chiamiamo',
+    profileSport: 'Il tuo sport',
+    profileBirth: 'Data di nascita',
+    profileSave: 'Salva',
+    profileSaving: 'Salvo…',
+    profileSaved: 'Salvato.',
+    profileQueued: 'Salvato qui. Parte da solo appena c\'è rete.',
+    profileError: 'Non sono riuscita a salvare. Riprova.',
+
+    rhythmTitle: 'Il tuo ritmo',
+    rhythmBody: 'Puoi cambiare idea quando vuoi, in tutt\'e due i sensi.',
+    /** 🔴 R3: la domanda sulla contraccezione esiste solo dai 15 in su. */
+    rhythmContraception: 'Prendi la pillola o un altro contraccettivo ormonale?',
+
+    langTitle: 'Lingua',
+
+    signOutTitle: 'Esci da BAB',
+    /** 🔴 Uscire cancella l'archivio locale, e va detto prima. */
+    signOutBody: 'I tuoi dati restano al sicuro sul server: quando rientri tornano qui. Da questo telefono spariscono, così se lo usa qualcun altro non trova le tue cose.',
+    signOutCta: 'Esci',
+    signOutWorking: 'Esco…',
+    signOutPendingOne: 'Aspetta: c\'è ancora una cosa che non è partita. Se esci adesso la perdi.',
+    signOutPending: 'Aspetta: {n} cose non sono ancora partite. Se esci adesso le perdi.',
+    signOutAnywayOne: 'Esci lo stesso e perdi quella cosa',
+    signOutAnyway: 'Esci lo stesso e perdi {n} cose',
+    signOutWait: 'Aspetto',
+
     queueTitle: 'In attesa di partire',
+    queueBodyOne: 'Una cosa è salvata qui e aspetta la rete. Non si perde.',
     queueBody: '{n} cose sono salvate qui e aspettano la rete. Non si perdono.',
+    queueParkedOne: 'Una non è riuscita a partire. Resta salvata qui ed è dentro il file che scarichi — se la cosa non si sblocca, scrivici.',
     queueParked: '{n} non sono riuscite a partire. Restano salvate qui e sono dentro il file che scarichi — se la cosa non si sblocca, scrivici.',
 
     exportTitle: 'Porta via i tuoi dati',
@@ -113,6 +149,7 @@ export const it = {
     exportWorking: 'Preparo il file…',
     exportDone: 'Fatto: il file è nei tuoi download.',
     exportFromDevice: 'Non c\'era rete, quindi il file contiene quello che sta su questo dispositivo.',
+    exportPendingOne: 'Una cosa non era ancora arrivata al server: è nel file, in fondo, segnata come non ancora inviata.',
     exportPending: '{n} cose non erano ancora arrivate al server: sono nel file, in fondo, segnate come non ancora inviate.',
     exportError: 'Non sono riuscita a preparare il file. Riprova fra poco.',
 
@@ -262,6 +299,7 @@ export const it = {
       readGap: 'Stamattina avevi previsto **{predicted}**, e ti sei allenata in **{actual}**.',
       readGapNote: 'Quello scarto non è un errore: è la cosa che stiamo allenando. Più lo noti, più si accorcia.',
       noPre: 'Non trovo il check-in di stamattina, quindi oggi non c\'è niente da confrontare. Va bene lo stesso — quello che scrivi qui conta comunque.',
+      recapSignalsOne: 'Ti sei fermata e hai nominato una sensazione. Farlo — trovare dove sta e darle una parola — è esattamente il muscolo che stiamo allenando.',
       recapSignals: 'Ti sei fermata e hai nominato {n} sensazioni. Farlo — trovare dove sta e darle una parola — è esattamente il muscolo che stiamo allenando.',
       openQuestion: 'Una domanda tranquilla su cui vale la pena fermarsi: cosa ti ha sorpresa di più di oggi — e quale segnale te l\'ha detto per primo?',
       notePlaceholder: 'Se ti va, scrivilo qui. Lo leggi solo tu.',
@@ -309,6 +347,7 @@ export const it = {
     collectingTitle: 'Stiamo ancora imparando come sei fatta',
     collectingBody: 'Ogni check-in è un puntino. Quando ce ne sono abbastanza, i puntini iniziano a mostrare pattern che sono solo tuoi.',
     collectingCount: '{done} di {total} giornate chiuse',
+    collectingLeftOne: 'Ancora uno e la tua lettura inizia a mostrarsi.',
     collectingLeft: 'Ancora {n} e la tua lettura inizia a mostrarsi.',
     /** 🔴 Nessuno dei tre è un voto: lo scarto è il meccanismo, non la pagella. */
     readingDown: 'Il tuo divario si sta accorciando. Stai imparando a sentirlo prima di controllarlo.',
@@ -460,6 +499,7 @@ export const it = {
     toldAdult: 'l\'ha detto a un adulto',
     notToldAdult: 'non risulta detto a nessuno',
     openedToday: 'oggi',
+    openedDay: 'da un giorno',
     openedDays: 'da {n} giorni',
     rosterTitle: 'Chi c\'è',
     checkedInNo: 'nessun check-in oggi',

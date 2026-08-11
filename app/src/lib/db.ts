@@ -47,9 +47,22 @@ export const TABLES = [
 export type TableName = typeof TABLES[number]
 
 export type PendingOp = {
-  /** UUID generato sul client: rende l'inserimento idempotente. */
+  /**
+   * Chiave della coda. Per un inserimento è l'uuid della riga — che è ciò che
+   * lo rende idempotente. Per una modifica è l'uuid dell'OPERAZIONE: due
+   * modifiche alla stessa riga sono due cose distinte e devono restare
+   * tutt'e due in coda, nell'ordine in cui le ha fatte.
+   */
   id: string
+  /**
+   * Assente vuol dire `insert`. Le code scritte prima che le modifiche
+   * esistessero non hanno questo campo, e devono continuare a partire.
+   */
+  op?: 'insert' | 'update'
+  /** Solo per `update`: la riga da modificare. */
+  target?: string
   table: TableName
+  /** Per `update` contiene SOLO i campi cambiati, non la riga intera. */
   row: Record<string, unknown>
   createdAt: number
   attempts: number
@@ -153,6 +166,45 @@ export async function put(
   const record: LocalRecord = { key: `${table}:${id}`, table, id, row, sortKey }
   await tx(RECORDS, 'readwrite', (s) => s.put(record))
   const op: PendingOp = { id, table, row, createdAt: Date.now(), attempts: 0 }
+  await tx(PENDING, 'readwrite', (s) => s.put(op))
+}
+
+/**
+ * Modifica una riga già scritta.
+ *
+ * 🔴 In coda finiscono SOLO i campi cambiati, non la riga intera.
+ *
+ * Non è un'ottimizzazione: è l'unica cosa che rende sopportabile una modifica
+ * fatta offline. Se si spedisse tutta la riga, cambiare il nome dal telefono
+ * riscriverebbe anche lo sport e la data di nascita con i valori che il
+ * telefono aveva in quel momento — e se nel frattempo li avesse corretti dal
+ * tablet, li perderebbe senza accorgersene. Mandando solo il campo toccato, due
+ * modifiche a campi diversi si fondono da sole.
+ *
+ * Resta vero che due modifiche allo STESSO campo da due dispositivi si
+ * sovrascrivono: vince l'ultima che arriva. Per un profilo è accettabile, e
+ * l'alternativa — una cronologia di versioni per il nome — costa più di quanto
+ * valga.
+ */
+export async function patch(
+  table: TableName,
+  id: string,
+  changes: Record<string, unknown>,
+): Promise<void> {
+  if (Object.keys(changes).length === 0) return
+  const key = `${table}:${id}`
+  const cur = await tx<LocalRecord | undefined>(RECORDS, 'readonly', (s) => s.get(key))
+  const next: LocalRecord = {
+    key, table, id,
+    row: { ...(cur?.row ?? { id }), ...changes },
+    sortKey: cur?.sortKey ?? id,
+  }
+  await tx(RECORDS, 'readwrite', (s) => s.put(next))
+
+  const op: PendingOp = {
+    id: crypto.randomUUID(), op: 'update', target: id,
+    table, row: changes, createdAt: Date.now(), attempts: 0,
+  }
   await tx(PENDING, 'readwrite', (s) => s.put(op))
 }
 

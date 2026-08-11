@@ -15,7 +15,8 @@ import TeamAthlete from './screens/team/Athlete'
 import { useSession } from './lib/session'
 import { useHydration } from './lib/hydrate'
 import { getProfile } from './lib/repo'
-import { useCopy } from './copy'
+import { adopt } from './lib/locale'
+import { useCopy, useSetLocale } from './copy'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
@@ -40,6 +41,7 @@ export default function App() {
    * silenzio.
    */
   const hydration = useHydration(userId)
+  const setLocale = useSetLocale()
   /** `null` = non ancora controllato. */
   const [hasProfile, setHasProfile] = useState<boolean | null>(null)
 
@@ -47,10 +49,17 @@ export default function App() {
     if (!userId || hydration.state !== 'done') { setHasProfile(null); return }
     let alive = true
     getProfile(userId)
-      .then((p) => { if (alive) setHasProfile(Boolean(p)) })
+      .then((p) => {
+        if (!alive) return
+        setHasProfile(Boolean(p))
+        // Telefono nuovo: se qui non ha mai scelto una lingua, si prende
+        // quella del suo profilo invece di ripartire dall'italiano.
+        const adopted = adopt(p?.locale)
+        if (adopted) setLocale(adopted)
+      })
       .catch(() => { if (alive) setHasProfile(false) })
     return () => { alive = false }
-  }, [userId, hydration.state])
+  }, [userId, hydration.state, setLocale])
 
   // Finché Supabase non è collegato l'app gira in locale, senza accesso: è la
   // stessa scelta di `lib/supabase.ts`, e serve a poterla sviluppare e provare

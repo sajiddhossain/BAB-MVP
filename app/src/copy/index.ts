@@ -18,12 +18,21 @@ export const DEFAULT_LOCALE: Locale = 'it'
 
 const CopyContext = createContext<Copy>(it)
 const LocaleContext = createContext<Locale>(DEFAULT_LOCALE)
+/** Cambiare lingua. Fuori dal provider non fa niente: nessuno deve rompersi. */
+const SetLocaleContext = createContext<(l: Locale) => void>(() => {})
 
-export function CopyProvider({ locale, children }: { locale: Locale; children: ReactNode }) {
+export function CopyProvider(
+  { locale, onLocale, children }:
+  { locale: Locale; onLocale?: (l: Locale) => void; children: ReactNode },
+) {
   return createElement(
-    LocaleContext.Provider,
-    { value: locale },
-    createElement(CopyContext.Provider, { value: LOCALES[locale] }, children),
+    SetLocaleContext.Provider,
+    { value: onLocale ?? (() => {}) },
+    createElement(
+      LocaleContext.Provider,
+      { value: locale },
+      createElement(CopyContext.Provider, { value: LOCALES[locale] }, children),
+    ),
   )
 }
 
@@ -45,6 +54,11 @@ export function useLocale(): Locale {
   return useContext(LocaleContext)
 }
 
+/** Il solo modo di cambiare lingua: la schermata dei dati. */
+export function useSetLocale(): (l: Locale) => void {
+  return useContext(SetLocaleContext)
+}
+
 /**
  * Interpolazione minima: `fill(t.checkin.days, { n: 3 })`.
  * Volutamente povera — se una stringa ha bisogno di più di questo, quasi sempre
@@ -54,4 +68,17 @@ export function fill(template: string, vars: Record<string, string | number>): s
   return template.replace(/\{(\w+)\}/g, (whole, k: string) =>
     k in vars ? String(vars[k]) : whole,
   )
+}
+
+/**
+ * Singolare e plurale: due stringhe intere, non una regola.
+ *
+ * «1 cose non sono ancora partite» è il genere di sciatteria che, a una
+ * ragazzina, dice che l'app è fatta male — e da lì in poi si fida meno anche
+ * di quello che le dice sul suo corpo. Due frasi separate perché l'accordo
+ * cambia da lingua a lingua (in italiano si porta dietro verbo e participio),
+ * e una regola sola non ce la può fare.
+ */
+export function plural(n: number, one: string, other: string): string {
+  return fill(n === 1 ? one : other, { n })
 }
