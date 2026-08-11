@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { fill, useCopy, useLocale } from '@/copy'
 import BodyMap from '@/components/BodyMap'
 import EmojiScale from '@/components/EmojiScale'
 import PillGroup from '@/components/PillGroup'
+import Step, { useAdvance, useFlow } from '@/components/Step'
 import { CHANNELS, HEADSPACE, channelQuestion } from '@/content/channels'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
 import { SENSATIONS, INTENSITIES, BEHAVIOURS, GROUP_LABEL, isRedFlag, sensationsIn } from '@/content/lexicon'
@@ -20,9 +22,13 @@ import { useSession } from '@/lib/session'
  * razionalizzazione fatta dopo aver visto il risultato — e il prediction error,
  * che è la metrica del prodotto, diventa carta straccia.
  *
- * 🔴 Una sola pagina che scorre, non una procedura a passi. I passi sono
- * etichette, non muri: se torna indietro a cambiare un canale non deve rifare
- * il giro. È la struttura dei prototipi già provati.
+ * 🔴 Una domanda per schermata. Prima era una pagina sola che scorreva, e il
+ * motivo per cui era stata scritta così era buono: tornare a cambiare un canale
+ * non deve costare il giro intero. Quel motivo è conservato — le risposte non si
+ * perdono mai e il passo indietro è libero — ma la pagina unica chiedeva a una
+ * tredicenne di guardare quattordici domande in una volta prima di rispondere
+ * alla prima. La risposta singola fa avanzare da sola, quindi il flusso a passi
+ * costa MENO tocchi della pagina che scorre, non di più.
  */
 
 function Rich({ text }: { text: string }) {
@@ -35,21 +41,30 @@ function Rich({ text }: { text: string }) {
   )
 }
 
-function Card({ label, children }: { label?: string; children: React.ReactNode }) {
-  return (
-    <section className="bab-card flex flex-col gap-3 px-4 py-4">
-      {label && <span className="bab-label">{label}</span>}
-      {children}
-    </section>
-  )
-}
-
 const TEMPO_ORDER: TempoCode[] = ['upbeat', 'steady', 'gentle']
+
+/**
+ * 🔴 Gli id dei passi sono NOMI DI COLONNA. Finiscono in due posti che devono
+ * combaciare: l'indirizzo (`?p=sleep_hours`) e `check_ins.skipped_fields`.
+ * Chiamarli `passo7` renderebbe illeggibile la seconda cosa, che è quella che
+ * dice quali domande vale la pena tenere dopo il pilota.
+ */
+const MAIN = [
+  'tempo_predicted', 'prediction_confidence', 'sleep_hours',
+  'sleep', 'energy', 'hydration', 'muscles', 'headspace', 'surprise', 'school_load',
+  'body', 'pain',
+] as const
+
+/** Le deviazioni dentro la mappa corporea: la barra resta ferma su `body`. */
+const NESTED = { body_what: 'body', body_strength: 'body', body_behaviour: 'body' }
 
 export default function CheckInPre() {
   const t = useCopy()
   const locale = useLocale()
+  const navigate = useNavigate()
   const { userId } = useSession()
+  const flow = useFlow(MAIN, NESTED)
+  const advance = useAdvance()
 
   // Il momento in cui ha aperto: serve a misurare quanto tempo passa davvero.
   // R1 · si misura per capire, non per giudicare.
@@ -72,6 +87,8 @@ export default function CheckInPre() {
   const [signals, setSignals] = useState<BodySignalDraft[]>([])
 
   const [pain, setPain] = useState<boolean | null>(null)
+  /** Le domande che ha scelto di saltare. Vedi `Step.onSkip`. */
+  const [skipped, setSkipped] = useState<string[]>([])
   const [result, setResult] = useState<{ suggested: TempoCode; chosen: TempoCode } | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -85,7 +102,20 @@ export default function CheckInPre() {
    */
   const redFlag = signals.find((s) => s.is_red_flag) ?? null
   const careOn = pain === true || redFlag !== null
-  const ready = predicted !== null && sum !== null && pain !== null
+
+  /** C'è qualcosa da perdere uscendo? Serve a non chiedere conferma a vuoto. */
+  const dirty = predicted !== null || confidence !== null || sleepHours !== null
+    || Object.values(ch).some((v) => v !== null) || headspace.length > 0
+    || surprise !== null || school !== null || signals.length > 0 || pain !== null
+
+  /** Rispondere cancella l'eventuale salto: si può cambiare idea tornando indietro. */
+  const answer = (id: string, set: () => void, go = flow.onward) =>
+    advance(() => { set(); setSkipped((p) => p.filter((x) => x !== id)) }, go)
+
+  const skip = (id: string) => {
+    setSkipped((p) => (p.includes(id) ? p : [...p, id]))
+    flow.onward()
+  }
 
   function addSignal() {
     if (!region || !sens) return
@@ -94,11 +124,12 @@ export default function CheckInPre() {
       intensity, behaviour, is_red_flag: isRedFlag(sens),
     }])
     setRegion(null); setSens(null); setIntensity(null); setBehaviour(null)
+    flow.go('body')
   }
 
-  async function submit() {
+  async function submit(protective: boolean) {
     if (sum === null || !predicted) return
-    const suggested = suggestWithPain(sum, careOn)
+    const suggested = suggestWithPain(sum, protective || redFlag !== null)
     setResult({ suggested, chosen: suggested })
     setSaving(true)
     if (userId) {
@@ -112,6 +143,7 @@ export default function CheckInPre() {
           headspace: headspace.filter((h) => h !== '__other'),
           headspace_other: hsOther.trim() || null, surprise, sleep_hours: sleepHours, school_load: school,
           started_at: startedAt,
+          skipped_fields: skipped.length ? skipped : null,
         }, signals)
       } catch { /* resta in coda locale: il check-in non si perde */ }
     }
@@ -132,31 +164,32 @@ export default function CheckInPre() {
           headspace: headspace.filter((h) => h !== '__other'),
           headspace_other: hsOther.trim() || null, surprise, sleep_hours: sleepHours, school_load: school,
           started_at: startedAt,
+          skipped_fields: skipped.length ? skipped : null,
         })
       } catch { /* idem */ }
     }
   }
 
-  // ── il risultato ──────────────────────────────────────────────────────────
+  /* ── Il risultato ─────────────────────────────────────────────────────────
+     🔴 Vince sempre sul passo nell'indirizzo. Il check-in è già salvato, e gli
+     eventi non si modificano: tornare indietro a "correggere" una risposta
+     creerebbe un secondo check-in che lei non ha chiesto. */
   if (result) {
     const tempo = TEMPOS[result.chosen]
     const guessedRight = predicted === result.suggested
     return (
-      <div className="flex flex-col gap-4 pt-2">
-        <h1 className="font-display text-[26px]">{t.checkin.pre.title}</h1>
-
-        <Card label={t.checkin.pre.result.compareLabel}>
-          <p className="text-[15px]">
-            <Rich text={guessedRight
-              ? fill(t.checkin.pre.result.matched, { tempo: TEMPOS[result.suggested].name })
-              : fill(t.checkin.pre.result.differed, {
-                  predicted: TEMPOS[predicted!].name, suggested: TEMPOS[result.suggested].name,
-                })} />
-          </p>
-          {!guessedRight && (
-            <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.pre.result.gapNote}</p>
-          )}
-        </Card>
+      <div className="flex flex-col gap-5 pt-2">
+        <p className="bab-label">{t.checkin.pre.result.compareLabel}</p>
+        <p className="text-[17px] leading-snug">
+          <Rich text={guessedRight
+            ? fill(t.checkin.pre.result.matched, { tempo: TEMPOS[result.suggested].name })
+            : fill(t.checkin.pre.result.differed, {
+                predicted: TEMPOS[predicted!].name, suggested: TEMPOS[result.suggested].name,
+              })} />
+        </p>
+        {!guessedRight && (
+          <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.pre.result.gapNote}</p>
+        )}
 
         {careOn && (
           <div className="bab-card flex flex-col gap-2 px-4 py-4"
@@ -173,11 +206,18 @@ export default function CheckInPre() {
           </div>
         )}
 
-        <Card label={t.checkin.pre.result.planLabel}>
-          <div className="flex items-center gap-2">
-            <span className="text-[28px]" aria-hidden>{tempo.emoji}</span>
+        {/* 🔴 Il protagonista della schermata, e si vede: è l'unico oggetto con
+            l'ombra da 8px e il colore pieno dell'andatura. Prima erano quattro
+            card identiche, e il piano di oggi pesava quanto il selettore. */}
+        <section className="bab-card flex flex-col gap-3 px-5 py-5"
+                 style={{ background: `var(--tempo-${result.chosen}-tint)`,
+                          borderColor: `var(--tempo-${result.chosen})`,
+                          boxShadow: 'var(--shadow-lg)' }}>
+          <p className="bab-label">{t.checkin.pre.result.planLabel}</p>
+          <div className="flex items-center gap-3">
+            <span className="text-[40px] leading-none" aria-hidden>{tempo.emoji}</span>
             <div>
-              <p className="font-display text-[20px]">{tempo.name}</p>
+              <h1 className="font-display text-[26px]">{tempo.name}</h1>
               <p className="text-[13px] text-[var(--color-ink-soft)]">{tempo.tag[locale]}</p>
             </div>
           </div>
@@ -185,215 +225,311 @@ export default function CheckInPre() {
           <ul className="flex list-disc flex-col gap-1.5 pl-5 text-[15px]">
             {tempo.plan[locale].map((p, i) => <li key={i}>{p}</li>)}
           </ul>
-        </Card>
+        </section>
 
-        <Card label={t.checkin.pre.result.swapLabel}>
+        <div className="flex flex-col gap-2">
+          <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.pre.result.swapLabel}</p>
           <PillGroup
             label={t.checkin.pre.result.swapLabel}
             options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, emoji: TEMPOS[c].emoji }))}
             value={result.chosen}
             onChange={(v) => void swap(v as TempoCode)}
           />
-        </Card>
+        </div>
 
         <p className="text-center text-[13px] text-[var(--color-ink-soft)]">
           {saving ? t.checkin.post.saving : t.checkin.post.saved}
         </p>
+
+        <button type="button" onClick={() => navigate('/today')}
+                className="bab-pill px-4 py-3.5 text-[17px]"
+                style={{ background: 'var(--color-lime)' }}>
+          {t.common.done}
+        </button>
       </div>
     )
   }
 
-  // ── il check-in ───────────────────────────────────────────────────────────
-  return (
-    <div className="flex flex-col gap-4 pt-2">
-      <h1 className="font-display text-[26px]">{t.checkin.pre.title}</h1>
+  /* ── I passi ──────────────────────────────────────────────────────────── */
 
-      {/* Passo 1 · Prevedi — PRIMA di guardare i canali, altrimenti non è una previsione */}
-      <Card label={t.checkin.pre.predict.label}>
-        <p className="text-[16px] font-bold">{t.checkin.pre.predict.title}</p>
-        <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.pre.predict.help}</p>
-        <PillGroup
-          label={t.checkin.pre.predict.title}
-          options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, emoji: TEMPOS[c].emoji }))}
-          value={predicted}
-          onChange={(v) => setPredicted(v as TempoCode)}
-        />
-        <p className="bab-label">{t.checkin.pre.predict.confidence}</p>
-        <PillGroup
-          label={t.checkin.pre.predict.confidence}
-          options={t.checkin.pre.predict.confidenceOptions.map((l, i) => ({ value: String(i + 1), label: l }))}
-          value={confidence ? String(confidence) : null}
-          onChange={(v) => setConfidence(Number(v))}
-        />
-        <p className="bab-label">{t.checkin.pre.predict.sleepHours}</p>
-        <PillGroup
-          label={t.checkin.pre.predict.sleepHours}
-          options={t.checkin.pre.predict.sleepHoursOptions.map((l) => ({ value: l, label: l }))}
-          value={sleepHours}
-          onChange={setSleepHours}
-        />
-      </Card>
+  const frame = {
+    at: flow.at, of: flow.of, onBack: flow.back,
+    onClose: () => navigate('/today'), dirty,
+  }
 
-      {/* Passo 2 · Sintonizzati */}
-      <Card label={t.checkin.pre.tuneIn.label}>
-        <p className="text-[16px] font-bold">{t.checkin.pre.tuneIn.title}</p>
-        {CHANNELS.map((c) => (
-          <div key={c.code} className="flex flex-col gap-1.5">
-            <p className="text-[14.5px]">{channelQuestion(c, locale)}</p>
-            <EmojiScale
-              scale={c.scale}
-              value={ch[c.code]}
-              onChange={(v) => setCh((p) => ({ ...p, [c.code]: v }))}
-              label={c.question[locale]}
-              low={c.low[locale]}
-              high={c.high[locale]}
-            />
-          </div>
-        ))}
+  /**
+   * Il passo della mappa. È una funzione e non un `case` perché le tre
+   * deviazioni annidate ci ricadono dentro quando la regione non c'è più —
+   * indietro-avanti col tasto del telefono, o un indirizzo incollato. Navigare
+   * durante il render sarebbe l'altra strada, ed è quella che React vieta.
+   */
+  const bodyStep = () => (
+    <Step {...frame} section={t.checkin.pre.pinpoint.label}
+          question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.help}
+          onNext={flow.onward}
+          nextLabel={signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
+      {signals.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {signals.map((s, i) => (
+            <li key={i} className="bab-pill flex items-center justify-between gap-2 px-3 py-2 text-[14px]"
+                style={s.is_red_flag ? { borderColor: 'var(--care)' } : undefined}>
+              <span>
+                {s.is_red_flag && <span aria-hidden>🚩 </span>}
+                {regionLabel(s.region as RegionCode, locale)} — {SENSATIONS.find((x) => x.code === s.sensation)?.label[locale]}
+              </span>
+              <button type="button" onClick={() => setSignals((p) => p.filter((_, j) => j !== i))}
+                      className="text-[var(--color-ink-soft)]">
+                {t.checkin.common.remove}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <BodyMap
+        selected={region}
+        logged={signals.map((s) => s.region as RegionCode)}
+        flagged={signals.filter((s) => s.is_red_flag).map((s) => s.region as RegionCode)}
+        onSelect={(r) => answer('body', () => setRegion(r), () => flow.go('body_what'))}
+      />
+    </Step>
+  )
 
-        <p className="bab-label">
-          {t.checkin.pre.tuneIn.headspace}{' '}
-          <span className="font-normal text-[var(--color-ink-soft)]">· {t.checkin.pre.tuneIn.headspaceHelp}</span>
-        </p>
-        <PillGroup
-          label={t.checkin.pre.tuneIn.headspace}
-          options={[...HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji })),
-                    { value: '__other', label: t.checkin.pre.tuneIn.headspaceOther }]}
-          value={headspace}
-          onChange={(v) => setHeadspace((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v])}
+  /** I quattro canali: stessa forma, stessa scala, una per schermata. */
+  const channel = CHANNELS.find((x) => x.code === flow.id)
+  if (channel) {
+    return (
+      <Step {...frame} section={t.checkin.pre.tuneIn.label}
+            question={channelQuestion(channel, locale)}
+            onNext={ch[channel.code] ? flow.onward : null}>
+        <EmojiScale
+          size="lg"
+          scale={channel.scale}
+          value={ch[channel.code]}
+          onChange={(v) => answer(channel.code, () => setCh((p) => ({ ...p, [channel.code]: v })))}
+          label={channel.question[locale]}
+          low={channel.low[locale]}
+          high={channel.high[locale]}
         />
-        {headspace.includes('__other') && (
-          <input
-            value={hsOther}
-            onChange={(e) => setHsOther(e.target.value)}
-            maxLength={60}
-            placeholder={t.checkin.pre.tuneIn.headspaceOtherPlaceholder}
-            aria-label={t.checkin.pre.tuneIn.headspaceOther}
-            className="bab-card px-3 py-2 text-[15px]"
+      </Step>
+    )
+  }
+
+  switch (flow.id) {
+    case 'tempo_predicted':
+      return (
+        <Step {...frame} section={t.checkin.pre.predict.label}
+              question={t.checkin.pre.predict.title} help={t.checkin.pre.predict.help}
+              onNext={predicted ? flow.onward : null}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.predict.title}
+            options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, emoji: TEMPOS[c].emoji }))}
+            value={predicted}
+            onChange={(v) => answer('tempo_predicted', () => setPredicted(v as TempoCode))}
           />
-        )}
+        </Step>
+      )
 
-        <p className="bab-label">{t.checkin.pre.tuneIn.surprise}</p>
-        <PillGroup
-          label={t.checkin.pre.tuneIn.surprise}
-          options={t.checkin.pre.tuneIn.surpriseOptions.map((l, i) => ({ value: String(i + 1), label: l }))}
-          value={surprise ? String(surprise) : null}
-          onChange={(v) => setSurprise(Number(v))}
-        />
+    case 'prediction_confidence':
+      return (
+        <Step {...frame} section={t.checkin.pre.predict.label}
+              question={t.checkin.pre.predict.confidence}
+              onNext={confidence ? flow.onward : null}
+              onSkip={() => skip('prediction_confidence')}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.predict.confidence}
+            options={t.checkin.pre.predict.confidenceOptions.map((l, i) => ({ value: String(i + 1), label: l }))}
+            value={confidence ? String(confidence) : null}
+            onChange={(v) => answer('prediction_confidence', () => setConfidence(Number(v)))}
+          />
+        </Step>
+      )
 
-        <p className="bab-label">{t.checkin.pre.tuneIn.schoolLoad}</p>
-        <PillGroup
-          label={t.checkin.pre.tuneIn.schoolLoad}
-          options={t.checkin.pre.tuneIn.schoolOptions.map((l, i) => ({ value: String(i + 1), label: l }))}
-          value={school ? String(school) : null}
-          onChange={(v) => setSchool(Number(v))}
-        />
-      </Card>
+    case 'sleep_hours':
+      return (
+        <Step {...frame} section={t.checkin.pre.predict.label}
+              question={t.checkin.pre.predict.sleepHours}
+              onNext={sleepHours ? flow.onward : null}
+              onSkip={() => skip('sleep_hours')}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.predict.sleepHours}
+            options={t.checkin.pre.predict.sleepHoursOptions.map((l) => ({ value: l, label: l }))}
+            value={sleepHours}
+            onChange={(v) => answer('sleep_hours', () => setSleepHours(v))}
+          />
+        </Step>
+      )
 
-      {/* Passo 2 · Individua e nomina */}
-      <Card label={t.checkin.pre.pinpoint.label}>
-        <p className="text-[16px] font-bold">{t.checkin.pre.pinpoint.title}</p>
-        <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.pre.pinpoint.help}</p>
+    case 'headspace':
+      /**
+       * 🔴 Headspace NON è saltabile, anche se sembra la più morbida delle
+       * quattro: è il quinto canale della somma, e senza di lei `total()`
+       * restituisce `null` e l'andatura non si può calcolare.
+       */
+      return (
+        <Step {...frame} section={t.checkin.pre.tuneIn.label}
+              question={t.checkin.pre.tuneIn.headspace}
+              help={t.checkin.pre.tuneIn.headspaceHelp}
+              onNext={hs !== null ? flow.onward : null}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.tuneIn.headspace}
+            options={[...HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji })),
+                      { value: '__other', label: t.checkin.pre.tuneIn.headspaceOther }]}
+            value={headspace}
+            onChange={(v) => setHeadspace((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v])}
+          />
+          {headspace.includes('__other') && (
+            <input
+              value={hsOther}
+              onChange={(e) => setHsOther(e.target.value)}
+              maxLength={60}
+              placeholder={t.checkin.pre.tuneIn.headspaceOtherPlaceholder}
+              aria-label={t.checkin.pre.tuneIn.headspaceOther}
+              className="bab-card px-3 py-2 text-[16px]"
+            />
+          )}
+        </Step>
+      )
 
-        {signals.length > 0 && (
-          <ul className="flex flex-col gap-2">
-            {signals.map((s, i) => (
-              <li key={i} className="bab-pill flex items-center justify-between gap-2 px-3 py-2 text-[13.5px]"
-                  style={s.is_red_flag ? { borderColor: 'var(--care)' } : undefined}>
-                <span>
-                  {s.is_red_flag && <span aria-hidden>🚩 </span>}
-                  {regionLabel(s.region as RegionCode, locale)} — {SENSATIONS.find((x) => x.code === s.sensation)?.label[locale]}
-                </span>
-                <button type="button" onClick={() => setSignals((p) => p.filter((_, j) => j !== i))}
-                        className="text-[var(--color-ink-soft)]">
-                  {t.checkin.common.remove}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+    case 'surprise':
+      return (
+        <Step {...frame} section={t.checkin.pre.tuneIn.label}
+              question={t.checkin.pre.tuneIn.surprise}
+              onNext={surprise ? flow.onward : null}
+              onSkip={() => skip('surprise')}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.tuneIn.surprise}
+            options={t.checkin.pre.tuneIn.surpriseOptions.map((l, i) => ({ value: String(i + 1), label: l }))}
+            value={surprise ? String(surprise) : null}
+            onChange={(v) => answer('surprise', () => setSurprise(Number(v)))}
+          />
+        </Step>
+      )
 
-        <BodyMap selected={region} logged={signals.map((s) => s.region as RegionCode)} onSelect={setRegion} />
+    case 'school_load':
+      return (
+        <Step {...frame} section={t.checkin.pre.tuneIn.label}
+              question={t.checkin.pre.tuneIn.schoolLoad}
+              onNext={school ? flow.onward : null}
+              onSkip={() => skip('school_load')}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.tuneIn.schoolLoad}
+            options={t.checkin.pre.tuneIn.schoolOptions.map((l, i) => ({ value: String(i + 1), label: l }))}
+            value={school ? String(school) : null}
+            onChange={(v) => answer('school_load', () => setSchool(Number(v)))}
+          />
+        </Step>
+      )
 
-        {region && (
-          <div className="flex flex-col gap-3">
-            <p className="bab-label">{regionLabel(region, locale)} · {t.checkin.pre.pinpoint.whatLike}</p>
-            {(['good', 'notice', 'flag'] as const).map((g) => (
-              <div key={g} className="flex flex-col gap-1.5">
-                <p className="text-[12.5px] text-[var(--color-ink-soft)]">{GROUP_LABEL[g][locale]}</p>
-                <PillGroup
-                  label={GROUP_LABEL[g][locale]}
-                  tone={g === 'flag' ? 'care' : 'neutral'}
-                  options={sensationsIn(g).map((s) => ({
-                    value: s.code, label: s.label[locale], emoji: s.emoji, flag: s.redFlag,
-                  }))}
-                  value={sens}
-                  onChange={setSens}
-                />
-              </div>
-            ))}
+    case 'body':
+      return bodyStep()
 
-            {sens && (
-              <>
-                <p className="bab-label">{t.checkin.pre.pinpoint.howStrong}</p>
-                <PillGroup
-                  label={t.checkin.pre.pinpoint.howStrong}
-                  options={INTENSITIES.map((i) => ({ value: String(i.value), label: i.label[locale] }))}
-                  value={intensity ? String(intensity) : null}
-                  onChange={(v) => setIntensity(Number(v))}
-                />
-                <p className="bab-label">{t.checkin.pre.pinpoint.whatDoes}</p>
-                <PillGroup
-                  label={t.checkin.pre.pinpoint.whatDoes}
-                  options={BEHAVIOURS.map((b) => ({ value: b.code, label: b.label[locale] }))}
-                  value={behaviour}
-                  onChange={setBehaviour}
-                />
-                <button type="button" onClick={addSignal}
-                        className="bab-pill self-start px-4 py-2 text-[14px]"
-                        style={{ background: 'var(--color-lime)' }}>
-                  {t.checkin.common.addThis}
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </Card>
+    case 'body_what':
+      if (!region) return bodyStep()
+      return (
+        <Step {...frame} section={regionLabel(region, locale)}
+              question={t.checkin.pre.pinpoint.whatLike}
+              onNext={sens ? () => flow.go('body_strength') : null}>
+          {(['good', 'notice', 'flag'] as const).map((g) => (
+            <div key={g} className="flex flex-col gap-2">
+              <p className="text-[12.5px] text-[var(--color-ink-soft)]">{GROUP_LABEL[g][locale]}</p>
+              <PillGroup
+                label={GROUP_LABEL[g][locale]}
+                tone={g === 'flag' ? 'care' : 'neutral'}
+                options={sensationsIn(g).map((s) => ({
+                  value: s.code, label: s.label[locale], emoji: s.emoji, flag: s.redFlag,
+                }))}
+                value={sens}
+                onChange={(v) => answer('body', () => setSens(v), () => flow.go('body_strength'))}
+              />
+            </div>
+          ))}
+        </Step>
+      )
 
-      {/* Il blocco educativo PRECEDE sempre la domanda: si insegna, poi si chiede (§10). */}
-      <Card>
-        <details>
-          <summary className="cursor-pointer text-[15px] font-bold">{DECODE_ACHE.workingTitle[locale]} · {DECODE_ACHE.protectiveTitle[locale]}</summary>
-          <div className="mt-3 flex flex-col gap-3">
+    case 'body_strength':
+      if (!region || !sens) return bodyStep()
+      return (
+        <Step {...frame} section={regionLabel(region, locale)}
+              question={t.checkin.pre.pinpoint.howStrong}
+              onNext={intensity ? () => flow.go('body_behaviour') : null}
+              onSkip={() => flow.go('body_behaviour')}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.pinpoint.howStrong}
+            options={INTENSITIES.map((i) => ({ value: String(i.value), label: i.label[locale] }))}
+            value={intensity ? String(intensity) : null}
+            onChange={(v) => answer('body', () => setIntensity(Number(v)), () => flow.go('body_behaviour'))}
+          />
+        </Step>
+      )
+
+    case 'body_behaviour':
+      if (!region || !sens) return bodyStep()
+      return (
+        <Step {...frame} section={regionLabel(region, locale)}
+              question={t.checkin.pre.pinpoint.whatDoes}
+              onNext={addSignal} nextLabel={t.checkin.common.addThis}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.pinpoint.whatDoes}
+            options={BEHAVIOURS.map((b) => ({ value: b.code, label: b.label[locale] }))}
+            value={behaviour}
+            onChange={setBehaviour}
+          />
+        </Step>
+      )
+
+    case 'pain':
+      /**
+       * 🔴 Il pezzo educativo sta sulla STESSA schermata della domanda, non su
+       * quella prima. §10 dice «si insegna, poi si chiede»: separarli vorrebbe
+       * dire insegnare in un posto e chiedere in un altro, e a quel punto la
+       * lezione è una schermata da superare invece che il modo di rispondere.
+       * Una decisione per schermata, non un elemento per schermata.
+       */
+      return (
+        <Step {...frame} section={t.checkin.pre.decodeLabel}
+              question={DECODE_ACHE.question[locale]}
+              onNext={pain !== null && sum !== null ? () => void submit(pain) : null}
+              nextLabel={t.flow.next}>
+          <div className="bab-card flex flex-col gap-3 px-4 py-4">
+            <p className="bab-label">{DECODE_ACHE.workingTitle[locale]}</p>
             <ul className="flex list-disc flex-col gap-1 pl-5 text-[14px]">
               {DECODE_ACHE.working[locale].map((x, i) => <li key={i}><Rich text={x} /></li>)}
             </ul>
+            <p className="bab-label" style={{ color: 'var(--care)' }}>{DECODE_ACHE.protectiveTitle[locale]}</p>
             <ul className="flex list-disc flex-col gap-1 pl-5 text-[14px]">
               {DECODE_ACHE.protective[locale].map((x, i) => <li key={i}><Rich text={x} /></li>)}
             </ul>
             <p className="text-[14px]"><Rich text={DECODE_ACHE.tell[locale]} /></p>
           </div>
-        </details>
 
-        <p className="text-[16px] font-bold">{DECODE_ACHE.question[locale]}</p>
-        <PillGroup
-          label={DECODE_ACHE.question[locale]}
-          tone="care"
-          options={[{ value: 'yes', label: t.common.yes }, { value: 'no', label: t.common.no }]}
-          value={pain === null ? null : pain ? 'yes' : 'no'}
-          onChange={(v) => setPain(v === 'yes')}
-        />
-      </Card>
+          <PillGroup
+            size="lg"
+            label={DECODE_ACHE.question[locale]}
+            tone="care"
+            options={[{ value: 'yes', label: t.common.yes }, { value: 'no', label: t.common.no }]}
+            value={pain === null ? null : pain ? 'yes' : 'no'}
+            onChange={(v) => setPain(v === 'yes')}
+          />
 
-      <button
-        type="button"
-        disabled={!ready}
-        onClick={() => void submit()}
-        className="bab-pill px-4 py-3 text-[16px] disabled:opacity-50"
-        style={{ background: ready ? 'var(--color-lime)' : undefined }}
-      >
-        {t.checkin.common.next}
-      </button>
-    </div>
-  )
+          {/* 🔴 Se i canali non sono completi la somma non esiste, e senza somma
+              non c'è andatura da suggerire. Si dice dove sta il buco invece di
+              lasciare un bottone spento senza spiegazione. */}
+          {sum === null && (
+            <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.common.needChannels}</p>
+          )}
+        </Step>
+      )
+
+    /** `useFlow` non restituisce mai un id fuori da `MAIN` o dalle deviazioni. */
+    default:
+      return null
+  }
 }

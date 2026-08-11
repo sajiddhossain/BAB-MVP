@@ -17,12 +17,15 @@ type Props = {
   label: string
   low: string
   high: string
+  /** `lg` quando la scala è l'unica cosa sulla schermata. */
+  size?: 'md' | 'lg'
 }
 
-export default function EmojiScale({ scale, value, onChange, label, low, high }: Props) {
+export default function EmojiScale({ scale, value, onChange, label, low, high, size = 'md' }: Props) {
+  const big = size === 'lg'
   return (
-    <div role="radiogroup" aria-label={label} className="flex flex-col gap-1.5">
-      <div className="flex justify-between gap-1.5">
+    <div role="radiogroup" aria-label={label} className="flex flex-col gap-2">
+      <div className={`flex justify-between ${big ? 'gap-2' : 'gap-1.5'}`}>
         {scale.map((emoji, i) => {
           const v = i + 1
           const on = value === v
@@ -35,7 +38,9 @@ export default function EmojiScale({ scale, value, onChange, label, low, high }:
               // Il nome accessibile è la posizione a parole, non l'emoji.
               aria-label={v === 1 ? low : v === scale.length ? high : `${v} / ${scale.length}`}
               onClick={() => onChange(v)}
-              className="flex-1 rounded-[14px] border-[3px] py-2.5 text-[24px] transition-transform"
+              className={`flex-1 rounded-[14px] border-[3px] transition-transform ${
+                big ? 'py-4 text-[32px]' : 'py-2.5 text-[24px]'
+              }`}
               style={{
                 borderColor: on ? 'var(--color-ink)' : 'var(--color-sand)',
                 background: on ? 'var(--tempo-steady-tint)' : 'var(--color-surface)',

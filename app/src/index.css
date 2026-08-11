@@ -113,6 +113,16 @@ h1, h2, h3, h4 {
   outline-offset: 2px;
 }
 
+/* A ogni passo del check-in il fuoco va sulla domanda, così chi usa uno screen
+   reader la sente invece di restare sul bottone appena premuto (`Step.tsx`).
+   Un titolo però non è un bersaglio: l'anello attorno gli darebbe l'aria di una
+   cosa da toccare, e comparirebbe a ogni passo senza che nessuno abbia usato la
+   tastiera. Si tiene il fuoco, si toglie il riquadro. */
+.bab-heading-focus:focus-visible,
+.bab-heading-focus:focus {
+  outline: none;
+}
+
 /* Every interactive target is at least 44px. Non-negotiable. */
 button, a[role="button"], input, select {
   min-height: 44px;

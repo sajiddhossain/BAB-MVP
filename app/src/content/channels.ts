@@ -78,7 +78,9 @@ export const HEADSPACE: Headspace[] = [
   { code: 'confident',   emoji: '😎',    polarity: 'positive', label: { it: 'Sicura di me',   en: 'Confident' } },
 ]
 
-export function channelQuestion(c: Channel, locale: Locale): string {
+/** Il `code` non c'entra col titolo, quindi non lo si pretende: così vale anche
+ *  per i canali del post, che hanno codici loro. */
+export function channelQuestion(c: Omit<Channel, 'code'>, locale: Locale): string {
   return `${c.emoji} ${c.question[locale]}`
 }
 

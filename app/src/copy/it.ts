@@ -33,6 +33,23 @@ export const it = {
   },
 
   /**
+   * La struttura dei flussi a passi: check-in e onboarding. Sta qui e non
+   * dentro `checkin` perché è la cornice, non il contenuto — e la cornice è la
+   * stessa dovunque si chieda una cosa alla volta.
+   */
+  flow: {
+    next: 'Avanti',
+    back: 'Indietro',
+    close: 'Chiudi',
+    skip: 'Salta questa',
+    progress: 'A che punto sei',
+    leaveTitle: 'Esci dal check-in?',
+    leaveBody: 'Quello che hai risposto finora non è ancora salvato: si salva tutto insieme alla fine. Se esci adesso lo perdi.',
+    leaveYes: 'Esci e perdi tutto',
+    leaveNo: 'Resta qui',
+  },
+
+  /**
    * R12 · Il link via email è la strada principale, non un ripiego: Google ha
    * un'età minima che una dodicenne spesso non raggiunge, e gli account
    * scolastici bloccano spesso l'accesso OAuth di terze parti.
@@ -226,6 +243,11 @@ export const it = {
       remove: 'Togli',
       reviewDifference: 'Rivedi la differenza',
       nothingYet: 'Ancora niente — tocca un punto per iniziare.',
+      /** Non rispondere alla mappa è una risposta piena: si dice così. */
+      nothingHere: 'Oggi è tutto tranquillo',
+      needChannels: 'Manca ancora qualche canale. Torna indietro a completarli: senza, l\'andatura non si può calcolare.',
+      andAnother: 'Ce n\'è un\'altra',
+      thatsAll: 'Basta così',
       /** R3 · Solo nei giorni che il suo calendario segna come educazione fisica. */
       peAsk: 'Oggi hai fatto educazione fisica?',
       peAskHelp: 'Capita di non andarci, e cambia parecchio il carico della giornata.',
@@ -233,8 +255,10 @@ export const it = {
     pre: {
       title: 'Leggi i tuoi segnali',
       steps: ['Prevedi', 'Sintonizzati', 'Confronta', 'Aggiusta'],
+      /** L'ultima domanda del pre: si insegna cos'è un dolore, poi si chiede. */
+      decodeLabel: 'Decodifica',
       predict: {
-        label: 'Passo 1 · Prevedi',
+        label: 'Prevedi',
         title: 'Prima di sintonizzarti — qual è la tua andatura oggi?',
         help: 'La tua "andatura" è quanto ha da dare il tuo corpo oggi. Tira a indovinare adesso — lo confermerai alla fine. Indovinare prima allena la tua lettura interiore, e "sbagliare" non è un fallimento: è tutto il punto.',
         confidence: 'Quanto sei sicura?',
@@ -243,7 +267,7 @@ export const it = {
         sleepHoursOptions: ['Meno di 6h', '6–7h', '7–8h', '8–9h', 'Più di 9h'],
       },
       tuneIn: {
-        label: 'Passo 2 · Sintonizzati',
+        label: 'Sintonizzati',
         title: 'I tuoi canali',
         /** Resta in inglese: è vocabolario del prodotto, come i nomi delle andature. */
         headspace: '🧠 Headspace',
@@ -256,7 +280,7 @@ export const it = {
         schoolOptions: ['Tranquilla', 'Impegnativa', 'Settimana d\'esami'],
       },
       pinpoint: {
-        label: 'Passo 2 · Individua e nomina',
+        label: 'Individua e nomina',
         title: 'Dove lo senti? Dagli un nome.',
         help: 'Fermarsi a trovare dove sta una sensazione, e metterci una parola sopra, è il cuore della competenza — è come un vago "mi sento strana" diventa qualcosa che capisci davvero. Tocca un punto, passa tra fronte e retro, poi scegli come si sente. Aggiungine quante ne noti, o nessuna se è tutto tranquillo.',
         front: 'Fronte',
@@ -269,8 +293,8 @@ export const it = {
         whatDoes: 'E cosa fa?',
       },
       result: {
-        compareLabel: 'Passo 3 · Confronta — la tua lettura contro il tuo corpo',
-        planLabel: 'Passo 4 · Aggiusta — il tuo piano di oggi',
+        compareLabel: 'Confronta — la tua lettura contro il tuo corpo',
+        planLabel: 'Aggiusta — il tuo piano di oggi',
         /** 🔴 Sbagliare la previsione non è un errore: è il meccanismo che lavora. */
         matched: 'Avevi indovinato: **{tempo}**.',
         differed: 'Avevi previsto **{predicted}**, i tuoi segnali dicono **{suggested}**.',
@@ -284,7 +308,7 @@ export const it = {
       title: 'Chiudi il cerchio',
       steps: ['Guarda indietro', 'Senti', 'Impara', 'Recupera'],
       lookBack: {
-        label: 'Passo 1 · Guarda indietro',
+        label: 'Guarda indietro',
         title: 'Con che andatura ti sei allenata davvero?',
         effort: 'Quanto è stata dura davvero?',
         duration: 'Quanto è durata?',
@@ -292,8 +316,8 @@ export const it = {
         sessionType: 'Che tipo di sessione?',
         sessionTypeOptions: ['Allenamento', 'Gara o partita', 'Educazione fisica', 'Palestra', 'Altro'],
       },
-      senseLabel: 'Passo 2 · Senti — una lettura veloce',
-      learnLabel: 'Passo 3 · Impara',
+      senseLabel: 'Senti — una lettura veloce',
+      learnLabel: 'Impara',
       /** 🔴 Niente "3/5": il §7 vieta i punteggi davanti all'atleta. */
       readSpot: 'Stamattina avevi previsto **{predicted}**, ed è andata proprio così.',
       readGap: 'Stamattina avevi previsto **{predicted}**, e ti sei allenata in **{actual}**.',
@@ -312,7 +336,7 @@ export const it = {
         copy: 'Copia una frase per il coach',
         notToday: 'Non oggi',
       },
-      recoverLabel: 'Passo 4 · Recupera — cosa chiede il tuo corpo adesso',
+      recoverLabel: 'Recupera — cosa chiede il tuo corpo adesso',
       saving: 'Salvo…',
       saved: 'Salvato. Anche senza campo: parte da solo quando torna.',
     },
@@ -440,8 +464,6 @@ export const it = {
     setUpLater: 'Lo imposto dopo',
 
     /** R3 · "La mia settimana": il calendario, chiamato come lo chiamerebbe lei. */
-    weekTitle: 'La mia settimana',
-    weekHelp: 'Segna quando ti alleni, quando hai educazione fisica, e le gare che già sai. Così BAB sa quando aspettarti — e sta zitta negli altri giorni.',
     weekTraining: 'Allenamenti',
     weekTrainingHelp: 'Giorni e orario, così sa quando chiederti il prima e il dopo',
     weekPe: 'Educazione fisica a scuola',

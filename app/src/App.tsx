@@ -29,6 +29,17 @@ export default function App() {
    * profilo lo intrappolerebbe in una procedura scritta per una tredicenne.
    */
   const isTeam = pathname.startsWith('/team')
+  /**
+   * 🔴 Durante un check-in la barra delle tab sparisce. Non è pulizia: un
+   * flusso a passi ha una sola strada avanti e una indietro, e tre destinazioni
+   * sempre in fondo allo schermo sono tre modi di perdere quello che ha scritto
+   * — che non è ancora salvato. La via d'uscita resta, ma è una sola e chiede
+   * conferma (vedi `Step`).
+   *
+   * Il bottone «mi sono fatta male» invece resta: §5 dice sempre a un tocco, e
+   * «sempre» comprende il mezzo del check-in.
+   */
+  const isFlow = pathname.startsWith('/checkin')
   const t = useCopy()
   /**
    * 🔴 L'idratazione viene PRIMA del profilo, e l'ordine è tutto.
@@ -123,7 +134,7 @@ export default function App() {
           It lives above the router so it is reachable from every screen. */}
       <HurtButton />
 
-      <main className="flex-1 px-4 pb-28">
+      <main className={`flex-1 px-4 ${isFlow ? 'pb-6' : 'pb-28'}`}>
         <Routes>
           <Route path="/" element={<Navigate to="/today" replace />} />
           <Route path="/today" element={<Today />} />
@@ -143,7 +154,7 @@ export default function App() {
         </Routes>
       </main>
 
-      <TabBar />
+      {!isFlow && <TabBar />}
     </div>
   )
 }

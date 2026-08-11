@@ -15,15 +15,21 @@ type Props = {
   label: string
   /** Colore dell'accento; corallo dove c'è di mezzo il dolore. */
   tone?: 'neutral' | 'care'
+  /**
+   * `lg` dove la domanda è sola sulla schermata: lo spazio c'è, e un bersaglio
+   * più grande si prende meglio con un pollice mentre si cammina verso il campo.
+   */
+  size?: 'md' | 'lg'
 }
 
-export default function PillGroup({ options, value, onChange, label, tone = 'neutral' }: Props) {
+export default function PillGroup({ options, value, onChange, label, tone = 'neutral', size = 'md' }: Props) {
   const multi = Array.isArray(value)
   const accent = tone === 'care' ? 'var(--care)' : 'var(--color-teal)'
   const isOn = (v: string) => (multi ? (value as string[]).includes(v) : value === v)
+  const big = size === 'lg'
 
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap gap-2">
+    <div role="group" aria-label={label} className={`flex flex-wrap ${big ? 'gap-2.5' : 'gap-2'}`}>
       {options.map((o) => {
         const on = isOn(o.value)
         return (
@@ -32,7 +38,9 @@ export default function PillGroup({ options, value, onChange, label, tone = 'neu
             type="button"
             aria-pressed={on}
             onClick={() => onChange(o.value)}
-            className="bab-pill flex items-center gap-1.5 px-3.5 py-2 text-[14px]"
+            className={`bab-pill flex items-center gap-1.5 ${
+              big ? 'px-5 py-3 text-[16px]' : 'px-3.5 py-2 text-[14px]'
+            }`}
             style={on
               ? { background: accent, borderColor: accent, color: 'var(--color-surface)' }
               : o.flag
