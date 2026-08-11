@@ -414,6 +414,41 @@ export const it = {
     undated: '{n} segnali più vecchi non hanno una data e restano fuori da questo conto.',
   },
 
+  /**
+   * «Come sta l'app». La apre lei quando qualcosa non si salva, non solo noi:
+   * per questo il testo sta qui e non nella console di chi amministra.
+   *
+   * 🔴 Dice cosa sta succedendo senza chiedere di capirlo. «In coda ci sono tre
+   * cose» è un fatto che può leggere ad alta voce al telefono; «PGRST301» no.
+   */
+  diag: {
+    title: 'Come sta l\'app',
+    open: 'Qualcosa non si salva?',
+    lede: 'Se ti sembra che qualcosa non venga salvato, qui c\'è cosa sta succedendo davvero. Puoi copiarlo e mandarcelo: non contiene niente di quello che hai scritto.',
+    serverTitle: 'Il server',
+    serverOn: 'Collegato.',
+    serverOff: 'Non collegato. BAB continua a funzionare e salva tutto qui, ma niente parte.',
+    sessionOn: 'Sei entrata.',
+    sessionOff: 'Non sei entrata: quello che scrivi resta su questo dispositivo.',
+    storageTitle: 'L\'archivio su questo dispositivo',
+    storageOn: 'Funziona.',
+    storageOff: 'Non riesco a leggerlo. Succede in navigazione privata, o se lo spazio è finito.',
+    storageCount: '{n} cose salvate qui.',
+    queueTitle: 'In attesa di partire',
+    queueNone: 'Niente in attesa: è tutto arrivato.',
+    queueWaitingOne: 'Una cosa aspetta la rete.',
+    queueWaiting: '{n} cose aspettano la rete.',
+    queueStuckOne: 'Una non è riuscita a partire.',
+    queueStuck: '{n} non sono riuscite a partire.',
+    push: 'Prova a mandare adesso',
+    pushing: 'Sto provando…',
+    pushDone: 'Partite {n}. Ne restano {left}.',
+    copy: 'Copia il rapporto',
+    copied: 'Copiato.',
+    /** 🔴 Detto qui perché è il momento in cui verrebbe da svuotare tutto. */
+    dontWipe: 'Non cancellare l\'app né i dati del browser finché resta qualcosa in attesa: quello che non è partito sta solo qui.',
+  },
+
   rhythm: {
     title: 'Il mio ritmo',
     rightNow: 'In questo momento sei in',

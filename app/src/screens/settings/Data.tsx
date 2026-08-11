@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { plural, useCopy } from '@/copy'
 import { buildExport, download } from '@/lib/account'
 import { useSession } from '@/lib/session'
@@ -67,6 +68,13 @@ export default function SettingsData() {
       {exp.k === 'error' && (
         <p className="text-[14px]" style={{ color: 'var(--care)' }}>{t.settings.exportError}</p>
       )}
+
+      {/* La via per capire cosa sta succedendo davvero, dove si va a
+          guardare quando si sospetta che qualcosa non si salvi. */}
+      <Link to="/settings/diagnostica"
+            className="self-start text-[13.5px] underline text-[var(--color-ink-soft)]">
+        {t.diag.open}
+      </Link>
 
       {/* Cosa non è ancora partito. `sync.ts` dice che le righe rimaste
           indietro vanno mostrate e mai ignorate: questo è il posto. */}

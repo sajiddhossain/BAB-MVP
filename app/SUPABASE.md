@@ -108,6 +108,28 @@ un motivo per non offrirlo — è un motivo per scriverlo, e il copy in `src/cop
 > come organizzazione, e un client secret JWT da rigenerare ogni 6 mesi — per una comodità
 > che il link via email copre già.
 
+## 4d · Il primo admin — una riga di SQL, una volta sola
+
+`team_staff` dice chi vede una squadra. Non dice chi può *crearne* una, iscriverci
+un'atleta, o guardare se il pilota sta funzionando. Quello lo dice
+`platform_admins`, ed è una tabella **che l'app non sa scrivere**: nessuna policy
+di insert, update o delete. Un admin si aggiunge solo da qui, cioè da chi ha già
+le chiavi di casa.
+
+🔴 Prima entra in BAB una volta col tuo indirizzo (senza, non esisti in
+`auth.users`). Poi, nel SQL Editor:
+
+```sql
+insert into public.platform_admins (user_id, note)
+select id, 'founder' from auth.users where email = 'tu@esempio.it';
+```
+
+Da lì in poi `/admin` si apre da sola: chi entra viene mandato a casa propria —
+un'atleta a Oggi, chi allena alla dashboard squadra, un admin alla console.
+
+**Per togliere un admin** basta cancellare la riga: ha effetto al ricaricamento
+successivo, senza aspettare che scada nessun token.
+
 ## 5 · Semi di prova — per verificare la dashboard squadra
 
 Finché non esiste una squadra con dentro qualcuno, non c'è modo di sapere se le

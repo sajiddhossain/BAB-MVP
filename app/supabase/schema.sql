@@ -598,6 +598,240 @@ grant select on public.coach_athletes, public.coach_check_ins,
   to authenticated;
 
 
+-- ════════════════════════════════════════════════════════════════════════════
+-- CHI AMMINISTRA LA PIATTAFORMA
+--
+-- `team_staff` dice chi vede una SQUADRA. Non dice chi può crearne una, chi può
+-- iscriverci un'atleta, chi può guardare se il pilota sta funzionando. Finora
+-- quelle cose si facevano scrivendo SQL a mano, il che vuol dire che ogni nuova
+-- atleta passava da chi ha la password del database.
+--
+-- 🔴 L'elenco degli admin è una TABELLA, e la tabella non si scrive dall'app.
+-- Nessuna policy di insert, update o delete: un admin si aggiunge solo dal SQL
+-- editor, cioè da chi ha già le chiavi di casa. Se fosse un ruolo dentro al
+-- token sarebbe più veloce da leggere, ma non si vedrebbe da nessuna parte e
+-- per toglierlo bisognerebbe aspettare che il token scada. Qui invece si guarda
+-- una tabella e si sa, e una riga in meno ha effetto al prossimo caricamento.
+-- ════════════════════════════════════════════════════════════════════════════
+
+create table if not exists public.platform_admins (
+  user_id  uuid primary key references auth.users(id) on delete cascade,
+  added_at timestamptz not null default now(),
+  -- Perché questa persona è admin. Fra sei mesi serve a capire se lo è ancora.
+  note     text check (note is null or char_length(note) <= 200)
+);
+
+-- security definer: deve poter leggere la tabella mentre decide se chi chiede
+-- ha il diritto di leggerla. Stesso motivo e stesse cautele di `is_staff_of`.
+create or replace function public.is_admin()
+returns boolean language sql stable security definer set search_path = public, pg_temp as $$
+  select exists (select 1 from public.platform_admins where user_id = auth.uid());
+$$;
+
+alter table public.platform_admins enable row level security;
+drop policy if exists "admin reads the list" on public.platform_admins;
+create policy "admin reads the list" on public.platform_admins
+  for select to authenticated using (public.is_admin());
+
+-- 🔵 IL PRIMO ADMIN si aggiunge a mano, una volta sola, dopo essere entrata in
+-- BAB almeno una volta (prima non esiste in auth.users):
+--
+--   insert into public.platform_admins (user_id, note)
+--   select id, 'founder' from auth.users where email = 'tu@esempio.it';
+
+
+-- ── COSA PUÒ FARE UN ADMIN ──────────────────────────────────────────────────
+-- Creare squadre, attaccarci lo staff, iscrivere e togliere atlete. Niente di
+-- più: NON legge i check-in, NON legge il ciclo, e soprattutto non legge il
+-- testo libero. La regola «le sue parole sono sue» non ha eccezioni per chi
+-- amministra — se le avesse, non sarebbe una regola.
+drop policy if exists "admin manages teams"   on public.teams;
+create policy "admin manages teams" on public.teams
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "admin manages staff"   on public.team_staff;
+create policy "admin manages staff" on public.team_staff
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+drop policy if exists "admin manages members" on public.team_members;
+create policy "admin manages members" on public.team_members
+  for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+
+-- ── ATTACCARE UNA PERSONA A UNA SQUADRA ─────────────────────────────────────
+-- Si cerca per email, perché è l'unica cosa che l'admin conosce davvero: è
+-- l'indirizzo con cui quella persona è entrata.
+--
+-- 🔴 Deve essere già entrata almeno una volta. Non si creano account per conto
+-- di qualcun altro — men che meno per una minorenne — e non si mandano inviti
+-- che sembrano account. Chi non c'è, non c'è: la funzione lo dice e si ferma.
+create or replace function public.admin_attach_staff(
+  p_team uuid, p_email text, p_role text default 'coach'
+) returns uuid language plpgsql security definer set search_path = public, pg_temp as $$
+declare u uuid;
+begin
+  if not public.is_admin() then raise exception 'non autorizzata' using errcode = '42501'; end if;
+  select id into u from auth.users where lower(email) = lower(btrim(p_email));
+  if u is null then
+    raise exception 'nessun account con questa email: deve entrare in BAB una volta prima'
+      using errcode = 'P0002';
+  end if;
+  insert into public.team_staff (team_id, user_id, role) values (p_team, u, p_role)
+    on conflict (team_id, user_id) do update set role = excluded.role;
+  return u;
+end $$;
+
+create or replace function public.admin_attach_athlete(p_team uuid, p_email text)
+returns uuid language plpgsql security definer set search_path = public, pg_temp as $$
+declare u uuid;
+begin
+  if not public.is_admin() then raise exception 'non autorizzata' using errcode = '42501'; end if;
+  select id into u from auth.users where lower(email) = lower(btrim(p_email));
+  if u is null then
+    raise exception 'nessun account con questa email: deve entrare in BAB una volta prima'
+      using errcode = 'P0002';
+  end if;
+  if not exists (select 1 from public.athletes where id = u) then
+    raise exception 'ha un account ma non ha ancora finito l''onboarding' using errcode = 'P0002';
+  end if;
+  -- Riattaccare chi era uscita non crea una riga nuova: rimette `left_at` a
+  -- null, così la storia dell'ingresso resta quella vera.
+  insert into public.team_members (team_id, athlete_id) values (p_team, u)
+    on conflict (team_id, athlete_id) do update set left_at = null;
+  return u;
+end $$;
+
+-- Togliere non cancella: mette una data di uscita. Lo staff smette di vederla
+-- da subito, e le sue righe restano sue e intatte.
+create or replace function public.admin_detach_athlete(p_team uuid, p_athlete uuid)
+returns void language plpgsql security definer set search_path = public, pg_temp as $$
+begin
+  if not public.is_admin() then raise exception 'non autorizzata' using errcode = '42501'; end if;
+  update public.team_members set left_at = now()
+   where team_id = p_team and athlete_id = p_athlete and left_at is null;
+end $$;
+
+
+-- ── CHIUDERE UNA BANDIERA ROSSA ─────────────────────────────────────────────
+-- §11 dice che devono escalare a un umano. Fino a oggi si aprivano e basta:
+-- `told_adult` nasceva `false` e `resolved_at` nullo, e NESSUNO poteva
+-- cambiarli. Un'escalation che non si può chiudere è un elenco che cresce, e
+-- un elenco che cresce si smette di guardare.
+--
+-- Può farlo lo staff della sua squadra o un admin. L'atleta può già aggiornare
+-- le proprie righe con la sua RLS: se un giorno le si chiede «l'hai detto a un
+-- adulto?», la risposta la scrive lei senza passare da qui.
+create or replace function public.mark_red_flag(
+  p_id uuid, p_told boolean, p_resolved boolean
+) returns void language plpgsql security definer set search_path = public, pg_temp as $$
+declare a uuid;
+begin
+  select athlete_id into a from public.red_flags where id = p_id;
+  if a is null then raise exception 'bandiera inesistente' using errcode = 'P0002'; end if;
+  if not (public.is_staff_of(a) or public.is_admin()) then
+    raise exception 'non autorizzata' using errcode = '42501';
+  end if;
+  update public.red_flags
+     set told_adult    = p_told,
+         told_adult_at = case when p_told and told_adult_at is null then now()
+                              when p_told then told_adult_at end,
+         resolved_at   = case when p_resolved then coalesce(resolved_at, now()) end
+   where id = p_id;
+end $$;
+
+
+-- ── COSA VEDE UN ADMIN ──────────────────────────────────────────────────────
+-- Stesse cautele delle viste dello staff: girano come proprietario, quindi la
+-- clausola `where public.is_admin()` è l'unica cosa che le tiene chiuse.
+--
+-- 🔴 Qui dentro non c'è NESSUNA colonna di testo libero, e non è una svista.
+
+-- Chi c'è, e in quale squadra. Serve a iscrivere e a togliere, non a leggere.
+create or replace view public.admin_athletes as
+  select a.id, a.display_name, a.athlete_code, public.age_years(a.birth_date) as age,
+         a.sport, a.locale, a.created_at,
+         m.team_id, t.name as team_name, m.joined_at, m.left_at
+  from public.athletes a
+  left join public.team_members m on m.athlete_id = a.id
+  left join public.teams t on t.id = m.team_id
+  where public.is_admin();
+
+-- Chi è staff di cosa, con l'email: è l'unica cosa che rende l'elenco leggibile
+-- — un uuid non dice a nessuno chi è quella persona, ed è l'email quella che
+-- l'admin ha digitato per aggiungerla.
+create or replace view public.admin_staff as
+  select s.team_id, t.name as team_name, s.user_id, u.email, s.role, s.added_at
+  from public.team_staff s
+  join public.teams t on t.id = s.team_id
+  join auth.users u on u.id = s.user_id
+  where public.is_admin();
+
+-- Il consenso è un fatto legale: chi ha accettato quale versione, e quando.
+-- Senza questa vista, dimostrarlo vuol dire aprire il database.
+create or replace view public.admin_consents as
+  select c.id, c.athlete_id, a.display_name, c.kind, c.text_version,
+         c.granted, c.granted_at
+  from public.consents c
+  join public.athletes a on a.id = c.athlete_id
+  where public.is_admin();
+
+-- Le bandiere rosse di tutte, non solo di una squadra. È l'unico posto dove si
+-- vede se una è rimasta aperta per tre settimane.
+create or replace view public.admin_red_flags as
+  select r.id, r.athlete_id, a.display_name, r.opened_at, r.region, r.sensation,
+         r.told_adult, r.told_adult_at, r.resolved_at,
+         m.team_id, t.name as team_name
+  from public.red_flags r
+  join public.athletes a on a.id = r.athlete_id
+  left join public.team_members m on m.athlete_id = r.athlete_id and m.left_at is null
+  left join public.teams t on t.id = m.team_id
+  where public.is_admin();
+
+-- Il battito del pilota. SOLO CONTEGGI: dice se il prodotto sta funzionando,
+-- non cosa ha scritto nessuna. Se un giorno servisse sapere di più, la domanda
+-- giusta non è «aggiungo una colonna qui» ma «chi ha diritto di saperlo».
+create or replace view public.admin_pulse as
+  select
+    (select count(*) from public.athletes)                                     as athletes,
+    (select count(*) from public.athletes
+      where created_at >= now() - interval '7 days')                           as athletes_new_7d,
+    (select count(*) from public.teams)                                        as teams,
+    (select count(*) from public.check_ins where local_date = current_date)    as checkins_today,
+    (select count(distinct athlete_id) from public.check_ins
+      where local_date = current_date)                                         as athletes_today,
+    (select count(*) from public.check_ins
+      where local_date >= current_date - 7)                                    as checkins_7d,
+    -- Il cerchio chiuso: un pre senza il suo post non produce prediction error,
+    -- che è la metrica del prodotto. Se questo numero resta basso, il pilota
+    -- misura molto meno di quanto sembra.
+    (select count(*) from public.check_ins
+      where kind = 'post' and local_date >= current_date - 7)                  as posts_7d,
+    (select count(*) from public.body_signals
+      where created_at >= now() - interval '7 days')                           as signals_7d,
+    (select count(*) from public.red_flags where resolved_at is null)          as flags_open,
+    (select count(*) from public.red_flags
+      where resolved_at is null and told_adult = false)                        as flags_untold,
+    -- 🔴 Una bandiera aperta da più di tre giorni non è un dato, è una persona
+    -- che sta aspettando.
+    (select count(*) from public.red_flags
+      where resolved_at is null and opened_at < now() - interval '3 days')     as flags_stale,
+    (select count(*) from public.consents where granted = false)               as consents_refused
+  where public.is_admin();
+
+grant select on public.admin_athletes, public.admin_staff, public.admin_consents,
+                public.admin_red_flags, public.admin_pulse
+  to authenticated;
+
+revoke all on function public.admin_attach_staff(uuid, text, text)   from public;
+revoke all on function public.admin_attach_athlete(uuid, text)       from public;
+revoke all on function public.admin_detach_athlete(uuid, uuid)       from public;
+revoke all on function public.mark_red_flag(uuid, boolean, boolean)  from public;
+grant execute on function public.admin_attach_staff(uuid, text, text)   to authenticated;
+grant execute on function public.admin_attach_athlete(uuid, text)       to authenticated;
+grant execute on function public.admin_detach_athlete(uuid, uuid)       to authenticated;
+grant execute on function public.mark_red_flag(uuid, boolean, boolean)  to authenticated;
+
+
 -- ── EXPORT (§9: i dati sono suoi) ───────────────────────────────────────────
 -- Funzione di prima classe, non un'aggiunta successiva.
 --

@@ -14,15 +14,18 @@ import AgendaDays from './screens/settings/AgendaDays'
 import AgendaEvents from './screens/settings/AgendaEvents'
 import SettingsLanguage from './screens/settings/Language'
 import SettingsData from './screens/settings/Data'
+import Diagnostics from './screens/settings/Diagnostics'
 import SettingsAccount from './screens/settings/Account'
 import CheckInPre from './screens/CheckInPre'
 import CheckInPost from './screens/CheckInPost'
 import SignIn from './screens/SignIn'
 import Onboarding from './screens/Onboarding'
 import Roster from './screens/team/Roster'
+import Admin from './screens/admin/Admin'
 import TeamAthlete from './screens/team/Athlete'
 import { useSession } from './lib/session'
 import { useHydration } from './lib/hydrate'
+import { homeFor, useRole } from './lib/role'
 import { getProfile } from './lib/repo'
 import { adopt } from './lib/locale'
 import { useCopy, useSetLocale } from './copy'
@@ -49,7 +52,23 @@ export default function App() {
    * «sempre» comprende il mezzo del check-in.
    */
   const isFlow = pathname.startsWith('/checkin')
+  const isAdmin = pathname.startsWith('/admin')
+  /**
+   * 🔴 «Come sta l'app» parla del DISPOSITIVO, non di chi lo tiene in mano:
+   * la coda, l'archivio locale, la connessione. Serve a un'atleta quando non le
+   * si salva niente, e serve a chi amministra mentre è al telefono con lei.
+   * Rimandare un admin alla console proprio quando apre la diagnostica sarebbe
+   * il momento peggiore per ricordargli chi è.
+   */
+  const isDiag = pathname === '/settings/diagnostica'
   const t = useCopy()
+
+  /**
+   * 🔴 Chi è entrato. Prima non se lo chiedeva nessuno: un coach finiva
+   * nell'onboarding di una tredicenne, e l'unica strada per la sua dashboard
+   * era scrivere `/team` a mano nella barra dell'indirizzo.
+   */
+  const { role, loading: roleLoading } = useRole(userId)
   /**
    * 🔴 L'idratazione viene PRIMA del profilo, e l'ordine è tutto.
    *
@@ -60,13 +79,20 @@ export default function App() {
    * inserimento, rifiutato dal server come duplicato e messo da parte in
    * silenzio.
    */
-  const hydration = useHydration(userId)
+  /**
+   * 🔴 Solo per le atlete. Lo staff non ha righe da scaricare — la dashboard
+   * legge dal server a ogni apertura, di proposito — e farlo aspettare davanti
+   * a nove richieste vuote sarebbe una schermata di attesa per niente. Si
+   * aspetta di sapere chi è prima di partire: idratare e poi scoprire che era
+   * un coach vorrebbe dire averlo già bloccato.
+   */
+  const hydration = useHydration(!roleLoading && role === 'athlete' ? userId : null)
   const setLocale = useSetLocale()
   /** `null` = non ancora controllato. */
   const [hasProfile, setHasProfile] = useState<boolean | null>(null)
 
   useEffect(() => {
-    if (!userId || hydration.state !== 'done') { setHasProfile(null); return }
+    if (!userId || role !== 'athlete' || hydration.state !== 'done') { setHasProfile(null); return }
     let alive = true
     getProfile(userId)
       .then((p) => {
@@ -79,7 +105,7 @@ export default function App() {
       })
       .catch(() => { if (alive) setHasProfile(false) })
     return () => { alive = false }
-  }, [userId, hydration.state, setLocale])
+  }, [userId, role, hydration.state, setLocale])
 
   // Finché Supabase non è collegato l'app gira in locale, senza accesso: è la
   // stessa scelta di `lib/supabase.ts`, e serve a poterla sviluppare e provare
@@ -118,16 +144,27 @@ export default function App() {
   // 🔴 Senza profilo non si entra: l'onboarding è dove si raccolgono il
   // consenso e lo stato del ciclo, e senza quelli metà del prodotto non può
   // funzionare — né legalmente né tecnicamente.
-  if (userId && hasProfile === false && !isTeam) {
+  if (userId && role === 'athlete' && hasProfile === false && !isTeam && !isAdmin && !isDiag) {
     return <Onboarding onDone={() => setHasProfile(true)} />
   }
-  if (userId && hasProfile === null && !isTeam) {
+  if (userId && role === 'athlete' && hasProfile === null && !isTeam && !isAdmin && !isDiag) {
     return <p className="p-8 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
   }
+
+  /**
+   * La console di chi amministra. Sta fuori dall'impaginazione dell'atleta come
+   * la dashboard squadra: si guarda da un portatile, non da un telefono in
+   * palestra, e non ha né tab né «mi sono fatta male».
+   */
+  if (isAdmin) return <Routes><Route path="/admin/*" element={<Admin />} /></Routes>
 
   // La dashboard squadra ha una sua impaginazione: niente tab dell'atleta,
   // niente pulsante «mi sono fatta male», e più larghezza — si guarda da un
   // portatile, non da un telefono in palestra.
+  if (userId && role !== 'athlete' && !isTeam && !isAdmin && !isDiag) {
+    return <Navigate to={homeFor(role)} replace />
+  }
+
   if (isTeam) {
     return (
       <Routes>
@@ -145,7 +182,9 @@ export default function App() {
 
       <main className={`flex-1 px-4 ${isFlow ? 'pb-6' : 'pb-28'}`}>
         <Routes>
-          <Route path="/" element={<Navigate to="/today" replace />} />
+          {/* Ognuno a casa sua: l'atleta a Oggi, il coach alla squadra, chi
+              amministra alla console. */}
+          <Route path="/" element={<Navigate to={homeFor(role)} replace />} />
           <Route path="/today" element={<Today />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/me" element={<Me />} />
@@ -165,6 +204,10 @@ export default function App() {
           <Route path="/settings/agenda/gare" element={<AgendaEvents />} />
           <Route path="/settings/lingua" element={<SettingsLanguage />} />
           <Route path="/settings/dati" element={<SettingsData />} />
+          {/* Non è nell'indice: ci si arriva da «I tuoi dati» quando qualcosa
+              non torna, o incollando l'indirizzo mentre si è al telefono con
+              lei. Metterla fra le voci principali insegnerebbe a dubitare. */}
+          <Route path="/settings/diagnostica" element={<Diagnostics />} />
           <Route path="/settings/account" element={<SettingsAccount />} />
           <Route path="/checkin/pre" element={<CheckInPre />} />
           <Route path="/checkin/post" element={<CheckInPost />} />
@@ -174,7 +217,7 @@ export default function App() {
           {import.meta.env.DEV && (
             <Route path="/dev/onboarding" element={<Onboarding onDone={() => {}} />} />
           )}
-          <Route path="*" element={<Navigate to="/today" replace />} />
+          <Route path="*" element={<Navigate to={homeFor(role)} replace />} />
         </Routes>
       </main>
 

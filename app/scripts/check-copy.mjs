@@ -75,9 +75,25 @@ const UI_ATTR = /\b(aria-label|placeholder|title|alt)=["']([^"']{2,})["']/g
  */
 const CODE_ISH = /=>|===|!==|&&|\|\||\)\s*:|\?\s*\(|\breturn\b|\bconst\b|\blet\b|\bif\s*\(|\.\w+\(|\?\s*$|^=\s/
 
+/**
+ * 🔴 L'unica esenzione, e vale la pena spiegarla perché un'esenzione tende a
+ * fare figli.
+ *
+ * `screens/admin/` è la console di chi amministra: la aprono la founder e chi
+ * lavora con lei, da un portatile. R9 — italiano E inglese — riguarda il
+ * prodotto che usa un'atleta, non gli strumenti interni. Tradurre sessanta
+ * etichette come «Squadre» e «Aggiungi staff» significherebbe raddoppiarle in
+ * un file dove vive la voce di BAB, rendendo più difficile trovare le frasi
+ * che una tredicenne legge davvero.
+ *
+ * La diagnostica NON è esente: quella la apre lei quando qualcosa non va.
+ */
+const EXEMPT = /^screens\/admin\//
+
 for (const file of walk(new URL('../src', import.meta.url).pathname)) {
   const src = readFileSync(file, 'utf8')
   const rel = file.split('/src/')[1]
+  if (EXEMPT.test(rel)) continue
   for (const m of src.matchAll(JSX_TEXT)) {
     const text = m[1].trim()
     if (/^[{}\s|·—–\-•]+$/.test(text)) continue

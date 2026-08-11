@@ -3,14 +3,18 @@
  * Controlla lo schema per le due regole che il database NON può far rispettare
  * da solo, e che si dimenticano in fretta.
  *
- * 1. Ogni vista coach_* deve filtrare con is_staff_of / is_staff_of_team.
+ * 1. Ogni vista deve filtrare con is_staff_of / is_staff_of_team / is_admin.
  *    Le viste girano con i privilegi del proprietario e bypassano la RLS: senza
- *    quella clausola, un coach legge l'intero database. Non è un dettaglio di
- *    stile, è l'unica cosa che regge.
+ *    quella clausola, chiunque sia autenticato legge l'intero database. Non è un
+ *    dettaglio di stile, è l'unica cosa che regge.
  *
- * 2. Nessuna colonna di testo libero dentro una vista coach_*.
+ * 2. Nessuna colonna di testo libero dentro una di quelle viste.
  *    R2: la squadra vede i dati dei due check-in, non le parole che lei scrive.
  *    La distinzione è fatta dall'elenco delle colonne, quindi va sorvegliata lì.
+ *
+ *    🔴 Vale anche per le viste admin_*, e non è pignoleria. Chi amministra ha
+ *    più potere di un coach, non meno bisogno di limiti: se «le sue parole sono
+ *    sue» avesse un'eccezione per la founder, non sarebbe una regola.
  *
  * Non sostituisce l'esecuzione dello schema: la sintassi la valida Postgres.
  * Serve a impedire che qualcuno aggiunga `note` alla vista senza accorgersene.
@@ -35,14 +39,14 @@ const errors = []
 
 // ── 1 e 2 · le viste dello staff ────────────────────────────────────────────
 const views = code.split(/create or replace view public\./).slice(1)
-if (views.length === 0) errors.push('Nessuna vista coach_* trovata: lo staff non vedrebbe niente.')
+if (views.length === 0) errors.push('Nessuna vista trovata: lo staff non vedrebbe niente.')
 
 for (const chunk of views) {
   const name = chunk.split(/\s/)[0]
   const body = chunk.split(';')[0]
 
-  if (!/is_staff_of/.test(body)) {
-    errors.push(`${name}: nessun filtro is_staff_of — la vista bypassa la RLS e mostra tutto.`)
+  if (!/is_staff_of|is_admin/.test(body)) {
+    errors.push(`${name}: nessun filtro is_staff_of o is_admin — la vista bypassa la RLS e mostra tutto.`)
   }
   for (const col of FREE_TEXT) {
     if (new RegExp(`[\\s,]${col}[\\s,]`).test(body)) {
@@ -174,6 +178,20 @@ if (existsSync(dbFile)) {
   }
 }
 
+// ── 9 · ogni funzione admin_* deve controllare chi la chiama ────────────────
+// Sono `security definer`: girano come proprietario, quindi la RLS non le
+// ferma. Il controllo `is_admin()` DENTRO il corpo è l'unica cosa che
+// impedisce a chiunque sia autenticato di iscriversi a una squadra da solo.
+// Una `grant execute to authenticated` senza quel controllo è una porta aperta.
+for (const chunk of code.split(/create or replace function public\./).slice(1)) {
+  const name = chunk.split(/[\s(]/)[0]
+  if (!name.startsWith('admin_')) continue
+  const body = chunk.slice(0, chunk.indexOf('$$;', chunk.indexOf('$$') + 2))
+  if (!/is_admin\s*\(\)/.test(body)) {
+    errors.push(`${name}: funzione admin senza controllo is_admin() — chiunque potrebbe chiamarla.`)
+  }
+}
+
 if (errors.length) {
   console.error('\n🔴 schema.sql\n')
   for (const e of errors) console.error('  · ' + e)
@@ -182,4 +200,4 @@ if (errors.length) {
 }
 
 const n = views.length
-console.log(`✅ schema.sql — ${n} viste staff: tutte filtrate, nessun testo libero esposto.`)
+console.log(`✅ schema.sql — ${n} viste: tutte filtrate, nessun testo libero esposto.`)
