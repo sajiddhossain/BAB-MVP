@@ -58,21 +58,28 @@ type Props = {
  */
 function Decor({ side }: { side: Side }) {
   const ink = 'var(--color-ink-soft)'
+  const hair = { fill: ink, opacity: 0.3 }
   if (side === 'front') {
     return (
       <g pointerEvents="none" aria-hidden>
-        <circle cx={92} cy={30} r={2.3} fill={ink} />
-        <circle cx={108} cy={30} r={2.3} fill={ink} />
-        <path d="M93.5,39 Q100,43.5 106.5,39" fill="none" stroke={ink}
+        {/* La frangia. Serve anche a far leggere la testa come una testa e non
+            come un ovale: senza, la faccia galleggia in mezzo al nulla. */}
+        <path d="M76.6,36 C76.8,20 87,12 100,12 C113,12 123.2,20 123.4,36
+                 C117,29 110,32 100,32 C90,32 83,29 76.6,36 Z" {...hair} />
+        <circle cx={92} cy={41} r={2.4} fill={ink} />
+        <circle cx={108} cy={41} r={2.4} fill={ink} />
+        <path d="M93.5,49 Q100,53.5 106.5,49" fill="none" stroke={ink}
               strokeWidth={1.8} strokeLinecap="round" />
       </g>
     )
   }
   return (
     <g pointerEvents="none" aria-hidden>
-      {/* Lo chignon dice «questa è la nuca» senza scrivere una parola. */}
-      <ellipse cx={100} cy={15} rx={10.5} ry={8} fill={ink} opacity={0.45} />
-      <path d="M100,112 L100,182" fill="none" stroke={ink} strokeWidth={2.2}
+      {/* Nuca e coda. Dicono «stai guardando il dietro» senza scrivere una
+          parola — che è l'unico modo di dirlo in un decimo di secondo. */}
+      <ellipse cx={100} cy={35} rx={23.4} ry={23} {...hair} />
+      <path d="M100,50 C104,57 108,71 107,88 C106.5,99 93.5,99 93,88 C92,71 96,57 100,50 Z" {...hair} />
+      <path d="M100,118 L100,168" fill="none" stroke={ink} strokeWidth={2.2}
             strokeDasharray="4 6" strokeLinecap="round" opacity={0.4} />
     </g>
   )

@@ -36,12 +36,15 @@ const el = (s, cls) =>
 /** Le decorazioni: si ridisegnano qui perché in `BodyMap.tsx` sono JSX. */
 const DECOR = {
   front: `<g class="ink">
-    <circle cx="92.5" cy="27" r="2.2"/><circle cx="107.5" cy="27" r="2.2"/>
-    <path d="M94,36 Q100,40.5 106,36" fill="none" stroke="#5C6A86" stroke-width="1.7" stroke-linecap="round"/></g>`,
+    <path opacity="0.3" d="M76.6,36 C76.8,20 87,12 100,12 C113,12 123.2,20 123.4,36
+      C117,29 110,32 100,32 C90,32 83,29 76.6,36 Z"/>
+    <circle cx="92" cy="41" r="2.4"/><circle cx="108" cy="41" r="2.4"/>
+    <path d="M93.5,49 Q100,53.5 106.5,49" fill="none" stroke="#5C6A86" stroke-width="1.8" stroke-linecap="round"/></g>`,
   back: `<g class="ink">
-    <ellipse cx="100" cy="13" rx="10" ry="7.5" opacity="0.45"/>
-    <path d="M100,104 L100,172" stroke="#5C6A86" stroke-width="2.2" stroke-dasharray="4 6"
-          stroke-linecap="round" fill="none" opacity="0.45"/></g>`,
+    <ellipse cx="100" cy="35" rx="23.4" ry="23" opacity="0.3"/>
+    <path opacity="0.3" d="M100,50 C104,57 108,71 107,88 C106.5,99 93.5,99 93,88 C92,71 96,57 100,50 Z"/>
+    <path d="M100,118 L100,168" stroke="#5C6A86" stroke-width="2.2" stroke-dasharray="4 6"
+          stroke-linecap="round" fill="none" opacity="0.4"/></g>`,
 }
 
 const figure = (side, map, states = {}, caption) => `
@@ -70,7 +73,7 @@ svg{width:200px;height:auto}
 .sel{fill:#34BBC0;stroke:#34BBC0;stroke-opacity:1}
 .log{fill:color-mix(in srgb,#34BBC0 14%,transparent);stroke:#34BBC0;stroke-opacity:.6}
 .flag{fill:color-mix(in srgb,#FF6B5C 12%,transparent);stroke:#FF6B5C;stroke-opacity:.7}
-.edge{fill:none;stroke:#0F0F12;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.edge{fill:none;stroke:#0F0F12;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .ink{fill:#5C6A86}
 figure{margin:0}figcaption{text-align:center;font-weight:700;margin-top:4px}
 </style>
@@ -83,7 +86,7 @@ const page = join(tmpdir(), 'bab-bodymap.html')
 writeFileSync(page, html)
 execFileSync(CHROME, [
   '--headless=new', '--disable-gpu', '--hide-scrollbars',
-  `--screenshot=${out}`, '--window-size=900,500', `file://${page}`,
+  `--screenshot=${out}`, '--window-size=900,470', `file://${page}`,
 ], { stdio: 'ignore' })
 
 console.log(
