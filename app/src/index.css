@@ -173,6 +173,19 @@ button, a[role="button"], input, select {
   outline-offset: 1px;
 }
 
+/* Il foglio che si alza sulla zona toccata. Sale da sotto perché è da lì che
+   arriva il pollice: il movimento dice da solo che è una cosa aperta adesso e
+   richiudibile, senza doverlo scrivere. Con «riduci le animazioni» la regola
+   più in alto lo spegne, e il foglio compare e basta — che è esattamente
+   quello che ha chiesto chi ha chiesto meno movimento. */
+.bab-sheet {
+  animation: bab-sheet-up 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes bab-sheet-up {
+  from { transform: translateY(14%); opacity: 0.4; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 /* L'onda del tocco. Vive dentro il ritaglio, quindi muore sul bordo del corpo.
    Con «riduci le animazioni» la regola qui sopra la spegne: resta un cerchio
    fermo per un istante, che è esattamente quello che serve a chi ha chiesto

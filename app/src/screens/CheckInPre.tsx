@@ -1,13 +1,15 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { fill, useCopy, useLocale } from '@/copy'
 import BodyMap from '@/components/BodyMap'
 import EmojiScale from '@/components/EmojiScale'
 import PillGroup from '@/components/PillGroup'
+import RegionSheet from '@/components/RegionSheet'
 import Step, { useAdvance, useFlow } from '@/components/Step'
 import { CHANNELS, HEADSPACE, channelQuestion } from '@/content/channels'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
-import { SENSATIONS, INTENSITIES, BEHAVIOURS, GROUP_LABEL, isRedFlag, sensationsIn } from '@/content/lexicon'
+import { GEOMETRY } from '@/components/body-shapes'
+import { SENSATIONS, isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { CARE, DECODE_ACHE } from '@/content/clinical'
 import { headspaceValue, total, suggestWithPain, type Channels } from '@/lib/tempo'
@@ -55,15 +57,22 @@ const MAIN = [
   'body', 'pain',
 ] as const
 
-/** Le deviazioni dentro la mappa corporea: la barra resta ferma su `body`. */
-const NESTED = { body_what: 'body', body_strength: 'body', body_behaviour: 'body' }
+/**
+ * 🔴 La mappa NON ha più passi annidati. Sensazione, intensità e comportamento
+ * erano tre schermate: toccavi il ginocchio e la figura spariva. Adesso sono un
+ * foglio che si alza sopra la figura — vedi `RegionSheet` per il perché — e
+ * quale zona è aperta sta in `?zona=`, così il tasto indietro del telefono
+ * chiude il foglio invece di far uscire dal check-in.
+ */
+const ZONE = 'zona'
 
 export default function CheckInPre() {
   const t = useCopy()
   const locale = useLocale()
   const navigate = useNavigate()
   const { userId } = useSession()
-  const flow = useFlow(MAIN, NESTED)
+  const flow = useFlow(MAIN)
+  const [params, setParams] = useSearchParams()
   const advance = useAdvance()
 
   // Il momento in cui ha aperto: serve a misurare quanto tempo passa davvero.
@@ -81,9 +90,6 @@ export default function CheckInPre() {
 
   // Il taccuino dei segnali: regione → sensazione → intensità → comportamento.
   const [region, setRegion] = useState<RegionCode | null>(null)
-  const [sens, setSens] = useState<string | null>(null)
-  const [intensity, setIntensity] = useState<number | null>(null)
-  const [behaviour, setBehaviour] = useState<string | null>(null)
   const [freeText, setFreeText] = useState('')
   const [signals, setSignals] = useState<BodySignalDraft[]>([])
 
@@ -118,14 +124,27 @@ export default function CheckInPre() {
     flow.onward()
   }
 
-  function addSignal() {
-    if (!region || !sens) return
+  /** Quale zona ha il foglio aperto sopra, se ce l'ha. */
+  const openZone = (() => {
+    const z = params.get(ZONE)
+    return z && z in { ...GEOMETRY.front, ...GEOMETRY.back, other: 1, all_over: 1 }
+      ? (z as RegionCode) : null
+  })()
+  const openSheet = (r: RegionCode) => setParams({ p: 'body', [ZONE]: r })
+  /** Chiudere senza aggiungere: si torna indietro, così la cronologia resta pulita. */
+  const closeSheet = () => navigate(-1)
+
+  function addSignal(d: { sensation: string; intensity: number | null; behaviour: string | null }) {
+    if (!openZone) return
     setSignals((prev) => [...prev, {
-      athlete_id: userId ?? '', region, region_free: freeText.trim() || null,
-      sensation: sens, intensity, behaviour, is_red_flag: isRedFlag(sens),
+      athlete_id: userId ?? '', region: openZone, region_free: freeText.trim() || null,
+      sensation: d.sensation, intensity: d.intensity, behaviour: d.behaviour,
+      is_red_flag: isRedFlag(d.sensation),
     }])
-    setRegion(null); setSens(null); setIntensity(null); setBehaviour(null); setFreeText('')
-    flow.go('body')
+    setRegion(null); setFreeText('')
+    // `replace`: dopo averlo aggiunto, tornare indietro nel foglio sarebbe
+    // tornare a una scelta che ha già confermato.
+    setParams({ p: 'body' }, { replace: true })
   }
 
   async function submit(protective: boolean) {
@@ -277,7 +296,7 @@ export default function CheckInPre() {
   const bodyStep = () => (
     <Step {...frame} fill
           question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.mapHint}
-          onNext={region === 'other' ? () => flow.go('body_what') : flow.onward}
+          onNext={region === 'other' ? () => openSheet('other') : flow.onward}
           nextLabel={region === 'other' ? t.flow.next
             : signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
       {/* Le zone già segnate: una riga sola che scorre di lato, così la
@@ -315,8 +334,12 @@ export default function CheckInPre() {
         // accoglierle è sempre esistita.
         onSelect={(r) => r === 'other'
           ? setRegion(r)
-          : answer('body', () => setRegion(r), () => flow.go('body_what'))}
+          : answer('body', () => setRegion(r), () => openSheet(r))}
       />
+      {openZone && (
+        <RegionSheet region={openZone} freeText={freeText}
+                     onCancel={closeSheet} onAdd={addSignal} />
+      )}
     </Step>
   )
 
@@ -455,63 +478,6 @@ export default function CheckInPre() {
     case 'body':
       return bodyStep()
 
-    case 'body_what':
-      if (!region) return bodyStep()
-      return (
-        <Step {...frame} section={regionLabel(region, locale)}
-              question={t.checkin.pre.pinpoint.whatLike}
-              help={t.checkin.pre.pinpoint.help}
-              onNext={sens ? () => flow.go('body_strength') : null}>
-          {(['good', 'notice', 'flag'] as const).map((g) => (
-            <div key={g} className="flex flex-col gap-2">
-              <p className="text-[12.5px] text-[var(--color-ink-soft)]">{GROUP_LABEL[g][locale]}</p>
-              <PillGroup
-                label={GROUP_LABEL[g][locale]}
-                tone={g === 'flag' ? 'care' : 'neutral'}
-                options={sensationsIn(g).map((s) => ({
-                  value: s.code, label: s.label[locale], emoji: s.emoji, flag: s.redFlag,
-                }))}
-                value={sens}
-                onChange={(v) => answer('body', () => setSens(v), () => flow.go('body_strength'))}
-              />
-            </div>
-          ))}
-        </Step>
-      )
-
-    case 'body_strength':
-      if (!region || !sens) return bodyStep()
-      return (
-        <Step {...frame} section={regionLabel(region, locale)}
-              question={t.checkin.pre.pinpoint.howStrong}
-              onNext={intensity ? () => flow.go('body_behaviour') : null}
-              onSkip={() => flow.go('body_behaviour')}>
-          <PillGroup
-            size="lg"
-            label={t.checkin.pre.pinpoint.howStrong}
-            options={INTENSITIES.map((i) => ({ value: String(i.value), label: i.label[locale] }))}
-            value={intensity ? String(intensity) : null}
-            onChange={(v) => answer('body', () => setIntensity(Number(v)), () => flow.go('body_behaviour'))}
-          />
-        </Step>
-      )
-
-    case 'body_behaviour':
-      if (!region || !sens) return bodyStep()
-      return (
-        <Step {...frame} section={regionLabel(region, locale)}
-              question={t.checkin.pre.pinpoint.whatDoes}
-              onNext={addSignal} nextLabel={t.checkin.common.addThis}>
-          <PillGroup
-            size="lg"
-            label={t.checkin.pre.pinpoint.whatDoes}
-            options={BEHAVIOURS.map((b) => ({ value: b.code, label: b.label[locale] }))}
-            value={behaviour}
-            onChange={setBehaviour}
-          />
-        </Step>
-      )
-
     case 'pain':
       /**
        * 🔴 Il pezzo educativo sta sulla STESSA schermata della domanda, non su
@@ -555,7 +521,7 @@ export default function CheckInPre() {
         </Step>
       )
 
-    /** `useFlow` non restituisce mai un id fuori da `MAIN` o dalle deviazioni. */
+    /** `useFlow` non restituisce mai un id fuori da `MAIN`. */
     default:
       return null
   }
