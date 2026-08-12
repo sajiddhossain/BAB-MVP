@@ -1,16 +1,23 @@
 import { useState } from 'react'
-import { useCopy, useLocale, type Locale } from '@/copy'
+import { fill, useCopy, useLocale, type Locale } from '@/copy'
 import PillGroup from '@/components/PillGroup'
+import CalendarMultiSelect from '@/components/CalendarMultiSelect'
 import { Progress } from '@/components/Step'
-import { saveProfile, saveConsent, saveSchedule, saveAthleteEvent, saveCycleEvent, type ScheduleEntry } from '@/lib/repo'
+import {
+  saveProfile, saveConsent, saveSchedule, saveSports, saveAthleteEvent, saveCycleEvent,
+  type ScheduleEntry,
+} from '@/lib/repo'
 import { useSession } from '@/lib/session'
+import { SPORTS, sportLabel } from '@/content/sports'
+import { minutesBetween } from '@/lib/agenda'
 
 /**
- * Onboarding — la forma decisa in R3.
+ * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
+ * e per il calendario del ciclo.
  *
  * 🔴 Qui la procedura a passi è giusta, al contrario del check-in: si fa una
- * volta sola, e ci sono cancelli veri (la contraccezione si chiede solo sopra i
- * 15 anni; le date del ciclo solo se ha detto di averlo).
+ * volta sola, e ci sono cancelli veri (la contraccezione si chiede solo dai
+ * 16 anni in su; le date del ciclo solo se ha detto di averlo).
  *
  * 🔴 «Chi vede cosa» viene PRIMA del consenso, e il consenso prima di tutto il
  * resto. R2: lo staff vede i check-in e le date del ciclo, e un consenso che
@@ -33,11 +40,13 @@ function Rich({ text }: { text: string }) {
  * sarebbe un tipo di componente nuovo a ogni render, React smonterebbe il
  * sottoalbero e il campo del nome perderebbe il fuoco a ogni lettera battuta.
  */
-function Frame({ title, help, children, next, canNext, back, onBack, labels, at, of }: {
+function Frame({ title, help, children, next, canNext, back, onBack, labels, at, of, extra }: {
   title: string; help?: string; children?: React.ReactNode
   next?: () => void; canNext?: boolean; back?: boolean; onBack?: () => void
   labels: { back: string; continue: string }
   at: number; of: number
+  /** Un secondo bottone, più leggero — oggi solo "non me lo ricordo". */
+  extra?: { label: string; onClick: () => void }
 }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col gap-4 px-5 py-8">
@@ -62,6 +71,12 @@ function Frame({ title, help, children, next, canNext, back, onBack, labels, at,
           {labels.continue}
         </button>
       )}
+      {extra && (
+        <button type="button" onClick={extra.onClick}
+                className="text-[14px] text-[var(--color-ink-soft)] underline">
+          {extra.label}
+        </button>
+      )}
     </div>
   )
 }
@@ -70,16 +85,17 @@ function Frame({ title, help, children, next, canNext, back, onBack, labels, at,
  * 🔴 «La tua settimana» era un passo solo con dentro tre domande — allenamenti,
  * educazione fisica, gare — più due campi orario. È esattamente la cosa che
  * l'onboarding fa bene dappertutto tranne lì, quindi adesso sono tre passi.
+ *
+ * 🔴 R3-bis: con più sport, `trainDay`/`trainStart`/`trainEnd` si ripetono una
+ * volta per ogni sport scelto — `trainIndex` dice a quale. La barra "passo X
+ * di Y" si ricalcola da sola (vedi `buildFlow`), non è più un array fisso.
  */
 type Step =
   | 'welcome' | 'whoSees' | 'consent' | 'name' | 'birthday' | 'sport'
-  | 'training' | 'pe' | 'events' | 'rhythm' | 'dates' | 'contraception' | 'done'
-
-/** L'ordine, per la barra. La contraccezione c'è o no a seconda dell'età. */
-const ORDER: Step[] = [
-  'welcome', 'whoSees', 'consent', 'name', 'birthday', 'sport',
-  'training', 'pe', 'events', 'rhythm', 'dates', 'contraception', 'done',
-]
+  | 'trainDay' | 'trainStart' | 'trainEnd'
+  | 'pe' | 'events' | 'rhythm'
+  | 'datesLast' | 'datesPrev' | 'datesBefore'
+  | 'contraception' | 'done'
 
 type CycleStatus = 'tracking' | 'not_yet' | 'undisclosed'
 
@@ -103,13 +119,20 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState<Step>('welcome')
   const [name, setName] = useState('')
   const [birth, setBirth] = useState('')
-  const [sport, setSport] = useState('')
-  const [trainDays, setTrainDays] = useState<number[]>([])
-  const [trainTime, setTrainTime] = useState('')
+
+  const [sports, setSportsPicked] = useState<string[]>([])
+  const [otherSport, setOtherSport] = useState('')
+  const [trainIndex, setTrainIndex] = useState(0)
+  const [trainDaysBySport, setTrainDaysBySport] = useState<Record<string, number[]>>({})
+  const [trainStartBySport, setTrainStartBySport] = useState<Record<string, string>>({})
+  const [trainEndBySport, setTrainEndBySport] = useState<Record<string, string>>({})
+
   const [peDays, setPeDays] = useState<number[]>([])
   const [eventDate, setEventDate] = useState('')
   const [cycle, setCycle] = useState<CycleStatus | null>(null)
-  const [dates, setDates] = useState<string[]>(['', '', ''])
+  const [lastCycleDays, setLastCycleDays] = useState<string[]>([])
+  const [prevCycleStart, setPrevCycleStart] = useState<string[]>([])
+  const [beforeCycleStart, setBeforeCycleStart] = useState<string[]>([])
   const [contraception, setContraception] = useState<'hormonal' | 'natural' | 'undisclosed' | null>(null)
   const [consentA, setConsentA] = useState(false)
   const [consentG, setConsentG] = useState(false)
@@ -117,13 +140,43 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   const L = { back: t.onboarding.back, continue: t.onboarding.continue }
   const age = ageFrom(birth)
-  const asksContraception = cycle === 'tracking' && age !== null && age >= 15
+  const asksContraception = cycle === 'tracking' && age !== null && age >= 16
 
-  /** La cornice comune: etichette e posizione nella barra. */
-  const F = { labels: L, at: ORDER.indexOf(step) + 1, of: ORDER.length }
+  /** Gli sport scelti, come stringhe finite: "Altro" diventa quello che ha scritto. */
+  const effectiveSports = sports
+    .map((c) => (c === 'other' ? otherSport.trim() : c))
+    .filter((s, i, arr) => s.length > 0 && arr.indexOf(s) === i)
 
   const toggle = (list: number[], set: (v: number[]) => void, d: number) =>
     set(list.includes(d) ? list.filter((x) => x !== d) : [...list, d])
+
+  const toggleSport = (code: string) =>
+    setSportsPicked((p) => (p.includes(code) ? p.filter((x) => x !== code) : [...p, code]))
+
+  /**
+   * L'elenco di tutte le schermate che si vedranno con le scelte fatte finora
+   * — serve solo a calcolare "passo X di Y". Non un array fisso: cambia con
+   * quanti sport ha scelto e se ha detto di avere il ciclo.
+   */
+  function buildFlow(): string[] {
+    const flow = ['welcome', 'whoSees', 'consent', 'name', 'birthday', 'sport']
+    for (const sport of effectiveSports) {
+      flow.push(`trainDay:${sport}`, `trainStart:${sport}`, `trainEnd:${sport}`)
+    }
+    flow.push('pe', 'events', 'rhythm')
+    if (cycle === 'tracking') flow.push('datesLast', 'datesPrev', 'datesBefore')
+    if (asksContraception) flow.push('contraception')
+    flow.push('done')
+    return flow
+  }
+
+  const currentTrainSport = effectiveSports[trainIndex]
+  const currentKey =
+    step === 'trainDay' || step === 'trainStart' || step === 'trainEnd'
+      ? `${step}:${currentTrainSport}`
+      : step
+  const flow = buildFlow()
+  const F = { labels: L, at: Math.max(1, flow.indexOf(currentKey) + 1), of: flow.length }
 
   async function finish() {
     setSaving(true)
@@ -131,7 +184,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       try {
         await saveProfile({
           id: userId, display_name: name.trim(), birth_date: birth,
-          sport: sport.trim() || null,
+          sport: effectiveSports[0] ?? null,
           cycle_status: cycle ?? 'undisclosed',
           contraception: contraception ?? 'undisclosed',
           locale: locale as Locale,
@@ -140,14 +193,31 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
         await saveConsent(userId, 'athlete', t.onboarding.consentVersion, consentA)
         await saveConsent(userId, 'guardian', t.onboarding.consentVersion, consentG)
 
-        const entries: ScheduleEntry[] = [
-          ...trainDays.map((d) => ({ athlete_id: userId, weekday: d, kind: 'training' as const, start_time: trainTime || null })),
-          ...peDays.map((d) => ({ athlete_id: userId, weekday: d, kind: 'pe' as const, start_time: null })),
-        ]
+        if (effectiveSports.length) await saveSports(userId, effectiveSports)
+
+        const entries: ScheduleEntry[] = []
+        for (const sport of effectiveSports) {
+          const days = trainDaysBySport[sport] ?? []
+          const start = trainStartBySport[sport] || null
+          const duration = start ? minutesBetween(start, trainEndBySport[sport] ?? '') : null
+          for (const d of days) {
+            entries.push({ athlete_id: userId, weekday: d, kind: 'training', sport, start_time: start, duration_min: duration })
+          }
+        }
+        for (const d of peDays) entries.push({ athlete_id: userId, weekday: d, kind: 'pe', start_time: null })
         if (entries.length) await saveSchedule(entries)
         if (eventDate) await saveAthleteEvent(userId, eventDate, 'competition')
+
         // Le date del ciclo stanno in una tabella a sé, e ci arrivano da sole.
-        for (const d of dates.filter(Boolean)) await saveCycleEvent(userId, d, 'period_start')
+        // L'ultimo ciclo può avere più giorni: il primo toccato è l'inizio,
+        // l'ultimo la fine — riusa i due valori che `cycle_events` ha già.
+        if (lastCycleDays.length) {
+          const sorted = [...lastCycleDays].sort()
+          await saveCycleEvent(userId, sorted[0], 'period_start')
+          if (sorted.length > 1) await saveCycleEvent(userId, sorted[sorted.length - 1], 'period_end')
+        }
+        if (prevCycleStart[0]) await saveCycleEvent(userId, prevCycleStart[0], 'period_start')
+        if (beforeCycleStart[0]) await saveCycleEvent(userId, beforeCycleStart[0], 'period_start')
       } catch { /* resta in coda locale */ }
     }
     setSaving(false)
@@ -156,20 +226,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'welcome') return (
     <Frame title={t.onboarding.welcomeTitle} help={t.onboarding.welcomeBody}
-           next={() => setStep('whoSees')} {...F}>
-      <div className="bab-card flex flex-col gap-2 px-4 py-4">
-        <p className="bab-label">{t.onboarding.isTitle}</p>
-        <ul className="flex list-disc flex-col gap-1 pl-5 text-[15px]">
-          {t.onboarding.isItems.map((x, i) => <li key={i}>{x}</li>)}
-        </ul>
-      </div>
-      <div className="bab-card flex flex-col gap-2 px-4 py-4" style={{ background: 'var(--color-sand)' }}>
-        <p className="bab-label">{t.onboarding.isNotTitle}</p>
-        <ul className="flex list-disc flex-col gap-1 pl-5 text-[15px]">
-          {t.onboarding.isNotItems.map((x, i) => <li key={i}>{x}</li>)}
-        </ul>
-      </div>
-    </Frame>
+           next={() => setStep('whoSees')} {...F} />
   )
 
   // 🔴 Prima del consenso, non dopo.
@@ -219,34 +276,70 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'sport') return (
     <Frame title={t.onboarding.sportTitle} help={t.onboarding.sportHelp}
-           next={() => setStep('training')} canNext back onBack={() => setStep('birthday')} {...F}>
-      <p className="bab-label">{t.onboarding.sportLabel}</p>
-      <input value={sport} onChange={(e) => setSport(e.target.value)} maxLength={40}
-             aria-label={t.onboarding.sportLabel}
-             className="bab-card px-4 py-3 text-[16px]" />
+           next={() => { setTrainIndex(0); setStep(effectiveSports.length ? 'trainDay' : 'pe') }}
+           canNext back onBack={() => setStep('birthday')} {...F}>
+      <PillGroup size="lg" label={t.onboarding.sportLabel} value={sports}
+                 options={SPORTS.map((s) => ({ value: s.code, label: s.label[locale] }))}
+                 onChange={toggleSport} />
+      {sports.includes('other') && (
+        <input value={otherSport} onChange={(e) => setOtherSport(e.target.value)} maxLength={40}
+               placeholder={t.onboarding.sportOtherPlaceholder}
+               aria-label={t.onboarding.sportOtherPlaceholder}
+               className="bab-card px-4 py-3 text-[16px]" />
+      )}
     </Frame>
   )
 
-  if (step === 'training') return (
-    <Frame title={t.onboarding.weekTraining} help={t.onboarding.weekTrainingHelp}
-           next={() => setStep('pe')} canNext back onBack={() => setStep('sport')} {...F}>
-      <PillGroup size="lg" label={t.onboarding.weekTraining} value={trainDays.map(String)}
+  if (step === 'trainDay') return (
+    <Frame title={fill(t.onboarding.trainDayTitle, { sport: sportLabel(currentTrainSport, locale) })}
+           help={t.onboarding.weekTrainingHelp}
+           next={() => setStep('trainStart')} canNext back
+           onBack={() => {
+             if (trainIndex > 0) { setTrainIndex(trainIndex - 1); setStep('trainEnd') } else setStep('sport')
+           }} {...F}>
+      <PillGroup size="lg" label={t.onboarding.weekTraining}
+                 value={(trainDaysBySport[currentTrainSport] ?? []).map(String)}
                  options={t.onboarding.weekdays.map((d, i) => ({ value: String(i + 1), label: d }))}
-                 onChange={(v) => toggle(trainDays, setTrainDays, Number(v))} />
-      {/* L'orario compare solo quando c'è un giorno a cui attaccarlo. */}
-      {trainDays.length > 0 && (
-        <label className="flex flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
-          {t.onboarding.timeLabel}
-          <input type="time" value={trainTime} onChange={(e) => setTrainTime(e.target.value)}
-                 className="bab-card px-3 py-2 text-[16px] text-[var(--color-ink)]" />
-        </label>
-      )}
+                 onChange={(v) => setTrainDaysBySport((p) => ({
+                   ...p,
+                   [currentTrainSport]: (() => {
+                     const cur = p[currentTrainSport] ?? []
+                     const d = Number(v)
+                     return cur.includes(d) ? cur.filter((x) => x !== d) : [...cur, d]
+                   })(),
+                 }))} />
+    </Frame>
+  )
+
+  if (step === 'trainStart') return (
+    <Frame title={t.onboarding.trainStartTitle}
+           next={() => setStep('trainEnd')} canNext back onBack={() => setStep('trainDay')} {...F}>
+      <input type="time" value={trainStartBySport[currentTrainSport] ?? ''}
+             onChange={(e) => setTrainStartBySport((p) => ({ ...p, [currentTrainSport]: e.target.value }))}
+             aria-label={t.onboarding.trainStartTitle}
+             className="bab-card px-3 py-2.5 text-[16px]" />
+    </Frame>
+  )
+
+  if (step === 'trainEnd') return (
+    <Frame title={t.onboarding.trainEndTitle} help={t.onboarding.trainEndHelp}
+           next={() => {
+             if (trainIndex + 1 < effectiveSports.length) { setTrainIndex(trainIndex + 1); setStep('trainDay') }
+             else setStep('pe')
+           }} canNext back onBack={() => setStep('trainStart')} {...F}>
+      <input type="time" value={trainEndBySport[currentTrainSport] ?? ''}
+             onChange={(e) => setTrainEndBySport((p) => ({ ...p, [currentTrainSport]: e.target.value }))}
+             aria-label={t.onboarding.trainEndTitle}
+             className="bab-card px-3 py-2.5 text-[16px]" />
     </Frame>
   )
 
   if (step === 'pe') return (
     <Frame title={t.onboarding.weekPe} help={t.onboarding.weekPeHelp}
-           next={() => setStep('events')} canNext back onBack={() => setStep('training')} {...F}>
+           next={() => setStep('events')} canNext back
+           onBack={() => {
+             if (effectiveSports.length) { setTrainIndex(effectiveSports.length - 1); setStep('trainEnd') } else setStep('sport')
+           }} {...F}>
       <PillGroup size="lg" label={t.onboarding.weekPe} value={peDays.map(String)}
                  options={t.onboarding.weekdays.map((d, i) => ({ value: String(i + 1), label: d }))}
                  onChange={(v) => toggle(peDays, setPeDays, Number(v))} />
@@ -267,60 +360,81 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'rhythm') return (
     <Frame title={t.onboarding.rhythmTitle} help={t.onboarding.rhythmBody} back onBack={() => setStep('events')} {...F}>
       {([['tracking', t.onboarding.rhythmYes, t.onboarding.rhythmYesHelp],
-         ['not_yet', t.onboarding.rhythmNotYet, t.onboarding.rhythmNotYetHelp],
-         ['undisclosed', t.onboarding.rhythmSkip, t.onboarding.rhythmSkipHelp]] as const).map(([k, label, help]) => (
+         ['not_yet', t.onboarding.rhythmNotYet, undefined],
+         ['undisclosed', t.onboarding.rhythmSkip, undefined]] as const).map(([k, label, help]) => (
         <button key={k} type="button"
-                onClick={() => { setCycle(k); setStep(k === 'tracking' ? 'dates' : 'done') }}
+                onClick={() => { setCycle(k); setStep(k === 'tracking' ? 'datesLast' : 'done') }}
                 className="bab-card flex flex-col gap-1 px-4 py-4 text-left">
           <span className="text-[16px] font-bold">{label}</span>
-          <span className="text-[13.5px] text-[var(--color-ink-soft)]">{help}</span>
+          {help && <span className="text-[13.5px] text-[var(--color-ink-soft)]">{help}</span>}
         </button>
       ))}
     </Frame>
   )
 
-  if (step === 'dates') return (
+  if (step === 'datesLast') return (
     <Frame title={t.onboarding.datesTitle} help={t.onboarding.datesHelp}
-           next={() => setStep(asksContraception ? 'contraception' : 'done')}
-           canNext back onBack={() => setStep('rhythm')} {...F}>
-      {[t.onboarding.dateMostRecent, t.onboarding.datePrevious, t.onboarding.dateBefore].map((label, i) => (
-        <label key={i} className="flex flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
-          {label}
-          <input type="date" value={dates[i]}
-                 onChange={(e) => setDates((p) => p.map((d, j) => j === i ? e.target.value : d))}
-                 className="bab-card px-3 py-2 text-[16px] text-[var(--color-ink)]" />
-        </label>
-      ))}
-      <details className="bab-card px-4 py-3">
-        <summary className="cursor-pointer text-[14px] font-bold">{t.onboarding.whyDatesTitle}</summary>
-        <p className="mt-2 text-[14px]">{t.onboarding.whyDatesBody}</p>
-      </details>
+           next={() => setStep('datesPrev')} canNext back onBack={() => setStep('rhythm')} {...F}>
+      <CalendarMultiSelect label={t.onboarding.datesTitle} selected={lastCycleDays} onChange={setLastCycleDays} />
       <div className="bab-card px-4 py-3" style={{ background: 'var(--cycle-tint)' }}>
         <p className="text-[14px]"><Rich text={t.onboarding.cyclePrivacy} /></p>
       </div>
     </Frame>
   )
 
-  // 🔴 Solo sopra i 15 anni (R3). Sotto, la domanda non compare proprio.
+  if (step === 'datesPrev') return (
+    <Frame title={t.onboarding.datesPrevTitle} help={t.onboarding.datesPrevHelp}
+           next={() => setStep('datesBefore')} canNext back onBack={() => setStep('datesLast')}
+           extra={{ label: t.onboarding.datesSkip, onClick: () => { setPrevCycleStart([]); setStep('datesBefore') } }} {...F}>
+      <CalendarMultiSelect label={t.onboarding.datesPrevTitle} selected={prevCycleStart}
+                           onChange={setPrevCycleStart} multiple={false} />
+    </Frame>
+  )
+
+  if (step === 'datesBefore') return (
+    <Frame title={t.onboarding.datesBeforeTitle} help={t.onboarding.datesBeforeHelp}
+           next={() => setStep(asksContraception ? 'contraception' : 'done')}
+           canNext back onBack={() => setStep('datesPrev')}
+           extra={{
+             label: t.onboarding.datesSkip,
+             onClick: () => { setBeforeCycleStart([]); setStep(asksContraception ? 'contraception' : 'done') },
+           }} {...F}>
+      <CalendarMultiSelect label={t.onboarding.datesBeforeTitle} selected={beforeCycleStart}
+                           onChange={setBeforeCycleStart} multiple={false} />
+    </Frame>
+  )
+
+  // 🔴 Solo dai 16 anni in su. Sotto, la domanda non compare proprio.
   if (step === 'contraception') return (
     <Frame title={t.onboarding.contraceptionTitle} help={t.onboarding.contraceptionHelp}
-           next={() => setStep('done')} canNext={contraception !== null} back onBack={() => setStep('dates')} {...F}>
+           next={() => setStep('done')} canNext={contraception !== null} back onBack={() => setStep('datesBefore')} {...F}>
       <PillGroup label={t.onboarding.contraceptionTitle} value={contraception}
                  options={[{ value: 'hormonal', label: t.common.yes },
                            { value: 'natural', label: t.common.no },
-                           { value: 'undisclosed', label: t.checkin.common.dontKnow }]}
+                           { value: 'undisclosed', label: t.onboarding.contraceptionUndisclosed }]}
                  onChange={(v) => setContraception(v as 'hormonal' | 'natural' | 'undisclosed')} />
     </Frame>
   )
+
+  const trainSummary = effectiveSports
+    .filter((s) => (trainDaysBySport[s] ?? []).length)
+    .map((s) => {
+      const days = (trainDaysBySport[s] ?? []).slice().sort((a, b) => a - b)
+        .map((d) => t.onboarding.weekdays[d - 1]).join(' · ')
+      return `${sportLabel(s, locale)} (${days})`
+    })
+    .join(' · ')
 
   return (
     <Frame title={t.onboarding.doneTitle} help={t.onboarding.doneBody} {...F}>
       <dl className="bab-card flex flex-col gap-2 px-4 py-4 text-[15px]">
         <div><dt className="bab-label">{t.onboarding.nameTitle}</dt><dd>{name}</dd></div>
-        {sport && <div><dt className="bab-label">{t.onboarding.sportLabel}</dt><dd>{sport}</dd></div>}
-        {trainDays.length > 0 && (
-          <div><dt className="bab-label">{t.onboarding.weekTraining}</dt>
-            <dd>{trainDays.sort().map((d) => t.onboarding.weekdays[d - 1]).join(' · ')}</dd></div>
+        {effectiveSports.length > 0 && (
+          <div><dt className="bab-label">{t.onboarding.sportLabel}</dt>
+            <dd>{effectiveSports.map((s) => sportLabel(s, locale)).join(' · ')}</dd></div>
+        )}
+        {trainSummary && (
+          <div><dt className="bab-label">{t.onboarding.weekTraining}</dt><dd>{trainSummary}</dd></div>
         )}
         {peDays.length > 0 && (
           <div><dt className="bab-label">{t.onboarding.weekPe}</dt>
