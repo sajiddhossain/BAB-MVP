@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { plural, useCopy } from '@/copy'
-import { entriesOf, timeOf, type Entry } from '@/lib/agenda'
+import { plural, useCopy, useLocale } from '@/copy'
+import { entriesOf, sportsOf, timeOf, type Entry } from '@/lib/agenda'
 import { listAthleteEvents, listSchedule } from '@/lib/repo'
+import { sportLabel } from '@/content/sports'
 import { Pane } from './shell'
 
 /**
@@ -47,6 +48,7 @@ function Week({ training, pe }: { training: Entry[]; pe: Entry[] }) {
 
 export default function SettingsAgenda() {
   const t = useCopy()
+  const locale = useLocale()
   const [rows, setRows] = useState<Record<string, unknown>[] | null>(null)
   const [events, setEvents] = useState<Record<string, unknown>[]>([])
 
@@ -60,19 +62,44 @@ export default function SettingsAgenda() {
 
   const training = entriesOf(rows ?? [], 'training')
   const pe = entriesOf(rows ?? [], 'pe')
-  const time = timeOf(training)
 
   const days = (list: Entry[]) =>
     list.length === 0
       ? t.settings.agendaNone
       : list.map((e) => t.onboarding.weekdays[e.weekday - 1]).join(' · ')
 
-  const rowsOut = [
-    {
+  /**
+   * Una riga per sport (R3-bis) — non più una sola "Allenamenti" per tutti.
+   * `sportsOf` prende solo gli sport che hanno davvero un giorno in agenda;
+   * righe vecchie senza sport (da prima di questa modifica) finiscono in una
+   * riga generica, così non spariscono dall'indice.
+   */
+  const sports = sportsOf(rows ?? [], 'training')
+  const legacy = entriesOf(rows ?? [], 'training', null)
+
+  const trainingRows = [
+    ...sports.map((sport) => {
+      const mine = training.filter((e) => e.sport === sport)
+      const time = timeOf(mine)
+      return {
+        to: `/settings/agenda/allenamenti/${encodeURIComponent(sport)}`,
+        title: sportLabel(sport, locale),
+        value: `${days(mine)}${time ? ` · ${time}` : ''}`,
+      }
+    }),
+    ...(legacy.length ? [{
       to: '/settings/agenda/allenamenti',
       title: t.onboarding.weekTraining,
-      value: training.length ? `${days(training)}${time ? ` · ${time}` : ''}` : t.settings.agendaNone,
-    },
+      value: `${days(legacy)}${timeOf(legacy) ? ` · ${timeOf(legacy)}` : ''}`,
+    }] : []),
+  ]
+
+  const rowsOut = [
+    ...(trainingRows.length ? trainingRows : [{
+      to: '/settings/agenda/allenamenti',
+      title: t.onboarding.weekTraining,
+      value: t.settings.agendaNone,
+    }]),
     {
       to: '/settings/agenda/educazione-fisica',
       title: t.onboarding.weekPe,

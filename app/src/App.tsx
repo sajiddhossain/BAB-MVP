@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import TabBar from './components/TabBar'
 import HurtButton from './components/HurtButton'
 import Today from './screens/Today'
@@ -31,6 +31,12 @@ import { adopt } from './lib/locale'
 import { useCopy, useSetLocale } from './copy'
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
+
+/** L'agenda allenamenti, montata su un indirizzo per sport (R3-bis). */
+function AgendaDaysBySport() {
+  const { sport } = useParams()
+  return <AgendaDays kind="training" sport={sport ? decodeURIComponent(sport) : null} />
+}
 
 export default function App() {
   const { userId, loading, connected } = useSession()
@@ -200,6 +206,7 @@ export default function App() {
           {/* Una schermata sola su due indirizzi: la domanda è «quali giorni»,
               cambia solo di cosa. */}
           <Route path="/settings/agenda/allenamenti" element={<AgendaDays kind="training" />} />
+          <Route path="/settings/agenda/allenamenti/:sport" element={<AgendaDaysBySport />} />
           <Route path="/settings/agenda/educazione-fisica" element={<AgendaDays kind="pe" />} />
           <Route path="/settings/agenda/gare" element={<AgendaEvents />} />
           <Route path="/settings/lingua" element={<SettingsLanguage />} />

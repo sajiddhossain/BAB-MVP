@@ -1,14 +1,19 @@
 import { useEffect, useState } from 'react'
-import { useCopy } from '@/copy'
+import { useCopy, useLocale, fill } from '@/copy'
 import PillGroup from '@/components/PillGroup'
-import { entriesOf, setDays, timeOf, type Kind } from '@/lib/agenda'
+import { endTimeOf, entriesOf, minutesBetween, setDays, timeOf, type Kind } from '@/lib/agenda'
 import { listSchedule } from '@/lib/repo'
 import { useSession } from '@/lib/session'
+import { sportLabel } from '@/content/sports'
 import { Pane, SaveButton, SaveNote, saveAndSettle, type SaveState } from './shell'
 
 /**
  * I giorni di un tipo — allenamento o educazione fisica. Una schermata sola,
- * montata su due indirizzi: la domanda è la stessa, cambia solo di cosa.
+ * montata su più indirizzi: la domanda è la stessa, cambia solo di cosa.
+ *
+ * 🔴 R3-bis: un allenamento ('training') porta anche `sport` — con più sport
+ * questa schermata è montata una volta per sport, non una sola per tutti gli
+ * allenamenti. 'pe' non ha sport, `sport` resta `null`.
  *
  * 🔴 Togliere un giorno lo CANCELLA, qui e sul server. È l'unico posto del
  * prodotto dove una riga sparisce davvero, e va bene così: un martedì a cui ha
@@ -16,14 +21,16 @@ import { Pane, SaveButton, SaveNote, saveAndSettle, type SaveState } from './she
  * del presente — e finché resta lì BAB continua a chiederle il check-in di
  * martedì.
  */
-export default function AgendaDays({ kind }: { kind: Kind }) {
+export default function AgendaDays({ kind, sport = null }: { kind: Kind; sport?: string | null }) {
   const t = useCopy()
+  const locale = useLocale()
   const { userId } = useSession()
 
   const [loaded, setLoaded] = useState(false)
   const [days, setPicked] = useState<number[]>([])
   const [time, setTime] = useState('')
-  const [was, setWas] = useState<{ days: number[]; time: string }>({ days: [], time: '' })
+  const [endTime, setEndTime] = useState('')
+  const [was, setWas] = useState<{ days: number[]; time: string; endTime: string }>({ days: [], time: '', endTime: '' })
   const [state, setState] = useState<SaveState>('idle')
 
   useEffect(() => {
@@ -31,18 +38,19 @@ export default function AgendaDays({ kind }: { kind: Kind }) {
     listSchedule()
       .then((rows) => {
         if (!alive) return
-        const mine = entriesOf(rows, kind)
+        const mine = entriesOf(rows, kind, kind === 'training' ? sport : undefined)
         const d = mine.map((e) => e.weekday)
         const tm = kind === 'training' ? timeOf(mine) : ''
-        setPicked(d); setTime(tm); setWas({ days: d, time: tm }); setLoaded(true)
+        const et = kind === 'training' ? endTimeOf(mine) : ''
+        setPicked(d); setTime(tm); setEndTime(et); setWas({ days: d, time: tm, endTime: et }); setLoaded(true)
       })
       .catch(() => { if (alive) setLoaded(true) })
     return () => { alive = false }
-  }, [kind])
+  }, [kind, sport])
 
   const same = (a: number[], b: number[]) =>
     a.length === b.length && [...a].sort().join() === [...b].sort().join()
-  const dirty = loaded && (!same(days, was.days) || (kind === 'training' && time !== was.time))
+  const dirty = loaded && (!same(days, was.days) || (kind === 'training' && (time !== was.time || endTime !== was.endTime)))
 
   const toggle = (d: number) =>
     setPicked((p) => { setState('idle'); return p.includes(d) ? p.filter((x) => x !== d) : [...p, d] })
@@ -51,15 +59,18 @@ export default function AgendaDays({ kind }: { kind: Kind }) {
     if (!userId) return
     await saveAndSettle(
       async () => {
-        await setDays(userId, kind, days, time || null)
-        setWas({ days, time })
+        const duration = kind === 'training' ? minutesBetween(time, endTime) : null
+        await setDays(userId, kind, days, time || null, sport, duration)
+        setWas({ days, time, endTime })
       },
       (o) => o.table === 'athlete_schedule',
       setState,
     )
   }
 
-  const title = kind === 'training' ? t.onboarding.weekTraining : t.onboarding.weekPe
+  const title = kind === 'training'
+    ? (sport ? fill(t.onboarding.trainDayTitle, { sport: sportLabel(sport, locale) }) : t.onboarding.weekTraining)
+    : t.onboarding.weekPe
   const help = kind === 'training' ? t.onboarding.weekTrainingHelp : t.onboarding.weekPeHelp
 
   return (
@@ -73,12 +84,20 @@ export default function AgendaDays({ kind }: { kind: Kind }) {
       {/* L'orario esiste solo per gli allenamenti, e solo se ce n'è almeno uno
           a cui attaccarlo. */}
       {kind === 'training' && days.length > 0 && (
-        <label className="flex flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
-          {t.onboarding.timeLabel}
-          <input type="time" value={time}
-                 onChange={(e) => { setTime(e.target.value); setState('idle') }}
-                 className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />
-        </label>
+        <div className="flex gap-3">
+          <label className="flex flex-1 flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
+            {t.onboarding.trainStartTitle}
+            <input type="time" value={time}
+                   onChange={(e) => { setTime(e.target.value); setState('idle') }}
+                   className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />
+          </label>
+          <label className="flex flex-1 flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
+            {t.onboarding.trainEndTitle}
+            <input type="time" value={endTime}
+                   onChange={(e) => { setEndTime(e.target.value); setState('idle') }}
+                   className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />
+          </label>
+        </div>
       )}
 
       {days.length === 0 && loaded && (
