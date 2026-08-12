@@ -364,21 +364,52 @@ create table if not exists public.team_events (
 create index if not exists team_events_team_idx on public.team_events (team_id, event_date desc);
 
 
+-- Gli sport che pratica — possono essere più di uno (onboarding, sport
+-- multipli). `athletes.sport` resta lo sport PRINCIPALE (il primo scelto),
+-- tenuto per chi lo legge già così (il riepilogo delle impostazioni); questa
+-- tabella è l'elenco completo, ed è la fonte di verità.
+create table if not exists public.athlete_sports (
+  id         uuid primary key default gen_random_uuid(),
+  athlete_id uuid not null references public.athletes(id) on delete cascade,
+  sport      text not null check (char_length(sport) <= 40),
+  created_at timestamptz not null default now(),
+  unique (athlete_id, sport)
+);
+create index if not exists athlete_sports_idx on public.athlete_sports (athlete_id);
+
+
 -- ── LA MIA SETTIMANA (calendario dell'atleta, R3) ───────────────────────────
 -- Il suo calendario, distinto da quello della squadra: qui c'è l'educazione
 -- fisica a scuola, che la squadra non conosce ma che è carico a tutti gli
 -- effetti — ed è il motivo per cui il check-in chiede `pe_attended`.
+--
+-- `sport` è null per 'pe'/'other'; per 'training' dice A QUALE dei suoi sport
+-- appartiene quel giorno (R3-bis, sport multipli) — non è una FK verso
+-- `athlete_sports`, è testo libero come il resto della coda offline: un join
+-- non serve a niente qui e romperebbe l'idempotenza della sincronizzazione.
 create table if not exists public.athlete_schedule (
   id           uuid primary key default gen_random_uuid(),
   athlete_id   uuid not null references public.athletes(id) on delete cascade,
   weekday      smallint not null check (weekday between 1 and 7),
   kind         text not null check (kind in ('pe','training','other')),
+  sport        text check (sport is null or char_length(sport) <= 40),
   start_time   time,
   duration_min smallint check (duration_min is null or duration_min between 15 and 300),
   label        text check (label is null or char_length(label) <= 60),
-  unique (athlete_id, weekday, kind, start_time)
+  unique (athlete_id, weekday, kind, sport, start_time)
 );
 create index if not exists athlete_schedule_idx on public.athlete_schedule (athlete_id, weekday);
+
+-- La `create table if not exists` sopra basta per un database nuovo. Su uno
+-- che ha già la tabella — senza `sport`, con il vecchio vincolo di unicità
+-- che non lo include — servono anche queste due righe, idempotenti come tutto
+-- il resto del file.
+alter table public.athlete_schedule add column if not exists sport text
+  check (sport is null or char_length(sport) <= 40);
+alter table public.athlete_schedule drop constraint if exists athlete_schedule_athlete_id_weekday_kind_start_time_key;
+alter table public.athlete_schedule drop constraint if exists athlete_schedule_athlete_id_weekday_kind_sport_start_time_key;
+alter table public.athlete_schedule add constraint athlete_schedule_athlete_id_weekday_kind_sport_start_time_key
+  unique (athlete_id, weekday, kind, sport, start_time);
 
 -- Le sue gare. R3: l'orario è opzionale perché spesso non lo sa ancora — e
 -- chiederglielo comunque sarebbe un modo per bloccarla su una domanda a cui non
@@ -416,7 +447,7 @@ declare t text;
 begin
   foreach t in array array['athletes','consents','check_ins','body_signals',
                            'red_flags','cycle_events','journey_progress','shares',
-                           'ux_events','athlete_schedule','athlete_events']
+                           'ux_events','athlete_schedule','athlete_events','athlete_sports']
   loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists "own rows" on public.%I', t);
@@ -852,6 +883,7 @@ returns jsonb language sql security invoker stable as $$
     'cycle_events', (select coalesce(jsonb_agg(to_jsonb(y)),'[]') from public.cycle_events y where y.athlete_id = auth.uid()),
     'journey',      (select coalesce(jsonb_agg(to_jsonb(j)),'[]') from public.journey_progress j where j.athlete_id = auth.uid()),
     'shares',       (select coalesce(jsonb_agg(to_jsonb(s)),'[]') from public.shares s where s.athlete_id = auth.uid()),
+    'sports',       (select coalesce(jsonb_agg(to_jsonb(sp)),'[]') from public.athlete_sports sp where sp.athlete_id = auth.uid()),
     'schedule',     (select coalesce(jsonb_agg(to_jsonb(w)),'[]') from public.athlete_schedule w where w.athlete_id = auth.uid()),
     'events',       (select coalesce(jsonb_agg(to_jsonb(e)),'[]') from public.athlete_events e where e.athlete_id = auth.uid()),
     -- 🔴 Anche la strumentazione. Non serve a lei e non gliela mostriamo da
