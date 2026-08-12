@@ -88,7 +88,7 @@ export default function SettingsProfile() {
 
       <div className="flex flex-col gap-1.5">
         <p className="bab-label">{t.onboarding.sportLabel}</p>
-        <PillGroup label={t.onboarding.sportLabel} value={sports}
+        <PillGroup columns={2} label={t.onboarding.sportLabel} value={sports}
                    options={SPORTS.map((s) => ({ value: s.code, label: s.label[locale] }))}
                    onChange={(c) => { toggleSport(c); setSportsSaveState('idle') }} />
         {sports.includes('other') && (

@@ -20,9 +20,16 @@ type Props = {
    * più grande si prende meglio con un pollice mentre si cammina verso il campo.
    */
   size?: 'sm' | 'md' | 'lg'
+  /**
+   * Griglia a colonne fisse invece del flusso libero. Per una manciata di
+   * opzioni corte il flusso libero va bene da solo; per una lista lunga con
+   * etichette di lunghezza diversa (gli sport) il flusso libero incolonna le
+   * pillole in righe irregolari — sembra buttato lì invece che scelto.
+   */
+  columns?: number
 }
 
-export default function PillGroup({ options, value, onChange, label, tone = 'neutral', size = 'md' }: Props) {
+export default function PillGroup({ options, value, onChange, label, tone = 'neutral', size = 'md', columns }: Props) {
   const multi = Array.isArray(value)
   const accent = tone === 'care' ? 'var(--care)' : 'var(--color-teal)'
   const isOn = (v: string) => (multi ? (value as string[]).includes(v) : value === v)
@@ -31,7 +38,8 @@ export default function PillGroup({ options, value, onChange, label, tone = 'neu
 
   return (
     <div role="group" aria-label={label}
-         className={`flex flex-wrap ${big ? 'gap-2.5' : small ? 'gap-1.5' : 'gap-2'}`}>
+         className={columns ? 'grid gap-2' : `flex flex-wrap ${big ? 'gap-2.5' : small ? 'gap-1.5' : 'gap-2'}`}
+         style={columns ? { gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` } : undefined}>
       {options.map((o) => {
         const on = isOn(o.value)
         return (
@@ -41,7 +49,8 @@ export default function PillGroup({ options, value, onChange, label, tone = 'neu
             aria-pressed={on}
             onClick={() => onChange(o.value)}
             className={`bab-pill flex items-center gap-1.5 ${
-              big ? 'px-5 py-3 text-[16px]'
+              columns ? 'justify-center px-2 py-2.5 text-center text-[14px]'
+                : big ? 'px-5 py-3 text-[16px]'
                 : small ? 'px-3 py-1.5 text-[13px]'
                 : 'px-3.5 py-2 text-[14px]'
             }`}

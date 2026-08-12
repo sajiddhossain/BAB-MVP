@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { plural, useCopy, useLocale } from '@/copy'
-import { entriesOf, sportsOf, timeOf, type Entry } from '@/lib/agenda'
+import { endTimeOf, entriesOf, sportsOf, timeOf, type Entry } from '@/lib/agenda'
 import { listAthleteEvents, listSchedule } from '@/lib/repo'
 import { sportLabel } from '@/content/sports'
 import { Pane } from './shell'
@@ -80,18 +80,25 @@ export default function SettingsAgenda() {
   const trainingRows = [
     ...sports.map((sport) => {
       const mine = training.filter((e) => e.sport === sport)
-      const time = timeOf(mine)
+      const start = timeOf(mine)
+      const end = endTimeOf(mine)
+      const time = start && end ? `${start}–${end}` : start
       return {
         to: `/settings/agenda/allenamenti/${encodeURIComponent(sport)}`,
         title: sportLabel(sport, locale),
         value: `${days(mine)}${time ? ` · ${time}` : ''}`,
       }
     }),
-    ...(legacy.length ? [{
-      to: '/settings/agenda/allenamenti',
-      title: t.onboarding.weekTraining,
-      value: `${days(legacy)}${timeOf(legacy) ? ` · ${timeOf(legacy)}` : ''}`,
-    }] : []),
+    ...(legacy.length ? [(() => {
+      const start = timeOf(legacy)
+      const end = endTimeOf(legacy)
+      const time = start && end ? `${start}–${end}` : start
+      return {
+        to: '/settings/agenda/allenamenti',
+        title: t.onboarding.weekTraining,
+        value: `${days(legacy)}${time ? ` · ${time}` : ''}`,
+      }
+    })()] : []),
   ]
 
   const rowsOut = [

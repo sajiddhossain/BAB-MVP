@@ -599,7 +599,7 @@ export const it = {
     rhythmNotYet: 'Non ancora',
     rhythmSkip: 'Preferisco non dirlo',
     datesTitle: 'Quando è stato il tuo ultimo ciclo?',
-    datesHelp: 'Tocca tutti i giorni in cui hai sanguinato — anche solo una stima va bene. Alla tua età i cicli si stanno ancora assestando, quindi BAB la tratta come una mappa larga, mai come un orario.',
+    datesHelp: 'Tocca tutti i giorni in cui hai sanguinato. Anche solo una stima va bene.',
     /** Le due date precedenti: aiutano BAB a stimare quanto dura il tuo ciclo, ma sono saltabili. */
     datesPrevTitle: 'E prima ancora, più o meno quando?',
     datesPrevHelp: 'Basta il giorno in cui è iniziato — anche solo una stima.',
@@ -615,7 +615,7 @@ export const it = {
      * di nessuna promessa: qui si dice cosa succede davvero, e dove sta lo
      * spegnimento.
      */
-    cyclePrivacy: 'Questa è la cosa più delicata che ti chiediamo, quindi te lo diciamo chiaro: **il tuo staff vede le date del ciclo**, insieme al resto dei tuoi check-in. Non vede quello che scrivi tu. E se preferisci di no, questa parte si spegne quando vuoi — il resto di BAB funziona esattamente uguale.',
+    cyclePrivacy: '**Il tuo staff vede le date del ciclo**, non quello che scrivi tu. Si spegne quando vuoi.',
     doneTitle: 'Ecco fatto',
     doneBody: 'Questo è quello che BAB sa di te. Puoi cambiare tutto dalle impostazioni.',
     doneCta: 'Inizia il mio primo check-in',

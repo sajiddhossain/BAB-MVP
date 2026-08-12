@@ -51,20 +51,24 @@ export default function CalendarMultiSelect({ selected, onChange, label, multipl
   }
 
   return (
-    <div role="group" aria-label={label} className="bab-card flex flex-col gap-2.5 px-3 py-3">
+    <div role="group" aria-label={label} className="bab-card flex flex-col gap-2 px-2.5 py-2.5">
       <div className="flex items-center justify-between px-1">
         <button type="button" aria-label="Mese precedente"
                 onClick={() => setView(new Date(year, month - 1, 1))}
-                className="bab-pill h-8 w-8 text-[15px]">‹</button>
-        <span className="text-[14px] font-bold capitalize">{monthLabel}</span>
+                className="bab-pill h-7 w-7 text-[13px]">‹</button>
+        <span className="text-[13px] font-bold capitalize">{monthLabel}</span>
         <button type="button" aria-label="Mese successivo" disabled={isCurrentMonth}
                 onClick={() => setView(new Date(year, month + 1, 1))}
-                className="bab-pill h-8 w-8 text-[15px] disabled:opacity-30">›</button>
+                className="bab-pill h-7 w-7 text-[13px] disabled:opacity-30">›</button>
       </div>
-      <div className="grid grid-cols-7 gap-1 text-center text-[11px] text-[var(--color-ink-soft)]">
+      <div className="grid grid-cols-7 text-center text-[10.5px] text-[var(--color-ink-soft)]">
         {WEEKDAY_LETTERS.map((d, i) => <span key={i}>{d}</span>)}
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      {/* Bottoni a misura fissa, non a griglia piena: così la riga resta
+          bassa qualunque sia la larghezza dello schermo — l'onboarding non
+          scorre mai, e sei righe di celle "aspect-square" bastavano a
+          sforare il viewport. */}
+      <div className="grid grid-cols-7 justify-items-center gap-y-0.5">
         {cells.map((d, i) => {
           if (!d) return <span key={i} aria-hidden />
           const iso = toISO(d)
@@ -73,7 +77,7 @@ export default function CalendarMultiSelect({ selected, onChange, label, multipl
           return (
             <button key={iso} type="button" disabled={future} onClick={() => toggle(d)}
                     aria-pressed={on}
-                    className="bab-pill aspect-square px-0 text-[13px] disabled:opacity-25"
+                    className="bab-pill h-8 w-8 px-0 text-[12px] disabled:opacity-25"
                     style={on
                       ? { background: 'var(--color-teal)', borderColor: 'var(--color-teal)', color: 'var(--color-surface)' }
                       : undefined}>

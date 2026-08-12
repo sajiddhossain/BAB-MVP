@@ -205,8 +205,8 @@ async function main() {
     ['profilo', '/settings/profilo'],
     ['ritmo', '/settings/ritmo'],
     ['agenda', '/settings/agenda'],
-    ['agenda-giorni-allenamento', '/settings/agenda/giorni?k=training'],
-    ['agenda-giorni-educazione-fisica', '/settings/agenda/giorni?k=pe'],
+    ['agenda-allenamenti-per-sport', '/settings/agenda/allenamenti/volleyball'],
+    ['agenda-educazione-fisica', '/settings/agenda/educazione-fisica'],
     ['agenda-gare', '/settings/agenda/gare'],
     ['lingua', '/settings/lingua'],
     ['dati', '/settings/dati'],
@@ -489,10 +489,15 @@ async function onboarding(page, S) {
       if (after !== before) return
       if (filled) await S.shot(`${name}-compilato`)
 
-      const go = page.locator('button').last()
-      if (await go.isDisabled()) throw new Error(`«Continua» disabilitato su «${before}»`)
-      await go.click()
-      await wait(850)
+      // 🔴 Non tutte le schermate hanno un «Continua» (i tre bottoni del
+      // ritmo avanzano da soli, e li ha già gestiti il controllo sopra). Dove
+      // non c'è, non c'è niente da cliccare qui.
+      const go = page.getByRole('button', { name: 'Continua', exact: true })
+      if (await go.count()) {
+        if (await go.isDisabled()) throw new Error(`«Continua» disabilitato su «${before}»`)
+        await go.click()
+        await wait(850)
+      }
     })
     if (stop) break
 
@@ -508,6 +513,19 @@ async function onboarding(page, S) {
  * di selettori per passo è esattamente la cosa che si sfasa quando l'onboarding
  * cambia, e nessuno se ne accorge finché non guarda 90 immagini a una a una.
  */
+/**
+ * L'indice DOM del bottone «Continua», se c'è. Non è più detto che sia
+ * l'ultimo bottone della schermata: le due date del ciclo saltabili hanno un
+ * secondo bottone («Non me lo ricordo») DOPO «Continua». Cercarlo per nome
+ * invece che per posizione tiene lo script giusto in tutt'e due i casi.
+ */
+async function continueIndex(all, total) {
+  for (let i = 0; i < total; i++) {
+    if ((await all.nth(i).innerText().catch(() => '')).trim() === 'Continua') return i
+  }
+  return total
+}
+
 async function fillStep(page) {
   const boxes = page.locator('input[type=checkbox]')
   if (await boxes.count()) {
@@ -520,10 +538,20 @@ async function fillStep(page) {
     // 🔴 Una data sola non va bene per tutti i campi data: sul compleanno una
     // data futura dà un'età fuori scala e «Continua» resta spento. Invece di
     // indovinare a quale passo siamo, si guarda se il bottone si è acceso.
-    if (await page.locator('button').last().isDisabled().catch(() => false)) {
-      await dates.first().fill('2011-04-12').catch(() => {})
+    //
+    // 🔴 2009 e non 2011: sotto i 16 anni la contraccezione non si chiede
+    // proprio, e quella schermata — riscritta in questa stessa sessione —
+    // resterebbe fuori dal giro di screenshot.
+    if (await page.getByRole('button', { name: 'Continua', exact: true }).isDisabled().catch(() => false)) {
+      await dates.first().fill('2009-04-12').catch(() => {})
       await wait(250)
     }
+    return true
+  }
+  const times = page.locator('input[type=time]')
+  if (await times.count()) {
+    const isEnd = /finisci/i.test(await page.locator('h1').first().innerText().catch(() => ''))
+    await times.first().fill(isEnd ? '19:30' : '18:00').catch(() => {})
     return true
   }
   const text = page.locator('input:not([type=time])')
@@ -531,18 +559,21 @@ async function fillStep(page) {
     await text.first().fill('Giulia').catch(() => {})
     return true
   }
-  // Bottoni del contenuto: fuori la freccia indietro (ha aria-label) e «Continua».
+  // Bottoni del contenuto: fuori la freccia indietro/mese (hanno aria-label)
+  // e tutto da «Continua» in poi (compreso «Continua» stesso, e quello che
+  // viene dopo di lui).
   const all = page.locator('button')
   const total = await all.count()
+  const boundary = await continueIndex(all, total)
   const idx = []
-  for (let i = 0; i < total - 1; i++) {
+  for (let i = 0; i < boundary; i++) {
     if (await all.nth(i).getAttribute('aria-label')) continue
     idx.push(i)
   }
   if (!idx.length) return false
   await all.nth(idx[0]).click().catch(() => {})
-  // Se sono giorni della settimana ne sceglie due: una settimana con un solo
-  // allenamento non somiglia a niente di vero.
+  // Se sono giorni della settimana (o giorni del calendario) ne sceglie due:
+  // una settimana con un solo allenamento non somiglia a niente di vero.
   if (idx.length >= 7) await all.nth(idx[2]).click().catch(() => {})
   await wait(400)
   return true

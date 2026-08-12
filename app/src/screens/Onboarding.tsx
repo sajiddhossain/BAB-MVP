@@ -49,19 +49,19 @@ function Frame({ title, help, children, next, canNext, back, onBack, labels, at,
   extra?: { label: string; onClick: () => void }
 }) {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col gap-4 px-5 py-8">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col gap-3 px-5 py-6">
       <div className="flex items-center gap-3">
         {back && (
           <button type="button" onClick={onBack} aria-label={labels.back}
-                  className="bab-pill h-11 w-11 shrink-0 text-[17px]">
+                  className="bab-pill h-10 w-10 shrink-0 text-[17px]">
             <span aria-hidden>←</span>
           </button>
         )}
         <Progress at={at} of={of} />
       </div>
-      <h1 className="font-display text-[26px] leading-tight">{title}</h1>
-      {help && <p className="text-[15px] text-[var(--color-ink-soft)]">{help}</p>}
-      <div className="flex flex-1 flex-col gap-4">{children}</div>
+      <h1 className="font-display text-[24px] leading-tight">{title}</h1>
+      {help && <p className="text-[14px] text-[var(--color-ink-soft)]">{help}</p>}
+      <div className="flex flex-1 flex-col gap-3">{children}</div>
       {next && (
         <button type="button" onClick={next} disabled={canNext === false}
                 className="bab-pill px-4 py-3.5 text-[17px] disabled:opacity-40"
@@ -278,7 +278,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     <Frame title={t.onboarding.sportTitle} help={t.onboarding.sportHelp}
            next={() => { setTrainIndex(0); setStep(effectiveSports.length ? 'trainDay' : 'pe') }}
            canNext back onBack={() => setStep('birthday')} {...F}>
-      <PillGroup size="lg" label={t.onboarding.sportLabel} value={sports}
+      <PillGroup columns={2} label={t.onboarding.sportLabel} value={sports}
                  options={SPORTS.map((s) => ({ value: s.code, label: s.label[locale] }))}
                  onChange={toggleSport} />
       {sports.includes('other') && (
@@ -376,8 +376,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     <Frame title={t.onboarding.datesTitle} help={t.onboarding.datesHelp}
            next={() => setStep('datesPrev')} canNext back onBack={() => setStep('rhythm')} {...F}>
       <CalendarMultiSelect label={t.onboarding.datesTitle} selected={lastCycleDays} onChange={setLastCycleDays} />
-      <div className="bab-card px-4 py-3" style={{ background: 'var(--cycle-tint)' }}>
-        <p className="text-[14px]"><Rich text={t.onboarding.cyclePrivacy} /></p>
+      <div className="bab-card px-3 py-2.5" style={{ background: 'var(--cycle-tint)' }}>
+        <p className="text-[13px]"><Rich text={t.onboarding.cyclePrivacy} /></p>
       </div>
     </Frame>
   )
@@ -416,14 +416,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     </Frame>
   )
 
-  const trainSummary = effectiveSports
-    .filter((s) => (trainDaysBySport[s] ?? []).length)
-    .map((s) => {
-      const days = (trainDaysBySport[s] ?? []).slice().sort((a, b) => a - b)
-        .map((d) => t.onboarding.weekdays[d - 1]).join(' · ')
-      return `${sportLabel(s, locale)} (${days})`
-    })
-    .join(' · ')
+  const trainedSports = effectiveSports.filter((s) => (trainDaysBySport[s] ?? []).length)
 
   return (
     <Frame title={t.onboarding.doneTitle} help={t.onboarding.doneBody} {...F}>
@@ -433,8 +426,20 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           <div><dt className="bab-label">{t.onboarding.sportLabel}</dt>
             <dd>{effectiveSports.map((s) => sportLabel(s, locale)).join(' · ')}</dd></div>
         )}
-        {trainSummary && (
-          <div><dt className="bab-label">{t.onboarding.weekTraining}</dt><dd>{trainSummary}</dd></div>
+        {trainedSports.length > 0 && (
+          <div>
+            <dt className="bab-label">{t.onboarding.weekTraining}</dt>
+            <dd className="flex flex-col gap-0.5">
+              {trainedSports.map((s) => {
+                const days = (trainDaysBySport[s] ?? []).slice().sort((a, b) => a - b)
+                  .map((d) => t.onboarding.weekdays[d - 1]).join(' · ')
+                const start = trainStartBySport[s]
+                const end = trainEndBySport[s]
+                const time = start && end ? ` · ${start}–${end}` : start ? ` · ${start}` : ''
+                return <span key={s}>{sportLabel(s, locale)}: {days}{time}</span>
+              })}
+            </dd>
+          </div>
         )}
         {peDays.length > 0 && (
           <div><dt className="bab-label">{t.onboarding.weekPe}</dt>
