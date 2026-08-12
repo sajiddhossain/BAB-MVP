@@ -8,4 +8,4 @@ dist/
 # storia di git anche dopo che li cancelli. Si rifanno in cinque minuti con
 # `node scripts/shots.mjs` dalla cartella app/, quindi il repo non è il posto
 # giusto per tenerli — e la cartella sul disco resta dov'è.
-screens/
+/screens/
