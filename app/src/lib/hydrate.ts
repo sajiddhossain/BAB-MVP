@@ -112,6 +112,11 @@ const SPECS: Spec[] = [
     sortKey: (r) => `${r.weekday}:${r.kind}:${r.id}`,
   },
   {
+    table: 'athlete_sports',
+    window: null,
+    sortKey: (r) => `${r.sport}:${r.id}`,
+  },
+  {
     table: 'athlete_events',
     window: { column: 'event_date', type: 'date' },
     sortKey: (r) => `${r.event_date}:${r.id}`,

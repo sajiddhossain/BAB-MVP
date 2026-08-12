@@ -235,6 +235,8 @@ export type ScheduleEntry = {
   athlete_id: string
   weekday: number            // 1 = lunedì, ISO
   kind: 'pe' | 'training' | 'other'
+  /** Solo per 'training': a quale dei suoi sport appartiene quel giorno. */
+  sport?: string | null
   start_time?: string | null
   duration_min?: number | null
 }
@@ -244,6 +246,25 @@ export async function saveSchedule(entries: ScheduleEntry[]): Promise<void> {
     const id = newId()
     await db.put('athlete_schedule', id, { ...e, id }, `${e.weekday}:${e.kind}:${id}`)
   }
+  void flush()
+}
+
+/** Gli sport che pratica — possono essere più di uno. Scritti una volta in onboarding. */
+export async function saveSports(athleteId: string, sports: string[]): Promise<void> {
+  for (const sport of sports) {
+    const id = newId()
+    await db.put('athlete_sports', id, { id, athlete_id: athleteId, sport }, `${sport}:${id}`)
+  }
+  void flush()
+}
+
+export async function listSports(): Promise<{ id: string; sport: string }[]> {
+  const all = await db.list('athlete_sports')
+  return all.map((r) => ({ id: String(r.id), sport: String(r.sport) }))
+}
+
+export async function removeSport(id: string): Promise<void> {
+  await db.remove('athlete_sports', id)
   void flush()
 }
 
