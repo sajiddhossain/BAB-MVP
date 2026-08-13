@@ -61,7 +61,7 @@ export default function TeamAthlete() {
                   {predicted && <span>{t.coach.predicted} {TEMPOS[predicted].emoji}</span>}
                   {trained && <span>· {t.coach.trained} {TEMPOS[trained].emoji} {TEMPOS[trained].name}</span>}
                   {post?.effort != null && (
-                    <span className="text-[var(--color-ink-soft)]">· {t.coach.effort} {post.effort}/5</span>
+                    <span className="text-[var(--color-ink-soft)]">· {t.coach.effort} {post.effort}/10</span>
                   )}
                   {(post?.pe_attended ?? pre?.pe_attended) != null && (
                     <span className="text-[13px] text-[var(--color-ink-soft)]">

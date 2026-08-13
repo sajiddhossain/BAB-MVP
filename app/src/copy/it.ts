@@ -394,6 +394,10 @@ export const it = {
       recapSignals: 'Ti sei fermata e hai nominato {n} sensazioni. Farlo — trovare dove sta e darle una parola — è esattamente il muscolo che stiamo allenando.',
       openQuestion: 'Una domanda tranquilla su cui vale la pena fermarsi: cosa ti ha sorpresa di più di oggi — e quale segnale te l\'ha detto per primo?',
       notePlaceholder: 'Se ti va, scrivilo qui. Lo leggi solo tu.',
+      painkillers: {
+        title: 'Hai preso un antidolorifico oggi?',
+        help: 'Prima o dopo l\'allenamento, per qualunque motivo.',
+      },
       broughtHome: {
         title: 'Cosa ti sei portata a casa?',
         help: 'Scegli quello che ti somiglia oggi — o nessuno.',

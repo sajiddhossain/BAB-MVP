@@ -18,7 +18,7 @@ export type ChannelCode = 'sleep' | 'energy' | 'hydration' | 'muscles'
 export type Channel = {
   code: ChannelCode
   emoji: string
-  /** Indice 0–4 = valore 1–5. */
+  /** Indice 0-based; il valore reale è `indice + offset` (default 1, vedi `EmojiScale`). */
   scale: string[]
   question: Record<Locale, string>
   low: Record<Locale, string>
@@ -27,15 +27,19 @@ export type Channel = {
 
 export const CHANNELS: Channel[] = [
   {
+    // 🔴 Sonno ed energia sono a 7 punti, non 5: la spec originale della
+    // founder li misura con lo Hooper Questionnaire, che usa una scala 1-7.
+    // Restano emoji, non numeri (§7), ma il RANGE combacia con lo strumento
+    // citato — vedi anche `lib/tempo.ts` per come cambia la somma dei canali.
     code: 'sleep', emoji: '😴',
-    scale: ['🦥', '🐢', '🐨', '🐰', '🦁'],
+    scale: ['🦥', '🐢', '🐨', '🐿️', '🐰', '🦌', '🦁'],
     question: { it: 'Sonno — quanto sei riposata da stanotte', en: 'Sleep — how rested you are from last night' },
     low: { it: 'Ho dormito pochissimo', en: 'Barely slept' },
     high: { it: 'Profondo e riposata', en: 'Deep & rested' },
   },
   {
     code: 'energy', emoji: '🔋',
-    scale: ['🌧️', '⛅', '🌤️', '☀️', '🔥'],
+    scale: ['🌧️', '🌦️', '⛅', '🌤️', '☀️', '🌞', '🔥'],
     question: { it: 'Energia — la voglia di partire, adesso', en: 'Energy — your get-up-and-go right now' },
     low: { it: 'A secco', en: 'Running on empty' },
     high: { it: 'Piena di voglia', en: 'Full of go' },
@@ -92,15 +96,20 @@ export function channelQuestion(c: Omit<Channel, 'code'>, locale: Locale): strin
  * letteratura solida dietro (Temm). Ha una scala tutta sua perché non misura
  * uno stato ma una fatica: le altre vanno dal peggio al meglio, questa dal
  * facile al massimale.
+ *
+ * 🔴 11 punti, 0–10: è la scala RPE standard (CR-10 di Foster), non la 1–5
+ * delle altre letture — la spec originale la chiede esplicitamente. `offset:
+ * 0` va passato a `EmojiScale` quando si usa questo canale, altrimenti
+ * l'indice 0 dell'array diventerebbe valore 1 invece di 0.
  */
 export type PostChannelCode = 'legs' | 'breath' | 'energy'
 
 export const EFFORT: Channel = {
   code: 'energy', emoji: '🔥',   // `code` non usato: l'effort ha una colonna sua
-  scale: ['😌', '🙂', '😅', '🥵', '🥴'],
+  scale: ['😌', '🙂', '😊', '🙃', '😅', '😓', '😰', '🥵', '😖', '🥴', '🤯'],
   question: { it: 'Quanto è stata dura davvero?', en: 'How hard did it actually feel?' },
-  low: { it: 'Facile', en: 'Easy' },
-  high: { it: 'Al massimo', en: 'Maxed out' },
+  low: { it: 'Niente di niente', en: 'Nothing at all' },
+  high: { it: 'Il massimo che avevo', en: 'Everything I had' },
 }
 
 export const POST_CHANNELS: (Omit<Channel, 'code'> & { code: PostChannelCode })[] = [

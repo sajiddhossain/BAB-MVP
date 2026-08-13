@@ -16,8 +16,15 @@ import type { TempoCode } from '@/content/tempo'
  * pilota.
  */
 
-/** Le soglie, in un posto solo. Somma dei 5 canali, da 5 a 25. */
-export const THRESHOLDS = { upbeat: 20, steady: 13 } as const
+/**
+ * Le soglie, in un posto solo. Somma dei 5 canali — ma non più tutti sulla
+ * stessa scala: sonno ed energia vanno 1–7 (Hooper), idratazione/muscoli/
+ * headspace restano 1–5. La somma resta da 5 (minimo di ognuno) a 29 (non più
+ * 25). 20 e 13 erano già soglie non validate sulla vecchia somma 5–25; 23 e 15
+ * sono le stesse posizioni relative (75% e 40% del range) sulla nuova — non
+ * più validate di prima, solo riscalate perché il range è cambiato sotto.
+ */
+export const THRESHOLDS = { upbeat: 23, steady: 15 } as const
 
 /**
  * Headspace è multi-select, ma la somma vuole un numero. Positivi meno

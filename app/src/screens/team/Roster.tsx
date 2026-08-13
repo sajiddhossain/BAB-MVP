@@ -143,7 +143,7 @@ export default function Roster() {
               ) : null}
               {post?.effort != null && (
                 <span className="text-[14px] text-[var(--color-ink-soft)]">
-                  · {t.coach.effort} {post.effort}/5
+                  · {t.coach.effort} {post.effort}/10
                 </span>
               )}
               {pe !== null && (

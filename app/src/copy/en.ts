@@ -332,6 +332,10 @@ export const en: Copy = {
       recapSignals: 'You stopped and named {n} sensations. Doing that — finding where it sits and giving it a word — is exactly the muscle we are training.',
       openQuestion: "A quiet question worth sitting with: what surprised you most about today — and which signal told you first?",
       notePlaceholder: 'Write it here if you like. Only you read this.',
+      painkillers: {
+        title: 'Did you take a painkiller today?',
+        help: 'Before or after training, for any reason.',
+      },
       broughtHome: {
         title: 'What did you bring home?',
         help: 'Pick whatever sounds like you today — or none.',

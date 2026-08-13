@@ -148,14 +148,18 @@ create table if not exists public.check_ins (
   tempo_suggested tempo,
   tempo_chosen    tempo,
 
-  -- ── canali 1–5 ──
-  sleep      smallint check (sleep      between 1 and 5),
-  energy     smallint check (energy     between 1 and 5),
+  -- ── canali ──
+  -- Sonno ed energia sono 1–7: la spec originale li misura con lo Hooper
+  -- Questionnaire, che usa quella scala. Gli altri restano 1–5. `effort` è
+  -- 0–10: è la RPE standard (CR-10 di Foster), non un canale "1–5" come gli
+  -- altri — vedi content/channels.ts e lib/tempo.ts per come cambia la somma.
+  sleep      smallint check (sleep      between 1 and 7),
+  energy     smallint check (energy     between 1 and 7),
   hydration  smallint check (hydration  between 1 and 5),
   muscles    smallint check (muscles    between 1 and 5),
   legs       smallint check (legs       between 1 and 5),  -- post
   breath     smallint check (breath     between 1 and 5),  -- post
-  effort     smallint check (effort     between 1 and 5),  -- post = session-RPE
+  effort     smallint check (effort     between 0 and 10), -- post = session-RPE (CR-10)
 
   -- ── non scalari ──
   -- Headspace è multi-select di proposito: non si chiede a una ragazza di dare
@@ -191,6 +195,16 @@ create table if not exists public.check_ins (
   skipped_fields text[] check (skipped_fields is null or array_length(skipped_fields,1) <= 30)
 );
 create index if not exists check_ins_athlete_date_idx on public.check_ins (athlete_id, local_date desc);
+
+-- Allarga i vincoli sulle installazioni già esistenti: sonno/energia da 1-5 a
+-- 1-7 (Hooper), effort da 1-5 a 0-10 (RPE standard). Righe già scritte con i
+-- vecchi range restano valide (sono un sottoinsieme), niente da migrare sui dati.
+alter table public.check_ins drop constraint if exists check_ins_sleep_check;
+alter table public.check_ins add constraint check_ins_sleep_check check (sleep between 1 and 7);
+alter table public.check_ins drop constraint if exists check_ins_energy_check;
+alter table public.check_ins add constraint check_ins_energy_check check (energy between 1 and 7);
+alter table public.check_ins drop constraint if exists check_ins_effort_check;
+alter table public.check_ins add constraint check_ins_effort_check check (effort between 0 and 10);
 
 
 -- ── SEGNALI CORPOREI ────────────────────────────────────────────────────────

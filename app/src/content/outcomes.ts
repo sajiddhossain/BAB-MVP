@@ -98,6 +98,11 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
  * dell'andatura, **non sono validate**: stanno qui insieme perché si cambino
  * in un posto solo.
  */
+/**
+ * `effort` è la RPE 0–10 (vedi `content/channels.ts`, `EFFORT`); `bodyAvg` resta
+ * su 1–5. Le soglie 7 e 3 sono la stessa posizione relativa di quelle originali
+ * (4 e 2 su una scala 1–5), non validate né allora né ora — vedi `lib/tempo.ts`.
+ */
 export function pickOutcome(tempo: TempoCode, effort: number, bodyAvg: number): OutcomeCode {
   if (tempo === 'upbeat') {
     if (bodyAvg >= 3.5) return 'upbeat_read'
@@ -105,9 +110,9 @@ export function pickOutcome(tempo: TempoCode, effort: number, bodyAvg: number): 
     return 'upbeat_solid'
   }
   if (tempo === 'steady') {
-    if (effort >= 4 && bodyAvg < 3) return 'steady_tipped'
-    if (bodyAvg >= 4 && effort <= 2) return 'steady_spare'
+    if (effort >= 7 && bodyAvg < 3) return 'steady_tipped'
+    if (bodyAvg >= 4 && effort <= 3) return 'steady_spare'
     return 'steady_judged'
   }
-  return effort >= 4 ? 'gentle_work' : 'gentle_true'
+  return effort >= 7 ? 'gentle_work' : 'gentle_true'
 }

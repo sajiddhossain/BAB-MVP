@@ -51,7 +51,7 @@ const TEMPO_ORDER: TempoCode[] = ['upbeat', 'steady', 'gentle']
 const MAIN = [
   'tempo_chosen', 'effort', 'duration_bucket', 'session_type',
   'legs', 'breath', 'energy', 'headspace',
-  'body', 'brought_home', 'note',
+  'body', 'painkillers', 'brought_home', 'note',
 ] as const
 
 /** Vedi la nota in `CheckInPre`: la mappa apre un foglio, non una schermata. */
@@ -80,6 +80,7 @@ export default function CheckInPost() {
   const [energy, setEnergy] = useState<number | null>(null)
   const [headspace, setHeadspace] = useState<string[]>([])
   const [hsOther, setHsOther] = useState('')
+  const [painkillers, setPainkillers] = useState<boolean | null>(null)
   const [brought, setBrought] = useState<string[]>([])
   const [note, setNote] = useState('')
 
@@ -113,7 +114,7 @@ export default function CheckInPost() {
 
   const dirty = actual !== null || effort !== null || duration !== null || session !== null
     || legs !== null || breath !== null || energy !== null || headspace.length > 0
-    || brought.length > 0 || note.trim() !== '' || signals.length > 0
+    || painkillers !== null || brought.length > 0 || note.trim() !== '' || signals.length > 0
 
   const answer = (id: string, set: () => void, go = flow.onward) =>
     advance(() => { set(); setSkipped((p) => p.filter((x) => x !== id)) }, go)
@@ -151,7 +152,7 @@ export default function CheckInPost() {
           athlete_id: userId, kind: 'post',
           tempo_predicted: predicted, tempo_chosen: actual,
           effort, legs, breath, energy, headspace: headspace.filter((h) => h !== '__other'),
-          headspace_other: hsOther.trim() || null,
+          headspace_other: hsOther.trim() || null, painkillers,
           brought_home: brought, note: note.trim() || null,
           session_type: session, duration_bucket: duration,
           started_at: startedAt,
@@ -328,9 +329,9 @@ export default function CheckInPost() {
       return (
         <Step {...frame} section={t.checkin.post.lookBack.label}
               question={channelQuestion(EFFORT, locale)}
-              onNext={effort ? flow.onward : null}>
+              onNext={effort !== null ? flow.onward : null}>
           <EmojiScale
-            size="lg"
+            size="lg" offset={0}
             scale={EFFORT.scale} value={effort}
             onChange={(v) => answer('effort', () => setEffort(v))}
             label={EFFORT.question[locale]} low={EFFORT.low[locale]} high={EFFORT.high[locale]}
@@ -402,6 +403,23 @@ export default function CheckInPost() {
 
     case 'body':
       return bodyStep()
+
+    case 'painkillers':
+      return (
+        <Step {...frame} section={t.checkin.post.senseLabel}
+              question={t.checkin.post.painkillers.title}
+              help={t.checkin.post.painkillers.help}
+              onNext={painkillers !== null ? flow.onward : null}
+              onSkip={() => skip('painkillers')}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.post.painkillers.title}
+            options={[{ value: 'yes', label: t.common.yes }, { value: 'no', label: t.common.no }]}
+            value={painkillers === null ? null : painkillers ? 'yes' : 'no'}
+            onChange={(v) => answer('painkillers', () => setPainkillers(v === 'yes'))}
+          />
+        </Step>
+      )
 
     case 'brought_home':
       /**
