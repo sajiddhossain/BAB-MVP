@@ -32,6 +32,21 @@ export const it = {
     ariaLabel: 'Navigazione principale',
   },
 
+  journey: {
+    lede: 'Otto settimane, una competenza al mese: prima impari a riconoscere i tuoi segnali, poi a capirli. Ogni settimana si sblocca quando arriva il suo turno.',
+    monthLabel: 'Mese',
+    weekLabel: 'Settimana {n}',
+    now: 'ora',
+    backToList: 'Torna al percorso',
+    missionLabel: 'La tua missione',
+    missionDone: 'Fatta ✓',
+    howBabHelpsLabel: 'Come BAB aiuta',
+    reflectLabel: 'Rifletti',
+    reflectPlaceholder: 'Se ti va, scrivilo qui. Lo leggi solo tu.',
+    reflectSave: 'Salva',
+    reflectSaved: 'Salvato ✓',
+  },
+
   /**
    * La struttura dei flussi a passi: check-in e onboarding. Sta qui e non
    * dentro `checkin` perché è la cornice, non il contenuto — e la cornice è la

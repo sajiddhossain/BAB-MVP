@@ -142,6 +142,13 @@ async function main() {
     await wait(700)
     await S.shot('14-foglio-zona-parola')
   })
+  await run('pre · foglio zona · cosa vogliono dire', async () => {
+    await page.getByRole('button', { name: /cosa vogliono dire/i }).click().catch(() => {})
+    await wait(400)
+    await S.shot('14b-foglio-zona-spiegazioni')
+    await page.getByRole('button', { name: /nascondi/i }).click().catch(() => {})
+    await wait(300)
+  })
   await run('pre · foglio zona · quanto e come', async () => {
     await pickFirstPill(page)
     await wait(700)
@@ -158,6 +165,12 @@ async function main() {
       await S.shot(`${String(i + 1).padStart(2, '0')}-${p}`)
     })
   }
+
+  await run('post · risultato + allena la consapevolezza', async () => {
+    const finish = page.getByRole('button', { name: 'Fatto', exact: true })
+    if (await finish.count()) { await finish.click().catch(() => {}); await wait(1200) }
+    await S.shot('12-post-risultato')
+  })
 
   await S.group('05-me')
   await run('me · sta ancora imparando', async () => {
@@ -198,6 +211,11 @@ async function main() {
   await S.group('07-percorso-e-storia')
   await run('percorso', async () => { await reload(page, '/journey'); await S.shot('percorso') })
   await run('storia della settimana', async () => { await reload(page, '/story'); await S.shot('storia') })
+  await run('storia · non sai da dove iniziare', async () => {
+    await page.getByRole('button', { name: /non sai da dove iniziare/i }).click().catch(() => {})
+    await wait(400)
+    await S.shot('storia-frasi-coach')
+  })
 
   await S.group('08-impostazioni')
   const SET = [
@@ -219,6 +237,75 @@ async function main() {
       await S.shot(name)
     })
   }
+
+  await S.group('07b-body-sense')
+  await run('body-sense · libreria', async () => {
+    await reload(page, '/senti')
+    await S.shot('libreria')
+  })
+  await run('body-sense · battito', async () => {
+    await page.getByRole('button', { name: /^Battito/ }).click()
+    await wait(500)
+    await S.shot('battito-guess')
+    await page.getByRole('button', { name: /Medio/ }).click()
+    await wait(400)
+    await S.shot('battito-count')
+    const tap = page.locator('button[aria-label="Tocca il cerchio a ogni battito"]')
+    await tap.click().catch(() => {})
+    await wait(400)
+    for (let n = 0; n < 6; n++) { await tap.click().catch(() => {}); await wait(250) }
+    await page.waitForFunction(() => {
+      const b = [...document.querySelectorAll('button')].find((x) => x.textContent.includes('Avanti'))
+      return b && !b.disabled
+    }, { timeout: 20000 }).catch(() => {})
+    await S.shot('battito-conteggio-fatto')
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(500)
+    await S.shot('battito-rivelazione')
+    await page.getByRole('button', { name: /Fine/ }).click()
+    await wait(600)
+  })
+  await run('body-sense · due lati', async () => {
+    await reload(page, '/senti')
+    await page.getByRole('button', { name: /^Due lati/ }).click()
+    await wait(500)
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(400)
+    await page.getByRole('button', { name: /Sinistro/ }).click()
+    await wait(300)
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(400)
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(400)
+    await page.getByRole('button', { name: /Destro/ }).click()
+    await wait(300)
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(500)
+    await S.shot('due-lati-rivelazione')
+    await page.getByRole('button', { name: /Fine/ }).click()
+    await wait(500)
+  })
+  await run('body-sense · trova la zona', async () => {
+    await reload(page, '/senti')
+    await page.getByRole('button', { name: /Trova la tua zona/ }).click()
+    await wait(500)
+    await page.getByRole('button', { name: '4', exact: true }).click()
+    await wait(300)
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(400)
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(400)
+    await S.shot('zona-respiro')
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(400)
+    await page.getByRole('button', { name: '2', exact: true }).click()
+    await wait(300)
+    await page.getByRole('button', { name: /Avanti/ }).click()
+    await wait(500)
+    await S.shot('zona-rivelazione')
+    await page.getByRole('button', { name: /Fine/ }).click()
+    await wait(500)
+  })
 
   await S.group('09-azioni')
   await run('lingua · passata a English', async () => {
@@ -572,6 +659,11 @@ async function fillStep(page) {
   if (await times.count()) {
     const isEnd = /finisci/i.test(await page.locator('h1').first().innerText().catch(() => ''))
     await times.first().fill(isEnd ? '19:30' : '18:00').catch(() => {})
+    return true
+  }
+  const numbers = page.locator('input[type=number]')
+  if (await numbers.count()) {
+    await numbers.first().fill('13').catch(() => {})
     return true
   }
   const text = page.locator('input:not([type=time])')

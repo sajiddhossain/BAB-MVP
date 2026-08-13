@@ -1,10 +1,184 @@
-import { useCopy } from '@/copy'
+import { useEffect, useState } from 'react'
+import { fill, useCopy, useLocale } from '@/copy'
+import { MONTHS, WEEKS, type JourneyWeek } from '@/content/journey'
+import {
+  currentWeek, journeyStart, missionProgress, progressRowFor, weekOf, weekWindow,
+  type CheckIn, type BodySignal, type JourneyRow,
+} from '@/lib/journey'
+import { recentCheckIns, recentSignals, listJourney, saveJourneyWeek } from '@/lib/repo'
+import { useSession } from '@/lib/session'
+
+/**
+ * Il Percorso — Mesi 1 e 2, le 8 settimane richieste dal pilota.
+ *
+ * 🔴 Le settimane si sbloccano in ordine, mai a salti: `riconosci → capisci`
+ * è una scala, non otto moduli indipendenti (vedi `content/journey.ts`).
+ * Si può sempre tornare indietro a rileggere una settimana già fatta, mai
+ * saltare avanti a una che non è ancora arrivata.
+ *
+ * 🔴 La missione si spunta da sola quando il numero è raggiunto — nessun
+ * bottone "fatto" da premere, nessun voto. §7.
+ */
+
+function Card({ children }: { children: React.ReactNode }) {
+  return <section className="bab-card flex flex-col gap-3 px-4 py-4">{children}</section>
+}
 
 export default function Journey() {
   const t = useCopy()
+  const locale = useLocale()
+  const { userId } = useSession()
+
+  const [checkIns, setCheckIns] = useState<CheckIn[] | null>(null)
+  const [signals, setSignals] = useState<BodySignal[]>([])
+  const [rows, setRows] = useState<JourneyRow[]>([])
+  const [openWeek, setOpenWeek] = useState<number | null>(null)
+  const [reflection, setReflection] = useState('')
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle')
+
+  useEffect(() => {
+    let alive = true
+    Promise.all([recentCheckIns(300), recentSignals(300), listJourney()])
+      .then(([c, s, j]) => {
+        if (!alive) return
+        setCheckIns(c as CheckIn[]); setSignals(s as BodySignal[]); setRows(j as JourneyRow[])
+      })
+      .catch(() => { if (alive) { setCheckIns([]); setSignals([]); setRows([]) } })
+    return () => { alive = false }
+  }, [])
+
+  const start = journeyStart(checkIns ?? [])
+  const atWeek = currentWeek(start)
+
+  // Segna da sola la settimana appena la missione tocca l'obiettivo — una
+  // volta sola, non ogni render: si scrive solo se non è già segnata.
+  // 🔴 Deve stare PRIMA di ogni `return` condizionale: gli hook di React
+  // vanno chiamati sempre nello stesso ordine, a ogni render.
+  useEffect(() => {
+    if (!userId || !checkIns?.length) return
+    for (const w of WEEKS) {
+      if (w.week > atWeek) break
+      const already = progressRowFor(rows, w.week)?.completed_at
+      if (already) continue
+      const { from, to } = weekWindow(start, w.week)
+      const done = missionProgress(w, from, to, checkIns, signals) >= w.missionGoal
+      if (done) {
+        void saveJourneyWeek(userId, w.week, { completed_at: new Date().toISOString() })
+          .then(() => setRows((r) => [...r.filter((x) => x.week !== w.week), { week: w.week, completed_at: new Date().toISOString() }]))
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkIns, signals, rows, atWeek, userId])
+
+  if (!checkIns) {
+    return <p className="pt-6 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
+  }
+
+  function open(week: JourneyWeek) {
+    if (week.week > atWeek) return
+    setOpenWeek(week.week)
+    setReflection(String(progressRowFor(rows, week.week)?.reflection ?? ''))
+    setSaveState('idle')
+  }
+
+  async function saveReflection(week: number) {
+    if (!userId) return
+    setSaveState('saving')
+    await saveJourneyWeek(userId, week, { reflection: reflection.trim() || undefined })
+    setRows((r) => [...r.filter((x) => x.week !== week), { ...progressRowFor(r, week), week, reflection: reflection.trim() }])
+    setSaveState('saved')
+  }
+
+  if (openWeek) {
+    const week = weekOf(openWeek)
+    const { from, to } = weekWindow(start, week.week)
+    const progress = missionProgress(week, from, to, checkIns, signals)
+    const done = Boolean(progressRowFor(rows, week.week)?.completed_at)
+    const month = MONTHS[week.month]
+
+    return (
+      <section className="flex flex-col gap-4 pt-2">
+        <div className="flex items-baseline justify-between gap-3">
+          <span className="bab-label">{month.emoji} {fill(t.journey.weekLabel, { n: week.week })}</span>
+          <button type="button" onClick={() => setOpenWeek(null)}
+                  className="text-[13.5px] underline text-[var(--color-ink-soft)]">
+            {t.journey.backToList}
+          </button>
+        </div>
+        <h1 className="font-display text-[24px] leading-tight">{week.title[locale]}</h1>
+        <p className="text-[14px] text-[var(--color-ink-soft)] italic">{week.subtitle[locale]}</p>
+        <p className="text-[15px]">{week.body[locale]}</p>
+
+        <Card>
+          <p className="bab-label">{t.journey.missionLabel}</p>
+          <p className="text-[15px]">🎯 {week.mission[locale]}</p>
+          <div className="flex items-center gap-2">
+            <div className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-[var(--color-ink)] bg-[var(--color-surface)]">
+              <div className="h-full rounded-full" style={{
+                width: `${Math.min(100, Math.round((progress / week.missionGoal) * 100))}%`,
+                background: done ? 'var(--color-lime)' : 'var(--color-teal)',
+              }} />
+            </div>
+            <span className="text-[13px] font-bold text-[var(--color-ink-soft)]">
+              {progress}/{week.missionGoal}
+            </span>
+          </div>
+          {done && <p className="text-[13px] font-bold" style={{ color: 'var(--color-vividteal)' }}>{t.journey.missionDone}</p>}
+        </Card>
+
+        <Card>
+          <p className="bab-label">{t.journey.howBabHelpsLabel}</p>
+          <p className="text-[14.5px]">{week.howBabHelps[locale]}</p>
+        </Card>
+
+        <Card>
+          <p className="bab-label">{t.journey.reflectLabel}</p>
+          <p className="text-[14.5px]">{week.reflect[locale]}</p>
+          <textarea value={reflection} onChange={(e) => { setReflection(e.target.value); setSaveState('idle') }}
+                    maxLength={1000} rows={4} placeholder={t.journey.reflectPlaceholder}
+                    className="bab-card px-3 py-2.5 text-[15px]" />
+          <button type="button" onClick={() => void saveReflection(week.week)}
+                  disabled={saveState === 'saving'}
+                  className="bab-pill self-start px-4 py-2 text-[14px] disabled:opacity-50">
+            {saveState === 'saved' ? t.journey.reflectSaved : t.journey.reflectSave}
+          </button>
+        </Card>
+      </section>
+    )
+  }
+
   return (
-    <section>
-      <h1 className="text-2xl">{t.tabs.journey}</h1>
+    <section className="flex flex-col gap-4 pt-2">
+      <h1 className="font-display text-[26px]">{t.tabs.journey}</h1>
+      <p className="text-[15px] text-[var(--color-ink-soft)]">{t.journey.lede}</p>
+
+      {([1, 2] as const).map((m) => (
+        <div key={m} className="flex flex-col gap-2.5">
+          <p className="bab-label">{MONTHS[m].emoji} {t.journey.monthLabel} {m} · {MONTHS[m].name[locale]}</p>
+          {WEEKS.filter((w) => w.month === m).map((w) => {
+            const done = Boolean(progressRowFor(rows, w.week)?.completed_at)
+            const locked = w.week > atWeek
+            const isNow = w.week === atWeek && !done
+            return (
+              <button key={w.week} type="button" onClick={() => open(w)} disabled={locked}
+                      className="bab-card flex items-center gap-3 px-4 py-3.5 text-left disabled:opacity-50">
+                <span aria-hidden className="text-[20px]">{done ? '✅' : locked ? '🔒' : '▶️'}</span>
+                <span className="flex flex-1 flex-col gap-0.5">
+                  <span className="text-[13px] font-bold text-[var(--color-ink-soft)]">
+                    {fill(t.journey.weekLabel, { n: w.week })}
+                  </span>
+                  <span className="text-[15px] font-bold">{w.title[locale]}</span>
+                </span>
+                {isNow && !locked && (
+                  <span className="bab-pill px-2.5 py-1 text-[11px]" style={{ background: 'var(--color-lime)' }}>
+                    {t.journey.now}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      ))}
     </section>
   )
 }

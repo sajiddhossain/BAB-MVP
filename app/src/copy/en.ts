@@ -20,6 +20,21 @@ export const en: Copy = {
     ariaLabel: 'Main navigation',
   },
 
+  journey: {
+    lede: "Eight weeks, one skill a month: first you learn to recognise your signals, then to understand them. Each week unlocks when its turn comes.",
+    monthLabel: 'Month',
+    weekLabel: 'Week {n}',
+    now: 'now',
+    backToList: 'Back to journey',
+    missionLabel: 'Your mission',
+    missionDone: 'Done ✓',
+    howBabHelpsLabel: 'How BAB helps',
+    reflectLabel: 'Reflect',
+    reflectPlaceholder: "If you want, write it here. Only you read it.",
+    reflectSave: 'Save',
+    reflectSaved: 'Saved ✓',
+  },
+
   flow: {
     next: 'Next',
     back: 'Back',

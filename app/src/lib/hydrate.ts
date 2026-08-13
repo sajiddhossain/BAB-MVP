@@ -66,9 +66,6 @@ const day = (v: unknown) => String(v ?? '').slice(0, 10)
  * `ux_events` è assente di proposito: è strumentazione, si scrive e non si
  * rilegge mai dall'app. Scaricarla vorrebbe dire riportare sul telefono
  * dell'atleta dei dati che servono solo a noi.
- *
- * `journey_progress` è assente perché il Percorso è fuori dalla v1 (R8):
- * niente lo scrive e niente lo legge.
  */
 const SPECS: Spec[] = [
   {
@@ -120,6 +117,11 @@ const SPECS: Spec[] = [
     table: 'athlete_events',
     window: { column: 'event_date', type: 'date' },
     sortKey: (r) => `${r.event_date}:${r.id}`,
+  },
+  {
+    table: 'journey_progress',
+    window: null,
+    sortKey: (r) => String(r.week).padStart(2, '0'),
   },
 ]
 

@@ -318,6 +318,30 @@ export async function recentSignals(limit = 200) {
   return db.list('body_signals', { limit, desc: true })
 }
 
+/* ── PERCORSO ──────────────────────────────────────────────────────────────
+ * Una riga per settimana, con `completed_at` e la sua riflessione — mai più
+ * di una riga per settimana (`unique(athlete_id, week)` sul server). */
+
+export async function listJourney(): Promise<Record<string, unknown>[]> {
+  return db.list('journey_progress')
+}
+
+export async function saveJourneyWeek(
+  athleteId: string, week: number,
+  changes: { completed_at?: string; reflection?: string },
+): Promise<void> {
+  const rows = await listJourney()
+  const existing = rows.find((r) => r.week === week)
+  if (existing) {
+    await db.patch('journey_progress', String(existing.id), changes)
+  } else {
+    const id = newId()
+    await db.put('journey_progress', id,
+      { id, athlete_id: athleteId, week, ...changes }, String(week).padStart(2, '0'))
+  }
+  void flush()
+}
+
 /**
  * La body-story condivisa.
  *
