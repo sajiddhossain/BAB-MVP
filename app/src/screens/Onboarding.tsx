@@ -453,10 +453,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'birthday') return (
     <Frame title={t.onboarding.birthdayTitle} help={t.onboarding.birthdayHelp}
-           next={() => setStep('sport')} canNext={age !== null && age >= 8 && age <= 80} back onBack={() => setStep('name')} {...F}>
+           next={() => setStep('sport')} canNext={age !== null && age >= 12 && age <= 80} back onBack={() => setStep('name')} {...F}>
       <input type="date" value={birth} onChange={(e) => setBirth(e.target.value)}
              aria-label={t.onboarding.birthdayTitle}
              className="bab-card px-4 py-3 text-[16px]" />
+      {age !== null && age < 12 && (
+        <p className="text-[13px]" style={{ color: 'var(--care)' }}>{t.onboarding.birthdayTooYoung}</p>
+      )}
     </Frame>
   )
 

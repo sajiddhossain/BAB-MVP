@@ -604,6 +604,7 @@ export const en: Copy = {
     namePlaceholder: 'Your name',
     birthdayTitle: 'When’s your birthday?',
     birthdayHelp: "Two reasons: so we can wish you a happy one, and so we know which questions make sense to ask you and which don't.",
+    birthdayTooYoung: "BAB is built for ages 12 and up. If you're under 12, you can't continue from here for now.",
     sportTitle: 'What sport do you do?',
     sportHelp: 'You can add more than one. It changes the words BAB uses with you — meets or matches, and what counts as a session.',
     sportLabel: 'Your sport',

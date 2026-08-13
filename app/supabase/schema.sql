@@ -40,7 +40,12 @@ create table if not exists public.athletes (
   created_at     timestamptz not null default now(),
   display_name   text        not null check (char_length(display_name) between 1 and 40),
   athlete_code   text        check (athlete_code is null or char_length(athlete_code) between 3 and 20),
-  birth_date     date        not null check (birth_date > date '1950-01-01'),
+  -- BAB è pensata dai 12 anni in su (R4): il limite non sta solo nella UI
+  -- dell'onboarding, altrimenti basta una chiamata diretta all'API per
+  -- aggirarlo. `current_date` qui è voluto: la regola è "almeno 12 anni OGGI",
+  -- non un valore fissato una volta per sempre.
+  birth_date     date        not null
+    check (birth_date > date '1950-01-01' and birth_date <= current_date - interval '12 years'),
   sport          text        check (sport is null or char_length(sport) <= 40),
   -- 'undisclosed' non è un ripiego: nasconde il blocco ritmo ovunque, e va
   -- rispettato in ogni schermata.
@@ -55,6 +60,12 @@ create table if not exists public.athletes (
 );
 alter table public.athletes add column if not exists first_period_age smallint
   check (first_period_age is null or first_period_age between 6 and 20);
+
+-- Rialza il vincolo dell'età minima sulle installazioni già esistenti, dove
+-- il check originale non escludeva ancora chi ha meno di 12 anni.
+alter table public.athletes drop constraint if exists athletes_birth_date_check;
+alter table public.athletes add constraint athletes_birth_date_check
+  check (birth_date > date '1950-01-01' and birth_date <= current_date - interval '12 years');
 
 -- L'età serve in un punto solo: decidere se mostrare la domanda sulla
 -- contraccezione ormonale (R3, sopra i 15). NON serve più a scegliere la mappa

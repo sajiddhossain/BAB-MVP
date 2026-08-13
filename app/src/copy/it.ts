@@ -693,6 +693,7 @@ export const it = {
     namePlaceholder: 'Il tuo nome',
     birthdayTitle: 'Quando sei nata?',
     birthdayHelp: 'Serve a due cose: farti gli auguri e creare un percorso adatto a te',
+    birthdayTooYoung: 'BAB è pensata per chi ha 12 anni o più. Se hai meno di 12 anni, per ora non puoi continuare da qui.',
     sportTitle: 'Che sport fai?',
     sportHelp: 'Puoi anche inserirne più di uno. Cambia il vocabolario che BAB usa con te — gare o partite, e cosa conta come sessione.',
     sportLabel: 'Il tuo sport',
