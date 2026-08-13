@@ -108,6 +108,16 @@ export default function Today() {
           )}
         </div>
       )}
+
+      {/* Sempre visibile, in ogni stato: si fa quando vuoi, non è legata al check-in. */}
+      <Link to="/senti" className="bab-card flex items-center gap-3 px-4 py-3.5">
+        <span aria-hidden className="text-[26px]">🧭</span>
+        <div className="flex flex-1 flex-col">
+          <p className="font-display text-[16px]">{t.bodySense.entryTitle}</p>
+          <p className="text-[13px] text-[var(--color-ink-soft)]">{t.bodySense.entryBody}</p>
+        </div>
+        <span aria-hidden className="text-[18px] text-[var(--color-ink-soft)]">→</span>
+      </Link>
     </section>
   )
 }

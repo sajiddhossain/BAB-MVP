@@ -10,6 +10,9 @@ import {
 import { useSession } from '@/lib/session'
 import { SPORTS, sportLabel } from '@/content/sports'
 import { minutesBetween } from '@/lib/agenda'
+import { TEMPOS, type TempoCode } from '@/content/tempo'
+import { bandFromBpm, type HeartBand } from '@/lib/heart'
+import TapCounter from '@/components/TapCounter'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -32,6 +35,22 @@ function Rich({ text }: { text: string }) {
         p.startsWith('**') ? <strong key={i}>{p.slice(2, -2)}</strong> : <span key={i}>{p}</span>,
       )}
     </>
+  )
+}
+
+/** Un passo del metodo, numerato — la schermata «Indovina. Poi senti davvero.» */
+function NumberedStep({ n, title, body }: { n: number; title: string; body: string }) {
+  return (
+    <div className="flex gap-3">
+      <span aria-hidden className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[13px] font-bold"
+            style={{ background: 'var(--color-lavender)' }}>
+        {n}
+      </span>
+      <div className="flex flex-col gap-0.5">
+        <p className="text-[14px] font-bold">{title}</p>
+        <p className="text-[13px] text-[var(--color-ink-soft)]">{body}</p>
+      </div>
+    </div>
   )
 }
 
@@ -91,7 +110,9 @@ function Frame({ title, help, children, next, canNext, back, onBack, labels, at,
  * di Y" si ricalcola da sola (vedi `buildFlow`), non è più un array fisso.
  */
 type Step =
-  | 'welcome' | 'whoSees' | 'consent' | 'name' | 'birthday' | 'sport'
+  | 'welcome'
+  | 'heartConcept' | 'heartSettle' | 'heartGuess' | 'heartCount' | 'heartReveal' | 'heartWrap'
+  | 'whoSees' | 'consent' | 'name' | 'birthday' | 'sport'
   | 'trainDay' | 'trainStart' | 'trainEnd'
   | 'pe' | 'events' | 'rhythm'
   | 'datesLast' | 'datesPrev' | 'datesBefore'
@@ -119,6 +140,11 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState<Step>('welcome')
   const [name, setName] = useState('')
   const [birth, setBirth] = useState('')
+
+  // L'esercizio del battito: niente di questo si salva, è solo il concetto
+  // provato una volta con le mani.
+  const [heartGuessBand, setHeartGuessBand] = useState<HeartBand | null>(null)
+  const [heartTaps, setHeartTaps] = useState<number | null>(null)
 
   const [sports, setSportsPicked] = useState<string[]>([])
   const [otherSport, setOtherSport] = useState('')
@@ -159,7 +185,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
    * quanti sport ha scelto e se ha detto di avere il ciclo.
    */
   function buildFlow(): string[] {
-    const flow = ['welcome', 'whoSees', 'consent', 'name', 'birthday', 'sport']
+    const flow = [
+      'welcome', 'heartConcept', 'heartSettle', 'heartGuess', 'heartCount', 'heartReveal', 'heartWrap',
+      'whoSees', 'consent', 'name', 'birthday', 'sport',
+    ]
     for (const sport of effectiveSports) {
       flow.push(`trainDay:${sport}`, `trainStart:${sport}`, `trainEnd:${sport}`)
     }
@@ -226,12 +255,145 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'welcome') return (
     <Frame title={t.onboarding.welcomeTitle} help={t.onboarding.welcomeBody}
-           next={() => setStep('whoSees')} {...F} />
+           next={() => setStep('heartConcept')} {...F} />
+  )
+
+  // 🔴 R3-bis: prima di chiederle qualsiasi dato, le si fa PROVARE il concetto
+  // — indovina, senti davvero, impara lo scarto — con le mani, non solo
+  // raccontato. Niente di questi sei passi si salva: è un esercizio, non un
+  // dato. I "gear" della schermata finale sono le andature vere di
+  // `content/tempo.ts`, lette da lì e non riscritte qui.
+  if (step === 'heartConcept') return (
+    <Frame title={t.heart.conceptTitle} help={t.heart.conceptHelp}
+           next={() => setStep('heartSettle')} canNext back onBack={() => setStep('welcome')} {...F}>
+      <div className="bab-card flex flex-col gap-3 px-4 py-3.5">
+        <NumberedStep n={1} title={t.heart.step1Title} body={t.heart.step1Body} />
+        <NumberedStep n={2} title={t.heart.step2Title} body={t.heart.step2Body} />
+        <NumberedStep n={3} title={t.heart.step3Title} body={t.heart.step3Body} />
+      </div>
+      <p className="text-[13px] text-[var(--color-ink-soft)]">{t.heart.conceptFooter}</p>
+    </Frame>
+  )
+
+  if (step === 'heartSettle') return (
+    <Frame title={t.heart.settleTitle} help={t.heart.settleBody}
+           next={() => setStep('heartGuess')} canNext back onBack={() => setStep('heartConcept')} {...F}>
+      <div className="flex flex-col items-center gap-3 pt-4">
+        <span aria-hidden className="text-[52px]">❤️</span>
+        <p className="max-w-[280px] text-center text-[13px] text-[var(--color-ink-soft)]">{t.heart.settleNote}</p>
+      </div>
+    </Frame>
+  )
+
+  if (step === 'heartGuess') return (
+    <Frame title={t.heart.guessTitle} help={t.heart.guessHelp}
+           next={() => setStep('heartCount')} canNext={heartGuessBand !== null}
+           back onBack={() => setStep('heartSettle')} {...F}>
+      <div className="grid grid-cols-3 gap-2">
+        {([
+          ['slow', '🐢', t.heart.slow, t.heart.slowHelp],
+          ['medium', '🚶', t.heart.medium, t.heart.mediumHelp],
+          ['fast', '🐇', t.heart.fast, t.heart.fastHelp],
+        ] as const).map(([band, emoji, label, help]) => (
+          <button key={band} type="button" onClick={() => setHeartGuessBand(band)}
+                  aria-pressed={heartGuessBand === band}
+                  className="bab-pill flex flex-col items-center gap-1 px-2 py-3 text-center"
+                  style={heartGuessBand === band
+                    ? { background: 'var(--color-teal)', borderColor: 'var(--color-teal)', color: 'var(--color-surface)' }
+                    : undefined}>
+            <span aria-hidden className="text-[22px]">{emoji}</span>
+            <span className="text-[13px] font-bold">{label}</span>
+            <span className="text-[10.5px] opacity-80">{help}</span>
+          </button>
+        ))}
+      </div>
+      <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.guessFooter}</p>
+    </Frame>
+  )
+
+  if (step === 'heartCount') return (
+    <Frame title={t.heart.countTitle} help={t.heart.countHelp}
+           next={() => setStep('heartReveal')} canNext={heartTaps !== null}
+           back onBack={() => setStep('heartGuess')} {...F}>
+      <TapCounter durationSec={15} ariaLabel={t.heart.tapAriaLabel}
+                  startLabel={t.heart.tapStart} startSub={t.heart.tapReady}
+                  goLabel={t.heart.tapGo} goSub={t.heart.tapGoSub}
+                  countingPrefix={t.heart.tapCounting} doneLabel={t.heart.tapDone}
+                  unitLabel={t.heart.tapBeats} onDone={setHeartTaps} />
+    </Frame>
+  )
+
+  if (step === 'heartReveal') {
+    const bpm = (heartTaps ?? 0) * 4
+    const measured = bandFromBpm(bpm)
+    const match = heartGuessBand === measured
+    const label = (b: HeartBand | null) => b === 'slow' ? t.heart.slow : b === 'medium' ? t.heart.medium : t.heart.fast
+    return (
+      <Frame title={match ? t.heart.revealMatchTitle : t.heart.revealMissTitle}
+             next={() => setStep('heartWrap')} canNext back onBack={() => setStep('heartCount')} {...F}>
+        <div className="bab-card flex flex-col items-center gap-1 px-4 py-3.5">
+          <span className="text-[38px] font-bold" style={{ color: 'var(--color-coral)' }}>{bpm}</span>
+          <span className="text-[11px] text-[var(--color-ink-soft)]">{t.heart.bpmLabel}</span>
+          <div className="mt-2 grid w-full grid-cols-2 gap-2">
+            <div className="rounded-2xl px-2 py-2 text-center"
+                 style={{ background: 'color-mix(in srgb, var(--color-lavender) 30%, white)' }}>
+              <p className="bab-label">{t.heart.yourGuess}</p>
+              <p className="text-[15px] font-bold">{label(heartGuessBand)}</p>
+            </div>
+            <div className="rounded-2xl px-2 py-2 text-center"
+                 style={{ background: 'color-mix(in srgb, var(--color-pink) 30%, white)' }}>
+              <p className="bab-label">{t.heart.youCounted}</p>
+              <p className="text-[15px] font-bold">{label(measured)}</p>
+            </div>
+          </div>
+        </div>
+        <div className="bab-card px-3 py-2.5" style={{ background: 'var(--tempo-steady-tint)' }}>
+          <p className="text-[13px]"><Rich text={match ? t.heart.revealMatchNote : t.heart.revealMissNote} /></p>
+        </div>
+        <p className="text-[12px] text-[var(--color-ink-soft)]">{t.heart.revealFooter}</p>
+      </Frame>
+    )
+  }
+
+  if (step === 'heartWrap') return (
+    <Frame title={t.heart.wrapTitle} help={t.heart.wrapBody}
+           next={() => setStep('whoSees')} canNext back onBack={() => setStep('heartReveal')} {...F}>
+      <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
+        <div className="flex items-start gap-2.5">
+          <span aria-hidden className="text-[19px]">☀️</span>
+          <div>
+            <p className="text-[13.5px] font-bold">{t.heart.checkinTitle}</p>
+            <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkinBody}</p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2.5">
+          <span aria-hidden className="text-[19px]">🌙</span>
+          <div>
+            <p className="text-[13.5px] font-bold">{t.heart.checkoutTitle}</p>
+            <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkoutBody}</p>
+          </div>
+        </div>
+      </div>
+      <p className="text-[13px]">{t.heart.gearsIntro}</p>
+      <div className="grid grid-cols-3 gap-2">
+        {(Object.keys(TEMPOS) as TempoCode[]).map((code) => {
+          const tempo = TEMPOS[code]
+          return (
+            <div key={code} className="bab-card flex flex-col items-center gap-0.5 px-1 py-2.5 text-center"
+                 style={{ borderColor: `var(${tempo.cssVar})` }}>
+              <span aria-hidden className="text-[19px]">{tempo.emoji}</span>
+              <span className="text-[11.5px] font-bold">{tempo.name}</span>
+            </div>
+          )
+        })}
+      </div>
+      <p className="text-[12px] text-[var(--color-ink-soft)]">{t.heart.wrapNote}</p>
+    </Frame>
   )
 
   // 🔴 Prima del consenso, non dopo.
   if (step === 'whoSees') return (
-    <Frame title={t.onboarding.whoSeesTitle} next={() => setStep('consent')} back onBack={() => setStep('welcome')} {...F}>
+    <Frame title={t.onboarding.whoSeesTitle} next={() => setStep('consent')} back onBack={() => setStep('heartWrap')} {...F}>
       <div className="bab-card px-4 py-4"><p className="text-[15px]">{t.onboarding.whoSeesTeam}</p></div>
       <div className="bab-card px-4 py-4" style={{ background: 'var(--tempo-steady-tint)' }}>
         <p className="text-[15px]">{t.onboarding.whoSeesPrivate}</p>

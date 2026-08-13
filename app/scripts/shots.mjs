@@ -468,7 +468,7 @@ async function onboarding(page, S) {
 
   const title = () => page.locator('h1').first().innerText().catch(() => '')
 
-  for (let i = 1; i <= 20; i++) {
+  for (let i = 1; i <= 30; i++) {
     // 🔴 La fine dell'onboarding non la dice un contatore: la dice la barra
     // delle tab, che esiste solo dentro l'app. Senza questo controllo il ciclo
     // tirava dritto e infilava «Oggi» e il pannello «mi sono fatta male» nella
@@ -480,6 +480,26 @@ async function onboarding(page, S) {
 
     const stop = await run(`onboarding · ${before}`, async () => {
       await S.shot(name)
+
+      // 🔴 L'esercizio del battito ha un timer VERO di 15 secondi — nessuna
+      // scorciatoia generica lo compila. Si tocca il cerchio per farlo
+      // partire, si tocca ancora un po' per simulare qualche battito, e poi
+      // si aspetta davvero che il conto alla rovescia finisca.
+      if (before === 'Ora contiamolo.') {
+        const tap = page.locator('button[aria-label="Tocca il cerchio a ogni battito"]')
+        await tap.click().catch(() => {})
+        await wait(600)
+        await S.shot(`${name}-conteggio`)
+        for (let n = 0; n < 8; n++) { await tap.click().catch(() => {}); await wait(300) }
+        await page.waitForFunction(() => {
+          const b = [...document.querySelectorAll('button')].find((x) => x.textContent.trim() === 'Continua')
+          return b && !b.disabled
+        }, { timeout: 20000 }).catch(() => {})
+        await S.shot(`${name}-compilato`)
+        const done = page.getByRole('button', { name: 'Continua', exact: true })
+        if (await done.count() && !(await done.isDisabled())) { await done.click(); await wait(850) }
+        return
+      }
 
       const filled = await fillStep(page)
       const after = await title()

@@ -6,6 +6,7 @@ import Journey from './screens/Journey'
 import Me from './screens/Me'
 import Story from './screens/Story'
 import Body from './screens/Body'
+import BodySense from './screens/BodySense'
 import SettingsIndex from './screens/settings/Index'
 import SettingsProfile from './screens/settings/Profile'
 import SettingsRhythm from './screens/settings/Rhythm'
@@ -196,6 +197,7 @@ export default function App() {
           <Route path="/me" element={<Me />} />
           <Route path="/story" element={<Story />} />
           <Route path="/body" element={<Body />} />
+          <Route path="/senti" element={<BodySense />} />
           {/* Le impostazioni: un indice e cinque schermate. Ognuna ha il suo
               indirizzo, quindi il tasto indietro del telefono torna all'indice
               invece di uscire dalle impostazioni. */}
