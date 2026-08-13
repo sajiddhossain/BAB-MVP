@@ -99,9 +99,19 @@ create table if not exists public.consents (
   kind         text not null check (kind in ('athlete','guardian','research')),
   text_version text not null check (char_length(text_version) <= 20),
   granted      boolean not null,
-  granted_at   timestamptz not null default now()
+  granted_at   timestamptz not null default now(),
+  -- Solo per kind='guardian': non è una verifica, è un riferimento a chi la
+  -- minorenne dichiara abbia acconsentito con lei — non c'è nessun controllo
+  -- server-side che quella persona esista o abbia davvero letto il testo.
+  guardian_name    text check (char_length(guardian_name) <= 100),
+  guardian_contact text check (char_length(guardian_contact) <= 120)
 );
 create index if not exists consents_athlete_idx on public.consents (athlete_id, kind);
+
+alter table public.consents add column if not exists guardian_name text
+  check (char_length(guardian_name) <= 100);
+alter table public.consents add column if not exists guardian_contact text
+  check (char_length(guardian_contact) <= 120);
 
 
 -- ── CHECK-IN ────────────────────────────────────────────────────────────────
@@ -806,7 +816,7 @@ create or replace view public.admin_staff as
 -- Senza questa vista, dimostrarlo vuol dire aprire il database.
 create or replace view public.admin_consents as
   select c.id, c.athlete_id, a.display_name, c.kind, c.text_version,
-         c.granted, c.granted_at
+         c.granted, c.granted_at, c.guardian_name, c.guardian_contact
   from public.consents c
   join public.athletes a on a.id = c.athlete_id
   where public.is_admin();

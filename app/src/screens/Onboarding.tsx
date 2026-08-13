@@ -163,6 +163,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [contraception, setContraception] = useState<'hormonal' | 'natural' | 'undisclosed' | null>(null)
   const [consentA, setConsentA] = useState(false)
   const [consentG, setConsentG] = useState(false)
+  const [guardianName, setGuardianName] = useState('')
+  const [guardianContact, setGuardianContact] = useState('')
   const [saving, setSaving] = useState(false)
 
   const L = { back: t.onboarding.back, continue: t.onboarding.continue }
@@ -222,7 +224,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         })
         await saveConsent(userId, 'athlete', t.onboarding.consentVersion, consentA)
-        await saveConsent(userId, 'guardian', t.onboarding.consentVersion, consentG)
+        await saveConsent(userId, 'guardian', t.onboarding.consentVersion, consentG,
+          { name: guardianName, contact: guardianContact })
 
         if (effectiveSports.length) await saveSports(userId, effectiveSports)
 
@@ -406,7 +409,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'consent') return (
     <Frame title={t.onboarding.consentTitle} help={t.onboarding.consentHelp}
-           next={() => setStep('name')} canNext={consentA && consentG} back onBack={() => setStep('whoSees')} {...F}>
+           next={() => setStep('name')}
+           canNext={consentA && consentG && guardianName.trim().length > 0}
+           back onBack={() => setStep('whoSees')} {...F}>
       <div className="bab-card px-4 py-3" style={{ background: 'var(--care-tint)', borderColor: 'var(--care)' }}>
         <p className="text-[14px]">{t.onboarding.consentDraftWarning}</p>
       </div>
@@ -417,6 +422,23 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           {label}
         </label>
       ))}
+      {consentG && (
+        <div className="bab-card flex flex-col gap-2.5 px-4 py-3.5">
+          <label className="flex flex-col gap-1 text-[13px] text-[var(--color-ink-soft)]">
+            {t.onboarding.consentGuardianNameLabel}
+            <input value={guardianName} onChange={(e) => setGuardianName(e.target.value)} maxLength={100}
+                   placeholder={t.onboarding.consentGuardianNamePlaceholder}
+                   className="bab-card px-3 py-2.5 text-[15px] text-[var(--color-ink)]" />
+          </label>
+          <label className="flex flex-col gap-1 text-[13px] text-[var(--color-ink-soft)]">
+            {t.onboarding.consentGuardianContactLabel}
+            <input value={guardianContact} onChange={(e) => setGuardianContact(e.target.value)} maxLength={120}
+                   placeholder={t.onboarding.consentGuardianContactPlaceholder}
+                   className="bab-card px-3 py-2.5 text-[15px] text-[var(--color-ink)]" />
+          </label>
+          <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.onboarding.consentGuardianNote}</p>
+        </div>
+      )}
     </Frame>
   )
 

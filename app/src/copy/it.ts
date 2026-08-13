@@ -671,7 +671,12 @@ export const it = {
     welcomeBody: 'Quasi tutte le app sportive ti misurano da fuori e ti dicono cosa fare. BAB fa l\'opposto: ti aiuta a capire cosa ti sta dicendo il tuo corpo — così sai quando spingere, quando riposare, e come dirlo ad alta voce.',
     back: 'Indietro',
     consentAthlete: 'Ho letto e ci sto',
-    consentGuardian: 'Un genitore o chi si prende cura di me ha letto e ci sta',
+    consentGuardian: 'Dichiaro che un genitore o chi si prende cura di me ha letto questo testo insieme a me e acconsente',
+    consentGuardianNameLabel: 'Nome di chi ha detto sì con te',
+    consentGuardianNamePlaceholder: 'Nome e cognome',
+    consentGuardianContactLabel: 'Email o telefono di questa persona (facoltativo)',
+    consentGuardianContactPlaceholder: 'Così possiamo ricontattarla se serve',
+    consentGuardianNote: 'Questa è una tua dichiarazione, non una firma: stai confermando che l\'hai letto insieme a un adulto responsabile e che è d\'accordo.',
     consentVersion: 'v1-bozza',
     /** 🔴 Segnaposto dichiarato: il testo legale vero non c'è ancora. */
     consentDraftWarning: 'Questo testo è un segnaposto: quello definitivo arriva prima che la app venga usata davvero.',

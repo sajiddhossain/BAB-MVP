@@ -224,11 +224,14 @@ export async function getProfile(id: string) {
 export async function saveConsent(
   athleteId: string, kind: 'athlete' | 'guardian' | 'research',
   textVersion: string, granted: boolean,
+  guardian?: { name?: string; contact?: string },
 ): Promise<void> {
   const id = newId()
   await db.put('consents', id, {
     id, athlete_id: athleteId, kind, text_version: textVersion, granted,
     granted_at: new Date().toISOString(),
+    guardian_name: guardian?.name?.trim() || null,
+    guardian_contact: guardian?.contact?.trim() || null,
   }, `${new Date().toISOString()}:${id}`)
   void flush()
 }
