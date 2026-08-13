@@ -111,13 +111,22 @@ export type DeleteFailure = 'not-connected' | 'offline' | 'server'
  * 🔴 E serve la rete. Non è una scusa tecnica: cancellare solo qui e lasciare
  * tutto sul server sarebbe una bugia — la schermata dice «sparisce tutto», e
  * deve essere vero.
+ *
+ * 🔴 Il controllo però è nel PROVARE, non in `navigator.onLine`: quell'API
+ * dice spesso «offline» anche con campo pieno (è nota per essere inaffidabile
+ * su mobile), e qui bloccava chi aveva rete vera prima ancora di tentare.
+ * Meglio chiamare il server e leggere se è fallito per davvero.
  */
 export async function deleteAccount(): Promise<void> {
   if (!supabase) throw Object.assign(new Error('not-connected'), { kind: 'not-connected' as DeleteFailure })
-  if (!navigator.onLine) throw Object.assign(new Error('offline'), { kind: 'offline' as DeleteFailure })
 
-  const { error } = await supabase.rpc('delete_my_account')
-  if (error) throw Object.assign(new Error(error.message), { kind: 'server' as DeleteFailure })
+  let result: Awaited<ReturnType<typeof supabase.rpc>>
+  try {
+    result = await supabase.rpc('delete_my_account')
+  } catch {
+    throw Object.assign(new Error('offline'), { kind: 'offline' as DeleteFailure })
+  }
+  if (result.error) throw Object.assign(new Error(result.error.message), { kind: 'server' as DeleteFailure })
 
   // Solo adesso. Da qui in poi non c'è più niente da perdere.
   await db.wipe()
