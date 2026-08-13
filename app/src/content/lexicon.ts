@@ -36,49 +36,72 @@ export type Sensation = {
   redFlag: boolean
   emoji?: string
   label: Record<Locale, string>
+  /**
+   * 🔴 Spiega la PAROLA, non la diagnosi: com'è sentirla, mai cosa significa
+   * dal punto di vista clinico. Quella riga resta `clinical`/`redFlag`, e
+   * quella sì deve passare da un medico dello sport — questa è solo
+   * lessico, la stessa cosa che farebbe un dizionario.
+   */
+  hint: Record<Locale, string>
 }
 
 export const SENSATIONS: Sensation[] = [
   // ── Gruppo "va bene" ──────────────────────────────────────────────────────
   { code: 'strong', group: 'good', clinical: 'normal', redFlag: false, emoji: '💪',
-    label: { it: 'Forte', en: 'Strong' } },
+    label: { it: 'Forte', en: 'Strong' },
+    hint: { it: 'Risponde bene, ha potenza', en: 'Responds well, has power' } },
   { code: 'warm',   group: 'good', clinical: 'normal', redFlag: false, emoji: '🔥',
-    label: { it: 'Calda / attiva', en: 'Warm / switched on' } },
+    label: { it: 'Calda / attiva', en: 'Warm / switched on' },
+    hint: { it: 'Sveglia, pronta a muoversi', en: 'Switched on, ready to move' } },
   { code: 'light',  group: 'good', clinical: 'normal', redFlag: false, emoji: '🪶',
-    label: { it: 'Leggera', en: 'Light' } },
+    label: { it: 'Leggera', en: 'Light' },
+    hint: { it: 'Senza peso, si muove facile', en: 'No weight to it, moves easily' } },
   { code: 'fine',   group: 'good', clinical: 'normal', redFlag: false, emoji: '✨',
-    label: { it: 'Tutto ok', en: 'All fine' } },
+    label: { it: 'Tutto ok', en: 'All fine' },
+    hint: { it: 'Non senti niente di particolare', en: "Nothing in particular to notice" } },
 
   // ── Gruppo "da notare" ────────────────────────────────────────────────────
   { code: 'tight',   group: 'notice', clinical: 'tension',     redFlag: false,
-    label: { it: 'Tesa / rigida', en: 'Tight / stiff' } },
+    label: { it: 'Tesa / rigida', en: 'Tight / stiff' },
+    hint: { it: 'Fatica a muoversi del tutto, come tirata', en: 'Hard to move all the way, like it\'s pulled' } },
   { code: 'sore',    group: 'notice', clinical: 'doms',        redFlag: false,
-    label: { it: 'Dolorante', en: 'Sore / achy' } },
+    label: { it: 'Dolorante', en: 'Sore / achy' },
+    hint: { it: 'Indolenzita, tipo il giorno dopo un allenamento duro', en: 'Achy, like the day after a hard session' } },
   { code: 'burning', group: 'notice', clinical: 'nociceptive', redFlag: false,
-    label: { it: 'Che brucia', en: 'Burning' } },
+    label: { it: 'Che brucia', en: 'Burning' },
+    hint: { it: 'Calda e pungente, come quando un muscolo lavora sodo', en: 'Hot and stinging, like a muscle working hard' } },
   { code: 'heavy',   group: 'notice', clinical: 'fatigue',     redFlag: false,
-    label: { it: 'Pesante / stanca', en: 'Heavy / tired' } },
+    label: { it: 'Pesante / stanca', en: 'Heavy / tired' },
+    hint: { it: 'Costa fatica anche muoverla un po\'', en: 'Takes effort to move even a little' } },
   { code: 'tender',  group: 'notice', clinical: 'doms',        redFlag: false,
-    label: { it: 'Sensibile al tocco', en: 'Tender' } },
+    label: { it: 'Sensibile al tocco', en: 'Tender' },
+    hint: { it: 'Fa male solo se la premi o tocchi', en: 'Only hurts if you press or touch it' } },
   { code: 'tingly',  group: 'notice', clinical: 'neural',      redFlag: false,
-    label: { it: 'Formicolio / intorpidita', en: 'Buzzy / tingly / numb' } },
+    label: { it: 'Formicolio / intorpidita', en: 'Buzzy / tingly / numb' },
+    hint: { it: 'Come spilli e aghi, o senti poco', en: 'Like pins and needles, or hard to feel' } },
   { code: 'crampy',  group: 'notice', clinical: 'cramp',       redFlag: false,
-    label: { it: 'Crampi', en: 'Crampy' } },
+    label: { it: 'Crampi', en: 'Crampy' },
+    hint: { it: 'Il muscolo si stringe da solo, all\'improvviso', en: 'The muscle suddenly locks up on its own' } },
   { code: 'sharp',   group: 'notice', clinical: 'nociceptive', redFlag: false,
-    label: { it: 'Fitta / acuta', en: 'Sharp' } },
+    label: { it: 'Fitta / acuta', en: 'Sharp' },
+    hint: { it: 'Un dolore breve e netto, come una puntura', en: 'A short, sharp jab, like a poke' } },
 
   // ── Gruppo "da far vedere" ── 🚩 instradano al Care da sole ───────────────
   { code: 'gives_way', group: 'flag', clinical: 'instability',  redFlag: true,
-    label: { it: 'Cede / instabile', en: 'Gives way / unstable' } },
+    label: { it: 'Cede / instabile', en: 'Gives way / unstable' },
+    hint: { it: 'Come se non reggesse il tuo peso', en: "Like it won't hold your weight" } },
   { code: 'swollen',   group: 'flag', clinical: 'inflammation', redFlag: true,
-    label: { it: 'Gonfia / calda al tatto', en: 'Swollen / hot' } },
+    label: { it: 'Gonfia / calda al tatto', en: 'Swollen / hot' },
+    hint: { it: 'Più grossa del solito, o calda se la tocchi', en: 'Bigger than usual, or warm to the touch' } },
 ]
 
-/** Le tre intensità. Tre livelli e non 1–5: più veloce e più onesto a 13 anni. */
+/** Scala a 5, su richiesta esplicita — più fine dei tre livelli originari. */
 export const INTENSITIES = [
-  { value: 1, label: { it: 'Un po\'',     en: 'A little' } },
-  { value: 2, label: { it: 'Abbastanza',  en: 'Quite a bit' } },
-  { value: 3, label: { it: 'Parecchio',   en: 'A lot' } },
+  { value: 1, label: { it: 'Un po\'',        en: 'A little' } },
+  { value: 2, label: { it: 'Un po\' di più', en: 'A bit more' } },
+  { value: 3, label: { it: 'Abbastanza',     en: 'Quite a bit' } },
+  { value: 4, label: { it: 'Parecchio',      en: 'A lot' } },
+  { value: 5, label: { it: 'Tantissimo',     en: 'A whole lot' } },
 ] as const
 
 /**

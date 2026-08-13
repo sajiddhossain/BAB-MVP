@@ -45,6 +45,7 @@ export default function Story() {
   const [on, setOn] = useState<BlockCode[]>(DEFAULT_BLOCKS)
   const [done, setDone] = useState<'idle' | 'saved'>('idle')
   const [copied, setCopied] = useState(false)
+  const [showStuck, setShowStuck] = useState(false)
 
   useEffect(() => {
     let alive = true
@@ -265,6 +266,18 @@ export default function Story() {
                 className="bab-pill self-start px-4 py-2 text-[14px]">
           {copied ? t.story.copied : t.story.copyWords}
         </button>
+
+        <button type="button" onClick={() => setShowStuck((v) => !v)}
+                className="self-start text-[13.5px] underline text-[var(--color-ink-soft)]">
+          {t.story.stuckTitle}
+        </button>
+        {showStuck && (
+          <ul className="flex flex-col gap-2">
+            {t.story.stuckPhrases.map((p, i) => (
+              <li key={i} className="bab-card px-3 py-2.5 text-[14px]">«{p}»</li>
+            ))}
+          </ul>
+        )}
       </section>
     </section>
   )

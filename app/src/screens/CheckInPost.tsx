@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { fill, plural, useCopy, useLocale } from '@/copy'
 import BodyMap from '@/components/BodyMap'
 import EmojiScale from '@/components/EmojiScale'
@@ -211,6 +211,10 @@ export default function CheckInPost() {
             {TEMPOS[actual].plan[locale].map((p, i) => <li key={i}>{p}</li>)}
           </ul>
         </section>
+
+        <Link to="/senti" className="bab-pill flex items-center justify-center gap-2 px-4 py-3 text-[15px]">
+          <span aria-hidden>🧭</span> {t.checkin.post.bodySenseCta}
+        </Link>
 
         <p className="text-center text-[13px] text-[var(--color-ink-soft)]">
           {saving ? t.checkin.post.saving : t.checkin.post.saved}

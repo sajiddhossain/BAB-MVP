@@ -183,6 +183,7 @@ export const it = {
     profileError: 'Non sono riuscita a salvare. Riprova.',
 
     rhythmTitle: 'Il tuo ritmo',
+    profileCycleHint: 'Sta in una sua schermata, separata: è la cosa più privata che teniamo.',
     rhythmBody: 'Puoi cambiare idea quando vuoi, in tutt\'e due i sensi.',
     /** 🔴 R3: la domanda sulla contraccezione esiste solo dai 15 in su. */
     rhythmContraception: 'Prendi la pillola o un altro contraccettivo ormonale?',
@@ -338,6 +339,8 @@ export const it = {
         elsewhere: 'Da un\'altra parte',
         where: 'Dove',
         whatLike: 'Come si sente?',
+        showHints: 'Cosa vogliono dire?',
+        hideHints: 'Nascondi',
         howStrong: 'Quanto è forte?',
         whatDoes: 'E cosa fa?',
       },
@@ -386,6 +389,7 @@ export const it = {
         notToday: 'Non oggi',
       },
       recoverLabel: 'Recupera — cosa chiede il tuo corpo adesso',
+      bodySenseCta: 'Allena la tua consapevolezza',
       saving: 'Salvo…',
       saved: 'Salvato. Anche senza campo: parte da solo quando torna.',
     },
@@ -541,6 +545,12 @@ export const it = {
     saidHelp: 'Copiale se ti aiutano — o dille a modo tuo, che è meglio.',
     copyWords: 'Copia queste parole',
     copied: 'Copiate ✓',
+    stuckTitle: 'Non sai da dove iniziare?',
+    stuckPhrases: [
+      'Vorrei farti vedere una cosa su come sto messa questa settimana.',
+      'Ho notato qualcosa nel mio corpo e volevo dirtelo prima che diventi un problema.',
+      'Ho bisogno di parlarti di come mi sento, hai due minuti dopo l\'allenamento?',
+    ],
     saved: 'Salvata',
     download: 'Salva l\'immagine',
     emptyState: 'Non hai ancora scelto niente — spunta almeno una cosa qui sopra e apparirà qui.',
@@ -691,6 +701,9 @@ export const it = {
     rhythmBody: 'Dopo il primo ciclo, anche il tuo corpo comincia a muoversi a modo suo. Il ciclo attraversa quattro fasi diverse, e crea un ritmo che tocca tutto — energia, umore, sonno, concentrazione — in un modo che è unico per te. BAB ti aiuta a capirlo.',
     rhythmYes: 'Sì, ce l\'ho',
     rhythmYesHelp: 'BAB mapperà le tue fasi dalle date che le dai',
+    firstPeriodAgeTitle: 'Se ti ricordi, quanti anni avevi quando ti è venuto la prima volta?',
+    firstPeriodAgeHelp: 'Solo se lo sai — non è un problema se non te lo ricordi.',
+    firstPeriodAgePlaceholder: 'Anni',
     rhythmNotYet: 'Non ancora',
     rhythmSkip: 'Preferisco non dirlo',
     datesTitle: 'Quando è stato il tuo ultimo ciclo?',
@@ -711,8 +724,11 @@ export const it = {
      * spegnimento.
      */
     cyclePrivacy: '**Il tuo staff vede le date del ciclo**, non quello che scrivi tu. Si spegne quando vuoi.',
-    doneTitle: 'Ecco fatto',
+    doneTitle: 'Ecco fatto, {name}',
     doneBody: 'Questo è quello che BAB sa di te. Puoi cambiare tutto dalle impostazioni.',
+    doneLastCycle: 'Ultimo ciclo',
+    doneCycleYearsOne: 'Ha il ciclo da circa {n} anno',
+    doneCycleYears: 'Ha il ciclo da circa {n} anni',
     doneCta: 'Inizia il mio primo check-in',
   },
 

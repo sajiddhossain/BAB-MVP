@@ -175,6 +175,8 @@ export type AthleteDraft = {
   birth_date: string
   sport?: string | null
   cycle_status: 'tracking' | 'not_yet' | 'undisclosed'
+  /** Quanti anni aveva al primo ciclo — facoltativo, "se se lo ricorda". */
+  first_period_age?: number | null
   contraception: 'natural' | 'hormonal' | 'unsure' | 'undisclosed'
   locale: string
   timezone?: string | null

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fill, useCopy, useLocale, type Locale } from '@/copy'
+import { fill, plural, useCopy, useLocale, type Locale } from '@/copy'
 import PillGroup from '@/components/PillGroup'
 import CalendarMultiSelect from '@/components/CalendarMultiSelect'
 import { Progress } from '@/components/Step'
@@ -114,7 +114,7 @@ type Step =
   | 'heartConcept' | 'heartSettle' | 'heartGuess' | 'heartCount' | 'heartReveal' | 'heartWrap'
   | 'whoSees' | 'consent' | 'name' | 'birthday' | 'sport'
   | 'trainDay' | 'trainStart' | 'trainEnd'
-  | 'pe' | 'events' | 'rhythm'
+  | 'pe' | 'events' | 'rhythm' | 'firstPeriodAge'
   | 'datesLast' | 'datesPrev' | 'datesBefore'
   | 'contraception' | 'done'
 
@@ -156,6 +156,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const [peDays, setPeDays] = useState<number[]>([])
   const [eventDate, setEventDate] = useState('')
   const [cycle, setCycle] = useState<CycleStatus | null>(null)
+  const [firstPeriodAge, setFirstPeriodAge] = useState<number | null>(null)
   const [lastCycleDays, setLastCycleDays] = useState<string[]>([])
   const [prevCycleStart, setPrevCycleStart] = useState<string[]>([])
   const [beforeCycleStart, setBeforeCycleStart] = useState<string[]>([])
@@ -193,7 +194,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       flow.push(`trainDay:${sport}`, `trainStart:${sport}`, `trainEnd:${sport}`)
     }
     flow.push('pe', 'events', 'rhythm')
-    if (cycle === 'tracking') flow.push('datesLast', 'datesPrev', 'datesBefore')
+    if (cycle === 'tracking') flow.push('firstPeriodAge', 'datesLast', 'datesPrev', 'datesBefore')
     if (asksContraception) flow.push('contraception')
     flow.push('done')
     return flow
@@ -215,6 +216,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           id: userId, display_name: name.trim(), birth_date: birth,
           sport: effectiveSports[0] ?? null,
           cycle_status: cycle ?? 'undisclosed',
+          first_period_age: firstPeriodAge,
           contraception: contraception ?? 'undisclosed',
           locale: locale as Locale,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -525,12 +527,26 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
          ['not_yet', t.onboarding.rhythmNotYet, undefined],
          ['undisclosed', t.onboarding.rhythmSkip, undefined]] as const).map(([k, label, help]) => (
         <button key={k} type="button"
-                onClick={() => { setCycle(k); setStep(k === 'tracking' ? 'datesLast' : 'done') }}
+                onClick={() => { setCycle(k); setStep(k === 'tracking' ? 'firstPeriodAge' : 'done') }}
                 className="bab-card flex flex-col gap-1 px-4 py-4 text-left">
           <span className="text-[16px] font-bold">{label}</span>
           {help && <span className="text-[13.5px] text-[var(--color-ink-soft)]">{help}</span>}
         </button>
       ))}
+    </Frame>
+  )
+
+  if (step === 'firstPeriodAge') return (
+    <Frame title={t.onboarding.firstPeriodAgeTitle} help={t.onboarding.firstPeriodAgeHelp}
+           next={() => setStep('datesLast')} canNext back onBack={() => setStep('rhythm')}
+           extra={{ label: t.onboarding.datesSkip, onClick: () => { setFirstPeriodAge(null); setStep('datesLast') } }}
+           {...F}>
+      <input type="number" inputMode="numeric" min={6} max={20}
+             value={firstPeriodAge ?? ''}
+             onChange={(e) => setFirstPeriodAge(e.target.value ? Number(e.target.value) : null)}
+             placeholder={t.onboarding.firstPeriodAgePlaceholder}
+             aria-label={t.onboarding.firstPeriodAgeTitle}
+             className="bab-card px-4 py-3 text-[16px]" />
     </Frame>
   )
 
@@ -579,9 +595,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   )
 
   const trainedSports = effectiveSports.filter((s) => (trainDaysBySport[s] ?? []).length)
+  /** La più vecchia delle date segnate per l'ultimo ciclo: è l'inizio. */
+  const lastCycleStart = lastCycleDays.length
+    ? lastCycleDays.slice().sort()[0]
+    : undefined
 
   return (
-    <Frame title={t.onboarding.doneTitle} help={t.onboarding.doneBody} {...F}>
+    <Frame title={fill(t.onboarding.doneTitle, { name })} help={t.onboarding.doneBody} {...F}>
       <dl className="bab-card flex flex-col gap-2 px-4 py-4 text-[15px]">
         <div><dt className="bab-label">{t.onboarding.nameTitle}</dt><dd>{name}</dd></div>
         {effectiveSports.length > 0 && (
@@ -607,9 +627,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           <div><dt className="bab-label">{t.onboarding.weekPe}</dt>
             <dd>{peDays.sort().map((d) => t.onboarding.weekdays[d - 1]).join(' · ')}</dd></div>
         )}
-        <div><dt className="bab-label">{t.rhythm.title}</dt>
-          <dd>{cycle === 'tracking' ? t.onboarding.rhythmYes
-             : cycle === 'not_yet' ? t.onboarding.rhythmNotYet : t.onboarding.rhythmSkip}</dd></div>
+        {cycle === 'tracking' && lastCycleStart && (
+          <div><dt className="bab-label">{t.onboarding.doneLastCycle}</dt>
+            <dd>{new Date(lastCycleStart).toLocaleDateString(locale, { day: 'numeric', month: 'long' })}</dd></div>
+        )}
+        {cycle === 'tracking' && firstPeriodAge !== null && age !== null && age >= firstPeriodAge && (
+          <div><dd>{plural(age - firstPeriodAge, t.onboarding.doneCycleYearsOne, t.onboarding.doneCycleYears)}</dd></div>
+        )}
       </dl>
       <button type="button" onClick={() => void finish()} disabled={saving}
               className="bab-pill px-4 py-3 text-[16px] disabled:opacity-60"

@@ -48,8 +48,13 @@ create table if not exists public.athletes (
   contraception  contraception not null default 'undisclosed',
   locale         text        not null default 'it' check (char_length(locale) <= 5),
   timezone       text        default 'Europe/Rome' check (char_length(timezone) <= 60),
+  -- Quanti anni aveva al primo ciclo, "se se lo ricorda" — facoltativo, serve a
+  -- leggere quanti anni sono passati rispetto a oggi.
+  first_period_age smallint check (first_period_age is null or first_period_age between 6 and 20),
   unique (athlete_code)
 );
+alter table public.athletes add column if not exists first_period_age smallint
+  check (first_period_age is null or first_period_age between 6 and 20);
 
 -- L'età serve in un punto solo: decidere se mostrare la domanda sulla
 -- contraccezione ormonale (R3, sopra i 15). NON serve più a scegliere la mappa

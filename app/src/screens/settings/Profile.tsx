@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useCopy, useLocale } from '@/copy'
 import PillGroup from '@/components/PillGroup'
 import { SPORTS } from '@/content/sports'
@@ -6,7 +7,15 @@ import { listSports } from '@/lib/repo'
 import { setSports } from '@/lib/sports'
 import { Pane, SaveButton, SaveNote, saveAndSettle, useProfileEdit } from './shell'
 
-/** I dati anagrafici, e basta. Il ciclo ha una schermata sua. */
+/**
+ * I dati anagrafici, e basta. Il ciclo ha una schermata sua.
+ *
+ * 🔴 Qui però c'è UN RIMANDO al ciclo, non il ciclo stesso — una riga sola,
+ * senza stato né valore, come le altre voci dell'indice impostazioni. Chi
+ * guarda lo schermo da dietro le spalle vede solo "Ciclo ›", non se lo tiene
+ * o cosa ha scritto: il contenuto vero resta comunque un tocco più in là,
+ * nella sua schermata.
+ */
 export default function SettingsProfile() {
   const t = useCopy()
   const locale = useLocale()
@@ -110,6 +119,15 @@ export default function SettingsProfile() {
 
       <SaveButton dirty={dirty} state={state} onClick={() => void commit(next)} />
       <SaveNote state={state} />
+
+      {/* Solo il rimando, mai il contenuto: vedi la nota in cima al file. */}
+      <Link to="/settings/ritmo" className="bab-card flex items-center gap-3 px-4 py-3.5">
+        <span className="flex flex-1 flex-col gap-0.5">
+          <span className="text-[16px] font-bold">{t.settings.rhythmTitle}</span>
+          <span className="text-[13.5px] text-[var(--color-ink-soft)]">{t.settings.profileCycleHint}</span>
+        </span>
+        <span aria-hidden className="text-[17px] text-[var(--color-ink-soft)]">→</span>
+      </Link>
     </Pane>
   )
 }

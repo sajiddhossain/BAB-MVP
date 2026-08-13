@@ -38,6 +38,7 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
   const [sens, setSens] = useState<string | null>(null)
   const [intensity, setIntensity] = useState<number | null>(null)
   const [behaviour, setBehaviour] = useState<string | null>(null)
+  const [showHints, setShowHints] = useState(false)
   const timer = useRef<number | undefined>(undefined)
 
   const title = region === 'other' && freeText.trim()
@@ -108,7 +109,7 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
             </h2>
             {chosen && (
               <p className="text-[13.5px] text-[var(--color-ink-soft)]">
-                {chosen.emoji} {chosen.label[locale]}
+                {chosen.emoji} {chosen.label[locale]} — {chosen.hint[locale]}
               </p>
             )}
           </div>
@@ -120,7 +121,23 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
 
         {!sens ? (
           <>
-            <p className="text-[15px] font-bold">{t.checkin.pre.pinpoint.whatLike}</p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[15px] font-bold">{t.checkin.pre.pinpoint.whatLike}</p>
+              <button type="button" onClick={() => setShowHints((v) => !v)}
+                      className="shrink-0 text-[12.5px] underline text-[var(--color-ink-soft)]">
+                {showHints ? t.checkin.pre.pinpoint.hideHints : t.checkin.pre.pinpoint.showHints}
+              </button>
+            </div>
+            {showHints && (
+              <ul className="bab-card flex flex-col gap-1.5 px-3.5 py-3 text-[13px]">
+                {SENSATIONS.map((s) => (
+                  <li key={s.code}>
+                    <span className="font-bold">{s.emoji} {s.label[locale]}</span>
+                    {' — '}<span className="text-[var(--color-ink-soft)]">{s.hint[locale]}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
             {(['good', 'notice', 'flag'] as const).map((g) => (
               <div key={g} className="flex flex-col gap-1.5">
                 <p className="text-[12px] text-[var(--color-ink-soft)]">{GROUP_LABEL[g][locale]}</p>
