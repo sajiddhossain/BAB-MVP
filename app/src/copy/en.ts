@@ -575,7 +575,7 @@ export const en: Copy = {
     birthdayTitle: 'When’s your birthday?',
     birthdayHelp: "Two reasons: so we can wish you a happy one, and so we know which questions make sense to ask you and which don't.",
     sportTitle: 'What sport do you do?',
-    sportHelp: 'It changes the words BAB uses with you — meets or matches, and what counts as a session.',
+    sportHelp: 'You can add more than one. It changes the words BAB uses with you — meets or matches, and what counts as a session.',
     sportLabel: 'Your sport',
     sportOtherPlaceholder: 'Type your sport',
     setUpLater: "I'll set this up later",

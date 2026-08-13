@@ -664,7 +664,7 @@ export const it = {
     birthdayTitle: 'Quando sei nata?',
     birthdayHelp: 'Serve a due cose: farti gli auguri e creare un percorso adatto a te',
     sportTitle: 'Che sport fai?',
-    sportHelp: 'Cambia il vocabolario che BAB usa con te — gare o partite, e cosa conta come sessione.',
+    sportHelp: 'Puoi anche inserirne più di uno. Cambia il vocabolario che BAB usa con te — gare o partite, e cosa conta come sessione.',
     sportLabel: 'Il tuo sport',
     sportOtherPlaceholder: 'Scrivi il tuo sport',
     setUpLater: 'Lo imposto dopo',

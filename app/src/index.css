@@ -34,11 +34,14 @@
      BAB palette. Lavender for Gentle is deliberate: it's the system's
      "mood / emotions" colour, and Gentle is the tempo that needs the
      most emotional permission to choose. */
-  --tempo-upbeat: var(--color-coral);
+  /* 🔴 Upbeat era lo stesso corallo di --care (il bottone "mi sono fatta
+     male"): due significati opposti — energia vs. dolore — con lo stesso
+     colore. Gold libero nella palette, e già evoca energia/carica. */
+  --tempo-upbeat: var(--color-gold);
   --tempo-steady: var(--color-teal);
   --tempo-gentle: var(--color-lavender);
 
-  --tempo-upbeat-tint: color-mix(in srgb, var(--color-coral) 14%, transparent);
+  --tempo-upbeat-tint: color-mix(in srgb, var(--color-gold) 16%, transparent);
   --tempo-steady-tint: color-mix(in srgb, var(--color-teal) 14%, transparent);
   --tempo-gentle-tint: color-mix(in srgb, var(--color-lavender) 18%, transparent);
 
