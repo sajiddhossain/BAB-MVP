@@ -312,7 +312,7 @@ export default function CheckInPre() {
               </span>
               <button type="button" onClick={() => setSignals((p) => p.filter((_, j) => j !== i))}
                       aria-label={t.checkin.common.remove}
-                      className="flex h-6 w-6 items-center justify-center rounded-full text-[13px] text-[var(--color-ink-soft)]"
+                      className="relative flex h-6 w-6 items-center justify-center rounded-full text-[13px] text-[var(--color-ink-soft)] before:absolute before:-inset-2.5 before:content-['']"
                       style={{ background: 'var(--color-sand)' }}>
                 <span aria-hidden>✕</span>
               </button>

@@ -447,6 +447,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
            next={() => setStep('birthday')} canNext={name.trim().length > 0} back onBack={() => setStep('consent')} {...F}>
       <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40}
              placeholder={t.onboarding.namePlaceholder} autoComplete="given-name"
+             aria-label={t.onboarding.nameTitle}
              className="bab-card px-4 py-3 text-[16px]" />
     </Frame>
   )

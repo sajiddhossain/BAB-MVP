@@ -55,11 +55,11 @@ export default function CalendarMultiSelect({ selected, onChange, label, multipl
       <div className="flex items-center justify-between px-1">
         <button type="button" aria-label="Mese precedente"
                 onClick={() => setView(new Date(year, month - 1, 1))}
-                className="bab-pill h-7 w-7 text-[13px]">‹</button>
+                className="bab-pill h-11 w-11 text-[13px]">‹</button>
         <span className="text-[13px] font-bold capitalize">{monthLabel}</span>
         <button type="button" aria-label="Mese successivo" disabled={isCurrentMonth}
                 onClick={() => setView(new Date(year, month + 1, 1))}
-                className="bab-pill h-7 w-7 text-[13px] disabled:opacity-30">›</button>
+                className="bab-pill h-11 w-11 text-[13px] disabled:opacity-30">›</button>
       </div>
       <div className="grid grid-cols-7 text-center text-[10.5px] text-[var(--color-ink-soft)]">
         {WEEKDAY_LETTERS.map((d, i) => <span key={i}>{d}</span>)}
@@ -77,7 +77,7 @@ export default function CalendarMultiSelect({ selected, onChange, label, multipl
           return (
             <button key={iso} type="button" disabled={future} onClick={() => toggle(d)}
                     aria-pressed={on}
-                    className="bab-pill h-8 w-8 px-0 text-[12px] disabled:opacity-25"
+                    className="bab-pill h-11 w-11 px-0 text-[12px] disabled:opacity-25"
                     style={on
                       ? { background: 'var(--color-teal)', borderColor: 'var(--color-teal)', color: 'var(--color-surface)' }
                       : undefined}>

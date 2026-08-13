@@ -46,7 +46,12 @@
   --tempo-gentle-tint: color-mix(in srgb, var(--color-lavender) 18%, transparent);
 
   /* ── Semantic: states ── */
-  --care: var(--color-coral);
+  /* 🔴 NON --color-coral diretto: quel corallo è ~2.8:1 su bianco, sotto il
+     4.5:1 richiesto per il testo AA — e --care è usato ovunque come testo
+     ("mi sono fatta male", bandiere rosse, avvisi). Questa è una tonalità
+     più scura della stessa famiglia, ~5:1 su bianco. --care-tint resta sul
+     corallo originale apposta: è solo uno sfondo, mai testo sopra. */
+  --care: #c73f2e;
   --care-tint: color-mix(in srgb, var(--color-coral) 12%, transparent);
   --cycle: var(--color-pink);
   --cycle-tint: color-mix(in srgb, var(--color-pink) 14%, transparent);

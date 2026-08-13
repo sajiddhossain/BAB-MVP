@@ -104,6 +104,7 @@ export default function SettingsProfile() {
           <input value={otherSport}
                  onChange={(e) => { setOtherSport(e.target.value); setSportsSaveState('idle') }}
                  maxLength={40} placeholder={t.onboarding.sportOtherPlaceholder}
+                 aria-label={t.onboarding.sportOtherPlaceholder}
                  className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />
         )}
         <SaveButton dirty={sportsDirty} state={sportsState} onClick={() => void saveSportsList()} />

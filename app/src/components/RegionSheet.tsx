@@ -124,12 +124,13 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
             <div className="flex items-center justify-between gap-2">
               <p className="text-[15px] font-bold">{t.checkin.pre.pinpoint.whatLike}</p>
               <button type="button" onClick={() => setShowHints((v) => !v)}
+                      aria-expanded={showHints} aria-controls="region-sheet-hints"
                       className="shrink-0 text-[12.5px] underline text-[var(--color-ink-soft)]">
                 {showHints ? t.checkin.pre.pinpoint.hideHints : t.checkin.pre.pinpoint.showHints}
               </button>
             </div>
             {showHints && (
-              <ul className="bab-card flex flex-col gap-1.5 px-3.5 py-3 text-[13px]">
+              <ul id="region-sheet-hints" className="bab-card flex flex-col gap-1.5 px-3.5 py-3 text-[13px]">
                 {SENSATIONS.map((s) => (
                   <li key={s.code}>
                     <span className="font-bold">{s.emoji} {s.label[locale]}</span>

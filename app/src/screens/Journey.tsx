@@ -136,6 +136,7 @@ export default function Journey() {
           <p className="text-[14.5px]">{week.reflect[locale]}</p>
           <textarea value={reflection} onChange={(e) => { setReflection(e.target.value); setSaveState('idle') }}
                     maxLength={1000} rows={4} placeholder={t.journey.reflectPlaceholder}
+                    aria-label={week.reflect[locale]}
                     className="bab-card px-3 py-2.5 text-[15px]" />
           <button type="button" onClick={() => void saveReflection(week.week)}
                   disabled={saveState === 'saving'}

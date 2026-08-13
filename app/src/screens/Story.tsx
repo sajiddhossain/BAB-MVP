@@ -268,11 +268,12 @@ export default function Story() {
         </button>
 
         <button type="button" onClick={() => setShowStuck((v) => !v)}
+                aria-expanded={showStuck} aria-controls="story-stuck-phrases"
                 className="self-start text-[13.5px] underline text-[var(--color-ink-soft)]">
           {t.story.stuckTitle}
         </button>
         {showStuck && (
-          <ul className="flex flex-col gap-2">
+          <ul id="story-stuck-phrases" className="flex flex-col gap-2">
             {t.story.stuckPhrases.map((p, i) => (
               <li key={i} className="bab-card px-3 py-2.5 text-[14px]">«{p}»</li>
             ))}
