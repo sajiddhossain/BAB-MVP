@@ -159,3 +159,31 @@ export async function consents(): Promise<Consent[]> {
   if (error) throw new Error(error.message)
   return (data ?? []) as Consent[]
 }
+
+/**
+ * I tre numeri del pilota (`docs/05-roadmap/01-piano-mvp.md`): erano scritti
+ * dal primo giorno, mai letti da nessuno schermo. Vedi `admin_instrumentation`
+ * in schema.sql per come sono calcolati — solo aggregati, mai un check-in solo.
+ */
+export type Instrumentation = {
+  checkins_30d: number
+  timed_30d: number
+  median_seconds_pre_30d: number | null
+  median_seconds_post_30d: number | null
+  suggested_pairs_30d: number
+  suggested_overridden_30d: number
+}
+
+export async function instrumentation(): Promise<Instrumentation | null> {
+  const { data, error } = await need().from('admin_instrumentation').select('*').maybeSingle()
+  if (error) throw new Error(error.message)
+  return (data as Instrumentation) ?? null
+}
+
+export type SkippedField = { field: string; n: number }
+
+export async function skippedFields(): Promise<SkippedField[]> {
+  const { data, error } = await need().from('admin_skipped_fields').select('field, n')
+  if (error) throw new Error(error.message)
+  return (data ?? []) as SkippedField[]
+}

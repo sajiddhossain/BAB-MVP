@@ -19,6 +19,7 @@ export const TABS = [
   { to: '/admin/squadre', label: 'Squadre' },
   { to: '/admin/bandiere', label: 'Bandiere rosse' },
   { to: '/admin/consensi', label: 'Consensi' },
+  { to: '/admin/strumentazione', label: 'Strumentazione pilota' },
 ]
 
 export function Card({ title, children, wide = false }: {

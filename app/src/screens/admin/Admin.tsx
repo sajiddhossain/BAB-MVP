@@ -3,6 +3,7 @@ import Pulse from './Pulse'
 import Teams from './Teams'
 import Flags from './Flags'
 import Consents from './Consents'
+import Instrumentation from './Instrumentation'
 import { Tab, TABS } from './shell'
 
 /**
@@ -38,6 +39,7 @@ export default function Admin() {
         <Route path="/squadre" element={<Teams />} />
         <Route path="/bandiere" element={<Flags />} />
         <Route path="/consensi" element={<Consents />} />
+        <Route path="/strumentazione" element={<Instrumentation />} />
       </Routes>
 
       {/* 🔴 Quello che questa console NON mostra, e non per dimenticanza. */}

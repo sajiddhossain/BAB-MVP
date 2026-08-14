@@ -889,8 +889,60 @@ create or replace view public.admin_pulse as
     (select count(*) from public.consents where granted = false)               as consents_refused
   where public.is_admin();
 
+-- ── STRUMENTAZIONE DEL PILOTA ──────────────────────────────────────────────
+-- I tre numeri di `docs/05-roadmap/01-piano-mvp.md`: erano scritti dal primo
+-- giorno (`started_at`/`completed_at`, `tempo_suggested`/`tempo_chosen`,
+-- `skipped_fields`), ma nessuno schermo li leggeva — restavano salvati e
+-- basta. Come `admin_pulse`: solo numeri aggregati, mai un check-in singolo.
+--
+-- 🔴 La mediana, non la media, per i secondi: un solo check-in lasciato
+-- aperto per un'ora (telefono in tasca, non un tempo vero) sposterebbe una
+-- media di parecchio; la mediana no.
+create or replace view public.admin_instrumentation as
+  select
+    -- Quanti check-in hanno DAVVERO le due marche temporali: se questo è
+    -- basso, il problema non è "quanto ci mette", è che il dato non arriva.
+    (select count(*) from public.check_ins
+      where local_date >= current_date - 30)                                      as checkins_30d,
+    (select count(*) from public.check_ins
+      where local_date >= current_date - 30
+        and started_at is not null and completed_at is not null)                   as timed_30d,
+    (select round(percentile_cont(0.5) within group (
+        order by extract(epoch from (completed_at - started_at))))::int
+      from public.check_ins
+      where kind = 'pre' and local_date >= current_date - 30
+        and started_at is not null and completed_at is not null
+        and completed_at >= started_at)                                           as median_seconds_pre_30d,
+    (select round(percentile_cont(0.5) within group (
+        order by extract(epoch from (completed_at - started_at))))::int
+      from public.check_ins
+      where kind = 'post' and local_date >= current_date - 30
+        and started_at is not null and completed_at is not null
+        and completed_at >= started_at)                                           as median_seconds_post_30d,
+    -- Suggerito vs scelto: entrambi stanno sulla riga 'pre' (§ lib/tempo.ts).
+    -- È l'atleta che corregge il modello — quante volte lo fa davvero.
+    (select count(*) from public.check_ins
+      where kind = 'pre' and local_date >= current_date - 30
+        and tempo_suggested is not null and tempo_chosen is not null)              as suggested_pairs_30d,
+    (select count(*) from public.check_ins
+      where kind = 'pre' and local_date >= current_date - 30
+        and tempo_suggested is not null and tempo_chosen is not null
+        and tempo_suggested <> tempo_chosen)                                       as suggested_overridden_30d
+  where public.is_admin();
+
+-- Quali domande salta più spesso, sommato su tutte: dice dove il check-in fa
+-- attrito, non chi lo prova. `field` è il nome colonna che c'è già nel codice
+-- (`CheckInPre.MAIN`/`CheckInPost.MAIN`), non un'etichetta scritta qui apposta.
+create or replace view public.admin_skipped_fields as
+  select field, count(*) as n
+  from public.check_ins, unnest(skipped_fields) as field
+  where local_date >= current_date - 30 and public.is_admin()
+  group by field
+  order by n desc;
+
 grant select on public.admin_athletes, public.admin_staff, public.admin_consents,
-                public.admin_red_flags, public.admin_pulse
+                public.admin_red_flags, public.admin_pulse,
+                public.admin_instrumentation, public.admin_skipped_fields
   to authenticated;
 
 revoke all on function public.admin_attach_staff(uuid, text, text)   from public;
