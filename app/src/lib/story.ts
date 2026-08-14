@@ -15,7 +15,7 @@ export type Week = {
   days: string[]
   /** L'andatura di ogni giorno, `null` dove non si è allenata o non ha chiuso. */
   tempos: (TempoCode | null)[]
-  /** Energia 1–5 per giorno, per la linea. `null` dove manca. */
+  /** Energia 1–7 per giorno (canale pre, Hooper), per la linea. `null` dove manca. */
   energy: (number | null)[]
   /** I punti più ricorrenti, al massimo tre. */
   spots: { region: RegionCode; sensation: string; times: number }[]

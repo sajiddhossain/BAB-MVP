@@ -110,8 +110,11 @@ export default function Story() {
   ) })
 
   if (shown.includes('energy')) sections.push({ h: 52, render: (y) => {
+    // 🔴 L'energia qui è quella del check-in pre, 1-7 (Hooper — vedi
+    // content/channels.ts): (e-1)/6 la porta a 0-1, non (e-1)/4 come quando
+    // era 1-5. Sbagliarlo non dà un errore, disegna solo la linea storta.
     const pts = week.energy
-      .map((e, i) => (e === null ? null : `${PAD + i * 46},${y + 40 - ((e - 1) / 4) * 26}`))
+      .map((e, i) => (e === null ? null : `${PAD + i * 46},${y + 40 - ((e - 1) / 6) * 26}`))
       .filter(Boolean).join(' ')
     return (
       <g key="energy">

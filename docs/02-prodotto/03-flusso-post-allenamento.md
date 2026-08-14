@@ -122,6 +122,13 @@ bodyAvg = (legs + breath + energy + headspaceValue) / 4
 effort  = 1..5
 ```
 
+⚠️ **Nell'app `effort` è 0–10** (scala RPE standard, CR-10 di Foster — la spec
+originale della founder la chiedeva esplicitamente), non 1–5 come nel prototipo
+qui sotto. Le soglie `effort ≥ 4` e `effort ≤ 2` nella tabella sono quelle del
+prototipo; nel codice (`content/outcomes.ts`) sono `effort ≥ 7` e `effort ≤ 3`
+— stessa posizione relativa sulla nuova scala, non un'altra soglia. `bodyAvg`
+resta 1–5, invariato.
+
 | Andatura | Condizione | Titolo | Messaggio |
 |---|---|---|---|
 | ⚡ Upbeat | `bodyAvg ≥ 3.5` | 🎯 **Lettura perfetta** | Ti sei fidata di te per un giorno Upbeat e il tuo corpo l'ha gestito bene. Fissa come si sente questo — è il tuo riferimento per un buon giorno Upbeat con recupero. |
