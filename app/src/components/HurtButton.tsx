@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCopy } from '@/copy'
 import HurtPanel from './HurtPanel'
+import { BandageIcon } from './icons'
 
 /**
  * §5: la segnalazione di una bandiera rossa acuta è sempre a un tocco, da
@@ -16,10 +17,10 @@ export default function HurtButton() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="bab-pill px-4 py-2 text-[13px]"
+          className="bab-pill flex items-center gap-1.5 px-4 py-2 text-[13px]"
           style={{ background: 'var(--care-tint)', borderColor: 'var(--care)', color: 'var(--care)' }}
         >
-          🩹 {t.hurt.button}
+          <BandageIcon size={15} /> {t.hurt.button}
         </button>
       </div>
       {open && <HurtPanel onClose={() => setOpen(false)} />}

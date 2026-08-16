@@ -150,6 +150,16 @@ export function LockIcon({ size = 24, color = 'currentColor' }: IconProps) {
   )
 }
 
+/** «Mi sono fatta male» — un cerotto, non una faccina di dolore: descrive l'azione, non giudica lo stato. */
+export function BandageIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <rect x="2.5" y="8.5" width="19" height="7" rx="3.5" stroke={color} {...base} transform="rotate(-35 12 12)" />
+      <path d="M9.5 8.7a2 2 0 1 1 4 4M14.5 15.3a2 2 0 1 1-4-4" stroke={color} {...base} transform="rotate(-35 12 12)" />
+    </svg>
+  )
+}
+
 /* ── Icone per Body-Sense e il lessico delle sensazioni ──────────────────
    Sostituiscono le emoji nei contenuti tradotti di `content/bodysense.ts`
    e `content/lexicon.ts`. Ogni content-file ora porta una chiave (`icon`)
