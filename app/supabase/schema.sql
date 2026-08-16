@@ -657,6 +657,13 @@ create or replace view public.coach_athletes as
   join public.team_members m on m.athlete_id = a.id and m.left_at is null
   where public.is_staff_of_team(m.team_id);
 
+-- 🔴 `drop` prima di `create`, qui e solo qui: Postgres rifiuta un
+-- `create or replace view` che rinomina o sposta una colonna già esistente
+-- alla stessa posizione ("cannot change name of view column"), e questa vista
+-- ha guadagnato mood/satisfaction/on_period in mezzo alle colonne vecchie, non
+-- in fondo. Nessuna vista dipende da questa, quindi il drop è sicuro — i
+-- permessi si riapplicano subito dopo con il `grant` più sotto.
+drop view if exists public.coach_check_ins;
 create or replace view public.coach_check_ins as
   select id, athlete_id, kind, local_date, created_at,
          tempo_predicted, prediction_confidence, tempo_suggested, tempo_chosen,
