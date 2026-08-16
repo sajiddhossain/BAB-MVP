@@ -12,6 +12,7 @@ import { GEOMETRY } from '@/components/body-shapes'
 import { isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
+import Sparkle from '@/components/Sparkle'
 import { norm, RANGES, recovery, predictionError } from '@/lib/tempo'
 import { saveCheckIn, checkInsOn, localDate, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -161,14 +162,17 @@ export default function CheckInPost() {
   if (done && actual && effortNorm !== null && recovered !== null) {
     const outcome = OUTCOMES[pickOutcome(actual, effortNorm, recovered)]
     const gap = predicted ? predictionError(predicted, actual) : null
+    // 🔴 Come nel pre: niente scintillio sopra una bandiera rossa.
+    const hasRedFlag = signals.some((s) => s.is_red_flag)
 
     return (
       <div className="flex flex-col gap-5 pt-2">
         <p className="bab-label">{t.checkin.post.learnLabel}</p>
 
         {/* Il protagonista: cosa è successo oggi, detto in una frase sola. */}
-        <section className="bab-card flex flex-col gap-3 px-5 py-5"
+        <section className="bab-card relative flex flex-col gap-3 px-5 py-5"
                  style={{ boxShadow: 'var(--shadow-lg)' }}>
+          {!hasRedFlag && <Sparkle />}
           <span className="text-[40px] leading-none" aria-hidden>{outcome.emoji}</span>
           <h1 className="font-display text-[24px] leading-tight">{outcome.title[locale]}</h1>
           <p className="text-[15px]"><Rich text={outcome.body[locale]} /></p>

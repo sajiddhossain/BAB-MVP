@@ -13,6 +13,7 @@ import { GEOMETRY } from '@/components/body-shapes'
 import { SENSATIONS, isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { CARE, DECODE_ACHE } from '@/content/clinical'
+import Sparkle from '@/components/Sparkle'
 import { total, suggestWithPain, type Channels } from '@/lib/tempo'
 import { saveCheckIn, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -231,10 +232,13 @@ export default function CheckInPre() {
         {/* 🔴 Il protagonista della schermata, e si vede: è l'unico oggetto con
             l'ombra da 8px e il colore pieno dell'andatura. Prima erano quattro
             card identiche, e il piano di oggi pesava quanto il selettore. */}
-        <section className="bab-card flex flex-col gap-3 px-5 py-5"
+        <section className="bab-card relative flex flex-col gap-3 px-5 py-5"
                  style={{ background: `var(--tempo-${result.chosen}-tint)`,
                           borderColor: `var(--tempo-${result.chosen})`,
                           boxShadow: 'var(--shadow-lg)' }}>
+          {/* 🔴 Mai se è in corso il Care mode: uno scintillio sopra un
+              avviso di dolore protettivo sarebbe fuori luogo, non festoso. */}
+          {!careOn && <Sparkle />}
           <p className="bab-label">{t.checkin.pre.result.planLabel}</p>
           <div className="flex items-center gap-3">
             <span className="text-[40px] leading-none" aria-hidden>{tempo.emoji}</span>

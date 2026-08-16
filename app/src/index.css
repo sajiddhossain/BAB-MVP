@@ -265,3 +265,17 @@ button, a[role="button"], input, select {
 /* Non ancora risposto: la riga c'è, il cursore no. */
 .bab-vas[aria-valuetext="—"]::-webkit-slider-thumb { opacity: 0; }
 .bab-vas[aria-valuetext="—"]::-moz-range-thumb { opacity: 0; }
+
+/* Lo scintillio di fine check-in — vedi `Sparkle.tsx` per il perché.
+   Compare, gira un po', sparisce: `forwards` lo lascia a opacità 0 alla
+   fine invece di tornare al frame iniziale, così non c'è uno scatto quando
+   l'animazione finisce. */
+@keyframes bab-sparkle-pop {
+  0%   { transform: scale(0) rotate(0deg); opacity: 0; }
+  35%  { transform: scale(1.15) rotate(10deg); opacity: 1; }
+  60%  { transform: scale(0.9) rotate(-6deg); opacity: 1; }
+  100% { transform: scale(0.8) rotate(0deg); opacity: 0; }
+}
+.bab-sparkle {
+  animation: bab-sparkle-pop 1.1s ease-out both;
+}
