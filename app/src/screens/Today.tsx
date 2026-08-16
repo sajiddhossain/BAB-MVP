@@ -4,7 +4,8 @@ import { useCopy, useLocale } from '@/copy'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { checkInsOn, localDate } from '@/lib/repo'
 import Mascot from '@/components/Mascot'
-import { CompassIcon, SunIcon, TempoIcon } from '@/components/icons'
+import Loading from '@/components/Loading'
+import { ArrowRightIcon, CompassIcon, SunIcon, TempoIcon } from '@/components/icons'
 
 /** Il cerchio colorato dietro un'icona — stessa idea in ogni stato, colore diverso. */
 function Badge({ children, bg }: { children: React.ReactNode; bg: string }) {
@@ -62,7 +63,7 @@ export default function Today() {
   }, [])
 
   if (state.kind === 'loading') {
-    return <p className="pt-6 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
+    return <Loading label={t.common.loading} />
   }
 
   return (
@@ -142,7 +143,7 @@ export default function Today() {
           <p className="font-display text-[16px]">{t.bodySense.entryTitle}</p>
           <p className="text-[13px] text-[var(--color-ink-soft)]">{t.bodySense.entryBody}</p>
         </div>
-        <span aria-hidden className="text-[18px] text-[var(--color-ink-soft)]">→</span>
+        <ArrowRightIcon size={18} color="var(--color-ink-soft)" />
       </Link>
     </section>
   )

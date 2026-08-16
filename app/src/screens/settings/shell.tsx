@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCopy } from '@/copy'
+import { ArrowLeftIcon } from '@/components/icons'
 import { getProfile, updateProfile, type ProfilePatch } from '@/lib/repo'
 import { useSession } from '@/lib/session'
 import { flush } from '@/lib/sync'
@@ -29,8 +30,8 @@ export function Pane({ title, help, children, back = '/settings' }: {
     <section className="flex flex-col gap-4 pt-2">
       <div className="flex items-center gap-3">
         <Link to={back} aria-label={t.settings.back}
-              className="bab-pill flex h-11 w-11 shrink-0 items-center justify-center text-[17px]">
-          <span aria-hidden>←</span>
+              className="bab-pill flex h-11 w-11 shrink-0 items-center justify-center">
+          <ArrowLeftIcon size={18} />
         </Link>
         <h1 className="font-display text-[24px] leading-tight">{title}</h1>
       </div>

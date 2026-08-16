@@ -10,7 +10,7 @@ import {
   type ExerciseId, type PickOption, type Step, type When,
 } from '@/content/bodysense'
 import Mascot from '@/components/Mascot'
-import { ContentIcon, type IconKey } from '@/components/icons'
+import { ClockIcon, CloseIcon, ContentIcon, QuestionIcon, type IconKey } from '@/components/icons'
 
 /**
  * Body-Sense — piccoli esercizi di interocezione, fuori dall'onboarding: si
@@ -167,7 +167,9 @@ export default function BodySense() {
             <ContentIcon name={c.icon} size={26} color="var(--color-vividteal)" />
             <span className="font-display text-[15px] leading-tight">{c.name}</span>
             <span className="text-[11px] font-bold" style={{ color: 'var(--color-vividteal)' }}>{c.trains}</span>
-            <span className="mt-auto text-[11px] text-[var(--color-ink-soft)]">⏱ {c.dur}</span>
+            <span className="mt-auto flex items-center gap-1 text-[11px] text-[var(--color-ink-soft)]">
+              <ClockIcon size={12} color="var(--color-ink-soft)" /> {c.dur}
+            </span>
           </button>
         ))}
       </div>
@@ -215,8 +217,9 @@ function Player({
           <ContentIcon name={ex.icon} size={15} color="var(--color-vividteal)" /> {ex.name[locale]}
         </span>
         <button type="button" onClick={onClose} aria-label={t.bodySense.close}
-                className="flex h-9 w-9 items-center justify-center text-[20px] text-[var(--color-ink-soft)]">
-          ✕
+                className="flex h-9 w-9 items-center justify-center rounded-full"
+                style={{ background: 'var(--color-sand)' }}>
+          <CloseIcon size={16} color="var(--color-ink-soft)" />
         </button>
       </div>
       <div className="mb-4"><Progress at={stepIdx + 1} of={totalSteps} /></div>
@@ -305,7 +308,7 @@ function Reveal({ exId, data }: { exId: ExerciseId; data: Record<string, string>
       <span className="inline-flex items-center gap-1.5">
         <ContentIcon name={TWOSIDES_OPT[v].icon} size={16} /> {TWOSIDES_OPT[v].label[locale]}
       </span>
-    ) : <>—</>
+    ) : <QuestionIcon size={16} color="var(--color-ink-soft)" />
     return (
       <>
         <div className="grid grid-cols-2 gap-2">
@@ -372,8 +375,9 @@ function HeartbeatPlayer({ stepIdx, isLast, heartGuess, setHeartGuess, heartTaps
           <ContentIcon name="heart" size={15} color="var(--color-vividteal)" /> {t.bodySense.heartbeatName}
         </span>
         <button type="button" onClick={onClose} aria-label={t.bodySense.close}
-                className="flex h-9 w-9 items-center justify-center text-[20px] text-[var(--color-ink-soft)]">
-          ✕
+                className="flex h-9 w-9 items-center justify-center rounded-full"
+                style={{ background: 'var(--color-sand)' }}>
+          <CloseIcon size={16} color="var(--color-ink-soft)" />
         </button>
       </div>
       <div className="mb-4"><Progress at={stepIdx + 1} of={3} /></div>

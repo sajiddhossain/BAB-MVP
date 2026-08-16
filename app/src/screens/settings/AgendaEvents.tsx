@@ -4,6 +4,8 @@ import PillGroup from '@/components/PillGroup'
 import { listAthleteEvents, localDate, removeAthleteEvent, saveAthleteEvent } from '@/lib/repo'
 import { useSession } from '@/lib/session'
 import { Pane, SaveNote, saveAndSettle, type SaveState } from './shell'
+import { DateField } from '@/components/fields'
+import Loading from '@/components/Loading'
 
 /**
  * Gare e partite. Sono date, non giorni della settimana: una gara non torna
@@ -92,7 +94,7 @@ export default function AgendaEvents() {
   return (
     <Pane title={t.onboarding.weekEvents} help={t.settings.agendaEventsHelp} back="/settings/agenda">
       {rows === null ? (
-        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
+        <Loading label={t.common.loading} />
       ) : (
         <>
           {upcoming.length > 0 && (
@@ -106,9 +108,8 @@ export default function AgendaEvents() {
             <h2 className="font-display text-[17px]">{t.settings.agendaAddEvent}</h2>
             <label className="flex flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
               {t.onboarding.eventDateLabel}
-              <input type="date" value={date} min={today}
-                     onChange={(e) => { setDate(e.target.value); setState('idle') }}
-                     className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />
+              <DateField value={date} min={today} ariaLabel={t.onboarding.eventDateLabel}
+                         onChange={(v) => { setDate(v); setState('idle') }} />
             </label>
             <PillGroup
               label={t.settings.agendaKindLabel} value={kind}

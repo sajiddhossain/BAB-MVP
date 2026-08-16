@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { plural, useCopy, useLocale } from '@/copy'
 import { endTimeOf, entriesOf, sportsOf, timeOf, type Entry } from '@/lib/agenda'
 import { listAthleteEvents, listSchedule } from '@/lib/repo'
+import { ArrowRightIcon } from '@/components/icons'
 import { sportLabel } from '@/content/sports'
 import { Pane } from './shell'
 
@@ -146,7 +147,7 @@ export default function SettingsAgenda() {
               <span className="text-[16px] font-bold">{r.title}</span>
               <span className="text-[13.5px] text-[var(--color-ink-soft)]">{r.value}</span>
             </span>
-            <span aria-hidden className="text-[17px] text-[var(--color-ink-soft)]">→</span>
+            <ArrowRightIcon size={17} color="var(--color-ink-soft)" />
           </Link>
         ))}
       </nav>

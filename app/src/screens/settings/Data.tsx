@@ -6,6 +6,7 @@ import { useSession } from '@/lib/session'
 import { parked } from '@/lib/sync'
 import * as db from '@/lib/db'
 import { Pane } from './shell'
+import { CloudRainIcon } from '@/components/icons'
 
 /** §9 · Il primo dei due diritti: portarsi via i propri dati. */
 
@@ -66,7 +67,11 @@ export default function SettingsData() {
         </div>
       )}
       {exp.k === 'error' && (
-        <p className="text-[14px]" style={{ color: 'var(--care)' }}>{t.settings.exportError}</p>
+        <div className="bab-card flex items-center gap-2.5 px-4 py-3"
+             style={{ background: 'var(--care-tint)', borderColor: 'var(--care)' }} role="alert">
+          <CloudRainIcon size={20} color="var(--care)" />
+          <p className="text-[14px]">{t.settings.exportError}</p>
+        </div>
       )}
 
       {/* La via per capire cosa sta succedendo davvero, dove si va a

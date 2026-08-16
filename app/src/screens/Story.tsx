@@ -8,7 +8,8 @@ import { PHASES, readCycle } from '@/content/cycle'
 import { useSession } from '@/lib/session'
 import type { Row } from '@/lib/insights'
 import Mascot from '@/components/Mascot'
-import { PinIcon, TempoIcon } from '@/components/icons'
+import Loading from '@/components/Loading'
+import { CheckIcon, PinIcon, TempoIcon } from '@/components/icons'
 
 /**
  * La body-story — l'output "Communicate" del §11.
@@ -76,7 +77,7 @@ export default function Story() {
   }, [week, locale, t])
 
   if (!week) {
-    return <p className="pt-6 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
+    return <Loading label={t.common.loading} />
   }
 
   const shown = on.filter((b) => hasContent(week, b, phase))
@@ -219,7 +220,14 @@ export default function Story() {
                     borderColor: b.code === 'cycle' ? 'var(--cycle)' : 'var(--color-teal)' }
                 : undefined}
             >
-              <span className="text-[15px] font-bold">{active && !empty ? '☑ ' : '☐ '}{b.label}</span>
+              <span className="flex items-center gap-1.5 text-[15px] font-bold">
+                <span aria-hidden className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded"
+                      style={{ border: 'var(--bab-border) solid var(--color-ink)',
+                               background: active && !empty ? 'var(--color-lime)' : 'var(--color-surface)' }}>
+                  {active && !empty && <CheckIcon size={11} />}
+                </span>
+                {b.label}
+              </span>
               <span className="text-[12.5px] text-[var(--color-ink-soft)]">{b.help}</span>
             </button>
           )

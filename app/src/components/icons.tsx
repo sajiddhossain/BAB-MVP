@@ -141,6 +141,33 @@ export function CheckIcon({ size = 24, color = 'currentColor' }: IconProps) {
   )
 }
 
+/** Chiudere — una X disegnata a mano, non il glifo di sistema "✕". */
+export function CloseIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M6 6l12 12M18 6L6 18" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function CalendarIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <rect x="3.5" y="5" width="17" height="15" rx="2.5" stroke={color} {...base} />
+      <path d="M3.5 9.5h17M8 3v3.5M16 3v3.5" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function ClockIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <circle cx="12" cy="12" r="9" stroke={color} {...base} />
+      <path d="M12 7v5.5l3.6 2.1" stroke={color} {...base} />
+    </svg>
+  )
+}
+
 export function LockIcon({ size = 24, color = 'currentColor' }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>

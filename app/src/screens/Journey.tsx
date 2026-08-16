@@ -9,6 +9,7 @@ import { recentCheckIns, recentSignals, listJourney, saveJourneyWeek } from '@/l
 import { useSession } from '@/lib/session'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
+import Loading from '@/components/Loading'
 import { CheckIcon, EyeIcon, LockIcon, PlayIcon, PuzzleIcon, TargetIcon } from '@/components/icons'
 
 /** Icona del mese — occhio per «riconosci» (mese 1), puzzle per «capisci» (mese 2). */
@@ -93,7 +94,7 @@ export default function Journey() {
   }, [checkIns, signals, rows, atWeek, userId])
 
   if (!checkIns) {
-    return <p className="pt-6 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
+    return <Loading label={t.common.loading} />
   }
 
   function open(week: JourneyWeek) {

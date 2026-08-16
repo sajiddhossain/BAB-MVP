@@ -6,6 +6,8 @@ import { SPORTS } from '@/content/sports'
 import { listSports } from '@/lib/repo'
 import { setSports } from '@/lib/sports'
 import { Pane, SaveButton, SaveNote, saveAndSettle, useProfileEdit } from './shell'
+import { DateField } from '@/components/fields'
+import { ArrowRightIcon } from '@/components/icons'
 
 /**
  * I dati anagrafici, e basta. Il ciclo ha una schermata sua.
@@ -114,9 +116,7 @@ export default function SettingsProfile() {
       {/* 🔴 La data di nascita non è anagrafe: decide se la domanda sulla
           contraccezione esiste (R3). Correggerla qui cambia l'altra schermata. */}
       {field(t.settings.profileBirth,
-        <input type="date" value={birth}
-               onChange={(e) => { setBirth(e.target.value); setState('idle') }}
-               className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />)}
+        <DateField value={birth} onChange={(v) => { setBirth(v); setState('idle') }} ariaLabel={t.settings.profileBirth} />)}
 
       <SaveButton dirty={dirty} state={state} onClick={() => void commit(next)} />
       <SaveNote state={state} />
@@ -127,7 +127,7 @@ export default function SettingsProfile() {
           <span className="text-[16px] font-bold">{t.settings.rhythmTitle}</span>
           <span className="text-[13.5px] text-[var(--color-ink-soft)]">{t.settings.profileCycleHint}</span>
         </span>
-        <span aria-hidden className="text-[17px] text-[var(--color-ink-soft)]">→</span>
+        <ArrowRightIcon size={17} color="var(--color-ink-soft)" />
       </Link>
     </Pane>
   )

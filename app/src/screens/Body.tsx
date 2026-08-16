@@ -11,6 +11,7 @@ import {
   type Signal, type Spot, type Window,
 } from '@/lib/bodyhistory'
 import Mascot from '@/components/Mascot'
+import Loading from '@/components/Loading'
 import { FlagIcon } from '@/components/icons'
 
 /**
@@ -52,7 +53,7 @@ export default function Body() {
   )
 
   if (!rows) {
-    return <p className="pt-6 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
+    return <Loading label={t.common.loading} />
   }
 
   const word = (code: string) =>

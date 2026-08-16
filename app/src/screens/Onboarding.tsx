@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { fill, plural, useCopy, useLocale, type Locale } from '@/copy'
 import PillGroup from '@/components/PillGroup'
 import CalendarMultiSelect from '@/components/CalendarMultiSelect'
+import { DateField, TimeField } from '@/components/fields'
 import { Progress } from '@/components/Step'
 import {
   saveProfile, saveConsent, saveSchedule, saveSports, saveAthleteEvent, saveCycleEvent,
@@ -15,7 +16,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
-import { ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
+import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -82,8 +83,8 @@ function Frame({ title, help, children, next, canNext, back, onBack, labels, at,
       <div className="flex items-center gap-3">
         {back && (
           <button type="button" onClick={onBack} aria-label={labels.back}
-                  className="bab-pill h-10 w-10 shrink-0 text-[17px]">
-            <span aria-hidden>←</span>
+                  className="bab-pill flex h-10 w-10 shrink-0 items-center justify-center">
+            <ArrowLeftIcon size={18} />
           </button>
         )}
         <Progress at={at} of={of} />
@@ -451,7 +452,11 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       {([['athlete', consentA, setConsentA, t.onboarding.consentAthlete],
          ['guardian', consentG, setConsentG, t.onboarding.consentGuardian]] as const).map(([k, on, set, label]) => (
         <label key={k} className="bab-card flex cursor-pointer items-center gap-3 px-4 py-3 text-[15px]">
-          <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} className="h-5 w-5" />
+          <input type="checkbox" checked={on} onChange={(e) => set(e.target.checked)} className="sr-only" />
+          <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
+                style={{ border: 'var(--bab-border) solid var(--color-ink)', background: on ? 'var(--color-lime)' : 'var(--color-surface)' }}>
+            {on && <CheckIcon size={15} />}
+          </span>
           {label}
         </label>
       ))}
@@ -488,9 +493,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'birthday') return (
     <Frame title={t.onboarding.birthdayTitle} help={t.onboarding.birthdayHelp}
            next={() => setStep('sport')} canNext={age !== null && age >= 12 && age <= 80} back onBack={() => setStep('name')} mascot {...F}>
-      <input type="date" value={birth} onChange={(e) => setBirth(e.target.value)}
-             aria-label={t.onboarding.birthdayTitle}
-             className="bab-card px-4 py-3 text-[16px]" />
+      <DateField value={birth} onChange={setBirth} ariaLabel={t.onboarding.birthdayTitle} className="px-4 py-3" />
       {age !== null && age < 12 && (
         <p className="text-[13px]" style={{ color: 'var(--care)' }}>{t.onboarding.birthdayTooYoung}</p>
       )}
@@ -537,10 +540,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'trainStart') return (
     <Frame title={t.onboarding.trainStartTitle}
            next={() => setStep('trainEnd')} canNext back onBack={() => setStep('trainDay')} mascot {...F}>
-      <input type="time" value={trainStartBySport[currentTrainSport] ?? ''}
-             onChange={(e) => setTrainStartBySport((p) => ({ ...p, [currentTrainSport]: e.target.value }))}
-             aria-label={t.onboarding.trainStartTitle}
-             className="bab-card px-3 py-2.5 text-[16px]" />
+      <TimeField value={trainStartBySport[currentTrainSport] ?? ''}
+                 onChange={(v) => setTrainStartBySport((p) => ({ ...p, [currentTrainSport]: v }))}
+                 ariaLabel={t.onboarding.trainStartTitle} />
     </Frame>
   )
 
@@ -550,10 +552,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
              if (trainIndex + 1 < effectiveSports.length) { setTrainIndex(trainIndex + 1); setStep('trainDay') }
              else setStep('pe')
            }} canNext back onBack={() => setStep('trainStart')} mascot {...F}>
-      <input type="time" value={trainEndBySport[currentTrainSport] ?? ''}
-             onChange={(e) => setTrainEndBySport((p) => ({ ...p, [currentTrainSport]: e.target.value }))}
-             aria-label={t.onboarding.trainEndTitle}
-             className="bab-card px-3 py-2.5 text-[16px]" />
+      <TimeField value={trainEndBySport[currentTrainSport] ?? ''}
+                 onChange={(v) => setTrainEndBySport((p) => ({ ...p, [currentTrainSport]: v }))}
+                 ariaLabel={t.onboarding.trainEndTitle} />
     </Frame>
   )
 
@@ -574,8 +575,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
            next={() => setStep('rhythm')} canNext back onBack={() => setStep('pe')} mascot {...F}>
       <label className="flex flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
         {t.onboarding.eventDateLabel}
-        <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)}
-               className="bab-card px-3 py-2 text-[16px] text-[var(--color-ink)]" />
+        <DateField value={eventDate} onChange={setEventDate} ariaLabel={t.onboarding.eventDateLabel} />
       </label>
     </Frame>
   )

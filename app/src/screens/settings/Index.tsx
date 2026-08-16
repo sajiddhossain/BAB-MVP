@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { plural, useCopy, useLocale, LOCALES } from '@/copy'
 import { getProfile, listSchedule, listSports } from '@/lib/repo'
 import { useSession } from '@/lib/session'
+import { ArrowRightIcon } from '@/components/icons'
 import { parked } from '@/lib/sync'
 import * as db from '@/lib/db'
 import { sportLabel } from '@/content/sports'
@@ -151,7 +152,7 @@ export default function SettingsIndex() {
               {r.soft && <span className="text-[13px] text-[var(--color-ink-soft)]">{r.soft}</span>}
               {r.warn && <span className="text-[13px]" style={{ color: 'var(--care)' }}>{r.warn}</span>}
             </span>
-            <span aria-hidden className="text-[17px] text-[var(--color-ink-soft)]">→</span>
+            <ArrowRightIcon size={17} color="var(--color-ink-soft)" />
           </Link>
         ))}
       </nav>

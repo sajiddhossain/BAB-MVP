@@ -6,6 +6,8 @@ import { listSchedule } from '@/lib/repo'
 import { useSession } from '@/lib/session'
 import { sportLabel } from '@/content/sports'
 import { Pane, SaveButton, SaveNote, saveAndSettle, type SaveState } from './shell'
+import { TimeField } from '@/components/fields'
+import { CalendarIcon } from '@/components/icons'
 
 /**
  * I giorni di un tipo — allenamento o educazione fisica. Una schermata sola,
@@ -87,21 +89,22 @@ export default function AgendaDays({ kind, sport = null }: { kind: Kind; sport?:
         <div className="flex gap-3">
           <label className="flex flex-1 flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
             {t.onboarding.trainStartTitle}
-            <input type="time" value={time}
-                   onChange={(e) => { setTime(e.target.value); setState('idle') }}
-                   className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />
+            <TimeField value={time} ariaLabel={t.onboarding.trainStartTitle}
+                       onChange={(v) => { setTime(v); setState('idle') }} />
           </label>
           <label className="flex flex-1 flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
             {t.onboarding.trainEndTitle}
-            <input type="time" value={endTime}
-                   onChange={(e) => { setEndTime(e.target.value); setState('idle') }}
-                   className="bab-card px-3 py-2.5 text-[16px] text-[var(--color-ink)]" />
+            <TimeField value={endTime} ariaLabel={t.onboarding.trainEndTitle}
+                       onChange={(v) => { setEndTime(v); setState('idle') }} />
           </label>
         </div>
       )}
 
       {days.length === 0 && loaded && (
-        <p className="text-[14px] text-[var(--color-ink-soft)]">{t.settings.agendaNoDays}</p>
+        <div className="bab-card flex items-center gap-2.5 px-4 py-3">
+          <CalendarIcon size={18} color="var(--color-ink-soft)" />
+          <p className="text-[14px] text-[var(--color-ink-soft)]">{t.settings.agendaNoDays}</p>
+        </div>
       )}
 
       <SaveButton dirty={dirty} state={state} onClick={() => void save()} />

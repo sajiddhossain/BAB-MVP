@@ -13,7 +13,7 @@ import { isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
 import Sparkle from '@/components/Sparkle'
-import { CompassIcon, ContentIcon, FlagIcon, TempoIcon } from '@/components/icons'
+import { CloseIcon, CompassIcon, ContentIcon, FlagIcon, TempoIcon } from '@/components/icons'
 import { norm, RANGES, recovery, predictionError } from '@/lib/tempo'
 import { saveCheckIn, checkInsOn, localDate, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -257,9 +257,9 @@ export default function CheckInPost() {
               </span>
               <button type="button" onClick={() => setSignals((p) => p.filter((_, j) => j !== i))}
                       aria-label={t.checkin.common.remove}
-                      className="relative flex h-6 w-6 items-center justify-center rounded-full text-[13px] text-[var(--color-ink-soft)] before:absolute before:-inset-2.5 before:content-['']"
+                      className="relative flex h-6 w-6 items-center justify-center rounded-full before:absolute before:-inset-2.5 before:content-['']"
                       style={{ background: 'var(--color-sand)' }}>
-                <span aria-hidden>✕</span>
+                <CloseIcon size={12} color="var(--color-ink-soft)" />
               </button>
             </li>
           ))}

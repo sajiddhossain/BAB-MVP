@@ -266,6 +266,21 @@ button, a[role="button"], input, select {
 .bab-vas[aria-valuetext="—"]::-webkit-slider-thumb { opacity: 0; }
 .bab-vas[aria-valuetext="—"]::-moz-range-thumb { opacity: 0; }
 
+/* Data e ora native — vedi `components/fields.tsx`. Si spegne solo
+   l'iconcina di sistema: il campo resta cliccabile e tastabile com'era. */
+.bab-native-field {
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color-scheme: light;
+}
+.bab-native-field::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+}
+
 /* Lo scintillio di fine check-in — vedi `Sparkle.tsx` per il perché.
    Compare, gira un po', sparisce: `forwards` lo lascia a opacità 0 alla
    fine invece di tornare al frame iniziale, così non c'è uno scatto quando
