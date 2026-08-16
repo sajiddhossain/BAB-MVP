@@ -61,13 +61,20 @@ function NumberedStep({ n, title, body }: { n: number; title: string; body: stri
  * sarebbe un tipo di componente nuovo a ogni render, React smonterebbe il
  * sottoalbero e il campo del nome perderebbe il fuoco a ogni lettera battuta.
  */
-function Frame({ title, help, children, next, canNext, back, onBack, labels, at, of, extra }: {
+function Frame({ title, help, children, next, canNext, back, onBack, labels, at, of, extra, mascot }: {
   title: string; help?: string; children?: React.ReactNode
   next?: () => void; canNext?: boolean; back?: boolean; onBack?: () => void
   labels: { back: string; continue: string }
   at: number; of: number
   /** Un secondo bottone, più leggero — oggi solo "non me lo ricordo". */
   extra?: { label: string; onClick: () => void }
+  /**
+   * 🔴 Compagna di sfondo, non protagonista: piccola, sempre nello stesso
+   * punto, sotto il titolo. Gli step che già la mettono altrove apposta
+   * (accanto al cuore, sopra la card del risultato...) non passano questo
+   * prop, per non averne due sullo stesso schermo.
+   */
+  mascot?: boolean
 }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col gap-3 px-5 py-6">
@@ -82,6 +89,11 @@ function Frame({ title, help, children, next, canNext, back, onBack, labels, at,
       </div>
       <h1 className="font-display text-[24px] leading-tight">{title}</h1>
       {help && <p className="text-[14px] text-[var(--color-ink-soft)]">{help}</p>}
+      {mascot && (
+        <div className="flex justify-center py-1">
+          <Mascot size={40} />
+        </div>
+      )}
       <div className="flex flex-1 flex-col gap-3">{children}</div>
       {next && (
         <button type="button" onClick={next} disabled={canNext === false}
@@ -278,7 +290,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   // `content/tempo.ts`, lette da lì e non riscritte qui.
   if (step === 'heartConcept') return (
     <Frame title={t.heart.conceptTitle} help={t.heart.conceptHelp}
-           next={() => setStep('heartSettle')} canNext back onBack={() => setStep('welcome')} {...F}>
+           next={() => setStep('heartSettle')} canNext back onBack={() => setStep('welcome')} mascot {...F}>
       <div className="bab-card flex flex-col gap-3 px-4 py-3.5">
         <NumberedStep n={1} title={t.heart.step1Title} body={t.heart.step1Body} />
         <NumberedStep n={2} title={t.heart.step2Title} body={t.heart.step2Body} />
@@ -333,7 +345,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'heartCount') return (
     <Frame title={t.heart.countTitle} help={t.heart.countHelp}
            next={() => setStep('heartReveal')} canNext={heartTaps !== null}
-           back onBack={() => setStep('heartGuess')} {...F}>
+           back onBack={() => setStep('heartGuess')} mascot {...F}>
       <TapCounter durationSec={15} ariaLabel={t.heart.tapAriaLabel}
                   startLabel={t.heart.tapStart} startSub={t.heart.tapReady}
                   goLabel={t.heart.tapGo} goSub={t.heart.tapGoSub}
@@ -418,7 +430,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   // 🔴 Prima del consenso, non dopo.
   if (step === 'whoSees') return (
-    <Frame title={t.onboarding.whoSeesTitle} next={() => setStep('consent')} back onBack={() => setStep('heartWrap')} {...F}>
+    <Frame title={t.onboarding.whoSeesTitle} next={() => setStep('consent')} back onBack={() => setStep('heartWrap')} mascot {...F}>
       <div className="bab-card px-4 py-4"><p className="text-[15px]">{t.onboarding.whoSeesTeam}</p></div>
       <div className="bab-card px-4 py-4" style={{ background: 'var(--tempo-steady-tint)' }}>
         <p className="text-[15px]">{t.onboarding.whoSeesPrivate}</p>
@@ -431,7 +443,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     <Frame title={t.onboarding.consentTitle} help={t.onboarding.consentHelp}
            next={() => setStep('name')}
            canNext={consentA && consentG && guardianName.trim().length > 0}
-           back onBack={() => setStep('whoSees')} {...F}>
+           back onBack={() => setStep('whoSees')} mascot {...F}>
       <div className="bab-card px-4 py-3" style={{ background: 'var(--care-tint)', borderColor: 'var(--care)' }}>
         <p className="text-[14px]">{t.onboarding.consentDraftWarning}</p>
       </div>
@@ -464,7 +476,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'name') return (
     <Frame title={t.onboarding.nameTitle} help={t.onboarding.nameHelp}
-           next={() => setStep('birthday')} canNext={name.trim().length > 0} back onBack={() => setStep('consent')} {...F}>
+           next={() => setStep('birthday')} canNext={name.trim().length > 0} back onBack={() => setStep('consent')} mascot {...F}>
       <input value={name} onChange={(e) => setName(e.target.value)} maxLength={40}
              placeholder={t.onboarding.namePlaceholder} autoComplete="given-name"
              aria-label={t.onboarding.nameTitle}
@@ -474,7 +486,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'birthday') return (
     <Frame title={t.onboarding.birthdayTitle} help={t.onboarding.birthdayHelp}
-           next={() => setStep('sport')} canNext={age !== null && age >= 12 && age <= 80} back onBack={() => setStep('name')} {...F}>
+           next={() => setStep('sport')} canNext={age !== null && age >= 12 && age <= 80} back onBack={() => setStep('name')} mascot {...F}>
       <input type="date" value={birth} onChange={(e) => setBirth(e.target.value)}
              aria-label={t.onboarding.birthdayTitle}
              className="bab-card px-4 py-3 text-[16px]" />
@@ -487,7 +499,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'sport') return (
     <Frame title={t.onboarding.sportTitle} help={t.onboarding.sportHelp}
            next={() => { setTrainIndex(0); setStep(effectiveSports.length ? 'trainDay' : 'pe') }}
-           canNext back onBack={() => setStep('birthday')} {...F}>
+           canNext back onBack={() => setStep('birthday')} mascot {...F}>
       <PillGroup columns={2} label={t.onboarding.sportLabel} value={sports}
                  options={SPORTS.map((s) => ({ value: s.code, label: s.label[locale] }))}
                  onChange={toggleSport} />
@@ -506,7 +518,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
            next={() => setStep('trainStart')} canNext back
            onBack={() => {
              if (trainIndex > 0) { setTrainIndex(trainIndex - 1); setStep('trainEnd') } else setStep('sport')
-           }} {...F}>
+           }} mascot {...F}>
       <PillGroup size="lg" label={t.onboarding.weekTraining}
                  value={(trainDaysBySport[currentTrainSport] ?? []).map(String)}
                  options={t.onboarding.weekdays.map((d, i) => ({ value: String(i + 1), label: d }))}
@@ -523,7 +535,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'trainStart') return (
     <Frame title={t.onboarding.trainStartTitle}
-           next={() => setStep('trainEnd')} canNext back onBack={() => setStep('trainDay')} {...F}>
+           next={() => setStep('trainEnd')} canNext back onBack={() => setStep('trainDay')} mascot {...F}>
       <input type="time" value={trainStartBySport[currentTrainSport] ?? ''}
              onChange={(e) => setTrainStartBySport((p) => ({ ...p, [currentTrainSport]: e.target.value }))}
              aria-label={t.onboarding.trainStartTitle}
@@ -536,7 +548,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
            next={() => {
              if (trainIndex + 1 < effectiveSports.length) { setTrainIndex(trainIndex + 1); setStep('trainDay') }
              else setStep('pe')
-           }} canNext back onBack={() => setStep('trainStart')} {...F}>
+           }} canNext back onBack={() => setStep('trainStart')} mascot {...F}>
       <input type="time" value={trainEndBySport[currentTrainSport] ?? ''}
              onChange={(e) => setTrainEndBySport((p) => ({ ...p, [currentTrainSport]: e.target.value }))}
              aria-label={t.onboarding.trainEndTitle}
@@ -549,7 +561,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
            next={() => setStep('events')} canNext back
            onBack={() => {
              if (effectiveSports.length) { setTrainIndex(effectiveSports.length - 1); setStep('trainEnd') } else setStep('sport')
-           }} {...F}>
+           }} mascot {...F}>
       <PillGroup size="lg" label={t.onboarding.weekPe} value={peDays.map(String)}
                  options={t.onboarding.weekdays.map((d, i) => ({ value: String(i + 1), label: d }))}
                  onChange={(v) => toggle(peDays, setPeDays, Number(v))} />
@@ -558,7 +570,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'events') return (
     <Frame title={t.onboarding.weekEvents} help={t.onboarding.weekEventsHelp}
-           next={() => setStep('rhythm')} canNext back onBack={() => setStep('pe')} {...F}>
+           next={() => setStep('rhythm')} canNext back onBack={() => setStep('pe')} mascot {...F}>
       <label className="flex flex-col gap-1.5 text-[13px] text-[var(--color-ink-soft)]">
         {t.onboarding.eventDateLabel}
         <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)}
@@ -568,7 +580,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   )
 
   if (step === 'rhythm') return (
-    <Frame title={t.onboarding.rhythmTitle} help={t.onboarding.rhythmBody} back onBack={() => setStep('events')} {...F}>
+    <Frame title={t.onboarding.rhythmTitle} help={t.onboarding.rhythmBody} back onBack={() => setStep('events')} mascot {...F}>
       {([['tracking', t.onboarding.rhythmYes, t.onboarding.rhythmYesHelp],
          ['not_yet', t.onboarding.rhythmNotYet, undefined],
          ['undisclosed', t.onboarding.rhythmSkip, undefined]] as const).map(([k, label, help]) => (
@@ -586,7 +598,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     <Frame title={t.onboarding.firstPeriodAgeTitle} help={t.onboarding.firstPeriodAgeHelp}
            next={() => setStep('datesLast')} canNext back onBack={() => setStep('rhythm')}
            extra={{ label: t.onboarding.datesSkip, onClick: () => { setFirstPeriodAge(null); setStep('datesLast') } }}
-           {...F}>
+           mascot {...F}>
       <input type="number" inputMode="numeric" min={6} max={20}
              value={firstPeriodAge ?? ''}
              onChange={(e) => setFirstPeriodAge(e.target.value ? Number(e.target.value) : null)}
@@ -598,7 +610,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'datesLast') return (
     <Frame title={t.onboarding.datesTitle} help={t.onboarding.datesHelp}
-           next={() => setStep('datesPrev')} canNext back onBack={() => setStep('rhythm')} {...F}>
+           next={() => setStep('datesPrev')} canNext back onBack={() => setStep('rhythm')} mascot {...F}>
       <CalendarMultiSelect label={t.onboarding.datesTitle} selected={lastCycleDays} onChange={setLastCycleDays} />
       <div className="bab-card px-3 py-2.5" style={{ background: 'var(--cycle-tint)' }}>
         <p className="text-[13px]"><Rich text={t.onboarding.cyclePrivacy} /></p>
@@ -609,7 +621,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'datesPrev') return (
     <Frame title={t.onboarding.datesPrevTitle} help={t.onboarding.datesPrevHelp}
            next={() => setStep('datesBefore')} canNext back onBack={() => setStep('datesLast')}
-           extra={{ label: t.onboarding.datesSkip, onClick: () => { setPrevCycleStart([]); setStep('datesBefore') } }} {...F}>
+           extra={{ label: t.onboarding.datesSkip, onClick: () => { setPrevCycleStart([]); setStep('datesBefore') } }} mascot {...F}>
       <CalendarMultiSelect label={t.onboarding.datesPrevTitle} selected={prevCycleStart}
                            onChange={setPrevCycleStart} multiple={false} />
     </Frame>
@@ -622,7 +634,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
            extra={{
              label: t.onboarding.datesSkip,
              onClick: () => { setBeforeCycleStart([]); setStep(asksContraception ? 'contraception' : 'done') },
-           }} {...F}>
+           }} mascot {...F}>
       <CalendarMultiSelect label={t.onboarding.datesBeforeTitle} selected={beforeCycleStart}
                            onChange={setBeforeCycleStart} multiple={false} />
     </Frame>
@@ -631,7 +643,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   // 🔴 Solo dai 16 anni in su. Sotto, la domanda non compare proprio.
   if (step === 'contraception') return (
     <Frame title={t.onboarding.contraceptionTitle} help={t.onboarding.contraceptionHelp}
-           next={() => setStep('done')} canNext={contraception !== null} back onBack={() => setStep('datesBefore')} {...F}>
+           next={() => setStep('done')} canNext={contraception !== null} back onBack={() => setStep('datesBefore')} mascot {...F}>
       <PillGroup label={t.onboarding.contraceptionTitle} value={contraception}
                  options={[{ value: 'hormonal', label: t.common.yes },
                            { value: 'natural', label: t.common.no },
