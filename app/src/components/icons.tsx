@@ -188,6 +188,17 @@ export function PinIcon({ size = 24, color = 'currentColor' }: IconProps) {
   )
 }
 
+export function BrainIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M9.5 3.5a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3.2 3.2 0 0 0 1.5 5.8 3 3 0 0 0 5.5 1.2V6a2.5 2.5 0 0 0-2-2.5Z"
+            stroke={color} {...base} />
+      <path d="M14.5 3.5a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3.2 3.2 0 0 1-1.5 5.8 3 3 0 0 1-5.5 1.2V6a2.5 2.5 0 0 1 2-2.5Z"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
 /* ── Icone per Body-Sense e il lessico delle sensazioni ──────────────────
    Sostituiscono le emoji nei contenuti tradotti di `content/bodysense.ts`
    e `content/lexicon.ts`. Ogni content-file ora porta una chiave (`icon`)

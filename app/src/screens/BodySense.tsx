@@ -173,9 +173,9 @@ export default function BodySense() {
       </div>
 
       {toast && (
-        <div className="fixed bottom-24 left-1/2 z-30 -translate-x-1/2 rounded-2xl px-4 py-3 text-center text-[13.5px] font-bold"
+        <div className="fixed bottom-24 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-2xl px-4 py-3 text-center text-[13.5px] font-bold"
              style={{ background: 'var(--color-ink)', color: 'var(--color-surface)', boxShadow: 'var(--shadow-md)' }}>
-          {t.bodySense.finishToast}
+          <ContentIcon name="sprout" size={16} color="var(--color-surface)" /> {t.bodySense.finishToast}
         </div>
       )}
     </section>

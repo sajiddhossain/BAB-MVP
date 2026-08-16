@@ -30,6 +30,13 @@ type Props = {
   of: number
   /** La domanda. È il titolo della schermata, non un'etichetta sopra un campo. */
   question: string
+  /**
+   * Un'icona davanti alla domanda — opzionale, decorativa. Sta FUORI da
+   * `question` apposta: quella resta una stringa semplice perché l'effetto
+   * che rimette il fuoco in cima dipende da lei, e un nodo React nuovo a ogni
+   * render romperebbe quel confronto.
+   */
+  questionIcon?: React.ReactNode
   help?: string
   children?: React.ReactNode
   onBack?: () => void
@@ -85,7 +92,7 @@ export function Progress({ at, of }: { at: number; of: number }) {
 }
 
 export default function Step({
-  section, at, of, question, help, children,
+  section, at, of, question, questionIcon, help, children,
   onBack, onClose, dirty, onNext, nextLabel, onSkip, fill = false,
 }: Props) {
   const t = useCopy()
@@ -159,9 +166,10 @@ export default function Step({
       <div className={`flex flex-1 flex-col ${fill ? 'min-h-0 gap-2' : 'gap-4'}`}>
         {section && <p className="bab-label shrink-0">{section}</p>}
         <h1 ref={head} tabIndex={-1}
-            className={`bab-heading-focus shrink-0 font-display leading-[1.12] ${
+            className={`bab-heading-focus flex shrink-0 items-center gap-2 font-display leading-[1.12] ${
               fill ? 'text-[22px]' : 'text-[27px]'
             }`}>
+          {questionIcon}
           {question}
         </h1>
         {help && (

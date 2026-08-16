@@ -341,7 +341,7 @@ export const it = {
         title: 'I tuoi canali',
         /** 🔴 La VAS: una riga fra due estremi, nessun numero. Gli estremi sono
          *  quelli della spec — «il peggio» e «il meglio» che ha mai provato. */
-        mood: '🧠 Come ti senti, dentro?',
+        mood: 'Come ti senti, dentro?',
         moodHelp: 'Trascina dove ti trovi oggi. Non c\'è un punto giusto.',
         moodLow: 'Il peggio che abbia mai provato',
         moodHigh: 'Il meglio che abbia mai provato',
@@ -626,7 +626,7 @@ export const it = {
     tapBeatsCounted: 'Battiti contati',
     tapBeats: 'battiti',
 
-    revealMatchTitle: 'Bel colpo! 🎯',
+    revealMatchTitle: 'Bel colpo!',
     revealMissTitle: 'Interessante — un po\' diverso.',
     bpmLabel: 'battiti al minuto (quelli che hai contato)',
     yourGuess: 'La tua stima',
@@ -655,7 +655,7 @@ export const it = {
     close: 'Chiudi',
     next: 'Avanti →',
     finish: 'Fine ✓',
-    finishToast: 'Bella prova 🌱 — la tua lettura interna si sta affinando.',
+    finishToast: 'Bella prova — la tua lettura interna si sta affinando.',
     heartbeatName: 'Battito',
     heartbeatTrains: 'Precisione',
     heartbeatDur: '60 sec',

@@ -14,7 +14,7 @@ import { SENSATIONS, isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { CARE, DECODE_ACHE } from '@/content/clinical'
 import Sparkle from '@/components/Sparkle'
-import { FlagIcon, TempoIcon } from '@/components/icons'
+import { BrainIcon, FlagIcon, TempoIcon } from '@/components/icons'
 import { total, suggestWithPain, type Channels } from '@/lib/tempo'
 import { saveCheckIn, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -428,6 +428,7 @@ export default function CheckInPre() {
       return (
         <Step {...frame} section={t.checkin.pre.tuneIn.label}
               question={t.checkin.pre.tuneIn.mood}
+              questionIcon={<BrainIcon size={24} color="var(--color-lavender)" />}
               help={t.checkin.pre.tuneIn.moodHelp}
               onNext={mood !== null ? flow.onward : null}>
           <VasSlider

@@ -282,7 +282,7 @@ export const en: Copy = {
       tuneIn: {
         label: 'Tune in',
         title: 'Your channels',
-        mood: '🧠 How do you feel, inside?',
+        mood: 'How do you feel, inside?',
         moodHelp: "Drag to where you are today. There's no right spot.",
         moodLow: "The worst I've ever felt",
         moodHigh: "The best I've ever felt",
@@ -537,7 +537,7 @@ export const en: Copy = {
     tapBeatsCounted: 'Beats counted',
     tapBeats: 'beats',
 
-    revealMatchTitle: 'Nice read! 🎯',
+    revealMatchTitle: 'Nice read!',
     revealMissTitle: 'Interesting — a little off.',
     bpmLabel: 'beats per minute (you counted)',
     yourGuess: 'Your guess',
@@ -566,7 +566,7 @@ export const en: Copy = {
     close: 'Close',
     next: 'Next →',
     finish: 'Finish ✓',
-    finishToast: "Nice rep 🌱 — that's your inner read getting sharper.",
+    finishToast: "Nice rep — that's your inner read getting sharper.",
     heartbeatName: 'Heartbeat',
     heartbeatTrains: 'Accuracy',
     heartbeatDur: '60s',
