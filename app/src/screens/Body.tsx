@@ -72,7 +72,10 @@ export default function Body() {
   return (
     <section className="flex flex-col gap-4 pt-2">
       <div className="flex items-baseline justify-between gap-3">
-        <h1 className="font-display text-[26px]">{t.body.title}</h1>
+        <div className="flex items-center gap-2">
+          <Mascot size={32} />
+          <h1 className="font-display text-[26px]">{t.body.title}</h1>
+        </div>
         <Link to="/me" className="text-[13.5px] underline text-[var(--color-ink-soft)]">
           {t.settings.back}
         </Link>

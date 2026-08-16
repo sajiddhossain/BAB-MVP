@@ -191,7 +191,10 @@ export default function Story() {
 
   return (
     <section className="flex flex-col gap-4 pt-2">
-      <h1 className="font-display text-[26px]">{t.story.title}</h1>
+      <div className="flex items-center gap-2">
+        <Mascot size={32} />
+        <h1 className="font-display text-[26px]">{t.story.title}</h1>
+      </div>
 
       <section className="bab-card flex flex-col gap-3 px-4 py-4">
         <h2 className="font-display text-[18px]">{t.story.chooseTitle}</h2>
