@@ -1,5 +1,6 @@
 import type { Locale } from '@/copy'
 import type { TempoCode } from './tempo'
+import type { IconKey } from '@/components/icons'
 
 /**
  * La card "Impara" del check-in post: otto esiti, incrociando andatura
@@ -21,14 +22,14 @@ export type OutcomeCode =
 
 export type Outcome = {
   code: OutcomeCode
-  emoji: string
+  icon: IconKey
   title: Record<Locale, string>
   body: Record<Locale, string>
 }
 
 export const OUTCOMES: Record<OutcomeCode, Outcome> = {
   upbeat_read: {
-    code: 'upbeat_read', emoji: '🎯',
+    code: 'upbeat_read', icon: 'target',
     title: { it: 'Lettura perfetta', en: 'Spot-on read' },
     body: {
       it: 'Ti sei fidata di te per un giorno Upbeat e il tuo corpo l\'ha gestito bene. Fissa come si sente questo — è il tuo riferimento per un buon giorno Upbeat con recupero.',
@@ -36,7 +37,7 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
     },
   },
   upbeat_cost: {
-    code: 'upbeat_cost', emoji: '🍃',
+    code: 'upbeat_cost', icon: 'leaf',
     title: { it: 'Il tuo corpo ha preso tanto oggi', en: 'Your body took a lot today' },
     body: {
       it: 'Quella sessione Upbeat è costata più del solito — e notare quel divario fra la fatica e come ti senti adesso *è* la lezione. È una spinta ad andare Steady o Gentle domani. Non è andato storto niente: hai solo imparato qualcosa su oggi.',
@@ -44,7 +45,7 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
     },
   },
   upbeat_solid: {
-    code: 'upbeat_solid', emoji: '⚡',
+    code: 'upbeat_solid', icon: 'bolt',
     title: { it: 'Un giorno Upbeat solido e onesto', en: 'A solid, honest Upbeat day' },
     body: {
       it: 'Hai spinto forte e sei piacevolmente stanca — è esattamente giusto dopo lavoro vero. Questo è il tipo buono di vuoto.',
@@ -52,7 +53,7 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
     },
   },
   steady_tipped: {
-    code: 'steady_tipped', emoji: '👀',
+    code: 'steady_tipped', icon: 'eye',
     title: { it: 'Uno Steady che è diventato Upbeat', en: 'Steady that tipped into Upbeat' },
     body: {
       it: 'Avevi chiamato un giorno Steady ma hai finito per spingere forte — e il tuo corpo lo sente. Vale uno sguardo curioso: cosa ti ha fatto andare più forte del previsto? È una cosa utile da notare.',
@@ -60,7 +61,7 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
     },
   },
   steady_spare: {
-    code: 'steady_spare', emoji: '🌤️',
+    code: 'steady_spare', icon: 'cloud-sun',
     title: { it: 'Ne avevi ancora nel serbatoio', en: 'Plenty left in the tank' },
     body: {
       it: 'Steady è stato facile e sei ancora fresca — forse oggi avevi di più. Non è un errore: un giorno di qualità non è mai sprecato, e adesso conosci la tua lettura un po\' meglio.',
@@ -68,7 +69,7 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
     },
   },
   steady_judged: {
-    code: 'steady_judged', emoji: '🎯',
+    code: 'steady_judged', icon: 'target',
     title: { it: 'Giorno Steady ben calibrato', en: 'Nicely judged Steady day' },
     body: {
       it: 'Sforzo controllato, corpo in buona forma. Questo è allenarsi con abilità — qualità invece che quantità, esattamente come previsto.',
@@ -76,7 +77,7 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
     },
   },
   gentle_work: {
-    code: 'gentle_work', emoji: '👀',
+    code: 'gentle_work', icon: 'eye',
     title: { it: 'Un Gentle diventato lavoro vero', en: 'Gentle that became real work' },
     body: {
       it: 'Doveva essere gentile, ma è diventato uno sforzo serio. Se il tuo corpo aveva bisogno di riposo, tienici un occhio — il recupero conta solo quando è davvero facile. Nessun dramma, solo qualcosa da notare.',
@@ -84,7 +85,7 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
     },
   },
   gentle_true: {
-    code: 'gentle_true', emoji: '🍃',
+    code: 'gentle_true', icon: 'leaf',
     title: { it: 'Un vero giorno Gentle — ben giocato', en: 'A real Gentle day — well played' },
     body: {
       it: 'Hai tenuto gentile e hai lasciato ricostruire il tuo corpo. È qui che i tuoi giorni duri diventano silenziosamente forza. Sceglierlo richiede più sicurezza che spingere.',

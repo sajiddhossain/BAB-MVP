@@ -366,6 +366,43 @@ export function FeatherIcon({ size = 24, color = 'currentColor' }: IconProps) {
   )
 }
 
+export function CloudRainIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M6.5 16A4 4 0 0 1 7 8.1a5 5 0 0 1 9.6-1.3A4.5 4.5 0 0 1 17.5 16h-11Z" stroke={color} {...base} />
+      <path d="M9 18.5l-1 2.5M13 18.5l-1 2.5M17 18.5l-1 2.5" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function ShieldIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 2.5l7.5 3V11c0 5-3.2 8.6-7.5 10.5C7.7 19.6 4.5 16 4.5 11V5.5l7.5-3Z" stroke={color} {...base} />
+      <path d="M8.7 12l2.3 2.3 4.3-4.6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function BulbIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M9 17.5h6M10 20h4" stroke={color} {...base} />
+      <path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.4 1 1.1 1 1.9v.3h5.6v-.3c0-.8.4-1.5 1-1.9A6.5 6.5 0 0 0 12 3Z"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function EarIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M13 3a6 6 0 0 1 6 6c0 2.5-1.5 3.3-1.5 5.5a2.5 2.5 0 0 1-5 0" stroke={color} {...base} />
+      <path d="M13 3a6.5 6.5 0 0 0-6.5 6.5c0 2 1 3 1 5v3a3 3 0 0 0 3 3" stroke={color} {...base} />
+    </svg>
+  )
+}
+
 /** Chiavi usate da `content/bodysense.ts` e `content/lexicon.ts` al posto delle emoji. */
 export type IconKey =
   | 'lungs' | 'bolt' | 'target' | 'balance' | 'jar' | 'heart'
@@ -373,6 +410,7 @@ export type IconKey =
   | 'strong' | 'minus' | 'repeat' | 'arrow-left' | 'arrow-right'
   | 'bowl' | 'droplet' | 'handshake' | 'sprout' | 'sparkle'
   | 'spiral' | 'breath-wave' | 'person' | 'dots' | 'feather'
+  | 'cloud-rain' | 'shield' | 'bulb' | 'ear' | 'eye' | 'leaf' | 'check'
 
 export function ContentIcon({ name, size = 24, color = 'currentColor' }: IconProps & { name: IconKey }) {
   switch (name) {
@@ -403,5 +441,12 @@ export function ContentIcon({ name, size = 24, color = 'currentColor' }: IconPro
     case 'person': return <PersonIcon size={size} color={color} />
     case 'dots': return <DotsIcon size={size} color={color} />
     case 'feather': return <FeatherIcon size={size} color={color} />
+    case 'cloud-rain': return <CloudRainIcon size={size} color={color} />
+    case 'shield': return <ShieldIcon size={size} color={color} />
+    case 'bulb': return <BulbIcon size={size} color={color} />
+    case 'ear': return <EarIcon size={size} color={color} />
+    case 'eye': return <EyeIcon size={size} color={color} />
+    case 'leaf': return <LeafIcon size={size} color={color} />
+    case 'check': return <CheckIcon size={size} color={color} />
   }
 }

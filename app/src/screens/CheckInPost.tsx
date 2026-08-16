@@ -13,7 +13,7 @@ import { isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
 import Sparkle from '@/components/Sparkle'
-import { CompassIcon, TempoIcon } from '@/components/icons'
+import { CompassIcon, ContentIcon, TempoIcon } from '@/components/icons'
 import { norm, RANGES, recovery, predictionError } from '@/lib/tempo'
 import { saveCheckIn, checkInsOn, localDate, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -174,7 +174,7 @@ export default function CheckInPost() {
         <section className="bab-card relative flex flex-col gap-3 px-5 py-5"
                  style={{ boxShadow: 'var(--shadow-lg)' }}>
           {!hasRedFlag && <Sparkle />}
-          <span className="text-[40px] leading-none" aria-hidden>{outcome.emoji}</span>
+          <ContentIcon name={outcome.icon} size={38} color="var(--color-vividteal)" />
           <h1 className="font-display text-[24px] leading-tight">{outcome.title[locale]}</h1>
           <p className="text-[15px]"><Rich text={outcome.body[locale]} /></p>
         </section>
@@ -354,7 +354,7 @@ export default function CheckInPost() {
           <PillGroup
             size="lg"
             label={t.checkin.post.lookBack.satisfaction}
-            options={SATISFACTION.map((x) => ({ value: x.code, label: x.label[locale], emoji: x.emoji }))}
+            options={SATISFACTION.map((x) => ({ value: x.code, label: x.label[locale], icon: <ContentIcon name={x.icon} size={16} /> }))}
             value={satisfaction}
             onChange={(v) => answer('satisfaction', () => setSatisfaction(v))}
           />
@@ -395,7 +395,7 @@ export default function CheckInPost() {
           <PillGroup
             size="lg"
             label={t.checkin.post.broughtHome.title}
-            options={BROUGHT_HOME.map((b) => ({ value: b.code, label: b.label[locale], emoji: b.emoji }))}
+            options={BROUGHT_HOME.map((b) => ({ value: b.code, label: b.label[locale], icon: <ContentIcon name={b.icon} size={16} /> }))}
             value={brought}
             onChange={(v) => setBrought((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v])}
           />

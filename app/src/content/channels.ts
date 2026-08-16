@@ -1,4 +1,5 @@
 import type { Locale } from '@/copy'
+import type { IconKey } from '@/components/icons'
 
 /**
  * I canali del check-in, e le scale che li misurano.
@@ -119,13 +120,18 @@ export const POST_CHANNELS: (Omit<Channel, 'code'> & { code: PostChannelCode })[
  * in cima — sono cinque modi legittimi di uscire da un allenamento. L'ordine
  * è quello della spec, e il `code` è quello che finisce nel database.
  */
-export const SATISFACTION = [
-  { code: 'disappointed', emoji: '😔', label: { it: 'Delusa',       en: 'Disappointed' } },
-  { code: 'frustrated',   emoji: '😤', label: { it: 'Frustrata',    en: 'Frustrated' } },
-  { code: 'satisfied',    emoji: '🙂', label: { it: 'Soddisfatta',  en: 'Satisfied' } },
-  { code: 'confident',    emoji: '😎', label: { it: 'Sicura di me', en: 'Confident' } },
-  { code: 'proud',        emoji: '🤩', label: { it: 'Fiera',        en: 'Proud' } },
-] as const
+/**
+ * 🔴 Icone astratte, non volti — coerente col resto dell'app (vedi
+ * `ContentIcon`/`ZigzagIcon`): non impersonano l'emozione che è lei a
+ * nominare, la illustrano da fuori (nuvola, scudo, stella...).
+ */
+export const SATISFACTION: { code: string; icon: IconKey; label: Record<Locale, string> }[] = [
+  { code: 'disappointed', icon: 'cloud-rain', label: { it: 'Delusa',       en: 'Disappointed' } },
+  { code: 'frustrated',   icon: 'zigzag',     label: { it: 'Frustrata',    en: 'Frustrated' } },
+  { code: 'satisfied',    icon: 'check',      label: { it: 'Soddisfatta',  en: 'Satisfied' } },
+  { code: 'confident',    icon: 'shield',     label: { it: 'Sicura di me', en: 'Confident' } },
+  { code: 'proud',        icon: 'star',       label: { it: 'Fiera',        en: 'Proud' } },
+]
 
 /**
  * "Cosa ti sei portata a casa?" — recuperata dal PDF originale della founder.
@@ -133,10 +139,10 @@ export const SATISFACTION = [
  * È la domanda migliore del materiale: sposta il metro da com'è andata la
  * prestazione a cosa ha imparato, e non c'è modo di rispondere male.
  */
-export const BROUGHT_HOME = [
-  { code: 'learned',  emoji: '💡', label: { it: 'Ho imparato qualcosa di nuovo', en: 'Learned something new' } },
-  { code: 'listened', emoji: '👂', label: { it: 'Ho ascoltato il mio corpo',     en: 'Listened to my body' } },
-  { code: 'helped',   emoji: '🤝', label: { it: 'Ho aiutato una compagna',        en: 'Helped a teammate' } },
-  { code: 'kind',     emoji: '💛', label: { it: 'Sono stata gentile con me',      en: 'Was kind to myself' } },
-  { code: 'nailed',   emoji: '✅', label: { it: 'Ho eseguito bene un esercizio',  en: 'Nailed an exercise' } },
+export const BROUGHT_HOME: { code: string; icon: IconKey; label: Record<Locale, string> }[] = [
+  { code: 'learned',  icon: 'bulb',      label: { it: 'Ho imparato qualcosa di nuovo', en: 'Learned something new' } },
+  { code: 'listened', icon: 'ear',       label: { it: 'Ho ascoltato il mio corpo',     en: 'Listened to my body' } },
+  { code: 'helped',   icon: 'handshake', label: { it: 'Ho aiutato una compagna',        en: 'Helped a teammate' } },
+  { code: 'kind',     icon: 'heart',     label: { it: 'Sono stata gentile con me',      en: 'Was kind to myself' } },
+  { code: 'nailed',   icon: 'check',     label: { it: 'Ho eseguito bene un esercizio',  en: 'Nailed an exercise' } },
 ]
