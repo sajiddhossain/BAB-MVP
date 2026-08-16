@@ -13,6 +13,8 @@ import { minutesBetween } from '@/lib/agenda'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
+import Sparkle from '@/components/Sparkle'
+import Mascot from '@/components/Mascot'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -628,7 +630,15 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   return (
     <Frame title={fill(t.onboarding.doneTitle, { name })} help={t.onboarding.doneBody} {...F}>
-      <dl className="bab-card flex flex-col gap-2 px-4 py-4 text-[15px]">
+      {/* 🔴 Stessa mascotte del Percorso e dello scintillio di fine check-in:
+          non un'illustrazione a sé per questa schermata, è la stessa
+          compagna. Qui accoglie invece di segnare "sei qui" — l'unico altro
+          posto in cui compare senza essere accanto a una tappa "ora". */}
+      <div className="flex justify-center py-1">
+        <Mascot size={56} />
+      </div>
+      <dl className="bab-card relative flex flex-col gap-2 px-4 py-4 text-[15px]">
+        <Sparkle />
         <div><dt className="bab-label">{t.onboarding.nameTitle}</dt><dd>{name}</dd></div>
         {effectiveSports.length > 0 && (
           <div><dt className="bab-label">{t.onboarding.sportLabel}</dt>
