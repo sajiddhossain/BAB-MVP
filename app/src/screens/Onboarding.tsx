@@ -350,6 +350,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     return (
       <Frame title={match ? t.heart.revealMatchTitle : t.heart.revealMissTitle}
              next={() => setStep('heartWrap')} canNext back onBack={() => setStep('heartCount')} {...F}>
+        <div className="flex justify-center py-1">
+          <Mascot size={44} />
+        </div>
         <div className="bab-card flex flex-col items-center gap-1 px-4 py-3.5">
           <span className="text-[38px] font-bold" style={{ color: 'var(--color-coral)' }}>{bpm}</span>
           <span className="text-[11px] text-[var(--color-ink-soft)]">{t.heart.bpmLabel}</span>
