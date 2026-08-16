@@ -3,6 +3,7 @@ import { fill, useCopy } from '@/copy'
 import { googleEnabled, signInWithCode, signInWithEmail, signInWithGoogle } from '@/lib/session'
 import { lockedFor, recordAttempt, resetAttempts } from '@/lib/rateLimit'
 import OtpInput from '@/components/OtpInput'
+import Mascot from '@/components/Mascot'
 
 const CODE_LENGTH = 6
 
@@ -117,6 +118,11 @@ export default function SignIn() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center gap-5 px-5 py-10">
+      {/* 🔴 Stessa mascotte del resto dell'app: il primo saluto, prima ancora
+          dell'onboarding. Compare sempre uguale, con o senza email inviata. */}
+      <div className="flex justify-center">
+        <Mascot size={56} />
+      </div>
       <div>
         <h1 className="font-display text-[30px] leading-tight">{t.auth.title}</h1>
         <p className="mt-2 text-[15px] text-[var(--color-ink-soft)]">{t.auth.lede}</p>
