@@ -9,6 +9,7 @@ import {
   EXERCISES, EXERCISE_ORDER, WHEN_LABEL,
   type ExerciseId, type PickOption, type Step, type When,
 } from '@/content/bodysense'
+import Mascot from '@/components/Mascot'
 
 /**
  * Body-Sense — piccoli esercizi di interocezione, fuori dall'onboarding: si
@@ -142,6 +143,9 @@ export default function BodySense() {
         <Link to="/me" className="text-[13.5px] underline text-[var(--color-ink-soft)]">
           {t.settings.back}
         </Link>
+      </div>
+      <div className="flex justify-center">
+        <Mascot size={40} />
       </div>
       <p className="text-[15px] text-[var(--color-ink-soft)]">{t.bodySense.lead}</p>
 
