@@ -1,12 +1,13 @@
 import { NavLink } from 'react-router-dom'
 import { useCopy } from '@/copy'
+import { SunIcon, PathIcon, TrendIcon } from './icons'
 
 export default function TabBar() {
   const t = useCopy()
   const tabs = [
-    { to: '/today', icon: '☀️', label: t.tabs.today },
-    { to: '/journey', icon: '🗺️', label: t.tabs.journey },
-    { to: '/me', icon: '📈', label: t.tabs.me },
+    { to: '/today', Icon: SunIcon, label: t.tabs.today },
+    { to: '/journey', Icon: PathIcon, label: t.tabs.journey },
+    { to: '/me', Icon: TrendIcon, label: t.tabs.me },
   ]
 
   return (
@@ -28,9 +29,7 @@ export default function TabBar() {
             >
               {({ isActive }) => (
                 <>
-                  <span aria-hidden className="text-xl leading-none">
-                    {tab.icon}
-                  </span>
+                  <tab.Icon size={22} color={isActive ? 'var(--color-ink)' : 'var(--color-ink-soft)'} />
                   <span>{tab.label}</span>
                   {/* La tab attiva è marcata anche dalla FORMA: il significato
                       non si affida mai al solo colore. */}

@@ -4,6 +4,17 @@ import { useCopy, useLocale } from '@/copy'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { checkInsOn, localDate } from '@/lib/repo'
 import Mascot from '@/components/Mascot'
+import { CompassIcon, SunIcon, TempoIcon } from '@/components/icons'
+
+/** Il cerchio colorato dietro un'icona — stessa idea in ogni stato, colore diverso. */
+function Badge({ children, bg }: { children: React.ReactNode; bg: string }) {
+  return (
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[var(--bab-border)] border-[var(--color-ink)]"
+         style={{ background: bg }}>
+      {children}
+    </div>
+  )
+}
 
 /**
  * La home. È l'unica schermata che vedono ogni giorno, quindi deve avere
@@ -59,28 +70,32 @@ export default function Today() {
       <h1 className="font-display text-[26px]">{t.tabs.today}</h1>
 
       {state.kind === 'fresh' && (
-        <div className="bab-card flex flex-col gap-3 px-4 py-5">
-          {/* 🔴 Prima del check-in non c'è ancora niente da leggere — solo
-              l'invito a partire. La mascotte lo tiene compagnia invece di
-              lasciare la card vuota di tocco. */}
-          <div className="flex justify-center">
-            <Mascot size={40} />
+        <div className="bab-card flex flex-col gap-3 px-4 py-5" style={{ boxShadow: 'var(--shadow-lg)' }}>
+          <div className="flex items-center gap-3">
+            <Badge bg="var(--tempo-steady-tint)"><SunIcon size={22} color="var(--color-vividteal)" /></Badge>
+            <h2 className="font-display text-[20px] leading-tight">{t.today.fresh.title}</h2>
           </div>
-          <h2 className="font-display text-[20px]">{t.today.fresh.title}</h2>
           <p className="text-[15px] text-[var(--color-ink-soft)]">{t.today.fresh.body}</p>
           <Link to="/checkin/pre" className="bab-pill px-4 py-3 text-center text-[16px]"
                 style={{ background: 'var(--color-lime)' }}>
             {t.today.fresh.cta}
           </Link>
+          {/* 🔴 Prima del check-in non c'è ancora niente da leggere. La
+              mascotte tiene compagnia invece di lasciare la card fredda. */}
+          <div className="flex justify-center pt-1">
+            <Mascot size={36} />
+          </div>
         </div>
       )}
 
       {state.kind === 'mid' && (
-        <div className="bab-card flex flex-col gap-3 px-4 py-5">
+        <div className="bab-card flex flex-col gap-3 px-4 py-5" style={{ boxShadow: 'var(--shadow-lg)' }}>
           {state.tempo && (
-            <div className="flex items-center gap-2">
-              <span className="text-[26px]" aria-hidden>{TEMPOS[state.tempo].emoji}</span>
-              <p className="font-display text-[20px]">{TEMPOS[state.tempo].name}</p>
+            <div className="flex items-center gap-3">
+              <Badge bg={`var(${TEMPOS[state.tempo].cssVar}-tint)`}>
+                <TempoIcon code={state.tempo} size={22} color={`var(${TEMPOS[state.tempo].cssVar})`} />
+              </Badge>
+              <p className="font-display text-[20px] leading-tight">{TEMPOS[state.tempo].name}</p>
             </div>
           )}
           <p className="text-[15px] text-[var(--color-ink-soft)]">{t.today.mid.body}</p>
@@ -93,23 +108,27 @@ export default function Today() {
       )}
 
       {state.kind === 'closed' && (
-        <div className="bab-card flex flex-col gap-3 px-4 py-5">
+        <div className="bab-card flex flex-col gap-3 px-4 py-5" style={{ boxShadow: 'var(--shadow-lg)' }}>
           <h2 className="font-display text-[20px]">{t.today.closed.title}</h2>
           <p className="text-[15px] text-[var(--color-ink-soft)]">{t.today.closed.body}</p>
-          <dl className="flex gap-6 text-[15px]">
+          <div className="flex gap-4">
             {state.predicted && (
-              <div>
-                <dt className="bab-label">{t.today.closed.predicted}</dt>
-                <dd>{TEMPOS[state.predicted].emoji} {TEMPOS[state.predicted].name}</dd>
+              <div className="flex flex-1 flex-col items-center gap-1.5 rounded-2xl px-3 py-3 text-center"
+                   style={{ background: `var(${TEMPOS[state.predicted].cssVar}-tint)` }}>
+                <TempoIcon code={state.predicted} size={20} color={`var(${TEMPOS[state.predicted].cssVar})`} />
+                <p className="bab-label">{t.today.closed.predicted}</p>
+                <p className="text-[14px] font-bold">{TEMPOS[state.predicted].name}</p>
               </div>
             )}
             {state.trained && (
-              <div>
-                <dt className="bab-label">{t.today.closed.trained}</dt>
-                <dd>{TEMPOS[state.trained].emoji} {TEMPOS[state.trained].name}</dd>
+              <div className="flex flex-1 flex-col items-center gap-1.5 rounded-2xl px-3 py-3 text-center"
+                   style={{ background: `var(${TEMPOS[state.trained].cssVar}-tint)` }}>
+                <TempoIcon code={state.trained} size={20} color={`var(${TEMPOS[state.trained].cssVar})`} />
+                <p className="bab-label">{t.today.closed.trained}</p>
+                <p className="text-[14px] font-bold">{TEMPOS[state.trained].name}</p>
               </div>
             )}
-          </dl>
+          </div>
           {state.trained && (
             <p className="text-[13px] text-[var(--color-ink-soft)]">{TEMPOS[state.trained].tag[locale]}</p>
           )}
@@ -118,7 +137,7 @@ export default function Today() {
 
       {/* Sempre visibile, in ogni stato: si fa quando vuoi, non è legata al check-in. */}
       <Link to="/senti" className="bab-card flex items-center gap-3 px-4 py-3.5">
-        <span aria-hidden className="text-[26px]">🧭</span>
+        <Badge bg="var(--tempo-steady-tint)"><CompassIcon size={20} color="var(--color-vividteal)" /></Badge>
         <div className="flex flex-1 flex-col">
           <p className="font-display text-[16px]">{t.bodySense.entryTitle}</p>
           <p className="text-[13px] text-[var(--color-ink-soft)]">{t.bodySense.entryBody}</p>
