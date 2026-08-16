@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ArrowLeftIcon, ArrowRightIcon } from './icons'
 
 /**
  * Un calendario piccolo, per toccare i giorni invece di scriverli.
@@ -55,11 +56,11 @@ export default function CalendarMultiSelect({ selected, onChange, label, multipl
       <div className="flex items-center justify-between px-1">
         <button type="button" aria-label="Mese precedente"
                 onClick={() => setView(new Date(year, month - 1, 1))}
-                className="bab-pill h-11 w-11 text-[13px]">‹</button>
+                className="bab-pill flex h-11 w-11 items-center justify-center"><ArrowLeftIcon size={16} /></button>
         <span className="text-[13px] font-bold capitalize">{monthLabel}</span>
         <button type="button" aria-label="Mese successivo" disabled={isCurrentMonth}
                 onClick={() => setView(new Date(year, month + 1, 1))}
-                className="bab-pill h-11 w-11 text-[13px] disabled:opacity-30">›</button>
+                className="bab-pill flex h-11 w-11 items-center justify-center disabled:opacity-30"><ArrowRightIcon size={16} /></button>
       </div>
       <div className="grid grid-cols-7 text-center text-[10.5px] text-[var(--color-ink-soft)]">
         {WEEKDAY_LETTERS.map((d, i) => <span key={i}>{d}</span>)}

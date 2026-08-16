@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useCopy } from '@/copy'
+import { ArrowLeftIcon, CloseIcon } from '@/components/icons'
 
 /**
  * Una schermata, una decisione.
@@ -123,9 +124,9 @@ export default function Step({
           onClick={onBack}
           disabled={!onBack}
           aria-label={t.flow.back}
-          className="bab-pill h-11 w-11 shrink-0 text-[17px] disabled:opacity-25"
+          className="bab-pill flex h-11 w-11 shrink-0 items-center justify-center disabled:opacity-25"
         >
-          <span aria-hidden>←</span>
+          <ArrowLeftIcon size={18} />
         </button>
 
         <Progress at={at} of={of} />
@@ -135,9 +136,9 @@ export default function Step({
             type="button"
             onClick={() => (dirty ? setLeaving(true) : onClose())}
             aria-label={t.flow.close}
-            className="bab-pill h-11 w-11 shrink-0 text-[17px]"
+            className="bab-pill flex h-11 w-11 shrink-0 items-center justify-center"
           >
-            <span aria-hidden>✕</span>
+            <CloseIcon size={16} />
           </button>
         )}
       </header>

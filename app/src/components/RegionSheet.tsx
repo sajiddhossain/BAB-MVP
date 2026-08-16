@@ -3,7 +3,7 @@ import { useCopy, useLocale } from '@/copy'
 import PillGroup from './PillGroup'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
 import { BEHAVIOURS, GROUP_LABEL, INTENSITIES, SENSATIONS, sensationsIn } from '@/content/lexicon'
-import { ContentIcon } from './icons'
+import { CloseIcon, ContentIcon } from './icons'
 
 /**
  * Il foglio che si alza sulla zona toccata.
@@ -115,8 +115,8 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
             )}
           </div>
           <button type="button" onClick={onCancel} aria-label={t.flow.close}
-                  className="bab-pill h-10 w-10 shrink-0 text-[16px]">
-            <span aria-hidden>✕</span>
+                  className="bab-pill flex h-10 w-10 shrink-0 items-center justify-center">
+            <CloseIcon size={15} />
           </button>
         </div>
 
