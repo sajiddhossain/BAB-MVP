@@ -1,6 +1,38 @@
 import { useEffect, useState } from 'react'
 import { fill, useCopy } from '@/copy'
 import { googleEnabled, signInWithCode, signInWithEmail, signInWithGoogle } from '@/lib/session'
+import { lockedFor, recordAttempt, resetAttempts } from '@/lib/rateLimit'
+
+/**
+ * Le soglie del freno — vedi `lib/rateLimit.ts` per il perché.
+ * Il codice tollera più tentativi liberi del link: un refuso capita, e
+ * indovinare un codice a 6 cifre a tentativi resta comunque impraticabile
+ * molto prima di arrivare al tetto dell'attesa.
+ */
+const CODE_LIMIT = { scope: 'otp-code', free: 5, base: 30_000, cap: 5 * 60_000 }
+const SEND_LIMIT = { scope: 'otp-send', free: 2, base: 30_000, cap: 5 * 60_000 }
+
+/** "0:45", "2:00" — non i millisecondi grezzi che nessuno legge a colpo d'occhio. */
+function formatWait(ms: number): string {
+  const s = Math.ceil(ms / 1000)
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
+
+/** Il conto alla rovescia vivo per un indirizzo: si aggiorna da solo, si ferma da solo a 0. */
+function useLock(scope: string, id: string): number {
+  const [ms, setMs] = useState(() => (id ? lockedFor(scope, id) : 0))
+  useEffect(() => {
+    if (!id) { setMs(0); return }
+    setMs(lockedFor(scope, id))
+    const i = setInterval(() => {
+      const left = lockedFor(scope, id)
+      setMs(left)
+      if (left <= 0) clearInterval(i)
+    }, 500)
+    return () => clearInterval(i)
+  }, [scope, id])
+  return ms
+}
 
 /**
  * Come si entra.
@@ -26,6 +58,9 @@ export default function SignIn() {
   const [code, setCode] = useState('')
   const [codeState, setCodeState] = useState<'idle' | 'checking' | 'wrong'>('idle')
 
+  const sendWait = useLock(SEND_LIMIT.scope, email)
+  const codeWait = useLock(CODE_LIMIT.scope, email)
+
   useEffect(() => {
     let alive = true
     void googleEnabled().then((on) => { if (alive) setGoogle(on) })
@@ -34,6 +69,8 @@ export default function SignIn() {
 
   async function sendLink(e: React.FormEvent) {
     e.preventDefault()
+    if (lockedFor(SEND_LIMIT.scope, email) > 0) return
+    recordAttempt(SEND_LIMIT.scope, email, SEND_LIMIT.free, SEND_LIMIT.base, SEND_LIMIT.cap)
     setState('sending')
     const r = await signInWithEmail(email.trim())
     if (r.ok) { setState('sent'); return }
@@ -45,12 +82,15 @@ export default function SignIn() {
 
   async function enterWithCode(e: React.FormEvent) {
     e.preventDefault()
+    if (lockedFor(CODE_LIMIT.scope, email) > 0) return
     setCodeState('checking')
     const r = await signInWithCode(email, code)
     // Se è andata, `onAuthStateChange` cambia schermata da solo: qui non c'è
-    // niente da fare se non restare fermi finché non succede.
-    if (r.ok) return
+    // niente da fare se non restare fermi finché non succede. Si riparte da
+    // zero per il prossimo accesso, invece di portarsi dietro i tentativi.
+    if (r.ok) { resetAttempts(CODE_LIMIT.scope, email); return }
     console.error('[auth]', r.error)
+    recordAttempt(CODE_LIMIT.scope, email, CODE_LIMIT.free, CODE_LIMIT.base, CODE_LIMIT.cap)
     setCodeState('wrong')
   }
 
@@ -95,13 +135,17 @@ export default function SignIn() {
             </div>
             <button
               type="submit"
-              disabled={codeState === 'checking' || code.length < 6}
+              disabled={codeState === 'checking' || code.length < 6 || codeWait > 0}
               className="bab-pill px-4 py-2.5 text-[14px] disabled:opacity-40"
             >
               {codeState === 'checking' ? t.auth.codeChecking : t.auth.codeSubmit}
             </button>
           </form>
-          {codeState === 'wrong' && (
+          {codeWait > 0 ? (
+            <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
+              {fill(t.auth.codeLocked, { time: formatWait(codeWait) })}
+            </p>
+          ) : codeState === 'wrong' && (
             <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
               {t.auth.codeWrong}
             </p>
@@ -123,12 +167,17 @@ export default function SignIn() {
           />
           <button
             type="submit"
-            disabled={state === 'sending'}
+            disabled={state === 'sending' || sendWait > 0}
             className="bab-pill px-4 py-3 text-[15px] disabled:opacity-60"
             style={{ background: 'var(--color-lime)' }}
           >
             {state === 'sending' ? t.auth.sending : t.auth.sendLink}
           </button>
+          {sendWait > 0 && (
+            <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
+              {fill(t.auth.sendLocked, { time: formatWait(sendWait) })}
+            </p>
+          )}
         </form>
       )}
 

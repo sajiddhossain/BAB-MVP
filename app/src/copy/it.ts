@@ -95,6 +95,9 @@ export const it = {
     codeSubmit: 'Entra',
     codeChecking: 'Controllo…',
     codeWrong: 'Codice sbagliato o scaduto. Rimanda la mail e riprova.',
+    /** {time} è già formattato, tipo "0:45" o "2:00". */
+    codeLocked: 'Troppi codici sbagliati. Riprova tra {time}.',
+    sendLocked: 'Hai già chiesto il link da poco. Riprova tra {time}.',
     or: 'oppure',
     google: 'Continua con Google',
     /** Detto prima di toccare il bottone, non dopo. */

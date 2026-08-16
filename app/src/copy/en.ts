@@ -66,6 +66,9 @@ export const en: Copy = {
     codeSubmit: 'Go in',
     codeChecking: 'Checking…',
     codeWrong: 'Wrong or expired code. Send the email again and try once more.',
+    /** {time} is already formatted, like "0:45" or "2:00". */
+    codeLocked: 'Too many wrong codes. Try again in {time}.',
+    sendLocked: 'You already asked for the link a moment ago. Try again in {time}.',
     or: 'or',
     google: 'Continue with Google',
     socialNote: "With Google, Google will know you use BAB. With the email link, it won't.",
