@@ -305,6 +305,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     <Frame title={t.heart.guessTitle} help={t.heart.guessHelp}
            next={() => setStep('heartCount')} canNext={heartGuessBand !== null}
            back onBack={() => setStep('heartSettle')} {...F}>
+      <div className="flex justify-center py-1">
+        <Mascot size={44} />
+      </div>
       <div className="grid grid-cols-3 gap-2">
         {([
           ['slow', '🐢', t.heart.slow, t.heart.slowHelp],
