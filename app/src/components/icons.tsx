@@ -149,3 +149,259 @@ export function LockIcon({ size = 24, color = 'currentColor' }: IconProps) {
     </svg>
   )
 }
+
+/* ── Icone per Body-Sense e il lessico delle sensazioni ──────────────────
+   Sostituiscono le emoji nei contenuti tradotti di `content/bodysense.ts`
+   e `content/lexicon.ts`. Ogni content-file ora porta una chiave (`icon`)
+   invece del carattere emoji; `ContentIcon` sotto la traduce in disegno. */
+
+export function LungsIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 3v9" stroke={color} {...base} />
+      <path d="M12 12c-1-3-3-3-4-2-2 2-3 7-1 9 1.5 1.5 3.5-.5 4-2M12 12c1-3 3-3 4-2 2 2 3 7 1 9-1.5 1.5-3.5-.5-4-2"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function BalanceIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 3v16M8 21h8" stroke={color} {...base} />
+      <path d="M4 8h6M14 8h6" stroke={color} {...base} />
+      <path d="M4 8l-2 5a3 3 0 0 0 6 0L4 8ZM20 8l-2 5a3 3 0 0 0 6 0l-4-5Z" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function JarIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M8 3h8v2.5c1.5.6 2.5 2 2.5 4V19a2 2 0 0 1-2 2H7.5a2 2 0 0 1-2-2V9.5c0-2 1-3.4 2.5-4V3Z" stroke={color} {...base} />
+      <path d="M6.2 12h11.6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function CloudSunIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <circle cx="8" cy="8" r="3" stroke={color} {...base} />
+      <path d="M8 2.5v1.4M8 12v1.4M2.5 8h1.4M12.6 8H14M3.9 3.9l1 1M11.1 3.9l-1 1" stroke={color} {...base} />
+      <path d="M9 12.5c.6-.7 1.5-1.1 2.5-1.1 2 0 3.6 1.5 3.6 3.4H19a2.9 2.9 0 0 1 0 5.7H8.4a3.4 3.4 0 0 1-1-6.6c.3-.6.9-1 1.6-1.4Z"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function FlameIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 2c1 3-2.5 4-2.5 7.5a2.5 2.5 0 0 0 5 0c0-1-.5-1.7-.5-1.7 1.8.8 3 3 3 5.2A5 5 0 0 1 7 13c0-4.5 4-5.5 5-11Z"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
+/** «Nervosa»: un disegno astratto — una linea a scatti — non un volto, per non impersonare
+    un'emozione che è lei a nominare (coerente con `Mascot.tsx`: qui non è nemmeno un compagno). */
+export function ZigzagIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M3 12l4-7 3 5 3-6 3 6 3-5 2 7" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function StarOutlineIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 2.5l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 16.6l-5.6 3-1.4-6.3-4.8-4.3 6.4-.6L12 2.5Z"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function QuestionIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <circle cx="12" cy="12" r="9.5" stroke={color} {...base} />
+      <path d="M9.3 9.5a2.7 2.7 0 1 1 4 2.3c-.9.5-1.3 1-1.3 2" stroke={color} {...base} />
+      <circle cx="12" cy="17" r="0.9" fill={color} stroke="none" />
+    </svg>
+  )
+}
+
+export function StrongIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M5 15V9a2 2 0 0 1 4 0v3.5M9 12.5V6a2 2 0 0 1 4 0v6.5" stroke={color} {...base} />
+      <path d="M13 8.2a2 2 0 0 1 4 .3v2M17 9.5a2 2 0 0 1 4 .5c0 4-2.5 8-7 8-3 0-5-1.3-6.5-3.3L5 12.5"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function MinusIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M5 12h14" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function RepeatIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M4 11a8 8 0 0 1 14-5.2M20 5v4h-4" stroke={color} {...base} />
+      <path d="M20 13a8 8 0 0 1-14 5.2M4 19v-4h4" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function ArrowLeftIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M19 12H5M11 6l-6 6 6 6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function ArrowRightIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M5 12h14M13 6l6 6-6 6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function BowlIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M3 11h18a9 7 0 0 1-18 0Z" stroke={color} {...base} />
+      <path d="M7 11c0-3 2-5 5-5s5 2 5 5" stroke={color} {...base} opacity={0.5} />
+      <path d="M9 19.5h6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function DropletIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 3s6 7 6 11.5a6 6 0 0 1-12 0C6 10 12 3 12 3Z" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function HandshakeIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M2 11l4-3 4 2.5 3-1.5 4 2 5-3" stroke={color} {...base} />
+      <path d="M6 8l4 5-2 2M14 9.5l3.5 4.5-2 2" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function SproutIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 21v-9" stroke={color} {...base} />
+      <path d="M12 12c0-3.5-3-5-7-5 0 4 2.5 6 7 5.5Z" stroke={color} {...base} />
+      <path d="M12 10c0-3 2.5-4.5 6-4.5.3 3.3-2 5.2-6 5Z" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function SparkleLineIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M11 3l1 4.5L16.5 8 12 9l-1 4.5L10 9 5.5 8 10 7.5 11 3Z" stroke={color} {...base} strokeLinejoin="round" />
+      <path d="M18 13l.6 2.4L21 16l-2.4.6L18 19l-.6-2.4L15 16l2.4-.6L18 13Z" stroke={color} {...base} strokeLinejoin="round" opacity={0.6} />
+    </svg>
+  )
+}
+
+export function SpiralIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 12a2 2 0 1 1 2 2 4 4 0 1 1 4-4 6 6 0 1 1-6-6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function BreathWaveIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M2 12c1.5-4 2.5-4 4 0s2.5 4 4 0 2.5-4 4 0 2.5 4 4 0 2.5-4 4 0" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function PersonIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <circle cx="12" cy="5" r="2.6" stroke={color} {...base} />
+      <path d="M12 9v6M8 21l2-6h4l2 6M7.5 13h9" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function DotsIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <circle cx="5" cy="12" r="1.4" fill={color} stroke="none" />
+      <circle cx="12" cy="12" r="1.4" fill={color} stroke="none" />
+      <circle cx="19" cy="12" r="1.4" fill={color} stroke="none" />
+    </svg>
+  )
+}
+
+export function FeatherIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M20 4c-8 0-14 6-14 14v2h2c8 0 14-6 14-14V4Z" stroke={color} {...base} />
+      <path d="M20 4L7 17M11 13l-3 3M15 9l-3 3" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+/** Chiavi usate da `content/bodysense.ts` e `content/lexicon.ts` al posto delle emoji. */
+export type IconKey =
+  | 'lungs' | 'bolt' | 'target' | 'balance' | 'jar' | 'heart'
+  | 'moon' | 'cloud-sun' | 'flame' | 'zigzag' | 'star' | 'question'
+  | 'strong' | 'minus' | 'repeat' | 'arrow-left' | 'arrow-right'
+  | 'bowl' | 'droplet' | 'handshake' | 'sprout' | 'sparkle'
+  | 'spiral' | 'breath-wave' | 'person' | 'dots' | 'feather'
+
+export function ContentIcon({ name, size = 24, color = 'currentColor' }: IconProps & { name: IconKey }) {
+  switch (name) {
+    case 'lungs': return <LungsIcon size={size} color={color} />
+    case 'bolt': return <BoltIcon size={size} color={color} />
+    case 'target': return <TargetIcon size={size} color={color} />
+    case 'balance': return <BalanceIcon size={size} color={color} />
+    case 'jar': return <JarIcon size={size} color={color} />
+    case 'heart': return <HeartIcon size={size} color={color} />
+    case 'moon': return <MoonIcon size={size} color={color} />
+    case 'cloud-sun': return <CloudSunIcon size={size} color={color} />
+    case 'flame': return <FlameIcon size={size} color={color} />
+    case 'zigzag': return <ZigzagIcon size={size} color={color} />
+    case 'star': return <StarOutlineIcon size={size} color={color} />
+    case 'question': return <QuestionIcon size={size} color={color} />
+    case 'strong': return <StrongIcon size={size} color={color} />
+    case 'minus': return <MinusIcon size={size} color={color} />
+    case 'repeat': return <RepeatIcon size={size} color={color} />
+    case 'arrow-left': return <ArrowLeftIcon size={size} color={color} />
+    case 'arrow-right': return <ArrowRightIcon size={size} color={color} />
+    case 'bowl': return <BowlIcon size={size} color={color} />
+    case 'droplet': return <DropletIcon size={size} color={color} />
+    case 'handshake': return <HandshakeIcon size={size} color={color} />
+    case 'sprout': return <SproutIcon size={size} color={color} />
+    case 'sparkle': return <SparkleLineIcon size={size} color={color} />
+    case 'spiral': return <SpiralIcon size={size} color={color} />
+    case 'breath-wave': return <BreathWaveIcon size={size} color={color} />
+    case 'person': return <PersonIcon size={size} color={color} />
+    case 'dots': return <DotsIcon size={size} color={color} />
+    case 'feather': return <FeatherIcon size={size} color={color} />
+  }
+}

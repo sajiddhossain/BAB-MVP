@@ -10,6 +10,7 @@ import {
   type ExerciseId, type PickOption, type Step, type When,
 } from '@/content/bodysense'
 import Mascot from '@/components/Mascot'
+import { ContentIcon, type IconKey } from '@/components/icons'
 
 /**
  * Body-Sense — piccoli esercizi di interocezione, fuori dall'onboarding: si
@@ -24,14 +25,14 @@ import Mascot from '@/components/Mascot'
  * Niente di quello che si fa qui si salva: è pratica, non un dato.
  */
 
-type Card = { id: ExerciseId | 'heartbeat'; emoji: string; name: string; trains: string; dur: string; when: When[] }
+type Card = { id: ExerciseId | 'heartbeat'; icon: IconKey; name: string; trains: string; dur: string; when: When[] }
 
 const WHEN_ORDER: When[] = ['before', 'after', 'match', 'anytime']
 
-const TWOSIDES_OPT: Record<string, { emoji: string; label: Record<Locale, string> }> = {
-  left: { emoji: '👈', label: { it: 'Sinistro', en: 'Left' } },
-  same: { emoji: '⚖️', label: { it: 'Uguale', en: 'Same' } },
-  right: { emoji: '👉', label: { it: 'Destro', en: 'Right' } },
+const TWOSIDES_OPT: Record<string, { icon: IconKey; label: Record<Locale, string> }> = {
+  left: { icon: 'arrow-left', label: { it: 'Sinistro', en: 'Left' } },
+  same: { icon: 'balance', label: { it: 'Uguale', en: 'Same' } },
+  right: { icon: 'arrow-right', label: { it: 'Destro', en: 'Right' } },
 }
 
 function Kicker({ text }: { text: string }) {
@@ -98,11 +99,11 @@ export default function BodySense() {
   }, [toast])
 
   const cards: Card[] = [
-    { id: 'heartbeat', emoji: '❤️', name: t.bodySense.heartbeatName, trains: t.bodySense.heartbeatTrains,
+    { id: 'heartbeat', icon: 'heart', name: t.bodySense.heartbeatName, trains: t.bodySense.heartbeatTrains,
       dur: t.bodySense.heartbeatDur, when: ['anytime', 'before'] },
     ...EXERCISE_ORDER.map((id): Card => {
       const e = EXERCISES[id]
-      return { id, emoji: e.emoji, name: e.name[locale], trains: e.trains[locale], dur: e.dur[locale], when: e.when }
+      return { id, icon: e.icon, name: e.name[locale], trains: e.trains[locale], dur: e.dur[locale], when: e.when }
     }),
   ]
   const visible = filter === 'all' ? cards : cards.filter((c) => c.when.includes(filter))
@@ -163,7 +164,7 @@ export default function BodySense() {
         {visible.map((c) => (
           <button key={c.id} type="button" onClick={() => open(c.id)}
                   className="bab-card flex min-h-[140px] flex-col gap-1.5 px-3.5 py-3.5 text-left">
-            <span aria-hidden className="text-[28px]">{c.emoji}</span>
+            <ContentIcon name={c.icon} size={26} color="var(--color-vividteal)" />
             <span className="font-display text-[15px] leading-tight">{c.name}</span>
             <span className="text-[11px] font-bold" style={{ color: 'var(--color-vividteal)' }}>{c.trains}</span>
             <span className="mt-auto text-[11px] text-[var(--color-ink-soft)]">⏱ {c.dur}</span>
@@ -210,8 +211,8 @@ function Player({
   return (
     <div className="flex flex-1 flex-col gap-3">
       <div className="mb-1 flex items-center justify-between">
-        <span className="text-[12px] font-bold uppercase tracking-[0.06em]" style={{ color: 'var(--color-vividteal)' }}>
-          {ex.emoji} {ex.name[locale]}
+        <span className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.06em]" style={{ color: 'var(--color-vividteal)' }}>
+          <ContentIcon name={ex.icon} size={15} color="var(--color-vividteal)" /> {ex.name[locale]}
         </span>
         <button type="button" onClick={onClose} aria-label={t.bodySense.close}
                 className="flex h-9 w-9 items-center justify-center text-[20px] text-[var(--color-ink-soft)]">
@@ -287,7 +288,7 @@ function PickButton({ option, row, selected, onPick }: { option: PickOption; row
             style={selected
               ? { background: 'var(--color-teal)', borderColor: 'var(--color-teal)', color: 'var(--color-surface)' }
               : undefined}>
-      {option.emoji && <span aria-hidden className="text-[20px]">{option.emoji}</span>}
+      {option.icon && <ContentIcon name={option.icon} size={18} color={selected ? 'var(--color-surface)' : 'var(--color-ink)'} />}
       <span className="text-[14px] font-bold">{option.label[locale]}</span>
     </button>
   )
@@ -300,17 +301,21 @@ function Reveal({ exId, data }: { exId: ExerciseId; data: Record<string, string>
   if (exId === 'twosides') {
     const guess = data.guess, actual = data.actual
     const match = guess === actual
-    const label = (v: string | undefined) => v && TWOSIDES_OPT[v] ? `${TWOSIDES_OPT[v].emoji} ${TWOSIDES_OPT[v].label[locale]}` : '—'
+    const Label = ({ v }: { v: string | undefined }) => v && TWOSIDES_OPT[v] ? (
+      <span className="inline-flex items-center gap-1.5">
+        <ContentIcon name={TWOSIDES_OPT[v].icon} size={16} /> {TWOSIDES_OPT[v].label[locale]}
+      </span>
+    ) : <>—</>
     return (
       <>
         <div className="grid grid-cols-2 gap-2">
           <div className="rounded-2xl px-2 py-2.5 text-center" style={{ background: 'color-mix(in srgb, var(--color-lavender) 30%, white)' }}>
             <p className="bab-label">{t.bodySense.twosidesYourGuess}</p>
-            <p className="text-[15px] font-bold">{label(guess)}</p>
+            <p className="flex items-center justify-center text-[15px] font-bold"><Label v={guess} /></p>
           </div>
           <div className="rounded-2xl px-2 py-2.5 text-center" style={{ background: 'color-mix(in srgb, var(--color-pink) 30%, white)' }}>
             <p className="bab-label">{t.bodySense.twosidesActual}</p>
-            <p className="text-[15px] font-bold">{label(actual)}</p>
+            <p className="flex items-center justify-center text-[15px] font-bold"><Label v={actual} /></p>
           </div>
         </div>
         <div className="bab-card px-3 py-2.5" style={{ background: 'var(--tempo-steady-tint)' }}>
@@ -381,17 +386,17 @@ function HeartbeatPlayer({ stepIdx, isLast, heartGuess, setHeartGuess, heartTaps
             <p className="text-[14.5px] text-[var(--color-ink-soft)]">{t.heart.guessHelp}</p>
             <div className="grid grid-cols-3 gap-2">
               {([
-                ['slow', '🐢', t.heart.slow, t.heart.slowHelp],
-                ['medium', '🚶', t.heart.medium, t.heart.mediumHelp],
-                ['fast', '🐇', t.heart.fast, t.heart.fastHelp],
-              ] as const).map(([band, emoji, label, help]) => (
+                ['slow', 'moon', t.heart.slow, t.heart.slowHelp],
+                ['medium', 'cloud-sun', t.heart.medium, t.heart.mediumHelp],
+                ['fast', 'flame', t.heart.fast, t.heart.fastHelp],
+              ] as const).map(([band, icon, label, help]) => (
                 <button key={band} type="button" onClick={() => setHeartGuess(band)}
                         aria-pressed={heartGuess === band}
                         className="bab-pill flex flex-col items-center gap-1 px-2 py-3 text-center"
                         style={heartGuess === band
                           ? { background: 'var(--color-teal)', borderColor: 'var(--color-teal)', color: 'var(--color-surface)' }
                           : undefined}>
-                  <span aria-hidden className="text-[22px]">{emoji}</span>
+                  <ContentIcon name={icon} size={22} color={heartGuess === band ? 'var(--color-surface)' : 'var(--color-ink)'} />
                   <span className="text-[13px] font-bold">{label}</span>
                   <span className="text-[10.5px] opacity-80">{help}</span>
                 </button>

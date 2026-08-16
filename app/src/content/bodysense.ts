@@ -1,4 +1,5 @@
 import type { Locale } from '@/copy'
+import type { IconKey } from '@/components/icons'
 
 /**
  * Body-Sense — la libreria di piccoli esercizi di interocezione, fuori
@@ -18,7 +19,7 @@ type L = Record<Locale, string>
 
 export type When = 'before' | 'after' | 'match' | 'anytime'
 
-export type PickOption = { emoji?: string; label: L; value: string }
+export type PickOption = { icon?: IconKey; label: L; value: string }
 
 export type Step =
   | { kind: 'text'; kicker: L; title: L; body: L }
@@ -33,7 +34,7 @@ export type ExerciseId = 'breath' | 'nervous' | 'zone' | 'twosides' | 'hunger' |
 
 export type Exercise = {
   id: ExerciseId
-  emoji: string
+  icon: IconKey
   name: L
   trains: L
   dur: L
@@ -50,7 +51,7 @@ export const WHEN_LABEL: Record<When, L> = {
 
 export const EXERCISES: Record<ExerciseId, Exercise> = {
   breath: {
-    id: 'breath', emoji: '🫁',
+    id: 'breath', icon: 'lungs',
     name: { it: 'Respiro', en: 'Breath' },
     trains: { it: 'Precisione + calma', en: 'Accuracy + calm' },
     dur: { it: '90 sec', en: '90s' },
@@ -65,9 +66,9 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         title: { it: 'Quanti respiri al minuto?', en: 'How many breaths a minute?' },
         body: { it: 'Un respiro = dentro e fuori. Fai una stima.', en: 'One breath = in and out. Take a guess.' },
         options: [
-          { emoji: '🌙', label: { it: 'Lento', en: 'Slow' }, value: 'slow' },
-          { emoji: '🌤️', label: { it: 'Medio', en: 'Medium' }, value: 'medium' },
-          { emoji: '🔥', label: { it: 'Veloce', en: 'Quick' }, value: 'quick' },
+          { icon: 'moon', label: { it: 'Lento', en: 'Slow' }, value: 'slow' },
+          { icon: 'cloud-sun', label: { it: 'Medio', en: 'Medium' }, value: 'medium' },
+          { icon: 'flame', label: { it: 'Veloce', en: 'Quick' }, value: 'quick' },
         ] },
       { kind: 'reflect',
         kicker: { it: 'Il tuo conto', en: 'Your read' },
@@ -85,7 +86,7 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
   },
 
   nervous: {
-    id: 'nervous', emoji: '⚡',
+    id: 'nervous', icon: 'bolt',
     name: { it: 'Nervosa o carica?', en: 'Nervous or Excited?' },
     trains: { it: 'Rileggere il segnale', en: 'Reframing' },
     dur: { it: '60 sec', en: '60s' },
@@ -99,9 +100,9 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         kicker: { it: 'Passo 1 · Dagli un nome', en: 'Step 1 · Name it' },
         title: { it: 'Come lo chiameresti?', en: 'What would you call that?' },
         options: [
-          { emoji: '😰', label: { it: 'Nervosa', en: 'Nervous' }, value: 'nervous' },
-          { emoji: '🤩', label: { it: 'Carica', en: 'Excited' }, value: 'excited' },
-          { emoji: '🤔', label: { it: 'Non so', en: 'Not sure' }, value: 'unsure' },
+          { icon: 'zigzag', label: { it: 'Nervosa', en: 'Nervous' }, value: 'nervous' },
+          { icon: 'star', label: { it: 'Carica', en: 'Excited' }, value: 'excited' },
+          { icon: 'question', label: { it: 'Non so', en: 'Not sure' }, value: 'unsure' },
         ] },
       { kind: 'reflect',
         kicker: { it: 'Il segreto', en: 'The secret' },
@@ -112,9 +113,9 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         title: { it: 'Dillo: "Sono pronta."', en: 'Say it: "I\'m ready."' },
         body: { it: 'Dillo nella tua testa, o a voce. Come ti sta?', en: 'Say it in your head, or out loud. How does it sit?' },
         options: [
-          { emoji: '💪', label: { it: 'Meglio', en: 'Feels better' }, value: 'better' },
-          { emoji: '➖', label: { it: 'Uguale', en: 'About the same' }, value: 'same' },
-          { emoji: '🔁', label: { it: 'Ci vuole pratica', en: 'Takes practice' }, value: 'practice' },
+          { icon: 'strong', label: { it: 'Meglio', en: 'Feels better' }, value: 'better' },
+          { icon: 'minus', label: { it: 'Uguale', en: 'About the same' }, value: 'same' },
+          { icon: 'repeat', label: { it: 'Ci vuole pratica', en: 'Takes practice' }, value: 'practice' },
         ] },
       { kind: 'reflect',
         kicker: { it: 'Ecco fatto', en: "That's it" },
@@ -124,7 +125,7 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
   },
 
   zone: {
-    id: 'zone', emoji: '🎯',
+    id: 'zone', icon: 'target',
     name: { it: 'Trova la tua zona', en: 'Find Your Zone' },
     trains: { it: 'Guidare il segnale', en: 'Steering' },
     dur: { it: '90 sec', en: '90s' },
@@ -153,7 +154,7 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
   },
 
   twosides: {
-    id: 'twosides', emoji: '⚖️',
+    id: 'twosides', icon: 'balance',
     name: { it: 'Due lati', en: 'Two Sides' },
     trains: { it: 'Localizzare', en: 'Locating' },
     dur: { it: '60 sec', en: '60s' },
@@ -168,9 +169,9 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         title: { it: 'Quale lato è più teso?', en: 'Which side is tighter?' },
         body: { it: 'Predici prima di controllare.', en: 'Predict before you test it.' },
         options: [
-          { emoji: '👈', label: { it: 'Sinistro', en: 'Left' }, value: 'left' },
-          { emoji: '⚖️', label: { it: 'Uguale', en: 'Same' }, value: 'same' },
-          { emoji: '👉', label: { it: 'Destro', en: 'Right' }, value: 'right' },
+          { icon: 'arrow-left', label: { it: 'Sinistro', en: 'Left' }, value: 'left' },
+          { icon: 'balance', label: { it: 'Uguale', en: 'Same' }, value: 'same' },
+          { icon: 'arrow-right', label: { it: 'Destro', en: 'Right' }, value: 'right' },
         ] },
       { kind: 'text',
         kicker: { it: 'Passo 2 · Controlla', en: 'Step 2 · Check' },
@@ -180,9 +181,9 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         kicker: { it: 'Passo 2 · Controlla', en: 'Step 2 · Check' },
         title: { it: 'Quale era davvero più teso?', en: 'Which was actually tighter?' },
         options: [
-          { emoji: '👈', label: { it: 'Sinistro', en: 'Left' }, value: 'left' },
-          { emoji: '⚖️', label: { it: 'Uguale', en: 'Same' }, value: 'same' },
-          { emoji: '👉', label: { it: 'Destro', en: 'Right' }, value: 'right' },
+          { icon: 'arrow-left', label: { it: 'Sinistro', en: 'Left' }, value: 'left' },
+          { icon: 'balance', label: { it: 'Uguale', en: 'Same' }, value: 'same' },
+          { icon: 'arrow-right', label: { it: 'Destro', en: 'Right' }, value: 'right' },
         ] },
       { kind: 'reveal',
         kicker: { it: 'Il tuo conto', en: 'Your read' },
@@ -191,7 +192,7 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
   },
 
   hunger: {
-    id: 'hunger', emoji: '🫙',
+    id: 'hunger', icon: 'jar',
     name: { it: 'Fame o sete?', en: 'Hungry or Thirsty?' },
     trains: { it: 'Distinguere i segnali', en: 'Telling apart' },
     dur: { it: '90 sec', en: '90s' },
@@ -205,10 +206,10 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         kicker: { it: 'Passo 1 · Indovina', en: 'Step 1 · Guess' },
         title: { it: 'Cos\'è?', en: 'What is it?' },
         options: [
-          { emoji: '🍚', label: { it: 'Fame', en: 'Hungry' }, value: 'hungry' },
-          { emoji: '💧', label: { it: 'Sete', en: 'Thirsty' }, value: 'thirsty' },
-          { emoji: '🤝', label: { it: 'Tutt\'e due', en: 'Both' }, value: 'both' },
-          { emoji: '🌱', label: { it: 'Nessuna', en: 'Neither' }, value: 'neither' },
+          { icon: 'bowl', label: { it: 'Fame', en: 'Hungry' }, value: 'hungry' },
+          { icon: 'droplet', label: { it: 'Sete', en: 'Thirsty' }, value: 'thirsty' },
+          { icon: 'handshake', label: { it: 'Tutt\'e due', en: 'Both' }, value: 'both' },
+          { icon: 'sprout', label: { it: 'Nessuna', en: 'Neither' }, value: 'neither' },
         ] },
       { kind: 'text',
         kicker: { it: 'Passo 2 · Controlla', en: 'Step 2 · Check' },
@@ -218,8 +219,8 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         kicker: { it: 'Passo 2 · Controlla', en: 'Step 2 · Check' },
         title: { it: 'Dopo l\'acqua…', en: 'After the water…' },
         options: [
-          { emoji: '🔁', label: { it: 'C\'è ancora', en: 'Still there' }, value: 'still' },
-          { emoji: '✨', label: { it: 'Si è calmato', en: 'Eased off' }, value: 'eased' },
+          { icon: 'repeat', label: { it: 'C\'è ancora', en: 'Still there' }, value: 'still' },
+          { icon: 'sparkle', label: { it: 'Si è calmato', en: 'Eased off' }, value: 'eased' },
         ] },
       { kind: 'reflect',
         kicker: { it: 'Bene', en: 'Nice' },
@@ -229,7 +230,7 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
   },
 
   feeling: {
-    id: 'feeling', emoji: '💗',
+    id: 'feeling', icon: 'heart',
     name: { it: 'Una sensazione nel corpo', en: 'Feeling in the Body' },
     trains: { it: 'Dare un nome', en: 'Naming' },
     dur: { it: '60 sec', en: '60s' },
@@ -243,11 +244,11 @@ export const EXERCISES: Record<ExerciseId, Exercise> = {
         kicker: { it: 'Passo 1 · Localizza', en: 'Step 1 · Locate' },
         title: { it: 'Indicala', en: 'Point to it' },
         options: [
-          { emoji: '🫀', label: { it: 'Petto', en: 'Chest' }, value: 'chest' },
-          { emoji: '🌀', label: { it: 'Pancia', en: 'Tummy' }, value: 'tummy' },
-          { emoji: '😮‍💨', label: { it: 'Gola', en: 'Throat' }, value: 'throat' },
-          { emoji: '🧍', label: { it: 'Spalle / mascella', en: 'Shoulders / jaw' }, value: 'shoulders' },
-          { emoji: '🤷', label: { it: 'Da un\'altra parte', en: 'Somewhere else' }, value: 'else' },
+          { icon: 'heart', label: { it: 'Petto', en: 'Chest' }, value: 'chest' },
+          { icon: 'spiral', label: { it: 'Pancia', en: 'Tummy' }, value: 'tummy' },
+          { icon: 'breath-wave', label: { it: 'Gola', en: 'Throat' }, value: 'throat' },
+          { icon: 'person', label: { it: 'Spalle / mascella', en: 'Shoulders / jaw' }, value: 'shoulders' },
+          { icon: 'dots', label: { it: 'Da un\'altra parte', en: 'Somewhere else' }, value: 'else' },
         ] },
       { kind: 'pick', store: 'word',
         kicker: { it: 'Passo 2 · Dalle un nome', en: 'Step 2 · Name' },

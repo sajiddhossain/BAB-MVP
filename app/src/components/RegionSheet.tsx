@@ -3,6 +3,7 @@ import { useCopy, useLocale } from '@/copy'
 import PillGroup from './PillGroup'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
 import { BEHAVIOURS, GROUP_LABEL, INTENSITIES, SENSATIONS, sensationsIn } from '@/content/lexicon'
+import { ContentIcon } from './icons'
 
 /**
  * Il foglio che si alza sulla zona toccata.
@@ -108,8 +109,8 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
               {title}
             </h2>
             {chosen && (
-              <p className="text-[13.5px] text-[var(--color-ink-soft)]">
-                {chosen.emoji} {chosen.label[locale]} — {chosen.hint[locale]}
+              <p className="flex items-center gap-1 text-[13.5px] text-[var(--color-ink-soft)]">
+                {chosen.icon && <ContentIcon name={chosen.icon} size={14} />} {chosen.label[locale]} — {chosen.hint[locale]}
               </p>
             )}
           </div>
@@ -133,7 +134,9 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
               <ul id="region-sheet-hints" className="bab-card flex flex-col gap-1.5 px-3.5 py-3 text-[13px]">
                 {SENSATIONS.map((s) => (
                   <li key={s.code}>
-                    <span className="font-bold">{s.emoji} {s.label[locale]}</span>
+                    <span className="inline-flex items-center gap-1 font-bold">
+                      {s.icon && <ContentIcon name={s.icon} size={14} />} {s.label[locale]}
+                    </span>
                     {' — '}<span className="text-[var(--color-ink-soft)]">{s.hint[locale]}</span>
                   </li>
                 ))}
@@ -147,7 +150,9 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
                   label={GROUP_LABEL[g][locale]}
                   tone={g === 'flag' ? 'care' : tone}
                   options={sensationsIn(g).map((s) => ({
-                    value: s.code, label: s.label[locale], emoji: s.emoji, flag: s.redFlag,
+                    value: s.code, label: s.label[locale],
+                    icon: s.icon ? <ContentIcon name={s.icon} size={14} /> : undefined,
+                    flag: s.redFlag,
                   }))}
                   value={sens}
                   onChange={pick}

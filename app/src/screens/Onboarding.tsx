@@ -15,7 +15,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
-import { TempoIcon } from '@/components/icons'
+import { ContentIcon, TempoIcon } from '@/components/icons'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -323,17 +323,17 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       </div>
       <div className="grid grid-cols-3 gap-2">
         {([
-          ['slow', '🐢', t.heart.slow, t.heart.slowHelp],
-          ['medium', '🚶', t.heart.medium, t.heart.mediumHelp],
-          ['fast', '🐇', t.heart.fast, t.heart.fastHelp],
-        ] as const).map(([band, emoji, label, help]) => (
+          ['slow', 'moon', t.heart.slow, t.heart.slowHelp],
+          ['medium', 'cloud-sun', t.heart.medium, t.heart.mediumHelp],
+          ['fast', 'flame', t.heart.fast, t.heart.fastHelp],
+        ] as const).map(([band, icon, label, help]) => (
           <button key={band} type="button" onClick={() => setHeartGuessBand(band)}
                   aria-pressed={heartGuessBand === band}
                   className="bab-pill flex flex-col items-center gap-1 px-2 py-3 text-center"
                   style={heartGuessBand === band
                     ? { background: 'var(--color-teal)', borderColor: 'var(--color-teal)', color: 'var(--color-surface)' }
                     : undefined}>
-            <span aria-hidden className="text-[22px]">{emoji}</span>
+            <ContentIcon name={icon} size={22} color={heartGuessBand === band ? 'var(--color-surface)' : 'var(--color-ink)'} />
             <span className="text-[13px] font-bold">{label}</span>
             <span className="text-[10.5px] opacity-80">{help}</span>
           </button>

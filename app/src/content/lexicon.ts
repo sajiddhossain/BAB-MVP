@@ -1,4 +1,5 @@
 import type { Locale } from '@/copy'
+import type { IconKey } from '@/components/icons'
 
 /**
  * Lessico delle sensazioni.
@@ -34,7 +35,7 @@ export type Sensation = {
   clinical: ClinicalCategory
   /** Se true, apre il Care mode DA SOLA: la classificazione non è compito suo. */
   redFlag: boolean
-  emoji?: string
+  icon?: IconKey
   label: Record<Locale, string>
   /**
    * 🔴 Spiega la PAROLA, non la diagnosi: com'è sentirla, mai cosa significa
@@ -47,16 +48,16 @@ export type Sensation = {
 
 export const SENSATIONS: Sensation[] = [
   // ── Gruppo "va bene" ──────────────────────────────────────────────────────
-  { code: 'strong', group: 'good', clinical: 'normal', redFlag: false, emoji: '💪',
+  { code: 'strong', group: 'good', clinical: 'normal', redFlag: false, icon: 'strong',
     label: { it: 'Forte', en: 'Strong' },
     hint: { it: 'Risponde bene, ha potenza', en: 'Responds well, has power' } },
-  { code: 'warm',   group: 'good', clinical: 'normal', redFlag: false, emoji: '🔥',
+  { code: 'warm',   group: 'good', clinical: 'normal', redFlag: false, icon: 'flame',
     label: { it: 'Calda / attiva', en: 'Warm / switched on' },
     hint: { it: 'Sveglia, pronta a muoversi', en: 'Switched on, ready to move' } },
-  { code: 'light',  group: 'good', clinical: 'normal', redFlag: false, emoji: '🪶',
+  { code: 'light',  group: 'good', clinical: 'normal', redFlag: false, icon: 'feather',
     label: { it: 'Leggera', en: 'Light' },
     hint: { it: 'Senza peso, si muove facile', en: 'No weight to it, moves easily' } },
-  { code: 'fine',   group: 'good', clinical: 'normal', redFlag: false, emoji: '✨',
+  { code: 'fine',   group: 'good', clinical: 'normal', redFlag: false, icon: 'sparkle',
     label: { it: 'Tutto ok', en: 'All fine' },
     hint: { it: 'Non senti niente di particolare', en: "Nothing in particular to notice" } },
 
