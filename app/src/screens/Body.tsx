@@ -10,6 +10,7 @@ import {
   WINDOWS, dayOf, daysAgo, heatOf, summarise,
   type Signal, type Spot, type Window,
 } from '@/lib/bodyhistory'
+import Mascot from '@/components/Mascot'
 
 /**
  * «Il mio corpo» — la mappa corporea che finalmente restituisce qualcosa.
@@ -79,6 +80,9 @@ export default function Body() {
 
       {neverAnything ? (
         <Card>
+          <div className="flex justify-center">
+            <Mascot size={40} />
+          </div>
           <h2 className="font-display text-[18px]">{t.body.emptyTitle}</h2>
           <p className="text-[15px] text-[var(--color-ink-soft)]">{t.body.emptyBody}</p>
           <Link to="/checkin/pre" className="bab-pill self-start px-5 py-2.5 text-[15px]"

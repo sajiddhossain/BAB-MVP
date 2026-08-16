@@ -8,6 +8,7 @@ import { TEMPOS } from '@/content/tempo'
 import { PHASES, readCycle } from '@/content/cycle'
 import { useSession } from '@/lib/session'
 import type { Row } from '@/lib/insights'
+import Mascot from '@/components/Mascot'
 
 /**
  * La body-story — l'output "Communicate" del §11.
@@ -224,7 +225,13 @@ export default function Story() {
       <section className="bab-card flex flex-col gap-3 px-4 py-4">
         <h2 className="font-display text-[18px]">{t.story.previewTitle}</h2>
         {shown.length === 0 ? (
-          <p className="text-[14px] text-[var(--color-ink-soft)]">{t.story.emptyState}</p>
+          // 🔴 Solo qui, MAI dentro l'SVG più sotto: quella è l'immagine
+          // esatta che parte, non c'è spazio per una mascotte che chi la
+          // riceve non ha mai visto nell'app.
+          <div className="flex flex-col items-center gap-2 py-2 text-center">
+            <Mascot size={40} />
+            <p className="text-[14px] text-[var(--color-ink-soft)]">{t.story.emptyState}</p>
+          </div>
         ) : (
           <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${W} ${H}`}
                width={W} height={H} className="h-auto w-full" role="img" aria-label={t.story.title}>
