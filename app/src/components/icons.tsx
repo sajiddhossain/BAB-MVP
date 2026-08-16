@@ -160,6 +160,16 @@ export function BandageIcon({ size = 24, color = 'currentColor' }: IconProps) {
   )
 }
 
+/** Bandiera rossa — marca i segnali che instradano al Care da soli (§4.3). */
+export function FlagIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M6 3v18" stroke={color} {...base} />
+      <path d="M6 4h12l-3 4 3 4H6Z" stroke={color} {...base} strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 /* ── Icone per Body-Sense e il lessico delle sensazioni ──────────────────
    Sostituiscono le emoji nei contenuti tradotti di `content/bodysense.ts`
    e `content/lexicon.ts`. Ogni content-file ora porta una chiave (`icon`)

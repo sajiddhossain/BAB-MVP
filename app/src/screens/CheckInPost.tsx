@@ -13,7 +13,7 @@ import { isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
 import Sparkle from '@/components/Sparkle'
-import { CompassIcon, ContentIcon, TempoIcon } from '@/components/icons'
+import { CompassIcon, ContentIcon, FlagIcon, TempoIcon } from '@/components/icons'
 import { norm, RANGES, recovery, predictionError } from '@/lib/tempo'
 import { saveCheckIn, checkInsOn, localDate, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -251,8 +251,8 @@ export default function CheckInPost() {
           {signals.map((s, i) => (
             <li key={i} className="bab-pill flex shrink-0 items-center gap-1.5 py-1.5 pl-3 pr-1.5 text-[12.5px]"
                 style={s.is_red_flag ? { borderColor: 'var(--care)' } : undefined}>
-              <span className="whitespace-nowrap">
-                {s.is_red_flag && <span aria-hidden>🚩 </span>}
+              <span className="inline-flex items-center gap-1 whitespace-nowrap">
+                {s.is_red_flag && <FlagIcon size={13} color="var(--care)" />}
                 {regionLabel(s.region as RegionCode, locale)}
               </span>
               <button type="button" onClick={() => setSignals((p) => p.filter((_, j) => j !== i))}

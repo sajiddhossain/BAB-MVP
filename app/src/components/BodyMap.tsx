@@ -4,6 +4,7 @@ import { REGIONS, regionLabel, type RegionCode } from '@/content/bodymap'
 import {
   GEOMETRY, HALF, MIN_HIT, MIRROR, SHADOW, VIEW, area, hitBox, type Shape, type Side,
 } from './body-shapes'
+import { FlagIcon } from './icons'
 
 /**
  * La mappa corporea. Compare in tre posti — check-in pre, check-in post e
@@ -309,12 +310,14 @@ export default function BodyMap({
                       <button
                         key={r.code} type="button" aria-pressed={selected === r.code}
                         onClick={() => choose(r.code)}
-                        className="bab-pill px-3 py-1.5 text-[12.5px]"
+                        className="bab-pill inline-flex items-center gap-1 px-3 py-1.5 text-[12.5px]"
                         style={selected === r.code
                           ? { background: accent, borderColor: accent, color: 'var(--color-surface)' }
                           : logged.includes(r.code) ? { background: tint } : undefined}
                       >
-                        {flagged.includes(r.code) && <span aria-hidden>🚩 </span>}
+                        {flagged.includes(r.code) && (
+                          <FlagIcon size={12} color={selected === r.code ? 'var(--color-surface)' : 'var(--care)'} />
+                        )}
                         {r.label[locale]}
                       </button>
                     ))}

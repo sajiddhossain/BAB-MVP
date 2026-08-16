@@ -6,6 +6,7 @@ import { SENSATIONS, isRedFlag } from '@/content/lexicon'
 import { CARE } from '@/content/clinical'
 import { useSession } from '@/lib/session'
 import { saveAcuteSignal } from '@/lib/repo'
+import { FlagIcon } from './icons'
 
 /**
  * «Mi sono fatta male» — tre tocchi dal problema all'istruzione.
@@ -130,7 +131,7 @@ export default function HurtPanel({ onClose }: { onClose: () => void }) {
                     onClick={() => void choose(code)}
                     className="bab-card flex items-center gap-2 px-4 py-3 text-left text-[15px]"
                   >
-                    {s.redFlag && <span aria-hidden>🚩</span>}
+                    {s.redFlag && <FlagIcon size={15} color="var(--care)" />}
                     {s.label[locale]}
                   </button>
                 )

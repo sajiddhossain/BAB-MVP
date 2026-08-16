@@ -11,6 +11,7 @@ import {
   type Signal, type Spot, type Window,
 } from '@/lib/bodyhistory'
 import Mascot from '@/components/Mascot'
+import { FlagIcon } from '@/components/icons'
 
 /**
  * «Il mio corpo» — la mappa corporea che finalmente restituisce qualcosa.
@@ -147,8 +148,8 @@ export default function Body() {
                         <button type="button" onClick={() => setPicked(s.region)}
                                 className="bab-pill flex w-full items-center justify-between gap-2 px-3.5 py-2.5 text-left text-[14.5px]"
                                 style={s.flagged > 0 ? { borderColor: 'var(--care)' } : undefined}>
-                          <span>
-                            {s.flagged > 0 && <span aria-hidden>🚩 </span>}
+                          <span className="inline-flex items-center gap-1">
+                            {s.flagged > 0 && <FlagIcon size={14} color="var(--care)" />}
                             {regionLabel(s.region, locale)}
                           </span>
                           <span className="text-[13px] font-normal text-[var(--color-ink-soft)]">
