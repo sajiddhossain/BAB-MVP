@@ -292,7 +292,10 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     <Frame title={t.heart.settleTitle} help={t.heart.settleBody}
            next={() => setStep('heartGuess')} canNext back onBack={() => setStep('heartConcept')} {...F}>
       <div className="flex flex-col items-center gap-3 pt-4">
-        <span aria-hidden className="text-[52px]">❤️</span>
+        <div className="flex items-center gap-2">
+          <Mascot size={44} />
+          <span aria-hidden className="text-[52px]">❤️</span>
+        </div>
         <p className="max-w-[280px] text-center text-[13px] text-[var(--color-ink-soft)]">{t.heart.settleNote}</p>
       </div>
     </Frame>
