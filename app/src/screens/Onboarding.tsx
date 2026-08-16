@@ -374,6 +374,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'heartWrap') return (
     <Frame title={t.heart.wrapTitle} help={t.heart.wrapBody}
            next={() => setStep('whoSees')} canNext back onBack={() => setStep('heartReveal')} {...F}>
+      <div className="flex justify-center py-1">
+        <Mascot size={48} />
+      </div>
       <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
         <div className="flex items-start gap-2.5">
           <span aria-hidden className="text-[19px]">☀️</span>
