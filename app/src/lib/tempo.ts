@@ -1,4 +1,4 @@
-import { HEADSPACE } from '@/content/channels'
+import { MOOD_RANGE } from '@/content/channels'
 import type { TempoCode } from '@/content/tempo'
 
 /**
@@ -17,49 +17,66 @@ import type { TempoCode } from '@/content/tempo'
  */
 
 /**
- * Le soglie, in un posto solo. Somma dei 5 canali — ma non più tutti sulla
- * stessa scala: sonno ed energia vanno 1–7 (Hooper), idratazione/muscoli/
- * headspace restano 1–5. La somma resta da 5 (minimo di ognuno) a 29 (non più
- * 25). 20 e 13 erano già soglie non validate sulla vecchia somma 5–25; 23 e 15
- * sono le stesse posizioni relative (75% e 40% del range) sulla nuova — non
- * più validate di prima, solo riscalate perché il range è cambiato sotto.
+ * 🔴 TUTTO QUI DENTRO LAVORA SU 0–1, MAI SUI VALORI GREZZI.
+ *
+ * I canali non sono più sulla stessa scala — sonno ed energia vanno 1–7
+ * (Hooper), l'umore 0–100 (VAS) — e sommarli così com'erano darebbe più peso
+ * a quello con il range più largo senza che nessuno l'abbia deciso. Peggio:
+ * cambiare una scala domani sposterebbe le soglie di nascosto, che è
+ * esattamente il modo in cui questa formula si è già rotta una volta.
+ *
+ * Normalizzando, le soglie diventano posizioni sul range — «tre quarti», «due
+ * quinti» — e restano vere qualunque scala abbia sotto.
  */
-export const THRESHOLDS = { upbeat: 23, steady: 15 } as const
+
+/** Da una scala [min,max] a 0–1. Fuori range viene tagliato, non esplode. */
+export const norm = (v: number, min: number, max: number): number =>
+  Math.max(0, Math.min(1, (v - min) / (max - min)))
+
+/** Le scale grezze, in un posto solo: chi normalizza le legge da qui. */
+export const RANGES = {
+  channel: { min: 1, max: 7 },   // sonno, energia — Hooper
+  mood: MOOD_RANGE,              // VAS
+  effort: { min: 0, max: 10 },   // session-RPE, CR-10
+} as const
 
 /**
- * Headspace è multi-select, ma la somma vuole un numero. Positivi meno
- * negativi, intorno a 3, tagliato a [1,5].
- *
- * `null` quando non ha risposto: senza questo un silenzio varrebbe 3, cioè
- * "nella media" — un'affermazione che lei non ha fatto.
+ * Le soglie, in un posto solo — adesso come frazioni del range, non come
+ * somme. 0.75 e 0.40 sono le stesse posizioni relative delle vecchie 20 e 13
+ * sulla somma 5–25 dei prototipi: **non sono validate** (§8: non far guidare
+ * una decisione da una soglia prima di averla validata). Quando arriveranno i
+ * dati del pilota si cambiano qui, e in nessun altro posto.
  */
-export function headspaceValue(selected: string[], other = ''): number | null {
-  if (selected.length === 0) return other.trim() ? 3 : null
-  const pos = selected.filter((c) => HEADSPACE.find((h) => h.code === c)?.polarity === 'positive').length
-  const neg = selected.filter((c) => HEADSPACE.find((h) => h.code === c)?.polarity === 'negative').length
-  return Math.max(1, Math.min(5, 3 + pos - neg))
-}
+export const THRESHOLDS = { upbeat: 0.75, steady: 0.40 } as const
 
 export type Channels = {
   sleep: number | null
   energy: number | null
-  hydration: number | null
-  muscles: number | null
 }
 
-/** Vero solo quando ci sono tutti e cinque: mancarne uno cambierebbe la somma. */
-export function isComplete(c: Channels, headspace: number | null): boolean {
-  return [c.sleep, c.energy, c.hydration, c.muscles, headspace].every((v) => v !== null)
+/** Vero solo quando ci sono tutti e tre: mancarne uno cambierebbe la media. */
+export function isComplete(c: Channels, mood: number | null): boolean {
+  return [c.sleep, c.energy, mood].every((v) => v !== null)
 }
 
-export function total(c: Channels, headspace: number | null): number | null {
-  if (!isComplete(c, headspace)) return null
-  return c.sleep! + c.energy! + c.hydration! + c.muscles! + headspace!
+/**
+ * La lettura del mattino, da 0 a 1: la media dei tre canali normalizzati.
+ * Media e non somma, così aggiungerne o toglierne uno non sposta le soglie.
+ */
+export function total(c: Channels, mood: number | null): number | null {
+  if (!isComplete(c, mood)) return null
+  const parts = [
+    norm(c.sleep!, RANGES.channel.min, RANGES.channel.max),
+    norm(c.energy!, RANGES.channel.min, RANGES.channel.max),
+    norm(mood!, RANGES.mood.min, RANGES.mood.max),
+  ]
+  return parts.reduce((a, b) => a + b, 0) / parts.length
 }
 
-export function suggest(sum: number): TempoCode {
-  if (sum >= THRESHOLDS.upbeat) return 'upbeat'
-  if (sum >= THRESHOLDS.steady) return 'steady'
+/** `read` è 0–1, l'uscita di `total`. */
+export function suggest(read: number): TempoCode {
+  if (read >= THRESHOLDS.upbeat) return 'upbeat'
+  if (read >= THRESHOLDS.steady) return 'steady'
   return 'gentle'
 }
 
@@ -70,8 +87,8 @@ export function suggest(sum: number): TempoCode {
  * l'app direbbe a una ragazza che ha male di allenarsi forte — che è il singolo
  * modo peggiore in cui questo prodotto può sbagliare.
  */
-export function suggestWithPain(sum: number, protectivePain: boolean): TempoCode {
-  return protectivePain ? 'gentle' : suggest(sum)
+export function suggestWithPain(read: number, protectivePain: boolean): TempoCode {
+  return protectivePain ? 'gentle' : suggest(read)
 }
 
 /**
@@ -91,14 +108,14 @@ export function predictionError(predicted: TempoCode, actual: TempoCode): number
 }
 
 /**
- * Quanto è recuperata adesso: gambe, respiro, energia più l'Headspace.
- * L'Headspace entra nella media perché dopo l'allenamento la testa fa parte
- * dello stato del corpo quanto le gambe.
+ * Quanto è recuperata adesso, da 0 a 1.
+ *
+ * Era la media di gambe, respiro, energia e headspace. Adesso il Tune In del
+ * post è una domanda sola — l'energia — quindi questa è la sua normalizzata e
+ * niente altro. Resta una funzione invece di un calcolo sparso nella
+ * schermata: se un giorno tornasse più di un canale, si aggiunge qui.
  */
-export function bodyAverage(
-  legs: number | null, breath: number | null, energy: number | null, headspace: number | null,
-): number | null {
-  const v = [legs, breath, energy, headspace]
-  if (v.some((x) => x === null)) return null
-  return (v as number[]).reduce((a, b) => a + b, 0) / 4
+export function recovery(energy: number | null): number | null {
+  if (energy === null) return null
+  return norm(energy, RANGES.channel.min, RANGES.channel.max)
 }

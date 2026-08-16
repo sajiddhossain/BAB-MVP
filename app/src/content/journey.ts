@@ -40,8 +40,8 @@ export const WEEKS: JourneyWeek[] = [
     title: { it: 'Conosci i tuoi segnali', en: 'Meet your signals' },
     subtitle: { it: 'Sintonizzati ogni giorno — niente da cambiare ancora.', en: 'Just tune in each day — no changing anything yet.' },
     body: {
-      it: 'Fai un Tune-In quotidiano. Conosci i tuoi canali — sonno, energia, idratazione, muscoli — più il tuo headspace. L\'obiettivo di questa settimana non è sentirti bene, è solo sentire, onestamente.',
-      en: "Do a daily Tune-In. Get to know your channels — sleep, energy, hydration, muscles — plus your headspace. The goal this week isn't to feel good, it's just to feel, honestly.",
+      it: 'Fai un Tune-In quotidiano. Conosci i tuoi canali — sonno, energia, umore. L\'obiettivo di questa settimana non è sentirti bene, è solo sentire, onestamente.',
+      en: "Do a daily Tune-In. Get to know your channels — sleep, energy, mood. The goal this week isn't to feel good, it's just to feel, honestly.",
     },
     mission: { it: 'Check-in in 5 giorni questa settimana. Non giudicare le risposte — solo notale.', en: "Check in on 5 days this week. Don't judge the answers — just notice them." },
     missionMetric: 'checkin', missionGoal: 5,

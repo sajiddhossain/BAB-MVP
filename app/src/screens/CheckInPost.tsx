@@ -6,13 +6,13 @@ import EmojiScale from '@/components/EmojiScale'
 import PillGroup from '@/components/PillGroup'
 import RegionSheet from '@/components/RegionSheet'
 import Step, { useAdvance, useFlow } from '@/components/Step'
-import { EFFORT, POST_CHANNELS, HEADSPACE, BROUGHT_HOME, channelQuestion } from '@/content/channels'
+import { EFFORT, POST_CHANNELS, SATISFACTION, BROUGHT_HOME, channelQuestion } from '@/content/channels'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
 import { GEOMETRY } from '@/components/body-shapes'
 import { isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
-import { headspaceValue, bodyAverage, predictionError } from '@/lib/tempo'
+import { norm, RANGES, recovery, predictionError } from '@/lib/tempo'
 import { saveCheckIn, checkInsOn, localDate, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
 
@@ -49,9 +49,9 @@ const TEMPO_ORDER: TempoCode[] = ['upbeat', 'steady', 'gentle']
 
 /** 🔴 Nomi di colonna, non numeri di passo: vedi la nota in `CheckInPre`. */
 const MAIN = [
-  'tempo_chosen', 'effort', 'duration_bucket', 'session_type',
-  'legs', 'breath', 'energy', 'headspace',
-  'body', 'painkillers', 'brought_home', 'note',
+  'tempo_chosen', 'effort', 'satisfaction', 'session_type',
+  'energy',
+  'body', 'brought_home', 'note',
 ] as const
 
 /** Vedi la nota in `CheckInPre`: la mappa apre un foglio, non una schermata. */
@@ -73,14 +73,9 @@ export default function CheckInPost() {
 
   const [actual, setActual] = useState<TempoCode | null>(null)
   const [effort, setEffort] = useState<number | null>(null)
-  const [duration, setDuration] = useState<string | null>(null)
+  const [satisfaction, setSatisfaction] = useState<string | null>(null)
   const [session, setSession] = useState<string | null>(null)
-  const [legs, setLegs] = useState<number | null>(null)
-  const [breath, setBreath] = useState<number | null>(null)
   const [energy, setEnergy] = useState<number | null>(null)
-  const [headspace, setHeadspace] = useState<string[]>([])
-  const [hsOther, setHsOther] = useState('')
-  const [painkillers, setPainkillers] = useState<boolean | null>(null)
   const [brought, setBrought] = useState<string[]>([])
   const [note, setNote] = useState('')
 
@@ -108,13 +103,13 @@ export default function CheckInPost() {
     return () => { alive = false }
   }, [])
 
-  const hs = headspaceValue(headspace, hsOther)
-  const bodyAvg = bodyAverage(legs, breath, energy, hs)
-  const ready = actual !== null && effort !== null && bodyAvg !== null
+  /** Entrambi 0–1: le soglie di `pickOutcome` sono frazioni, non valori grezzi. */
+  const recovered = recovery(energy)
+  const effortNorm = effort === null ? null : norm(effort, RANGES.effort.min, RANGES.effort.max)
+  const ready = actual !== null && effortNorm !== null && recovered !== null
 
-  const dirty = actual !== null || effort !== null || duration !== null || session !== null
-    || legs !== null || breath !== null || energy !== null || headspace.length > 0
-    || painkillers !== null || brought.length > 0 || note.trim() !== '' || signals.length > 0
+  const dirty = actual !== null || effort !== null || satisfaction !== null || session !== null
+    || energy !== null || brought.length > 0 || note.trim() !== '' || signals.length > 0
 
   const answer = (id: string, set: () => void, go = flow.onward) =>
     advance(() => { set(); setSkipped((p) => p.filter((x) => x !== id)) }, go)
@@ -151,10 +146,9 @@ export default function CheckInPost() {
         await saveCheckIn({
           athlete_id: userId, kind: 'post',
           tempo_predicted: predicted, tempo_chosen: actual,
-          effort, legs, breath, energy, headspace: headspace.filter((h) => h !== '__other'),
-          headspace_other: hsOther.trim() || null, painkillers,
+          effort, satisfaction, energy,
           brought_home: brought, note: note.trim() || null,
-          session_type: session, duration_bucket: duration,
+          session_type: session,
           started_at: startedAt,
           skipped_fields: skipped.length ? skipped : null,
         }, signals)
@@ -164,8 +158,8 @@ export default function CheckInPost() {
   }
 
   /* ── Il risultato ─────────────────────────────────────────────────────── */
-  if (done && actual && effort !== null && bodyAvg !== null) {
-    const outcome = OUTCOMES[pickOutcome(actual, effort, bodyAvg)]
+  if (done && actual && effortNorm !== null && recovered !== null) {
+    const outcome = OUTCOMES[pickOutcome(actual, effortNorm, recovered)]
     const gap = predicted ? predictionError(predicted, actual) : null
 
     return (
@@ -287,8 +281,8 @@ export default function CheckInPost() {
   /** Le tre letture del dopo: gambe, respiro, energia. Una per schermata. */
   const channel = POST_CHANNELS.find((x) => x.code === flow.id)
   if (channel) {
-    const val = channel.code === 'legs' ? legs : channel.code === 'breath' ? breath : energy
-    const set = channel.code === 'legs' ? setLegs : channel.code === 'breath' ? setBreath : setEnergy
+    const val = energy
+    const set = setEnergy
     return (
       <Step {...frame} section={t.checkin.post.senseLabel}
             question={channelQuestion(channel, locale)}
@@ -339,18 +333,25 @@ export default function CheckInPost() {
         </Step>
       )
 
-    case 'duration_bucket':
+    case 'satisfaction':
+      /**
+       * 🔴 Cinque parole, non una scala: "Delusa" non è il fondo di una
+       * classifica con "Fiera" in cima. L'aiuto sotto la domanda lo dice
+       * apposta — è il posto del check-in dove sarebbe più facile far sentire
+       * qualcuna in difetto per come è andato un allenamento.
+       */
       return (
         <Step {...frame} section={t.checkin.post.lookBack.label}
-              question={t.checkin.post.lookBack.duration}
-              onNext={duration ? flow.onward : null}
-              onSkip={() => skip('duration_bucket')}>
+              question={t.checkin.post.lookBack.satisfaction}
+              help={t.checkin.post.lookBack.satisfactionHelp}
+              onNext={satisfaction ? flow.onward : null}
+              onSkip={() => skip('satisfaction')}>
           <PillGroup
             size="lg"
-            label={t.checkin.post.lookBack.duration}
-            options={t.checkin.post.lookBack.durationOptions.map((l) => ({ value: l, label: l }))}
-            value={duration}
-            onChange={(v) => answer('duration_bucket', () => setDuration(v))}
+            label={t.checkin.post.lookBack.satisfaction}
+            options={SATISFACTION.map((x) => ({ value: x.code, label: x.label[locale], emoji: x.emoji }))}
+            value={satisfaction}
+            onChange={(v) => answer('satisfaction', () => setSatisfaction(v))}
           />
         </Step>
       )
@@ -373,53 +374,8 @@ export default function CheckInPost() {
         </Step>
       )
 
-    case 'headspace':
-      /** 🔴 Entra in `bodyAverage`: senza, il risultato non si può calcolare. */
-      return (
-        <Step {...frame} section={t.checkin.post.senseLabel}
-              question={t.checkin.pre.tuneIn.headspace}
-              help={t.checkin.pre.tuneIn.headspaceHelp}
-              onNext={hs !== null ? flow.onward : null}>
-          <PillGroup
-            size="lg"
-            label={t.checkin.pre.tuneIn.headspace}
-            options={[...HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji })),
-                      { value: '__other', label: t.checkin.pre.tuneIn.headspaceOther }]}
-            value={headspace}
-            onChange={(v) => setHeadspace((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v])}
-          />
-          {headspace.includes('__other') && (
-            <input
-              value={hsOther}
-              onChange={(e) => setHsOther(e.target.value)}
-              maxLength={60}
-              placeholder={t.checkin.pre.tuneIn.headspaceOtherPlaceholder}
-              aria-label={t.checkin.pre.tuneIn.headspaceOther}
-              className="bab-card px-3 py-2 text-[16px]"
-            />
-          )}
-        </Step>
-      )
-
     case 'body':
       return bodyStep()
-
-    case 'painkillers':
-      return (
-        <Step {...frame} section={t.checkin.post.senseLabel}
-              question={t.checkin.post.painkillers.title}
-              help={t.checkin.post.painkillers.help}
-              onNext={painkillers !== null ? flow.onward : null}
-              onSkip={() => skip('painkillers')}>
-          <PillGroup
-            size="lg"
-            label={t.checkin.post.painkillers.title}
-            options={[{ value: 'yes', label: t.common.yes }, { value: 'no', label: t.common.no }]}
-            value={painkillers === null ? null : painkillers ? 'yes' : 'no'}
-            onChange={(v) => answer('painkillers', () => setPainkillers(v === 'yes'))}
-          />
-        </Step>
-      )
 
     case 'brought_home':
       /**

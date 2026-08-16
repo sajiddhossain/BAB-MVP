@@ -206,3 +206,62 @@ button, a[role="button"], input, select {
   from { r: 4; opacity: 0.9; }
   to { r: 42; opacity: 0; }
 }
+
+/* La riga della VAS. È un `input[type=range]` truccato, non un componente
+   scritto a mano: così restano gratis la tastiera (frecce), il trascinamento
+   col pollice e il ruolo `slider` per gli screen reader.
+
+   La riga a sinistra del cursore si riempie (`--vas-fill`, scritta dal
+   componente) perché su una scala continua serve vedere *quanto* si è andati
+   avanti — ma non c'è nessun numero, nessuna tacca: quello la renderebbe una
+   Likert invece di una VAS. Il cursore sparisce finché non l'ha toccata. */
+.bab-vas {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 44px;               /* il bersaglio, non la riga: §a11y */
+  background: transparent;
+  cursor: pointer;
+}
+.bab-vas::-webkit-slider-runnable-track {
+  height: 14px;
+  border-radius: 999px;
+  border: var(--bab-border) solid var(--color-ink);
+  background: linear-gradient(
+    to right,
+    var(--color-teal) var(--vas-fill, 0%),
+    var(--color-surface) var(--vas-fill, 0%)
+  );
+}
+.bab-vas::-moz-range-track {
+  height: 14px;
+  border-radius: 999px;
+  border: var(--bab-border) solid var(--color-ink);
+  background: linear-gradient(
+    to right,
+    var(--color-teal) var(--vas-fill, 0%),
+    var(--color-surface) var(--vas-fill, 0%)
+  );
+}
+.bab-vas::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 30px;
+  width: 30px;
+  margin-top: -11px;
+  border-radius: 999px;
+  border: var(--bab-border) solid var(--color-ink);
+  background: var(--color-lime);
+  box-shadow: 3px 3px 0 0 var(--color-ink);
+}
+.bab-vas::-moz-range-thumb {
+  height: 30px;
+  width: 30px;
+  border-radius: 999px;
+  border: var(--bab-border) solid var(--color-ink);
+  background: var(--color-lime);
+  box-shadow: 3px 3px 0 0 var(--color-ink);
+}
+/* Non ancora risposto: la riga c'è, il cursore no. */
+.bab-vas[aria-valuetext="—"]::-webkit-slider-thumb { opacity: 0; }
+.bab-vas[aria-valuetext="—"]::-moz-range-thumb { opacity: 0; }

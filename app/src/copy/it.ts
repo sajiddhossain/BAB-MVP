@@ -58,6 +58,9 @@ export const it = {
     close: 'Chiudi',
     skip: 'Salta questa',
     progress: 'A che punto sei',
+    /** Le posizioni in mezzo a una scala, per chi la sente invece di vederla. */
+    scaleMiddle: 'a metà',
+    scaleToward: 'verso «{label}»',
     leaveTitle: 'Esci dal check-in?',
     leaveBody: 'Quello che hai risposto finora non è ancora salvato: si salva tutto insieme alla fine. Se esci adesso lo perdi.',
     leaveYes: 'Esci e perdi tutto',
@@ -331,15 +334,18 @@ export const it = {
       tuneIn: {
         label: 'Sintonizzati',
         title: 'I tuoi canali',
-        /** Resta in inglese: è vocabolario del prodotto, come i nomi delle andature. */
-        headspace: '🧠 Headspace',
-        headspaceHelp: 'tocca quelle che ti somigliano',
-        headspaceOther: '➕ Altro',
-        headspaceOtherPlaceholder: 'Con parole tue…',
-        surprise: 'Qualcosa ti ha sorpresa?',
-        surpriseOptions: ['No, come pensavo', 'Sì, un po\'', 'Sì, parecchio'],
+        /** 🔴 La VAS: una riga fra due estremi, nessun numero. Gli estremi sono
+         *  quelli della spec — «il peggio» e «il meglio» che ha mai provato. */
+        mood: '🧠 Come ti senti, dentro?',
+        moodHelp: 'Trascina dove ti trovi oggi. Non c\'è un punto giusto.',
+        moodLow: 'Il peggio che abbia mai provato',
+        moodHigh: 'Il meglio che abbia mai provato',
         schoolLoad: 'Com\'è la scuola in questi giorni?',
         schoolOptions: ['Tranquilla', 'Impegnativa', 'Settimana d\'esami'],
+        period: 'Oggi hai il ciclo?',
+        periodHelp: 'Serve solo a leggere meglio gli altri segnali. Puoi saltarla.',
+        painkillers: 'Hai preso un antidolorifico oggi?',
+        painkillersHelp: 'Per qualunque motivo, anche non legato allo sport.',
       },
       pinpoint: {
         label: 'Individua e nomina',
@@ -378,8 +384,8 @@ export const it = {
         label: 'Guarda indietro',
         title: 'Con che andatura ti sei allenata davvero?',
         effort: 'Quanto è stata dura davvero?',
-        duration: 'Quanto è durata?',
-        durationOptions: ['Meno di 30 min', '30–60 min', '1–2 ore', 'Più di 2 ore'],
+        satisfaction: 'Come ti senti di come è andata?',
+        satisfactionHelp: 'Nessuna di queste è quella giusta: sono cinque modi legittimi di uscire da un allenamento.',
         sessionType: 'Che tipo di sessione?',
         sessionTypeOptions: ['Allenamento', 'Gara o partita', 'Educazione fisica', 'Palestra', 'Altro'],
       },
@@ -394,10 +400,6 @@ export const it = {
       recapSignals: 'Ti sei fermata e hai nominato {n} sensazioni. Farlo — trovare dove sta e darle una parola — è esattamente il muscolo che stiamo allenando.',
       openQuestion: 'Una domanda tranquilla su cui vale la pena fermarsi: cosa ti ha sorpresa di più di oggi — e quale segnale te l\'ha detto per primo?',
       notePlaceholder: 'Se ti va, scrivilo qui. Lo leggi solo tu.',
-      painkillers: {
-        title: 'Hai preso un antidolorifico oggi?',
-        help: 'Prima o dopo l\'allenamento, per qualunque motivo.',
-      },
       broughtHome: {
         title: 'Cosa ti sei portata a casa?',
         help: 'Scegli quello che ti somiglia oggi — o nessuno.',

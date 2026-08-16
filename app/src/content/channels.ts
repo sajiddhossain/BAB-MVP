@@ -3,17 +3,21 @@ import type { Locale } from '@/copy'
 /**
  * I canali del check-in, e le scale che li misurano.
  *
- * 🔴 I `code` sono nomi di COLONNE (`check_ins.sleep`, `.energy`, …) e i codici
- * di Headspace finiscono in `check_ins.headspace text[]`. Non si cambiano mai.
+ * 🔴 I `code` sono nomi di COLONNE (`check_ins.sleep`, `.energy`). Non si
+ * cambiano mai.
  *
  * Le emoji non sono decorazione: il §7 chiede scale che una tredicenne legga
- * senza pensarci, e una fila di numeri da 1 a 5 non lo è. Ogni canale ha la sua
- * famiglia di immagini — animali per il sonno, meteo per l'energia, paesaggi
- * per l'idratazione, natura per i muscoli — così la scala si capisce prima di
- * leggere le etichette agli estremi.
+ * senza pensarci, e una fila di numeri non lo è. Ogni canale ha la sua famiglia
+ * di immagini — animali per il sonno, meteo per l'energia — così la scala si
+ * capisce prima di leggere le etichette agli estremi.
+ *
+ * 🔴 QUESTA LISTA È CORTA APPOSTA. Erano quattro (più idratazione e muscoli):
+ * la spec della founder ne chiede due, e i muscoli in particolare li cattura
+ * già la mappa corporea, che chiede DOVE e con che parola invece di un voto
+ * medio su tutto il corpo. Ogni domanda tolta è un check-in che finisce.
  */
 
-export type ChannelCode = 'sleep' | 'energy' | 'hydration' | 'muscles'
+export type ChannelCode = 'sleep' | 'energy'
 
 export type Channel = {
   code: ChannelCode
@@ -44,43 +48,21 @@ export const CHANNELS: Channel[] = [
     low: { it: 'A secco', en: 'Running on empty' },
     high: { it: 'Piena di voglia', en: 'Full of go' },
   },
-  {
-    code: 'hydration', emoji: '💧',
-    scale: ['🏜️', '🌵', '🌾', '🌿', '🌊'],
-    question: { it: 'Idratazione — quanto ti senti dissetata', en: 'Hydration — how watered you feel' },
-    low: { it: 'Assetata, secca', en: 'Parched / dry' },
-    high: { it: 'Ben idratata', en: 'Fully watered' },
-  },
-  {
-    code: 'muscles', emoji: '💪',
-    scale: ['🪨', '🪵', '🍂', '🪶', '🦋'],
-    question: { it: 'Muscoli e corpo — pesantezza contro elasticità', en: 'Muscles & body — heaviness vs spring' },
-    low: { it: 'Pesante, dolorante', en: 'Heavy / sore' },
-    high: { it: 'Leggera ed elastica', en: 'Light & springy' },
-  },
 ]
 
 /**
- * Headspace è multi-select di proposito (§7): non si chiede a una ragazza di
- * dare un VOTO al proprio umore, le si chiede di NOMINARLO. Il valore numerico
- * si deriva dopo, e lei non lo vede mai.
+ * L'umore, su scala VAS — «visual analogue scale»: una riga continua fra due
+ * estremi, senza tacche e senza numeri, dove si segna un punto.
+ *
+ * 🔴 Prima era un multi-select di parole ("Stressata", "Concentrata"…), scelto
+ * per non chiedere a una ragazza di dare un VOTO al proprio umore. La spec
+ * della founder chiede una VAS, che è lo strumento con cui l'umore si misura
+ * in letteratura, e la sostituzione è deliberata. Il §7 resta rispettato dove
+ * conta: la riga non ha numeri, non ha tacche e non mostra mai un punteggio —
+ * lei sposta un cursore fra "il peggio" e "il meglio", e il valore 0–100
+ * esiste solo nel database.
  */
-export type Headspace = {
-  code: string
-  emoji: string
-  polarity: 'positive' | 'negative'
-  label: Record<Locale, string>
-}
-
-export const HEADSPACE: Headspace[] = [
-  { code: 'distracted',  emoji: '🌀',    polarity: 'negative', label: { it: 'Distratta',      en: 'Distracted' } },
-  { code: 'insecure',    emoji: '🫣',    polarity: 'negative', label: { it: 'Insicura',       en: 'Insecure' } },
-  { code: 'stressed',    emoji: '😣',    polarity: 'negative', label: { it: 'Stressata',      en: 'Stressed' } },
-  { code: 'overwhelmed', emoji: '😵‍💫', polarity: 'negative', label: { it: 'Sopraffatta',    en: 'Overwhelmed' } },
-  { code: 'calm',        emoji: '😌',    polarity: 'positive', label: { it: 'Calma',          en: 'Calm' } },
-  { code: 'focused',     emoji: '🎯',    polarity: 'positive', label: { it: 'Concentrata',    en: 'Focused' } },
-  { code: 'confident',   emoji: '😎',    polarity: 'positive', label: { it: 'Sicura di me',   en: 'Confident' } },
-]
+export const MOOD_RANGE = { min: 0, max: 100 } as const
 
 /** Il `code` non c'entra col titolo, quindi non lo si pretende: così vale anche
  *  per i canali del post, che hanno codici loro. */
@@ -102,7 +84,7 @@ export function channelQuestion(c: Omit<Channel, 'code'>, locale: Locale): strin
  * 0` va passato a `EmojiScale` quando si usa questo canale, altrimenti
  * l'indice 0 dell'array diventerebbe valore 1 invece di 0.
  */
-export type PostChannelCode = 'legs' | 'breath' | 'energy'
+export type PostChannelCode = 'energy'
 
 export const EFFORT: Channel = {
   code: 'energy', emoji: '🔥',   // `code` non usato: l'effort ha una colonna sua
@@ -112,29 +94,38 @@ export const EFFORT: Channel = {
   high: { it: 'Il massimo che avevo', en: 'Everything I had' },
 }
 
+/**
+ * 🔴 Il Tune In del post è UNA domanda sola: l'energia, sulla stessa 1–7 di
+ * Hooper del mattino — è la spec, e serve che sia la stessa scala perché
+ * mattina e sera vanno confrontate. "Gambe e muscoli" e "Respiro e cuore"
+ * erano qui e sono stati tolti: quello che dice il corpo lo chiede la mappa,
+ * che localizza e nomina invece di chiedere una media.
+ */
 export const POST_CHANNELS: (Omit<Channel, 'code'> & { code: PostChannelCode })[] = [
   {
-    code: 'legs', emoji: '💪',
-    scale: ['🪨', '🪵', '🍂', '🪶', '🦋'],
-    question: { it: 'Gambe e muscoli', en: 'Legs & muscles' },
-    low: { it: 'Distrutte, pesanti', en: 'Trashed / heavy' },
-    high: { it: 'Leggere e a posto', en: 'Light & fine' },
-  },
-  {
-    code: 'breath', emoji: '🫁',
-    scale: ['🌩️', '🌧️', '🌥️', '🌤️', '☀️'],
-    question: { it: 'Respiro e cuore', en: 'Breathing & heart' },
-    low: { it: 'Ancora a mille', en: 'Still pounding' },
-    high: { it: 'Calmi', en: 'Settled & calm' },
-  },
-  {
     code: 'energy', emoji: '🔋',
-    scale: ['🪫', '🔅', '🔆', '✨', '⚡'],
+    scale: ['🪫', '🔅', '🔆', '💡', '✨', '🌟', '⚡'],
     question: { it: 'Energia adesso', en: 'Energy right now' },
     low: { it: 'A terra', en: 'Drained' },
     high: { it: 'Ancora carica', en: 'Still buzzing' },
   },
 ]
+
+/**
+ * "Quanto ti senti soddisfatta?" — dalla spec della founder, Step 1 del post.
+ *
+ * 🔴 Cinque parole, non una scala: sono stati d'animo, e nessuno è un voto
+ * sulla prestazione. "Delusa" non è il fondo di una classifica che ha "Fiera"
+ * in cima — sono cinque modi legittimi di uscire da un allenamento. L'ordine
+ * è quello della spec, e il `code` è quello che finisce nel database.
+ */
+export const SATISFACTION = [
+  { code: 'disappointed', emoji: '😔', label: { it: 'Delusa',       en: 'Disappointed' } },
+  { code: 'frustrated',   emoji: '😤', label: { it: 'Frustrata',    en: 'Frustrated' } },
+  { code: 'satisfied',    emoji: '🙂', label: { it: 'Soddisfatta',  en: 'Satisfied' } },
+  { code: 'confident',    emoji: '😎', label: { it: 'Sicura di me', en: 'Confident' } },
+  { code: 'proud',        emoji: '🤩', label: { it: 'Fiera',        en: 'Proud' } },
+] as const
 
 /**
  * "Cosa ti sei portata a casa?" — recuperata dal PDF originale della founder.

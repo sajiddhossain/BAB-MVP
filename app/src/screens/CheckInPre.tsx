@@ -4,15 +4,16 @@ import { fill, useCopy, useLocale } from '@/copy'
 import BodyMap from '@/components/BodyMap'
 import EmojiScale from '@/components/EmojiScale'
 import PillGroup from '@/components/PillGroup'
+import VasSlider from '@/components/VasSlider'
 import RegionSheet from '@/components/RegionSheet'
 import Step, { useAdvance, useFlow } from '@/components/Step'
-import { CHANNELS, HEADSPACE, channelQuestion } from '@/content/channels'
+import { CHANNELS, MOOD_RANGE, channelQuestion } from '@/content/channels'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
 import { GEOMETRY } from '@/components/body-shapes'
 import { SENSATIONS, isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { CARE, DECODE_ACHE } from '@/content/clinical'
-import { headspaceValue, total, suggestWithPain, type Channels } from '@/lib/tempo'
+import { total, suggestWithPain, type Channels } from '@/lib/tempo'
 import { saveCheckIn, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
 
@@ -53,7 +54,7 @@ const TEMPO_ORDER: TempoCode[] = ['upbeat', 'steady', 'gentle']
  */
 const MAIN = [
   'tempo_predicted', 'prediction_confidence', 'sleep_hours',
-  'sleep', 'energy', 'hydration', 'muscles', 'headspace', 'surprise', 'school_load',
+  'sleep', 'energy', 'mood', 'school_load', 'on_period', 'painkillers',
   'body', 'pain',
 ] as const
 
@@ -82,11 +83,11 @@ export default function CheckInPre() {
   const [predicted, setPredicted] = useState<TempoCode | null>(null)
   const [confidence, setConfidence] = useState<number | null>(null)
   const [sleepHours, setSleepHours] = useState<string | null>(null)
-  const [ch, setCh] = useState<Channels>({ sleep: null, energy: null, hydration: null, muscles: null })
-  const [headspace, setHeadspace] = useState<string[]>([])
-  const [hsOther, setHsOther] = useState('')
-  const [surprise, setSurprise] = useState<number | null>(null)
+  const [ch, setCh] = useState<Channels>({ sleep: null, energy: null })
+  const [mood, setMood] = useState<number | null>(null)
   const [school, setSchool] = useState<number | null>(null)
+  const [onPeriod, setOnPeriod] = useState<boolean | null>(null)
+  const [painkillers, setPainkillers] = useState<boolean | null>(null)
 
   // Il taccuino dei segnali: regione → sensazione → intensità → comportamento.
   const [region, setRegion] = useState<RegionCode | null>(null)
@@ -99,8 +100,8 @@ export default function CheckInPre() {
   const [result, setResult] = useState<{ suggested: TempoCode; chosen: TempoCode } | null>(null)
   const [saving, setSaving] = useState(false)
 
-  const hs = headspaceValue(headspace, hsOther)
-  const sum = total(ch, hs)
+  /** 0–1, non una somma grezza: vedi `lib/tempo.ts`. */
+  const read = total(ch, mood)
   /**
    * 🔴 Due strade diverse arrivano al Care, e vanno raccontate diversamente.
    * Se è stata una BANDIERA ROSSA a instradare, dirle "hai segnalato dolore
@@ -112,8 +113,9 @@ export default function CheckInPre() {
 
   /** C'è qualcosa da perdere uscendo? Serve a non chiedere conferma a vuoto. */
   const dirty = predicted !== null || confidence !== null || sleepHours !== null
-    || Object.values(ch).some((v) => v !== null) || headspace.length > 0
-    || surprise !== null || school !== null || signals.length > 0 || pain !== null
+    || Object.values(ch).some((v) => v !== null) || mood !== null
+    || school !== null || onPeriod !== null || painkillers !== null
+    || signals.length > 0 || pain !== null
 
   /** Rispondere cancella l'eventuale salto: si può cambiare idea tornando indietro. */
   const answer = (id: string, set: () => void, go = flow.onward) =>
@@ -148,8 +150,8 @@ export default function CheckInPre() {
   }
 
   async function submit(protective: boolean) {
-    if (sum === null || !predicted) return
-    const suggested = suggestWithPain(sum, protective || redFlag !== null)
+    if (read === null || !predicted) return
+    const suggested = suggestWithPain(read, protective || redFlag !== null)
     setResult({ suggested, chosen: suggested })
     setSaving(true)
     if (userId) {
@@ -159,9 +161,9 @@ export default function CheckInPre() {
           tempo_predicted: predicted, prediction_confidence: confidence,
           // 🔴 Sempre entrambe le colonne, anche quando coincidono.
           tempo_suggested: suggested, tempo_chosen: suggested,
-          sleep: ch.sleep, energy: ch.energy, hydration: ch.hydration, muscles: ch.muscles,
-          headspace: headspace.filter((h) => h !== '__other'),
-          headspace_other: hsOther.trim() || null, surprise, sleep_hours: sleepHours, school_load: school,
+          sleep: ch.sleep, energy: ch.energy, mood,
+          sleep_hours: sleepHours, school_load: school,
+          on_period: onPeriod, painkillers,
           started_at: startedAt,
           skipped_fields: skipped.length ? skipped : null,
         }, signals)
@@ -172,7 +174,7 @@ export default function CheckInPre() {
 
   /** Il cambio di andatura si salva come check-in nuovo: gli eventi non si modificano. */
   async function swap(to: TempoCode) {
-    if (!result || !predicted || sum === null) return
+    if (!result || !predicted || read === null) return
     setResult({ ...result, chosen: to })
     if (userId) {
       try {
@@ -180,9 +182,9 @@ export default function CheckInPre() {
           athlete_id: userId, kind: 'pre',
           tempo_predicted: predicted, prediction_confidence: confidence,
           tempo_suggested: result.suggested, tempo_chosen: to,
-          sleep: ch.sleep, energy: ch.energy, hydration: ch.hydration, muscles: ch.muscles,
-          headspace: headspace.filter((h) => h !== '__other'),
-          headspace_other: hsOther.trim() || null, surprise, sleep_hours: sleepHours, school_load: school,
+          sleep: ch.sleep, energy: ch.energy, mood,
+          sleep_hours: sleepHours, school_load: school,
+          on_period: onPeriod, painkillers,
           started_at: startedAt,
           skipped_fields: skipped.length ? skipped : null,
         })
@@ -411,50 +413,59 @@ export default function CheckInPre() {
         </Step>
       )
 
-    case 'headspace':
+    case 'mood':
       /**
-       * 🔴 Headspace NON è saltabile, anche se sembra la più morbida delle
-       * quattro: è il quinto canale della somma, e senza di lei `total()`
-       * restituisce `null` e l'andatura non si può calcolare.
+       * 🔴 L'umore NON è saltabile: è il terzo canale della media, e senza
+       * `total()` torna `null` e l'andatura non si può calcolare.
+       *
+       * La VAS parte senza cursore, non da metà — vedi `VasSlider`.
        */
       return (
         <Step {...frame} section={t.checkin.pre.tuneIn.label}
-              question={t.checkin.pre.tuneIn.headspace}
-              help={t.checkin.pre.tuneIn.headspaceHelp}
-              onNext={hs !== null ? flow.onward : null}>
-          <PillGroup
-            size="lg"
-            label={t.checkin.pre.tuneIn.headspace}
-            options={[...HEADSPACE.map((h) => ({ value: h.code, label: h.label[locale], emoji: h.emoji })),
-                      { value: '__other', label: t.checkin.pre.tuneIn.headspaceOther }]}
-            value={headspace}
-            onChange={(v) => setHeadspace((p) => p.includes(v) ? p.filter((x) => x !== v) : [...p, v])}
+              question={t.checkin.pre.tuneIn.mood}
+              help={t.checkin.pre.tuneIn.moodHelp}
+              onNext={mood !== null ? flow.onward : null}>
+          <VasSlider
+            value={mood}
+            onChange={(v) => setMood(v)}
+            min={MOOD_RANGE.min} max={MOOD_RANGE.max}
+            label={t.checkin.pre.tuneIn.mood}
+            low={t.checkin.pre.tuneIn.moodLow}
+            high={t.checkin.pre.tuneIn.moodHigh}
           />
-          {headspace.includes('__other') && (
-            <input
-              value={hsOther}
-              onChange={(e) => setHsOther(e.target.value)}
-              maxLength={60}
-              placeholder={t.checkin.pre.tuneIn.headspaceOtherPlaceholder}
-              aria-label={t.checkin.pre.tuneIn.headspaceOther}
-              className="bab-card px-3 py-2 text-[16px]"
-            />
-          )}
         </Step>
       )
 
-    case 'surprise':
+    case 'on_period':
       return (
         <Step {...frame} section={t.checkin.pre.tuneIn.label}
-              question={t.checkin.pre.tuneIn.surprise}
-              onNext={surprise ? flow.onward : null}
-              onSkip={() => skip('surprise')}>
+              question={t.checkin.pre.tuneIn.period}
+              help={t.checkin.pre.tuneIn.periodHelp}
+              onNext={onPeriod !== null ? flow.onward : null}
+              onSkip={() => skip('on_period')}>
           <PillGroup
             size="lg"
-            label={t.checkin.pre.tuneIn.surprise}
-            options={t.checkin.pre.tuneIn.surpriseOptions.map((l, i) => ({ value: String(i + 1), label: l }))}
-            value={surprise ? String(surprise) : null}
-            onChange={(v) => answer('surprise', () => setSurprise(Number(v)))}
+            label={t.checkin.pre.tuneIn.period}
+            options={[{ value: 'yes', label: t.common.yes }, { value: 'no', label: t.common.no }]}
+            value={onPeriod === null ? null : onPeriod ? 'yes' : 'no'}
+            onChange={(v) => answer('on_period', () => setOnPeriod(v === 'yes'))}
+          />
+        </Step>
+      )
+
+    case 'painkillers':
+      return (
+        <Step {...frame} section={t.checkin.pre.tuneIn.label}
+              question={t.checkin.pre.tuneIn.painkillers}
+              help={t.checkin.pre.tuneIn.painkillersHelp}
+              onNext={painkillers !== null ? flow.onward : null}
+              onSkip={() => skip('painkillers')}>
+          <PillGroup
+            size="lg"
+            label={t.checkin.pre.tuneIn.painkillers}
+            options={[{ value: 'yes', label: t.common.yes }, { value: 'no', label: t.common.no }]}
+            value={painkillers === null ? null : painkillers ? 'yes' : 'no'}
+            onChange={(v) => answer('painkillers', () => setPainkillers(v === 'yes'))}
           />
         </Step>
       )
@@ -489,7 +500,7 @@ export default function CheckInPre() {
       return (
         <Step {...frame} section={t.checkin.pre.decodeLabel}
               question={DECODE_ACHE.question[locale]}
-              onNext={pain !== null && sum !== null ? () => void submit(pain) : null}
+              onNext={pain !== null && read !== null ? () => void submit(pain) : null}
               nextLabel={t.flow.next}>
           <div className="bab-card flex flex-col gap-3 px-4 py-4">
             <p className="bab-label">{DECODE_ACHE.workingTitle[locale]}</p>
@@ -515,7 +526,7 @@ export default function CheckInPre() {
           {/* 🔴 Se i canali non sono completi la somma non esiste, e senza somma
               non c'è andatura da suggerire. Si dice dove sta il buco invece di
               lasciare un bottone spento senza spiegazione. */}
-          {sum === null && (
+          {read === null && (
             <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.common.needChannels}</p>
           )}
         </Step>

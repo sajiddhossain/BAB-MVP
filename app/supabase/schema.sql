@@ -149,29 +149,46 @@ create table if not exists public.check_ins (
   tempo_chosen    tempo,
 
   -- ── canali ──
-  -- Sonno ed energia sono 1–7: la spec originale li misura con lo Hooper
-  -- Questionnaire, che usa quella scala. Gli altri restano 1–5. `effort` è
-  -- 0–10: è la RPE standard (CR-10 di Foster), non un canale "1–5" come gli
-  -- altri — vedi content/channels.ts e lib/tempo.ts per come cambia la somma.
+  -- 🔴 OGNI SCALA QUI HA UNO STRUMENTO DIETRO, non un gusto:
+  --   sleep, energy  1–7   Hooper Questionnaire
+  --   mood           0–100 VAS (visual analogue scale)
+  --   effort         0–10  session-RPE, CR-10 di Foster
+  -- `lib/tempo.ts` le normalizza tutte a 0–1 prima di confrontarle: non
+  -- sommare mai due di queste colonne così come sono.
   sleep      smallint check (sleep      between 1 and 7),
-  energy     smallint check (energy     between 1 and 7),
-  hydration  smallint check (hydration  between 1 and 5),
-  muscles    smallint check (muscles    between 1 and 5),
-  legs       smallint check (legs       between 1 and 5),  -- post
-  breath     smallint check (breath     between 1 and 5),  -- post
+  energy     smallint check (energy     between 1 and 7),  -- pre e post
+  mood       smallint check (mood       between 0 and 100),
   effort     smallint check (effort     between 0 and 10), -- post = session-RPE (CR-10)
 
-  -- ── non scalari ──
-  -- Headspace è multi-select di proposito: non si chiede a una ragazza di dare
-  -- un voto al proprio umore, le si chiede di nominarlo.
+  -- 🔴 Colonne non più scritte da nessuna schermata, tenute perché i dati già
+  -- raccolti restano validi. `hydration`/`muscles`/`legs`/`breath` erano canali
+  -- tolti dal check-in — la mappa corporea chiede DOVE e con che parola, che è
+  -- meglio di una media su tutto il corpo. `headspace` era l'umore a parole,
+  -- sostituito dalla VAS. NON aggiungerne di nuove qui: si tolgono quando i
+  -- dati del pilota sono stati esportati.
+  hydration        smallint check (hydration between 1 and 5),
+  muscles          smallint check (muscles   between 1 and 5),
+  legs             smallint check (legs      between 1 and 5),
+  breath           smallint check (breath    between 1 and 5),
   headspace        text[] check (headspace is null or array_length(headspace,1) <= 8),
   headspace_other  text   check (headspace_other is null or char_length(headspace_other) <= 60),
   surprise         smallint check (surprise between 1 and 3),
+  duration_bucket  text   check (duration_bucket is null or char_length(duration_bucket) <= 10),
+
+  -- ── riflessione sull'esito (post) ──
+  -- Cinque parole, non una scala: nessuna è un voto sulla prestazione. Vedi
+  -- SATISFACTION in content/channels.ts.
+  satisfaction text check (satisfaction is null or satisfaction in
+    ('disappointed','frustrated','satisfied','confident','proud')),
 
   -- ── contesto di vita ──
   sleep_hours   text     check (sleep_hours is null or char_length(sleep_hours) <= 10),
   school_load   smallint check (school_load between 1 and 3),
   painkillers   boolean,
+  -- Il ciclo chiesto il giorno stesso: `cycle_events` tiene le date, questo
+  -- tiene "oggi sì/no" accanto agli altri segnali di quel check-in. null =
+  -- non risposto o non le è stato chiesto.
+  on_period     boolean,
 
   -- ── riflessione (post) ──
   brought_home text[] check (brought_home is null or array_length(brought_home,1) <= 5),
@@ -179,7 +196,6 @@ create table if not exists public.check_ins (
 
   -- ── sessione (post) ──
   session_type    text check (session_type is null or session_type in ('training','match','pe','gym','other')),
-  duration_bucket text check (duration_bucket is null or char_length(duration_bucket) <= 10),
 
   -- R3: nei giorni in cui il suo calendario dice "educazione fisica", il check-in
   -- chiede se ci è andata davvero — capita spesso di no, e il carico del giorno
@@ -205,6 +221,16 @@ alter table public.check_ins drop constraint if exists check_ins_energy_check;
 alter table public.check_ins add constraint check_ins_energy_check check (energy between 1 and 7);
 alter table public.check_ins drop constraint if exists check_ins_effort_check;
 alter table public.check_ins add constraint check_ins_effort_check check (effort between 0 and 10);
+
+-- Le colonne nuove: l'umore su VAS, la soddisfazione a parole, il ciclo del
+-- giorno. Idempotenti come le altre, così un database già in piedi si allinea
+-- senza ricrearlo.
+alter table public.check_ins add column if not exists mood smallint
+  check (mood between 0 and 100);
+alter table public.check_ins add column if not exists satisfaction text
+  check (satisfaction is null or satisfaction in
+    ('disappointed','frustrated','satisfied','confident','proud'));
+alter table public.check_ins add column if not exists on_period boolean;
 
 
 -- ── SEGNALI CORPOREI ────────────────────────────────────────────────────────
@@ -634,9 +660,10 @@ create or replace view public.coach_athletes as
 create or replace view public.coach_check_ins as
   select id, athlete_id, kind, local_date, created_at,
          tempo_predicted, prediction_confidence, tempo_suggested, tempo_chosen,
-         sleep, energy, hydration, muscles, legs, breath, effort,
+         sleep, energy, mood, effort, satisfaction,
+         hydration, muscles, legs, breath,  -- storiche, non più scritte
          headspace, surprise,            -- headspace_other NO: è testo libero
-         sleep_hours, school_load, painkillers,
+         sleep_hours, school_load, painkillers, on_period,
          brought_home,                   -- `note` NO: sono le sue parole
          session_type, duration_bucket, pe_attended,
          started_at, completed_at

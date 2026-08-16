@@ -122,12 +122,17 @@ bodyAvg = (legs + breath + energy + headspaceValue) / 4
 effort  = 1..5
 ```
 
-⚠️ **Nell'app `effort` è 0–10** (scala RPE standard, CR-10 di Foster — la spec
-originale della founder la chiedeva esplicitamente), non 1–5 come nel prototipo
-qui sotto. Le soglie `effort ≥ 4` e `effort ≤ 2` nella tabella sono quelle del
-prototipo; nel codice (`content/outcomes.ts`) sono `effort ≥ 7` e `effort ≤ 3`
-— stessa posizione relativa sulla nuova scala, non un'altra soglia. `bodyAvg`
-resta 1–5, invariato.
+⚠️ **La tabella qui sotto è il PROTOTIPO, non l'app.** Nel codice:
+
+| | Prototipo | App oggi |
+|---|---|---|
+| `effort` | 1–5 | **0–10** (RPE standard, CR-10 di Foster) |
+| stato del corpo | `bodyAvg` = media di gambe, respiro, energia, headspace (1–5) | **`recovery`** = la sola energia 1–7 (Hooper): gambe e respiro sono stati tolti dal Tune In, perché la mappa corporea chiede DOVE e con che parola invece di una media |
+| soglie | numeri assoluti (`effort ≥ 4`) | **frazioni 0–1** (`effort ≥ 0.7`) |
+
+Le soglie in `content/outcomes.ts` sono le stesse posizioni relative del
+prototipo, espresse come frazione del range: così un cambio di scala non le
+rompe più in silenzio — cosa che è già successa una volta. Vedi `lib/tempo.ts`.
 
 | Andatura | Condizione | Titolo | Messaggio |
 |---|---|---|---|

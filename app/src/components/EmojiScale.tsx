@@ -1,3 +1,5 @@
+import { fill, useCopy } from '@/copy'
+
 /**
  * La scala a emoji. Compare sette volte fra pre e post, quindi è il componente
  * che vale di più farne uno buono.
@@ -8,6 +10,11 @@
  * Accessibile come un gruppo di radio: chi usa uno screen reader sente
  * l'etichetta a parole ("Ho dormito pochissimo" … "Profondo e riposata"), non
  * "emoji lucertola".
+ *
+ * 🔴 Nemmeno i punti in mezzo hanno un numero. Dicevano "5 / 7", che è
+ * esattamente il punteggio che il §7 vieta — solo letto ad alta voce invece
+ * che stampato, quindi vietato solo per chi ci vede. Adesso dicono da che
+ * parte stanno.
  *
  * 🔴 Oltre 5 punti (sonno/energia a 7, effort a 11) una riga sola che si
  * stringe per stare tutta larga finirebbe sotto i 44px di bersaglio — la
@@ -29,6 +36,7 @@ type Props = {
 }
 
 export default function EmojiScale({ scale, value, onChange, label, low, high, size = 'md', offset = 1 }: Props) {
+  const t = useCopy()
   const big = size === 'lg'
   const wrap = scale.length > 5
   const max = offset + scale.length - 1
@@ -38,6 +46,11 @@ export default function EmojiScale({ scale, value, onChange, label, low, high, s
         {scale.map((emoji, i) => {
           const v = i + offset
           const on = value === v
+          const at = i / (scale.length - 1)
+          const name = v === offset ? low
+            : v === max ? high
+            : at === 0.5 ? t.flow.scaleMiddle
+            : fill(t.flow.scaleToward, { label: at < 0.5 ? low : high })
           return (
             <button
               key={v}
@@ -45,7 +58,7 @@ export default function EmojiScale({ scale, value, onChange, label, low, high, s
               role="radio"
               aria-checked={on}
               // Il nome accessibile è la posizione a parole, non l'emoji.
-              aria-label={v === offset ? low : v === max ? high : `${v} / ${max}`}
+              aria-label={name}
               onClick={() => onChange(v)}
               className={`rounded-[14px] border-[3px] transition-transform ${
                 wrap

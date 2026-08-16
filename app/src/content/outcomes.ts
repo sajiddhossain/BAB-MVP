@@ -99,20 +99,24 @@ export const OUTCOMES: Record<OutcomeCode, Outcome> = {
  * in un posto solo.
  */
 /**
- * `effort` è la RPE 0–10 (vedi `content/channels.ts`, `EFFORT`); `bodyAvg` resta
- * su 1–5. Le soglie 7 e 3 sono la stessa posizione relativa di quelle originali
- * (4 e 2 su una scala 1–5), non validate né allora né ora — vedi `lib/tempo.ts`.
+ * 🔴 `effort` e `recovery` arrivano NORMALIZZATI 0–1, non grezzi — vedi
+ * `lib/tempo.ts`. Le soglie qui sono frazioni del range, quindi restano vere
+ * anche se domani la RPE o il canale energia cambiano scala: è la lezione di
+ * quando erano numeri assoluti e un cambio di scala le ha rotte in silenzio.
+ *
+ * Sono le stesse posizioni relative dei prototipi (bodyAvg 3.5/2.5/3/4 su una
+ * scala 1–5, effort 4/2 su una 1–5) e, come allora, **non sono validate**.
  */
-export function pickOutcome(tempo: TempoCode, effort: number, bodyAvg: number): OutcomeCode {
+export function pickOutcome(tempo: TempoCode, effort: number, recovery: number): OutcomeCode {
   if (tempo === 'upbeat') {
-    if (bodyAvg >= 3.5) return 'upbeat_read'
-    if (bodyAvg < 2.5) return 'upbeat_cost'
+    if (recovery >= 0.625) return 'upbeat_read'
+    if (recovery < 0.375) return 'upbeat_cost'
     return 'upbeat_solid'
   }
   if (tempo === 'steady') {
-    if (effort >= 7 && bodyAvg < 3) return 'steady_tipped'
-    if (bodyAvg >= 4 && effort <= 3) return 'steady_spare'
+    if (effort >= 0.7 && recovery < 0.5) return 'steady_tipped'
+    if (recovery >= 0.75 && effort <= 0.3) return 'steady_spare'
     return 'steady_judged'
   }
-  return effort >= 7 ? 'gentle_work' : 'gentle_true'
+  return effort >= 0.7 ? 'gentle_work' : 'gentle_true'
 }

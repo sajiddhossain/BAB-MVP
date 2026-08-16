@@ -52,23 +52,20 @@ export type CheckInDraft = {
   /** 🔴 Sempre entrambe: la differenza è l'atleta che corregge il modello. */
   tempo_suggested?: string | null
   tempo_chosen?: string | null
+  /** 🔴 Le scale non sono la stessa: sleep/energy 1–7 (Hooper), mood 0–100
+   *  (VAS), effort 0–10 (RPE). Non confrontarle senza passare da `lib/tempo`. */
   sleep?: number | null
   energy?: number | null
-  hydration?: number | null
-  muscles?: number | null
-  legs?: number | null
-  breath?: number | null
+  mood?: number | null
   effort?: number | null
-  headspace?: string[] | null
-  headspace_other?: string | null
-  surprise?: number | null
+  satisfaction?: string | null
   sleep_hours?: string | null
   school_load?: number | null
   painkillers?: boolean | null
+  on_period?: boolean | null
   brought_home?: string[] | null
   note?: string | null
   session_type?: string | null
-  duration_bucket?: string | null
   /** Strumentazione del pilota: irrecuperabile se non la si mette adesso. */
   started_at?: string | null
   skipped_fields?: string[] | null
