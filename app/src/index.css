@@ -279,3 +279,14 @@ button, a[role="button"], input, select {
 .bab-sparkle {
   animation: bab-sparkle-pop 1.1s ease-out both;
 }
+
+/* Il dondolio della mascotte — vedi `Mascot.tsx`. In loop, ma
+   "riduci le animazioni" la ferma da sola con la regola già globale
+   più in alto (durata forzata, un solo giro). */
+.bab-mascot-bob {
+  animation: bab-mascot-bob 2.4s ease-in-out infinite;
+}
+@keyframes bab-mascot-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}

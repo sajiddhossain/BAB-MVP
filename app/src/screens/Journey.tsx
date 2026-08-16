@@ -8,6 +8,7 @@ import {
 import { recentCheckIns, recentSignals, listJourney, saveJourneyWeek } from '@/lib/repo'
 import { useSession } from '@/lib/session'
 import Sparkle from '@/components/Sparkle'
+import Mascot from '@/components/Mascot'
 
 /**
  * Il Percorso — Mesi 1 e 2, le 8 settimane richieste dal pilota.
@@ -169,34 +170,59 @@ export default function Journey() {
       <h1 className="font-display text-[26px]">{t.tabs.journey}</h1>
       <p className="text-[15px] text-[var(--color-ink-soft)]">{t.journey.lede}</p>
 
-      {([1, 2] as const).map((m) => (
-        <div key={m} className="flex flex-col gap-2.5">
-          <p className="bab-label">{MONTHS[m].emoji} {t.journey.monthLabel} {m} · {MONTHS[m].name[locale]}</p>
-          {WEEKS.filter((w) => w.month === m).map((w) => {
-            const done = Boolean(progressRowFor(rows, w.week)?.completed_at)
-            const locked = w.week > atWeek
-            const isNow = w.week === atWeek && !done
-            return (
-              <button key={w.week} type="button" onClick={() => open(w)} disabled={locked}
-                      className="bab-card relative flex items-center gap-3 px-4 py-3.5 text-left disabled:opacity-50">
-                {done && justCompleted.has(w.week) && <Sparkle />}
-                <span aria-hidden className="text-[20px]">{done ? '✅' : locked ? '🔒' : '▶️'}</span>
-                <span className="flex flex-1 flex-col gap-0.5">
-                  <span className="text-[13px] font-bold text-[var(--color-ink-soft)]">
-                    {fill(t.journey.weekLabel, { n: w.week })}
-                  </span>
-                  <span className="text-[15px] font-bold">{w.title[locale]}</span>
-                </span>
-                {isNow && !locked && (
-                  <span className="bab-pill px-2.5 py-1 text-[11px]" style={{ background: 'var(--color-lime)' }}>
-                    {t.journey.now}
-                  </span>
-                )}
-              </button>
-            )
-          })}
-        </div>
-      ))}
+      {/* 🔴 Un sentiero, non un elenco: le tappe si susseguono a zig-zag,
+          collegate da una riga tratteggiata — la stessa idea di una mappa di
+          livelli, nello stile quaderno invece che nel 3D patinato di quel
+          genere di app. L'ordine nel DOM resta dall'alto in basso: per uno
+          screen reader è comunque un elenco in ordine, lo zig-zag è solo
+          visivo. */}
+      {([1, 2] as const).map((m) => {
+        const monthWeeks = WEEKS.filter((w) => w.month === m)
+        return (
+          <div key={m} className="flex flex-col gap-1">
+            <p className="bab-label">{MONTHS[m].emoji} {t.journey.monthLabel} {m} · {MONTHS[m].name[locale]}</p>
+            <div className="relative flex flex-col items-stretch py-1">
+              <div aria-hidden
+                   className="absolute left-1/2 top-8 bottom-8 -translate-x-1/2 border-l-[3px] border-dashed"
+                   style={{ borderColor: 'var(--color-sand)' }} />
+              {monthWeeks.map((w, i) => {
+                const done = Boolean(progressRowFor(rows, w.week)?.completed_at)
+                const locked = w.week > atWeek
+                const isNow = w.week === atWeek && !done
+                const onRight = i % 2 === 1
+                return (
+                  <button key={w.week} type="button" onClick={() => open(w)} disabled={locked}
+                          className={`bab-card relative z-10 my-1.5 flex max-w-[80%] items-center gap-3 px-3.5 py-3 text-left disabled:opacity-45 ${
+                            onRight ? 'flex-row-reverse self-end text-right' : 'self-start'}`}
+                          style={{
+                            background: done ? 'var(--tempo-steady-tint)' : locked ? 'var(--color-sand)' : undefined,
+                            boxShadow: isNow ? 'var(--shadow-md)' : undefined,
+                          }}>
+                    {done && justCompleted.has(w.week) && <Sparkle />}
+                    <span aria-hidden className="text-[20px]">{done ? '✅' : locked ? '🔒' : '▶️'}</span>
+                    <span className="flex flex-1 flex-col gap-0.5">
+                      <span className="text-[12.5px] font-bold text-[var(--color-ink-soft)]">
+                        {fill(t.journey.weekLabel, { n: w.week })}
+                      </span>
+                      <span className="text-[15px] font-bold">{w.title[locale]}</span>
+                    </span>
+                    {isNow && !locked && (
+                      <span className="bab-pill px-2.5 py-1 text-[11px]" style={{ background: 'var(--color-lime)' }}>
+                        {t.journey.now}
+                      </span>
+                    )}
+                    {isNow && !locked && (
+                      <span className={`absolute -top-4 ${onRight ? '-left-4' : '-right-4'}`}>
+                        <Mascot size={40} />
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )
+      })}
     </section>
   )
 }
