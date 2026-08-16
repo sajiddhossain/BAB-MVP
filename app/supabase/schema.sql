@@ -225,12 +225,21 @@ create table if not exists public.body_signals (
   region      text not null check (char_length(region) <= 40),
   region_free text check (region_free is null or char_length(region_free) <= 40),
   sensation   text not null check (char_length(sensation) <= 40),
-  intensity   smallint check (intensity between 1 and 3),
+  -- 🔴 1-5, come `INTENSITIES` in content/lexicon.ts. Erano 3 e sono diventati
+  -- 5 su richiesta esplicita: se questo vincolo resta a 3, ogni segnale
+  -- "Parecchio" o "Tantissimo" viene rifiutato dal server — e siccome si scrive
+  -- prima in locale e la coda ingoia l'errore, sparisce in silenzio.
+  intensity   smallint check (intensity between 1 and 5),
   behaviour   behaviour_tag,
   is_red_flag boolean not null default false
 );
 create index if not exists body_signals_athlete_idx on public.body_signals (athlete_id, created_at desc);
 create index if not exists body_signals_region_idx  on public.body_signals (athlete_id, region);
+
+-- Stessa storia dei canali: allarga il vincolo dove il database esiste già.
+alter table public.body_signals drop constraint if exists body_signals_intensity_check;
+alter table public.body_signals add constraint body_signals_intensity_check
+  check (intensity between 1 and 5);
 
 
 -- ── BANDIERE ROSSE ──────────────────────────────────────────────────────────
