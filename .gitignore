@@ -9,3 +9,6 @@ dist/
 # `node scripts/shots.mjs` dalla cartella app/, quindi il repo non è il posto
 # giusto per tenerli — e la cartella sul disco resta dov'è.
 /screens/
+
+# Il punto della situazione: documento da mandare fuori, non da versionare.
+docs/05-roadmap/04-punto-della-situazione-*.md
