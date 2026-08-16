@@ -368,8 +368,8 @@ function HeartbeatPlayer({ stepIdx, isLast, heartGuess, setHeartGuess, heartTaps
   return (
     <div className="flex flex-1 flex-col gap-3">
       <div className="mb-1 flex items-center justify-between">
-        <span className="text-[12px] font-bold uppercase tracking-[0.06em]" style={{ color: 'var(--color-vividteal)' }}>
-          ❤️ {t.bodySense.heartbeatName}
+        <span className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.06em]" style={{ color: 'var(--color-vividteal)' }}>
+          <ContentIcon name="heart" size={15} color="var(--color-vividteal)" /> {t.bodySense.heartbeatName}
         </span>
         <button type="button" onClick={onClose} aria-label={t.bodySense.close}
                 className="flex h-9 w-9 items-center justify-center text-[20px] text-[var(--color-ink-soft)]">

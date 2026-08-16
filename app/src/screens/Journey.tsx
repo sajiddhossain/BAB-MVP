@@ -9,7 +9,7 @@ import { recentCheckIns, recentSignals, listJourney, saveJourneyWeek } from '@/l
 import { useSession } from '@/lib/session'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
-import { EyeIcon, PuzzleIcon } from '@/components/icons'
+import { CheckIcon, EyeIcon, LockIcon, PlayIcon, PuzzleIcon, TargetIcon } from '@/components/icons'
 
 /** Icona del mese — occhio per «riconosci» (mese 1), puzzle per «capisci» (mese 2). */
 function MonthIcon({ month, size = 14 }: { month: 1 | 2; size?: number }) {
@@ -135,7 +135,9 @@ export default function Journey() {
         <Card relative>
           {done && justCompleted.has(week.week) && <Sparkle />}
           <p className="bab-label">{t.journey.missionLabel}</p>
-          <p className="text-[15px]">🎯 {week.mission[locale]}</p>
+          <p className="flex items-center gap-1.5 text-[15px]">
+            <TargetIcon size={16} color="var(--color-vividteal)" /> {week.mission[locale]}
+          </p>
           <div className="flex items-center gap-2">
             <div className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-[var(--color-ink)] bg-[var(--color-surface)]">
               <div className="h-full rounded-full" style={{
@@ -208,7 +210,9 @@ export default function Journey() {
                             boxShadow: isNow ? 'var(--shadow-md)' : undefined,
                           }}>
                     {done && justCompleted.has(w.week) && <Sparkle />}
-                    <span aria-hidden className="text-[20px]">{done ? '✅' : locked ? '🔒' : '▶️'}</span>
+                    {done ? <CheckIcon size={20} color="var(--color-vividteal)" />
+                      : locked ? <LockIcon size={20} color="var(--color-ink-soft)" />
+                      : <PlayIcon size={20} color="var(--color-teal)" />}
                     <span className="flex flex-1 flex-col gap-0.5">
                       <span className="text-[12.5px] font-bold text-[var(--color-ink-soft)]">
                         {fill(t.journey.weekLabel, { n: w.week })}

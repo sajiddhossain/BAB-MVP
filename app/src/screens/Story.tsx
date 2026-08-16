@@ -4,11 +4,11 @@ import { recentCheckIns, recentSignals, cycleDates, saveShare } from '@/lib/repo
 import { buildWeek, DEFAULT_BLOCKS, hasContent, type BlockCode, type Week } from '@/lib/story'
 import { regionLabel } from '@/content/bodymap'
 import { SENSATIONS } from '@/content/lexicon'
-import { TEMPOS } from '@/content/tempo'
 import { PHASES, readCycle } from '@/content/cycle'
 import { useSession } from '@/lib/session'
 import type { Row } from '@/lib/insights'
 import Mascot from '@/components/Mascot'
+import { PinIcon, TempoIcon } from '@/components/icons'
 
 /**
  * La body-story — l'output "Communicate" del §11.
@@ -91,10 +91,12 @@ export default function Story() {
   if (shown.includes('tempos')) sections.push({ h: 46, render: (y) => (
     <g key="tempos">
       {line(y, t.story.blocks.tempos)}
-      {week.tempos.map((c, i) => (
-        <text key={i} x={PAD + i * 46} y={y + 26} fontSize={20} fontFamily={FONT}>
-          {c ? TEMPOS[c].emoji : '·'}
-        </text>
+      {week.tempos.map((c, i) => c ? (
+        <g key={i} transform={`translate(${PAD + i * 46},${y + 6})`}>
+          <TempoIcon code={c} size={20} color="#0F0F12" />
+        </g>
+      ) : (
+        <text key={i} x={PAD + i * 46} y={y + 26} fontSize={20} fontFamily={FONT}>·</text>
       ))}
     </g>
   ) })
@@ -103,9 +105,14 @@ export default function Story() {
     <g key="spots">
       {line(y, t.story.blocks.spots)}
       {week.spots.map((s, i) => (
-        <text key={i} x={PAD} y={y + 20 + i * 18} fontSize={13} fill="#0F0F12" fontFamily={FONT}>
-          📍 {regionLabel(s.region, locale)} — {SENSATIONS.find((x) => x.code === s.sensation)?.label[locale] ?? s.sensation}
-        </text>
+        <g key={i}>
+          <g transform={`translate(${PAD},${y + 9 + i * 18})`}>
+            <PinIcon size={13} color="#0F0F12" />
+          </g>
+          <text x={PAD + 17} y={y + 20 + i * 18} fontSize={13} fill="#0F0F12" fontFamily={FONT}>
+            {regionLabel(s.region, locale)} — {SENSATIONS.find((x) => x.code === s.sensation)?.label[locale] ?? s.sensation}
+          </text>
+        </g>
       ))}
     </g>
   ) })

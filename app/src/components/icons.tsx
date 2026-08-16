@@ -170,6 +170,24 @@ export function FlagIcon({ size = 24, color = 'currentColor' }: IconProps) {
   )
 }
 
+/** «Ora»: la tappa attiva nel Percorso — un triangolo di riproduzione, non una freccia generica. */
+export function PlayIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M7 4.5v15l13-7.5Z" stroke={color} {...base} strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export function PinIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M12 21.5S5 14.8 5 9.5a7 7 0 0 1 14 0c0 5.3-7 12-7 12Z" stroke={color} {...base} strokeLinejoin="round" />
+      <circle cx="12" cy="9.5" r="2.4" stroke={color} {...base} />
+    </svg>
+  )
+}
+
 /* ── Icone per Body-Sense e il lessico delle sensazioni ──────────────────
    Sostituiscono le emoji nei contenuti tradotti di `content/bodysense.ts`
    e `content/lexicon.ts`. Ogni content-file ora porta una chiave (`icon`)

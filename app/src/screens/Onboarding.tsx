@@ -15,7 +15,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
-import { ContentIcon, TempoIcon } from '@/components/icons'
+import { ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -307,7 +307,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       <div className="flex flex-col items-center gap-3 pt-4">
         <div className="flex items-center gap-2">
           <Mascot size={44} />
-          <span aria-hidden className="text-[52px]">❤️</span>
+          <HeartIcon size={44} color="var(--care)" />
         </div>
         <p className="max-w-[280px] text-center text-[13px] text-[var(--color-ink-soft)]">{t.heart.settleNote}</p>
       </div>
@@ -398,14 +398,14 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
       </div>
       <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
         <div className="flex items-start gap-2.5">
-          <span aria-hidden className="text-[19px]">☀️</span>
+          <SunIcon size={19} color="var(--color-gold)" />
           <div>
             <p className="text-[13.5px] font-bold">{t.heart.checkinTitle}</p>
             <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkinBody}</p>
           </div>
         </div>
         <div className="flex items-start gap-2.5">
-          <span aria-hidden className="text-[19px]">🌙</span>
+          <MoonIcon size={19} color="var(--color-lavender)" />
           <div>
             <p className="text-[13.5px] font-bold">{t.heart.checkoutTitle}</p>
             <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkoutBody}</p>
