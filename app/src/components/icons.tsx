@@ -114,3 +114,38 @@ export function TempoIcon({ code, size = 24, color = 'currentColor' }: IconProps
   if (code === 'steady') return <WaveIcon size={size} color={color} />
   return <LeafIcon size={size} color={color} />
 }
+
+export function EyeIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12Z" stroke={color} {...base} />
+      <circle cx="12" cy="12" r="2.6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function PuzzleIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M9 4h4v2.2a1.6 1.6 0 0 0 2.8 1.1 1.6 1.6 0 0 1 2.8 1.1V12h-2.2a1.6 1.6 0 0 0 0 3.2H20v4h-4v-2.2a1.6 1.6 0 0 0-3.2 0V19H9v-4H6.8a1.6 1.6 0 0 1 0-3.2H9V9H6.8a1.6 1.6 0 0 1-1.1-2.8A1.6 1.6 0 0 1 9 6.2V4Z"
+            stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function CheckIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <path d="M4 12.5l5 5L20 6" stroke={color} {...base} />
+    </svg>
+  )
+}
+
+export function LockIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden>
+      <rect x="5" y="11" width="14" height="9" rx="2" stroke={color} {...base} />
+      <path d="M8 11V7.5a4 4 0 0 1 8 0V11" stroke={color} {...base} />
+    </svg>
+  )
+}

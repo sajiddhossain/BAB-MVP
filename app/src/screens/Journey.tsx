@@ -9,6 +9,12 @@ import { recentCheckIns, recentSignals, listJourney, saveJourneyWeek } from '@/l
 import { useSession } from '@/lib/session'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
+import { EyeIcon, PuzzleIcon } from '@/components/icons'
+
+/** Icona del mese — occhio per «riconosci» (mese 1), puzzle per «capisci» (mese 2). */
+function MonthIcon({ month, size = 14 }: { month: 1 | 2; size?: number }) {
+  return month === 1 ? <EyeIcon size={size} /> : <PuzzleIcon size={size} />
+}
 
 /**
  * Il Percorso — Mesi 1 e 2, le 8 settimane richieste dal pilota.
@@ -110,12 +116,13 @@ export default function Journey() {
     const { from, to } = weekWindow(start, week.week)
     const progress = missionProgress(week, from, to, checkIns, signals)
     const done = Boolean(progressRowFor(rows, week.week)?.completed_at)
-    const month = MONTHS[week.month]
 
     return (
       <section className="flex flex-col gap-4 pt-2">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="bab-label">{month.emoji} {fill(t.journey.weekLabel, { n: week.week })}</span>
+          <span className="bab-label flex items-center gap-1.5">
+            <MonthIcon month={week.month} /> {fill(t.journey.weekLabel, { n: week.week })}
+          </span>
           <button type="button" onClick={() => setOpenWeek(null)}
                   className="text-[13.5px] underline text-[var(--color-ink-soft)]">
             {t.journey.backToList}
@@ -180,7 +187,9 @@ export default function Journey() {
         const monthWeeks = WEEKS.filter((w) => w.month === m)
         return (
           <div key={m} className="flex flex-col gap-1">
-            <p className="bab-label">{MONTHS[m].emoji} {t.journey.monthLabel} {m} · {MONTHS[m].name[locale]}</p>
+            <p className="bab-label flex items-center gap-1.5">
+              <MonthIcon month={m} /> {t.journey.monthLabel} {m} · {MONTHS[m].name[locale]}
+            </p>
             <div className="relative flex flex-col items-stretch py-1">
               <div aria-hidden
                    className="absolute left-1/2 top-8 bottom-8 -translate-x-1/2 border-l-[3px] border-dashed"

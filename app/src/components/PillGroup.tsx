@@ -5,7 +5,7 @@
  * perché a una ragazza non si domanda di dare un voto al proprio umore ma di
  * nominarlo — e i sentimenti veri arrivano più d'uno alla volta.
  */
-export type PillOption = { value: string; label: string; emoji?: string; flag?: boolean }
+export type PillOption = { value: string; label: string; emoji?: string; icon?: React.ReactNode; flag?: boolean }
 
 type Props = {
   options: PillOption[]
@@ -60,7 +60,7 @@ export default function PillGroup({ options, value, onChange, label, tone = 'neu
                 ? { borderColor: 'var(--care)' }
                 : undefined}
           >
-            {o.emoji && <span aria-hidden>{o.emoji}</span>}
+            {o.icon ? <span aria-hidden className="flex items-center">{o.icon}</span> : o.emoji && <span aria-hidden>{o.emoji}</span>}
             {o.label}
           </button>
         )

@@ -14,6 +14,7 @@ import { SENSATIONS, isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { CARE, DECODE_ACHE } from '@/content/clinical'
 import Sparkle from '@/components/Sparkle'
+import { TempoIcon } from '@/components/icons'
 import { total, suggestWithPain, type Channels } from '@/lib/tempo'
 import { saveCheckIn, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -241,7 +242,7 @@ export default function CheckInPre() {
           {!careOn && <Sparkle />}
           <p className="bab-label">{t.checkin.pre.result.planLabel}</p>
           <div className="flex items-center gap-3">
-            <span className="text-[40px] leading-none" aria-hidden>{tempo.emoji}</span>
+            <TempoIcon code={result.chosen} size={40} color={`var(--tempo-${result.chosen})`} />
             <div>
               <h1 className="font-display text-[26px]">{tempo.name}</h1>
               <p className="text-[13px] text-[var(--color-ink-soft)]">{tempo.tag[locale]}</p>
@@ -257,7 +258,7 @@ export default function CheckInPre() {
           <p className="text-[14px] text-[var(--color-ink-soft)]">{t.checkin.pre.result.swapLabel}</p>
           <PillGroup
             label={t.checkin.pre.result.swapLabel}
-            options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, emoji: TEMPOS[c].emoji }))}
+            options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, icon: <TempoIcon code={c} size={16} color={`var(--tempo-${c})`} /> }))}
             value={result.chosen}
             onChange={(v) => void swap(v as TempoCode)}
           />
@@ -378,7 +379,7 @@ export default function CheckInPre() {
           <PillGroup
             size="lg"
             label={t.checkin.pre.predict.title}
-            options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, emoji: TEMPOS[c].emoji }))}
+            options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, icon: <TempoIcon code={c} size={16} color={`var(--tempo-${c})`} /> }))}
             value={predicted}
             onChange={(v) => answer('tempo_predicted', () => setPredicted(v as TempoCode))}
           />

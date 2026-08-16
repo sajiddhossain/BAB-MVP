@@ -15,6 +15,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
+import { TempoIcon } from '@/components/icons'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -418,7 +419,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           return (
             <div key={code} className="bab-card flex flex-col items-center gap-0.5 px-1 py-2.5 text-center"
                  style={{ borderColor: `var(${tempo.cssVar})` }}>
-              <span aria-hidden className="text-[19px]">{tempo.emoji}</span>
+              <TempoIcon code={code} size={19} color={`var(${tempo.cssVar})`} />
               <span className="text-[11.5px] font-bold">{tempo.name}</span>
             </div>
           )

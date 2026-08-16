@@ -13,6 +13,7 @@ import { isRedFlag } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
 import Sparkle from '@/components/Sparkle'
+import { CompassIcon, TempoIcon } from '@/components/icons'
 import { norm, RANGES, recovery, predictionError } from '@/lib/tempo'
 import { saveCheckIn, checkInsOn, localDate, type BodySignalDraft } from '@/lib/repo'
 import { useSession } from '@/lib/session'
@@ -212,7 +213,7 @@ export default function CheckInPost() {
         </section>
 
         <Link to="/senti" className="bab-pill flex items-center justify-center gap-2 px-4 py-3 text-[15px]">
-          <span aria-hidden>🧭</span> {t.checkin.post.bodySenseCta}
+          <CompassIcon size={18} /> {t.checkin.post.bodySenseCta}
         </Link>
 
         <p className="text-center text-[13px] text-[var(--color-ink-soft)]">
@@ -312,7 +313,7 @@ export default function CheckInPost() {
           <PillGroup
             size="lg"
             label={t.checkin.post.lookBack.title}
-            options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, emoji: TEMPOS[c].emoji }))}
+            options={TEMPO_ORDER.map((c) => ({ value: c, label: TEMPOS[c].name, icon: <TempoIcon code={c} size={16} color={`var(--tempo-${c})`} /> }))}
             value={actual}
             onChange={(v) => answer('tempo_chosen', () => setActual(v as TempoCode))}
           />
