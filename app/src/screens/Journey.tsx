@@ -7,6 +7,7 @@ import {
 } from '@/lib/journey'
 import { recentCheckIns, recentSignals, listJourney, saveJourneyWeek } from '@/lib/repo'
 import { useSession } from '@/lib/session'
+import Sparkle from '@/components/Sparkle'
 
 /**
  * Il Percorso — Mesi 1 e 2, le 8 settimane richieste dal pilota.
@@ -20,8 +21,12 @@ import { useSession } from '@/lib/session'
  * bottone "fatto" da premere, nessun voto. §7.
  */
 
-function Card({ children }: { children: React.ReactNode }) {
-  return <section className="bab-card flex flex-col gap-3 px-4 py-4">{children}</section>
+function Card({ children, relative }: { children: React.ReactNode; relative?: boolean }) {
+  return (
+    <section className={`bab-card flex flex-col gap-3 px-4 py-4 ${relative ? 'relative' : ''}`}>
+      {children}
+    </section>
+  )
 }
 
 export default function Journey() {
@@ -35,6 +40,13 @@ export default function Journey() {
   const [openWeek, setOpenWeek] = useState<number | null>(null)
   const [reflection, setReflection] = useState('')
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle')
+  /**
+   * Le settimane che si sono chiuse da sole DURANTE questa visita — non quelle
+   * già fatte prima. Lo scintillio festeggia il momento in cui succede, non
+   * ogni volta che si rilegge una settimana vecchia: altrimenti sarebbe
+   * decorazione permanente, non un festeggiamento (§1 del tono di voce).
+   */
+  const [justCompleted, setJustCompleted] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     let alive = true
@@ -64,7 +76,10 @@ export default function Journey() {
       const done = missionProgress(w, from, to, checkIns, signals) >= w.missionGoal
       if (done) {
         void saveJourneyWeek(userId, w.week, { completed_at: new Date().toISOString() })
-          .then(() => setRows((r) => [...r.filter((x) => x.week !== w.week), { week: w.week, completed_at: new Date().toISOString() }]))
+          .then(() => {
+            setRows((r) => [...r.filter((x) => x.week !== w.week), { week: w.week, completed_at: new Date().toISOString() }])
+            setJustCompleted((p) => new Set(p).add(w.week))
+          })
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,7 +124,8 @@ export default function Journey() {
         <p className="text-[14px] text-[var(--color-ink-soft)] italic">{week.subtitle[locale]}</p>
         <p className="text-[15px]">{week.body[locale]}</p>
 
-        <Card>
+        <Card relative>
+          {done && justCompleted.has(week.week) && <Sparkle />}
           <p className="bab-label">{t.journey.missionLabel}</p>
           <p className="text-[15px]">🎯 {week.mission[locale]}</p>
           <div className="flex items-center gap-2">
@@ -162,7 +178,8 @@ export default function Journey() {
             const isNow = w.week === atWeek && !done
             return (
               <button key={w.week} type="button" onClick={() => open(w)} disabled={locked}
-                      className="bab-card flex items-center gap-3 px-4 py-3.5 text-left disabled:opacity-50">
+                      className="bab-card relative flex items-center gap-3 px-4 py-3.5 text-left disabled:opacity-50">
+                {done && justCompleted.has(w.week) && <Sparkle />}
                 <span aria-hidden className="text-[20px]">{done ? '✅' : locked ? '🔒' : '▶️'}</span>
                 <span className="flex flex-1 flex-col gap-0.5">
                   <span className="text-[13px] font-bold text-[var(--color-ink-soft)]">
