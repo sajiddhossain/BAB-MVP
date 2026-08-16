@@ -290,3 +290,67 @@ button, a[role="button"], input, select {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
+
+/* Il resto della mascotte viva — occhi, sguardo, bocca, scintillii — vedi
+   `Mascot.tsx`. Stesso principio del dondolio: loop CSS, e "riduci le
+   animazioni" li spegne da sé con la regola globale più in alto. */
+.bab-mascot-wrap {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
+}
+.bab-mascot-spark {
+  position: absolute;
+  pointer-events: none;
+  animation: bab-mascot-twinkle 3.1s ease-in-out infinite;
+}
+@keyframes bab-mascot-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  50% { opacity: 0.9; transform: scale(1) rotate(14deg); }
+}
+
+.bab-mascot-gaze {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bab-mascot-gaze 6.5s ease-in-out infinite;
+}
+@keyframes bab-mascot-gaze {
+  0%, 12%, 100% { transform: translate(0, 0); }
+  22%, 34% { transform: translate(1.2px, 0); }
+  46% { transform: translate(0, 0); }
+  62%, 74% { transform: translate(-1.2px, 0.4px); }
+  88% { transform: translate(0, 0); }
+}
+
+.bab-mascot-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bab-mascot-blink 5s ease-in-out infinite;
+}
+.bab-mascot-eye-r {
+  animation-delay: 0.04s;
+}
+@keyframes bab-mascot-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  92%, 96% { transform: scaleY(0.12); }
+  94%, 98% { transform: scaleY(1); }
+}
+
+.bab-mascot-mouth-closed, .bab-mascot-mouth-open {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.bab-mascot-mouth-closed {
+  animation: bab-mascot-mouth-closed 4.4s ease-in-out infinite;
+}
+.bab-mascot-mouth-open {
+  animation: bab-mascot-mouth-open 4.4s ease-in-out infinite;
+}
+@keyframes bab-mascot-mouth-closed {
+  0%, 35%, 82%, 100% { opacity: 1; transform: scale(1); }
+  55%, 68% { opacity: 0; transform: scale(0.9); }
+}
+@keyframes bab-mascot-mouth-open {
+  0%, 35%, 82%, 100% { opacity: 0; transform: scale(0.85); }
+  55%, 68% { opacity: 1; transform: scale(1.05); }
+}
