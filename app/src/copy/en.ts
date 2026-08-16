@@ -57,12 +57,14 @@ export const en: Copy = {
     emailPlaceholder: 'name@example.com',
     sendLink: 'Send me the link',
     sending: 'Sending…',
-    sentTitle: 'Check your email',
-    sentBody: "We've sent a link to **{email}**. Open it on this phone and you're in.",
+    sentTitle: 'Enter the code',
+    sentBody: "We've sent it to **{email}**: it's 6 digits, inside the same email as the link.",
     sentAgain: "Didn't arrive? Send it again",
-    codeHint: "Link opening in the wrong place? The same email has a 6-digit code.",
+    /** Prefer the link? It's in the same email — here the code is the main path. */
+    codeHint: "Prefer the link? It's in the same email.",
     codeLabel: 'Code',
-    codePlaceholder: '123456',
+    /** {i} and {n} are numbers: "Digit 3 of 6". One label per box. */
+    codeDigitLabel: 'Digit {i} of {n}',
     codeSubmit: 'Go in',
     codeChecking: 'Checking…',
     codeWrong: 'Wrong or expired code. Send the email again and try once more.',

@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { fill, useCopy } from '@/copy'
 import { googleEnabled, signInWithCode, signInWithEmail, signInWithGoogle } from '@/lib/session'
 import { lockedFor, recordAttempt, resetAttempts } from '@/lib/rateLimit'
+import OtpInput from '@/components/OtpInput'
+
+const CODE_LENGTH = 6
 
 /**
  * Le soglie del freno — vedi `lib/rateLimit.ts` per il perché.
@@ -80,11 +83,10 @@ export default function SignIn() {
     setState('error')
   }
 
-  async function enterWithCode(e: React.FormEvent) {
-    e.preventDefault()
-    if (lockedFor(CODE_LIMIT.scope, email) > 0) return
+  async function submitCode(value: string) {
+    if (value.length < CODE_LENGTH || lockedFor(CODE_LIMIT.scope, email) > 0) return
     setCodeState('checking')
-    const r = await signInWithCode(email, code)
+    const r = await signInWithCode(email, value)
     // Se è andata, `onAuthStateChange` cambia schermata da solo: qui non c'è
     // niente da fare se non restare fermi finché non succede. Si riparte da
     // zero per il prossimo accesso, invece di portarsi dietro i tentativi.
@@ -92,7 +94,26 @@ export default function SignIn() {
     console.error('[auth]', r.error)
     recordAttempt(CODE_LIMIT.scope, email, CODE_LIMIT.free, CODE_LIMIT.base, CODE_LIMIT.cap)
     setCodeState('wrong')
+    setCode('') // riparte da caselle vuote: ritentare lo stesso codice sbagliato non serve
   }
+
+  /**
+   * L'ultima cifra manda da sola — è quello che ci si aspetta da sei
+   * caselle. Il bottone resta comunque, per chi arriva lì da tastiera e
+   * preferisce confermare invece che farlo scattare da solo.
+   *
+   * `submittedFor` evita di rimandare lo stesso codice due volte: senza,
+   * digitare la sesta cifra E toccare "Entra" nello stesso istante manderebbe
+   * due richieste, e la seconda consumerebbe un tentativo per niente.
+   */
+  const submittedFor = useRef('')
+  useEffect(() => {
+    if (code.length === CODE_LENGTH && code !== submittedFor.current) {
+      submittedFor.current = code
+      void submitCode(code)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code])
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col justify-center gap-5 px-5 py-10">
@@ -102,54 +123,54 @@ export default function SignIn() {
       </div>
 
       {state === 'sent' ? (
-        <div className="bab-card flex flex-col gap-2 px-4 py-4" style={{ background: 'var(--tempo-steady-tint)' }}>
-          <h2 className="font-display text-[18px]">{t.auth.sentTitle}</h2>
-          <p className="text-[15px]">
-            {fill(t.auth.sentBody, { email }).split('**').map((p, i) =>
-              i % 2 ? <strong key={i}>{p}</strong> : <span key={i}>{p}</span>,
-            )}
-          </p>
-          <button type="button" onClick={() => setState('idle')} className="bab-pill self-start px-4 py-2 text-[13px]">
-            {t.auth.sentAgain}
-          </button>
+        // 🔴 Schermata dedicata al codice, non il link con un ripiego in coda:
+        // le sei caselle sono la cosa grande al centro, il link è la nota in
+        // fondo. Per una spiegazione più lunga di quale problema risolve, vedi
+        // `enterWithCode` più sopra.
+        <div className="flex flex-col gap-4">
+          <div>
+            <h2 className="font-display text-[22px]">{t.auth.sentTitle}</h2>
+            <p className="mt-1 text-[15px] text-[var(--color-ink-soft)]">
+              {fill(t.auth.sentBody, { email }).split('**').map((p, i) =>
+                i % 2 ? <strong key={i}>{p}</strong> : <span key={i}>{p}</span>,
+              )}
+            </p>
+          </div>
 
-          {/* Il codice, sotto il link e non al posto suo: per la maggior parte
-              il link basta, e chi ne ha bisogno lo trova senza cercarlo. */}
-          <p className="mt-1 text-[13.5px] text-[var(--color-ink-soft)]">{t.auth.codeHint}</p>
-          <form onSubmit={enterWithCode} className="flex items-end gap-2">
-            <div className="flex flex-col gap-1">
-              <label className="bab-label" htmlFor="code">{t.auth.codeLabel}</label>
-              <input
-                id="code"
-                type="text"
-                required
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                pattern="[0-9]*"
-                maxLength={6}
-                value={code}
-                onChange={(e) => { setCode(e.target.value.replace(/\D/g, '')); setCodeState('idle') }}
-                placeholder={t.auth.codePlaceholder}
-                className="bab-card w-[11ch] px-2 py-2.5 text-center text-[17px] tracking-[0.2em]"
-              />
-            </div>
+          <form onSubmit={(e) => { e.preventDefault(); void submitCode(code) }} className="flex flex-col gap-3">
+            <OtpInput
+              length={CODE_LENGTH}
+              value={code}
+              onChange={(v) => { setCode(v); setCodeState('idle') }}
+              disabled={codeState === 'checking' || codeWait > 0}
+              label={t.auth.codeLabel}
+              digitLabel={(i, n) => fill(t.auth.codeDigitLabel, { i, n })}
+            />
+            {codeWait > 0 ? (
+              <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
+                {fill(t.auth.codeLocked, { time: formatWait(codeWait) })}
+              </p>
+            ) : codeState === 'wrong' && (
+              <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
+                {t.auth.codeWrong}
+              </p>
+            )}
             <button
               type="submit"
-              disabled={codeState === 'checking' || code.length < 6 || codeWait > 0}
-              className="bab-pill px-4 py-2.5 text-[14px] disabled:opacity-40"
+              disabled={codeState === 'checking' || code.length < CODE_LENGTH || codeWait > 0}
+              className="bab-pill px-4 py-3 text-[15px] disabled:opacity-40"
+              style={{ background: 'var(--color-lime)' }}
             >
               {codeState === 'checking' ? t.auth.codeChecking : t.auth.codeSubmit}
             </button>
           </form>
-          {codeWait > 0 ? (
-            <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
-              {fill(t.auth.codeLocked, { time: formatWait(codeWait) })}
-            </p>
-          ) : codeState === 'wrong' && (
-            <p className="text-[13.5px]" style={{ color: 'var(--care)' }} role="alert">
-              {t.auth.codeWrong}
-            </p>
-          )}
+
+          <div className="flex items-center justify-between gap-3 text-[13.5px] text-[var(--color-ink-soft)]">
+            <span>{t.auth.codeHint}</span>
+            <button type="button" onClick={() => setState('idle')} className="underline shrink-0">
+              {t.auth.sentAgain}
+            </button>
+          </div>
         </div>
       ) : (
         <form onSubmit={sendLink} className="flex flex-col gap-3">

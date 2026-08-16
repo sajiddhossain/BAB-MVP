@@ -80,8 +80,8 @@ export const it = {
     emailPlaceholder: 'nome@esempio.it',
     sendLink: 'Mandami il link',
     sending: 'Sto mandando…',
-    sentTitle: 'Guarda la posta',
-    sentBody: 'Abbiamo mandato un link a **{email}**. Aprilo da questo telefono ed è fatta.',
+    sentTitle: 'Inserisci il codice',
+    sentBody: 'Te l\'abbiamo mandato a **{email}**: sono 6 cifre, dentro la stessa email del link.',
     sentAgain: 'Non è arrivato? Rimandalo',
     /**
      * 🔴 La seconda strada, non un dettaglio. Su iPhone il link aperto dalla
@@ -89,9 +89,11 @@ export const it = {
      * sessione si apre nel posto sbagliato e da lì sembra che non funzioni
      * niente. Il codice si copia e si incolla dove sei già.
      */
-    codeHint: 'Il link non si apre dove vuoi tu? Nella stessa email c\'è un codice a 6 cifre.',
+    /** Preferisci il link? Sta nella stessa email — qui il codice è la strada principale. */
+    codeHint: 'Preferisci il link? È nella stessa email.',
     codeLabel: 'Codice',
-    codePlaceholder: '123456',
+    /** {i} e {n} sono numeri: "Cifra 3 di 6". Un\'etichetta per casella. */
+    codeDigitLabel: 'Cifra {i} di {n}',
     codeSubmit: 'Entra',
     codeChecking: 'Controllo…',
     codeWrong: 'Codice sbagliato o scaduto. Rimanda la mail e riprova.',
