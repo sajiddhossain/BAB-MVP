@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useCopy, useLocale } from '@/copy'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { checkInsOn, localDate } from '@/lib/repo'
+import Mascot from '@/components/Mascot'
 
 /**
  * La home. È l'unica schermata che vedono ogni giorno, quindi deve avere
@@ -59,6 +60,12 @@ export default function Today() {
 
       {state.kind === 'fresh' && (
         <div className="bab-card flex flex-col gap-3 px-4 py-5">
+          {/* 🔴 Prima del check-in non c'è ancora niente da leggere — solo
+              l'invito a partire. La mascotte lo tiene compagnia invece di
+              lasciare la card vuota di tocco. */}
+          <div className="flex justify-center">
+            <Mascot size={40} />
+          </div>
           <h2 className="font-display text-[20px]">{t.today.fresh.title}</h2>
           <p className="text-[15px] text-[var(--color-ink-soft)]">{t.today.fresh.body}</p>
           <Link to="/checkin/pre" className="bab-pill px-4 py-3 text-center text-[16px]"
