@@ -262,7 +262,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'welcome') return (
     <Frame title={t.onboarding.welcomeTitle} help={t.onboarding.welcomeBody}
-           next={() => setStep('heartConcept')} {...F} />
+           next={() => setStep('heartConcept')} {...F}>
+      {/* 🔴 Stessa mascotte di tutto il resto del percorso: qui accoglie
+          all'inizio, come alla fine (schermata "done" più sotto). */}
+      <div className="flex justify-center py-2">
+        <Mascot size={64} />
+      </div>
+    </Frame>
   )
 
   // 🔴 R3-bis: prima di chiederle qualsiasi dato, le si fa PROVARE il concetto
