@@ -121,6 +121,50 @@ export default function App() {
   if (connected && loading) {
     return <p className="p-8 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
   }
+  /**
+   * Solo per gli screenshot di cammino (scripts/walkthrough.mjs): rende la
+   * schermata vera senza passare da un account vero. Stesso involucro
+   * dell'app reale (HurtButton + TabBar dove ci sono anche lì) così gli
+   * screenshot non mentono su cosa c'è intorno alla schermata.
+   */
+  if (import.meta.env.DEV && pathname.startsWith('/dev/')) {
+    const key = pathname.slice('/dev/'.length)
+    const screens: Record<string, React.ReactNode> = {
+      onboarding: <Onboarding onDone={() => {}} />,
+      today: <Today />,
+      journey: <Journey />,
+      body: <Body />,
+      story: <Story />,
+      bodysense: <BodySense />,
+      me: <Me />,
+      journal: <Journal />,
+      'checkin-pre': <CheckInPre />,
+      'checkin-post': <CheckInPost />,
+      'settings': <SettingsIndex />,
+      'settings/profilo': <SettingsProfile />,
+      'settings/ritmo': <SettingsRhythm />,
+      'settings/agenda': <SettingsAgenda />,
+      'settings/agenda/allenamenti': <AgendaDays kind="training" />,
+      'settings/agenda/educazione-fisica': <AgendaDays kind="pe" />,
+      'settings/agenda/gare': <AgendaEvents />,
+      'settings/lingua': <SettingsLanguage />,
+      'settings/dati': <SettingsData />,
+      'settings/diagnostica': <Diagnostics />,
+      'settings/account': <SettingsAccount />,
+    }
+    const el = screens[key]
+    if (el) {
+      if (key === 'onboarding') return el
+      const isFlow = key === 'checkin-pre' || key === 'checkin-post'
+      return (
+        <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col">
+          <HurtButton />
+          <main className={`flex-1 px-4 ${isFlow ? 'pb-6' : 'pb-28'}`}>{el}</main>
+          {!isFlow && <TabBar />}
+        </div>
+      )
+    }
+  }
   if (connected && !userId) return <SignIn />
 
   // Il primo accesso su un dispositivo scarica quello che c'è già. È l'unico

@@ -73,20 +73,29 @@ export default function CheckInPost() {
   const [predicted, setPredicted] = useState<TempoCode | null>(null)
   const [lookedForPre, setLookedForPre] = useState(false)
 
-  const [actual, setActual] = useState<TempoCode | null>(null)
-  const [effort, setEffort] = useState<number | null>(null)
+  /**
+   * `?seed=1` (solo DEV): per screenshot/cammino, mostra la schermata finale
+   * senza dover attraversare a clic un flusso a passi — fragile via script,
+   * dato che l'ordine e i controlli di ogni domanda cambiano nel tempo.
+   */
+  const seeded = import.meta.env.DEV && new URLSearchParams(location.search).get('seed') === '1'
+
+  const [actual, setActual] = useState<TempoCode | null>(seeded ? 'steady' : null)
+  const [effort, setEffort] = useState<number | null>(seeded ? 5 : null)
   const [satisfaction, setSatisfaction] = useState<string | null>(null)
   const [session, setSession] = useState<string | null>(null)
-  const [energy, setEnergy] = useState<number | null>(null)
+  const [energy, setEnergy] = useState<number | null>(seeded ? 5 : null)
   const [brought, setBrought] = useState<string[]>([])
   const [note, setNote] = useState('')
 
   const [region, setRegion] = useState<RegionCode | null>(null)
   const [freeText, setFreeText] = useState('')
-  const [signals, setSignals] = useState<BodySignalDraft[]>([])
+  const [signals, setSignals] = useState<BodySignalDraft[]>(
+    seeded ? [{ athlete_id: 'x', region: 'knee_r', sensation: 'sharp', intensity: 3, is_red_flag: false }] : [],
+  )
 
   const [skipped, setSkipped] = useState<string[]>([])
-  const [done, setDone] = useState(false)
+  const [done, setDone] = useState(seeded)
   const [saving, setSaving] = useState(false)
   /** "Non oggi" sul suggerimento di parlarne — resta chiuso finché non riapre lo schermo. */
   const [communicateDismissed, setCommunicateDismissed] = useState(false)

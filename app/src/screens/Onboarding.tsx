@@ -153,7 +153,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   const locale = useLocale()
   const { userId } = useSession()
 
-  const [step, setStep] = useState<Step>('welcome')
+  const [step, setStep] = useState<Step>(
+    (import.meta.env.DEV && (new URLSearchParams(location.search).get('step') as Step)) || 'welcome',
+  )
   const [name, setName] = useState('')
   const [birth, setBirth] = useState('')
 
