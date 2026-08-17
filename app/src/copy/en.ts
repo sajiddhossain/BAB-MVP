@@ -672,6 +672,7 @@ export const en: Copy = {
     redFlagsTitle: '🚩 Worth looking at now',
     redFlagsHelp: "Open flags, oldest first. They don't wait for the next session.",
     redFlagsNone: 'No open flags.',
+    redFlagsError: "Couldn't check for open flags — that doesn't mean there aren't any. Try again when you can.",
     toldAdult: 'told an adult',
     notToldAdult: 'no record of telling anyone',
     openedToday: 'today',
@@ -691,6 +692,8 @@ export const en: Copy = {
     cycleNote: "These are the dates she entered, not a forecast. At her age cycles are often still irregular: use them as context for a day, never to plan around, and never as a topic unless she opens it.",
     cycleNone: 'No dates entered.',
     nothingYet: 'No check-ins yet.',
+    fetchError: "Couldn't load this data.",
+    retry: 'Try again',
   },
 
   common: {

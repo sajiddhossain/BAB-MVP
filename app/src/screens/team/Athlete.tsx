@@ -20,19 +20,38 @@ export default function TeamAthlete() {
   const t = useCopy()
   const { athleteId = '' } = useParams()
   const [rows, setRows] = useState<TodayRow[] | null>(null)
-  const [cycle, setCycle] = useState<CycleDate[]>([])
+  const [cycle, setCycle] = useState<CycleDate[] | null>(null)
+  const [error, setError] = useState(false)
+  const [reload, setReload] = useState(0)
 
   const days = lastDays(14)
 
   useEffect(() => {
     let alive = true
+    setRows(null); setCycle(null); setError(false)
     Promise.all([historyFor(athleteId, days[0]), cycleFor(athleteId)])
-      .then(([h, c]) => { if (!alive) return; setRows(h); setCycle(c) })
-      .catch(() => { if (alive) setRows([]) })
+      .then(([h, c]) => {
+        if (!alive) return
+        if (h === null || c === null) { setError(true); return }
+        setRows(h); setCycle(c)
+      })
+      .catch(() => { if (alive) setError(true) })
     return () => { alive = false }
-  }, [athleteId, days[0]])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [athleteId, days[0], reload])
 
-  if (!rows) {
+  if (error) {
+    return (
+      <div className="m-4 flex flex-col items-start gap-2 bab-card px-4 py-4">
+        <p className="text-[15px]">{t.coach.fetchError}</p>
+        <button type="button" onClick={() => setReload((n) => n + 1)}
+                className="bab-pill px-4 py-2 text-[14px]">
+          {t.coach.retry}
+        </button>
+      </div>
+    )
+  }
+  if (!rows || !cycle) {
     return <p className="p-8 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
   }
 

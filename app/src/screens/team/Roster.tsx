@@ -30,35 +30,51 @@ function daysAgo(iso: string): number {
 export default function Roster() {
   const t = useCopy()
   const locale = useLocale()
-  const [teams, setTeams] = useState<StaffTeam[] | null | 'offline'>(null)
+  const [teams, setTeams] = useState<StaffTeam[] | 'offline' | 'error' | null>(null)
+  const [rosterError, setRosterError] = useState(false)
   const [people, setPeople] = useState<RosterAthlete[]>([])
   const [today, setToday] = useState<TodayRow[]>([])
-  const [flags, setFlags] = useState<RedFlag[]>([])
+  const [flags, setFlags] = useState<RedFlag[] | 'error'>([])
+  const [reload, setReload] = useState(0)
 
   useEffect(() => {
     let alive = true
+    setTeams(null)
+    setRosterError(false)
     myTeams().then(async (ts) => {
       if (!alive) return
-      if (ts === null) { setTeams('offline'); return }
+      if (ts === 'offline' || ts === 'error') { setTeams(ts); return }
       setTeams(ts)
       if (ts.length === 0) return
       const list = await roster(ts[0].team_id)
       if (!alive) return
+      if (list === null) { setRosterError(true); return }
       setPeople(list)
       const ids = list.map((a) => a.id)
       const [rows, rf] = await Promise.all([checkInsOn(localDate(), ids), openRedFlags(ids)])
       if (!alive) return
-      setToday(rows)
-      setFlags(rf)
+      setToday(rows ?? [])
+      setFlags(rf ?? 'error')
     })
     return () => { alive = false }
-  }, [])
+  }, [reload])
 
   if (teams === null) {
     return <p className="p-8 text-center text-[15px] text-[var(--color-ink-soft)]">{t.common.loading}</p>
   }
   if (teams === 'offline') {
     return <p className="bab-card m-4 px-4 py-4 text-[15px]">{t.coach.notConnected}</p>
+  }
+  if (teams === 'error' || rosterError) {
+    return (
+      <div className="m-4 flex flex-col items-start gap-2 bab-card px-4 py-4">
+        <p className="text-[15px]">{t.coach.fetchError}</p>
+        <button type="button" onClick={() => setReload((n) => n + 1)}
+                className="bab-pill px-4 py-2 text-[14px]">
+          {t.coach.retry}
+        </button>
+      </div>
+    )
   }
   if (teams.length === 0) {
     return <p className="bab-card m-4 px-4 py-4 text-[15px]">{t.coach.noTeams}</p>
@@ -75,9 +91,20 @@ export default function Roster() {
 
       {/* 🚩 Prima di tutto il resto. */}
       <section className="bab-card flex flex-col gap-3 px-4 py-4"
-               style={flags.length ? { background: 'var(--care-tint)', borderColor: 'var(--care)' } : undefined}>
+               style={flags === 'error' || flags.length
+                 ? { background: 'var(--care-tint)', borderColor: 'var(--care)' }
+                 : undefined}>
         <h2 className="font-display text-[18px]">{t.coach.redFlagsTitle}</h2>
-        {flags.length === 0 ? (
+        {flags === 'error' ? (
+          <div className="flex flex-col items-start gap-2">
+            <p className="text-[15px] font-bold">{t.coach.redFlagsError}</p>
+            <button type="button" onClick={() => setReload((n) => n + 1)}
+                    className="bab-pill px-4 py-2 text-[14px]"
+                    style={{ borderColor: 'var(--care)', color: 'var(--care)' }}>
+              {t.coach.retry}
+            </button>
+          </div>
+        ) : flags.length === 0 ? (
           <p className="text-[15px] text-[var(--color-ink-soft)]">{t.coach.redFlagsNone}</p>
         ) : (
           <>

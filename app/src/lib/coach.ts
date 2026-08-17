@@ -51,13 +51,23 @@ export type RedFlag = {
 
 export type CycleDate = { athlete_id: string; kind: string; event_date: string }
 
-/** `null` quando Supabase non è collegato: la dashboard lo dice invece di fingere. */
-export async function myTeams(): Promise<StaffTeam[] | null> {
-  if (!supabase) return null
+/**
+ * `null` quando i dati non si sanno — la query è fallita — MAI quando sono
+ * semplicemente zero. Per `openRedFlags` non è un dettaglio: "non sono
+ * riuscito a controllare" e "non ce ne sono" sono due fatti diversi, e
+ * confonderli vorrebbe dire mostrare rassicurazione a un coach che in realtà
+ * non ha ricevuto risposta dal server (§11).
+ *
+ * `myTeams` distingue in più "non collegato" (`'offline'`) da "collegato ma
+ * la query è fallita" (`'error'`): sono due schermate diverse, la prima dice
+ * di trovare rete, la seconda di riprovare.
+ */
+export async function myTeams(): Promise<StaffTeam[] | 'offline' | 'error'> {
+  if (!supabase) return 'offline'
   const { data, error } = await supabase
     .from('team_staff')
     .select('team_id, role, teams(name, sport)')
-  if (error) { console.error('[coach] teams', error.message); return [] }
+  if (error) { console.error('[coach] teams', error.message); return 'error' }
   return (data ?? []).map((r) => {
     const team = r.teams as unknown as { name: string; sport: string } | null
     return { team_id: r.team_id as string, role: r.role as string,
@@ -65,26 +75,27 @@ export async function myTeams(): Promise<StaffTeam[] | null> {
   })
 }
 
-export async function roster(teamId: string): Promise<RosterAthlete[]> {
-  if (!supabase) return []
+export async function roster(teamId: string): Promise<RosterAthlete[] | null> {
+  if (!supabase) return null
   const { data, error } = await supabase
     .from('coach_athletes')
     .select('id, display_name, age, sport')
     .eq('team_id', teamId)
     .order('display_name')
-  if (error) { console.error('[coach] roster', error.message); return [] }
+  if (error) { console.error('[coach] roster', error.message); return null }
   return (data ?? []) as RosterAthlete[]
 }
 
 /** I check-in di una giornata per tutta la squadra. */
-export async function checkInsOn(date: string, ids: string[]): Promise<TodayRow[]> {
-  if (!supabase || ids.length === 0) return []
+export async function checkInsOn(date: string, ids: string[]): Promise<TodayRow[] | null> {
+  if (!supabase) return null
+  if (ids.length === 0) return []
   const { data, error } = await supabase
     .from('coach_check_ins')
     .select('athlete_id, kind, local_date, tempo_predicted, tempo_chosen, effort, pe_attended')
     .eq('local_date', date)
     .in('athlete_id', ids)
-  if (error) { console.error('[coach] check-ins', error.message); return [] }
+  if (error) { console.error('[coach] check-ins', error.message); return null }
   return (data ?? []) as TodayRow[]
 }
 
@@ -94,28 +105,29 @@ export async function checkInsOn(date: string, ids: string[]): Promise<TodayRow[
  * risolte e le ordina dalla più vecchia: una aperta da tre giorni è più
  * urgente di una di stamattina, non meno.
  */
-export async function openRedFlags(ids: string[]): Promise<RedFlag[]> {
-  if (!supabase || ids.length === 0) return []
+export async function openRedFlags(ids: string[]): Promise<RedFlag[] | null> {
+  if (!supabase) return null
+  if (ids.length === 0) return []
   const { data, error } = await supabase
     .from('coach_red_flags')
     .select('id, athlete_id, opened_at, region, sensation, told_adult, resolved_at')
     .in('athlete_id', ids)
     .is('resolved_at', null)
     .order('opened_at', { ascending: true })
-  if (error) { console.error('[coach] red flags', error.message); return [] }
+  if (error) { console.error('[coach] red flags', error.message); return null }
   return (data ?? []) as RedFlag[]
 }
 
 /** Le ultime due settimane di una singola atleta. */
-export async function historyFor(athleteId: string, since: string): Promise<TodayRow[]> {
-  if (!supabase) return []
+export async function historyFor(athleteId: string, since: string): Promise<TodayRow[] | null> {
+  if (!supabase) return null
   const { data, error } = await supabase
     .from('coach_check_ins')
     .select('athlete_id, kind, local_date, tempo_predicted, tempo_chosen, effort, pe_attended')
     .eq('athlete_id', athleteId)
     .gte('local_date', since)
     .order('local_date', { ascending: false })
-  if (error) { console.error('[coach] history', error.message); return [] }
+  if (error) { console.error('[coach] history', error.message); return null }
   return (data ?? []) as TodayRow[]
 }
 
@@ -125,14 +137,14 @@ export async function historyFor(athleteId: string, since: string): Promise<Toda
  * un'inferenza che si calcola a runtime, e nessuno deve poterla scambiare per
  * un fatto clinico.
  */
-export async function cycleFor(athleteId: string): Promise<CycleDate[]> {
-  if (!supabase) return []
+export async function cycleFor(athleteId: string): Promise<CycleDate[] | null> {
+  if (!supabase) return null
   const { data, error } = await supabase
     .from('coach_cycle_events')
     .select('athlete_id, kind, event_date')
     .eq('athlete_id', athleteId)
     .order('event_date', { ascending: false })
     .limit(6)
-  if (error) { console.error('[coach] cycle', error.message); return [] }
+  if (error) { console.error('[coach] cycle', error.message); return null }
   return (data ?? []) as CycleDate[]
 }

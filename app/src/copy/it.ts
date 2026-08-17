@@ -777,6 +777,8 @@ export const it = {
     redFlagsTitle: '🚩 Da guardare adesso',
     redFlagsHelp: 'Segnalazioni aperte, dalla più vecchia. Non aspettano il prossimo allenamento.',
     redFlagsNone: 'Nessuna segnalazione aperta.',
+    /** 🔴 §11: "non sono riuscito a controllare" non è "non ce ne sono" — vanno dette diverse. */
+    redFlagsError: 'Non sono riuscito a controllare le segnalazioni aperte — non vuol dire che non ce ne siano. Riprova appena puoi.',
     toldAdult: 'l\'ha detto a un adulto',
     notToldAdult: 'non risulta detto a nessuno',
     openedToday: 'oggi',
@@ -797,6 +799,8 @@ export const it = {
     cycleNote: 'Sono le date che ha inserito lei, non una previsione. Alla sua età i cicli spesso non sono ancora regolari: servono come contesto per capire una giornata, mai per programmare o per farne un tema di conversazione se non è lei ad aprirlo.',
     cycleNone: 'Nessuna data inserita.',
     nothingYet: 'Ancora nessun check-in.',
+    fetchError: 'Non sono riuscito a caricare questi dati.',
+    retry: 'Riprova',
   },
 
   common: {
