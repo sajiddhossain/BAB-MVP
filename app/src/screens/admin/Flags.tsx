@@ -19,12 +19,14 @@ export default function Flags() {
   const locale = useLocale()
   const [busy, setBusy] = useState<string | null>(null)
   const [problem, setProblem] = useState<string | null>(null)
+  /** L'id della bandiera per cui sta chiedendo conferma prima di chiudere — mai più di una alla volta. */
+  const [confirming, setConfirming] = useState<string | null>(null)
 
   const word = (code: string) =>
     SENSATIONS.find((s) => s.code === code)?.label[locale] ?? code
 
   async function mark(id: string, told: boolean, resolved: boolean) {
-    setProblem(null); setBusy(id)
+    setProblem(null); setBusy(id); setConfirming(null)
     try { await markFlag(id, told, resolved); list.reload() }
     catch (e) { setProblem(e instanceof Error ? e.message : String(e)) }
     finally { setBusy(null) }
@@ -77,21 +79,40 @@ export default function Flags() {
             </p>
 
             {!f.resolved_at && (
-              <div className="flex flex-wrap gap-2">
-                {!f.told_adult && (
+              confirming === f.id ? (
+                <div className="flex flex-col gap-1.5 rounded-xl px-2.5 py-2" style={{ background: 'var(--care-tint)' }}>
+                  <p className="text-[13.5px] font-bold">Chiudere questa segnalazione?</p>
+                  <p className="text-[13px] text-[var(--color-ink-soft)]">Non si riapre da qui.</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" disabled={busy === f.id}
+                            onClick={() => void mark(f.id, f.told_adult, true)}
+                            className="bab-pill px-4 py-2 text-[13.5px] disabled:opacity-40"
+                            style={{ borderColor: 'var(--care)', color: 'var(--care)' }}>
+                      Sì, chiudi
+                    </button>
+                    <button type="button" onClick={() => setConfirming(null)}
+                            className="bab-pill px-4 py-2 text-[13.5px]">
+                      Annulla
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {!f.told_adult && (
+                    <button type="button" disabled={busy === f.id}
+                            onClick={() => void mark(f.id, true, false)}
+                            className="bab-pill px-4 py-2 text-[13.5px] disabled:opacity-40">
+                      L'ha detto a un adulto
+                    </button>
+                  )}
                   <button type="button" disabled={busy === f.id}
-                          onClick={() => void mark(f.id, true, false)}
-                          className="bab-pill px-4 py-2 text-[13.5px] disabled:opacity-40">
-                    L'ha detto a un adulto
+                          onClick={() => setConfirming(f.id)}
+                          className="bab-pill px-4 py-2 text-[13.5px] disabled:opacity-40"
+                          style={{ background: 'var(--color-lime)' }}>
+                    Chiudi
                   </button>
-                )}
-                <button type="button" disabled={busy === f.id}
-                        onClick={() => void mark(f.id, f.told_adult, true)}
-                        className="bab-pill px-4 py-2 text-[13.5px] disabled:opacity-40"
-                        style={{ background: 'var(--color-lime)' }}>
-                  Chiudi
-                </button>
-              </div>
+                </div>
+              )
             )}
           </Card>
         )

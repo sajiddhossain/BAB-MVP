@@ -46,10 +46,24 @@ export type RedFlag = {
   region: string
   sensation: string
   told_adult: boolean
+  told_adult_at: string | null
   resolved_at: string | null
 }
 
 export type CycleDate = { athlete_id: string; kind: string; event_date: string }
+
+/**
+ * Chiudere il cerchio su una bandiera rossa — stessa `mark_red_flag` di
+ * `admin.ts`, gated `is_staff_of(a) or is_admin()` DENTRO alla funzione
+ * (`security definer`, quindi la RLS non basta): un coach può marcare solo
+ * le bandiere della propria squadra, e il server lo verifica da solo,
+ * non ci si fida di questa chiamata.
+ */
+export async function markFlag(id: string, told: boolean, resolved: boolean): Promise<void> {
+  if (!supabase) throw new Error('not-connected')
+  const { error } = await supabase.rpc('mark_red_flag', { p_id: id, p_told: told, p_resolved: resolved })
+  if (error) throw new Error(error.message)
+}
 
 /**
  * `null` quando i dati non si sanno — la query è fallita — MAI quando sono
@@ -110,7 +124,7 @@ export async function openRedFlags(ids: string[]): Promise<RedFlag[] | null> {
   if (ids.length === 0) return []
   const { data, error } = await supabase
     .from('coach_red_flags')
-    .select('id, athlete_id, opened_at, region, sensation, told_adult, resolved_at')
+    .select('id, athlete_id, opened_at, region, sensation, told_adult, told_adult_at, resolved_at')
     .in('athlete_id', ids)
     .is('resolved_at', null)
     .order('opened_at', { ascending: true })

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { plural, useCopy, useLocale } from '@/copy'
-import { checkInsOn, myTeams, openRedFlags, roster,
+import { checkInsOn, markFlag, myTeams, openRedFlags, roster,
          type RedFlag, type RosterAthlete, type StaffTeam, type TodayRow } from '@/lib/coach'
 import { localDate } from '@/lib/repo'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
@@ -36,6 +36,22 @@ export default function Roster() {
   const [today, setToday] = useState<TodayRow[]>([])
   const [flags, setFlags] = useState<RedFlag[] | 'error'>([])
   const [reload, setReload] = useState(0)
+  const [busy, setBusy] = useState<string | null>(null)
+  /** L'id della bandiera per cui sta chiedendo conferma prima di chiudere — mai più di una alla volta. */
+  const [confirming, setConfirming] = useState<string | null>(null)
+
+  async function mark(id: string, told: boolean, resolved: boolean) {
+    setBusy(id); setConfirming(null)
+    try {
+      await markFlag(id, told, resolved)
+      setFlags((fs) => fs === 'error' ? fs : fs.map((f) => f.id === id
+        ? { ...f, told_adult: f.told_adult || told,
+            told_adult_at: f.told_adult_at ?? (told ? new Date().toISOString() : null),
+            resolved_at: resolved ? new Date().toISOString() : f.resolved_at }
+        : f).filter((f) => !f.resolved_at))
+    } catch { /* resta com'era; il pulsante torna cliccabile e può riprovare */ }
+    finally { setBusy(null) }
+  }
 
   useEffect(() => {
     let alive = true
@@ -113,22 +129,60 @@ export default function Roster() {
               {flags.map((f) => {
                 const d = daysAgo(f.opened_at)
                 return (
-                  <li key={f.id} className="bab-card flex flex-wrap items-baseline gap-x-2 gap-y-1 px-3 py-2.5">
-                    <Link to={`/team/${f.athlete_id}`} className="text-[15px] font-bold underline">
-                      {nameOf(f.athlete_id)}
-                    </Link>
-                    <span className="text-[15px]">
-                      {regionLabel(f.region as RegionCode, locale)} —{' '}
-                      {SENSATIONS.find((s) => s.code === f.sensation)?.label[locale] ?? f.sensation}
-                    </span>
-                    <span className="text-[13px] text-[var(--color-ink-soft)]">
-                      {d === 0 ? t.coach.openedToday : plural(d, t.coach.openedDay, t.coach.openedDays)}
-                    </span>
-                    {/* La misura di sicurezza del pilota: deve arrivare al 100%. */}
-                    <span className="bab-pill px-2 py-0.5 text-[12px]"
-                          style={f.told_adult ? undefined : { borderColor: 'var(--care)', color: 'var(--care)' }}>
-                      {f.told_adult ? t.coach.toldAdult : t.coach.notToldAdult}
-                    </span>
+                  <li key={f.id} className="bab-card flex flex-col gap-1.5 px-3 py-2.5">
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                      <Link to={`/team/${f.athlete_id}`} className="text-[15px] font-bold underline">
+                        {nameOf(f.athlete_id)}
+                      </Link>
+                      <span className="text-[15px]">
+                        {regionLabel(f.region as RegionCode, locale)} —{' '}
+                        {SENSATIONS.find((s) => s.code === f.sensation)?.label[locale] ?? f.sensation}
+                      </span>
+                      <span className="text-[13px] text-[var(--color-ink-soft)]">
+                        {d === 0 ? t.coach.openedToday : plural(d, t.coach.openedDay, t.coach.openedDays)}
+                      </span>
+                      {/* La misura di sicurezza del pilota: deve arrivare al 100%. */}
+                      <span className="bab-pill px-2 py-0.5 text-[12px]"
+                            style={f.told_adult ? undefined : { borderColor: 'var(--care)', color: 'var(--care)' }}>
+                        {f.told_adult ? t.coach.toldAdult : t.coach.notToldAdult}
+                      </span>
+                    </div>
+
+                    {confirming === f.id ? (
+                      <div className="flex flex-col gap-1.5 rounded-xl px-2.5 py-2"
+                           style={{ background: 'var(--care-tint)' }}>
+                        <p className="text-[13px] font-bold">{t.coach.markConfirmTitle}</p>
+                        <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.coach.markConfirmBody}</p>
+                        <div className="flex flex-wrap gap-2">
+                          <button type="button" disabled={busy === f.id}
+                                  onClick={() => void mark(f.id, f.told_adult, true)}
+                                  className="bab-pill px-3 py-1.5 text-[13px] disabled:opacity-40"
+                                  style={{ borderColor: 'var(--care)', color: 'var(--care)' }}>
+                            {t.coach.markConfirmYes}
+                          </button>
+                          <button type="button" onClick={() => setConfirming(null)}
+                                  className="bab-pill px-3 py-1.5 text-[13px]">
+                            {t.coach.markConfirmNo}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        {!f.told_adult && (
+                          <button type="button" disabled={busy === f.id}
+                                  onClick={() => void mark(f.id, true, false)}
+                                  className="bab-pill px-3 py-1.5 text-[13px] disabled:opacity-40">
+                            {t.coach.markToldAdult}
+                          </button>
+                        )}
+                        <button type="button" disabled={busy === f.id}
+                                onClick={() => setConfirming(f.id)}
+                                className="bab-pill px-3 py-1.5 text-[13px] disabled:opacity-40"
+                                style={{ background: 'var(--color-lime)' }}>
+                          {t.coach.markResolve}
+                        </button>
+                      </div>
+                    )}
                   </li>
                 )
               })}
