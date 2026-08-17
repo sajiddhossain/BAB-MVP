@@ -309,6 +309,25 @@ create table if not exists public.cycle_events (
 create index if not exists cycle_events_athlete_idx on public.cycle_events (athlete_id, event_date desc);
 
 
+-- ── DIARIO ──────────────────────────────────────────────────────────────────
+-- Commento Figma id:1883772406: "qualcos'altro che vuoi condividere con BAB?
+-- Puoi scriverlo qui e puoi vederlo solo tu" — un mini diario, separato dalla
+-- nota di fine check-in perché quella è legata a UN allenamento, questo no: si
+-- scrive quando vuole, non solo dopo essersi allenata.
+--
+-- ⚠ STESSA REGOLA DEL CICLO: nessuna vista coach_*/admin_* la legge, MAI. Non
+-- serve elencarla da nessuna parte per escluderla — semplicemente non compare
+-- in nessuna vista, e il RLS-loop qui sotto (con `athlete_id = auth.uid()`) è
+-- l'unica policy che esiste su questa tabella.
+create table if not exists public.journal_entries (
+  id         uuid primary key default gen_random_uuid(),
+  athlete_id uuid not null references public.athletes(id) on delete cascade,
+  body       text not null check (char_length(body) between 1 and 2000),
+  created_at timestamptz not null default now()
+);
+create index if not exists journal_entries_athlete_idx on public.journal_entries (athlete_id, created_at desc);
+
+
 -- ── PERCORSO ────────────────────────────────────────────────────────────────
 create table if not exists public.journey_progress (
   id           uuid primary key default gen_random_uuid(),
@@ -521,7 +540,7 @@ do $$
 declare t text;
 begin
   foreach t in array array['athletes','consents','check_ins','body_signals',
-                           'red_flags','cycle_events','journey_progress','shares',
+                           'red_flags','cycle_events','journal_entries','journey_progress','shares',
                            'ux_events','athlete_schedule','athlete_events','athlete_sports']
   loop
     execute format('alter table public.%I enable row level security', t);
@@ -1016,6 +1035,7 @@ returns jsonb language sql security invoker stable as $$
     'body_signals', (select coalesce(jsonb_agg(to_jsonb(b)),'[]') from public.body_signals b where b.athlete_id = auth.uid()),
     'red_flags',    (select coalesce(jsonb_agg(to_jsonb(r)),'[]') from public.red_flags r where r.athlete_id = auth.uid()),
     'cycle_events', (select coalesce(jsonb_agg(to_jsonb(y)),'[]') from public.cycle_events y where y.athlete_id = auth.uid()),
+    'journal',      (select coalesce(jsonb_agg(to_jsonb(j2)),'[]') from public.journal_entries j2 where j2.athlete_id = auth.uid()),
     'journey',      (select coalesce(jsonb_agg(to_jsonb(j)),'[]') from public.journey_progress j where j.athlete_id = auth.uid()),
     'shares',       (select coalesce(jsonb_agg(to_jsonb(s)),'[]') from public.shares s where s.athlete_id = auth.uid()),
     'sports',       (select coalesce(jsonb_agg(to_jsonb(sp)),'[]') from public.athlete_sports sp where sp.athlete_id = auth.uid()),

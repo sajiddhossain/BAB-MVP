@@ -348,7 +348,10 @@ export const en: Copy = {
       },
       communicate: {
         title: "Is there anything worth telling someone?",
-        copy: 'Copy a line for your coach',
+        help: "You don't have to — but if you want to, here are two ways to say it. Tap to copy.",
+        phrase1: 'Today I felt {sensation} — {region}. Can we talk when you have a minute?',
+        phrase2: "{region}: {sensation}. I want to keep an eye on it, telling you so you know too.",
+        copied: 'Copied — paste it wherever you need.',
         notToday: 'Not today',
       },
       recoverLabel: "Recover — what your body's asking for now",
@@ -462,6 +465,23 @@ export const en: Copy = {
     storyBody: 'Something you can hand to a coach or a parent',
     storyCta: 'Put one together',
     storyLocked: 'Unlocks after your first full week',
+    journalTitle: 'My journal',
+    journalBody: 'Anything else you want to share with BAB? You can write it here — only you see it.',
+    journalCta: 'Open your journal',
+  },
+
+  /** Free notes, whenever she wants — not only after training. Only she sees them: no coach/admin view ever reads this. */
+  journal: {
+    title: 'My journal',
+    help: "You can write whenever you want, not just after training. Only you see it — no coach, no admin.",
+    placeholder: 'Anything else you want to share with BAB?',
+    save: 'Save',
+    empty: "Nothing here yet. Whenever you feel like writing something, this is the place.",
+    deleteLabel: 'Delete',
+    deleteConfirmTitle: 'Delete this note?',
+    deleteConfirmBody: "This can't be undone.",
+    deleteConfirmYes: 'Yes, delete it',
+    deleteConfirmNo: 'Cancel',
   },
 
   story: {

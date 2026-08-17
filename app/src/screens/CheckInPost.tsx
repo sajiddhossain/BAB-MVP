@@ -9,7 +9,7 @@ import Step, { useAdvance, useFlow } from '@/components/Step'
 import { EFFORT, POST_CHANNELS, SATISFACTION, BROUGHT_HOME, channelQuestion } from '@/content/channels'
 import { regionLabel, type RegionCode } from '@/content/bodymap'
 import { GEOMETRY } from '@/components/body-shapes'
-import { isRedFlag } from '@/content/lexicon'
+import { isRedFlag, SENSATIONS } from '@/content/lexicon'
 import { TEMPOS, type TempoCode } from '@/content/tempo'
 import { OUTCOMES, pickOutcome } from '@/content/outcomes'
 import Sparkle from '@/components/Sparkle'
@@ -88,6 +88,9 @@ export default function CheckInPost() {
   const [skipped, setSkipped] = useState<string[]>([])
   const [done, setDone] = useState(false)
   const [saving, setSaving] = useState(false)
+  /** "Non oggi" sul suggerimento di parlarne — resta chiuso finché non riapre lo schermo. */
+  const [communicateDismissed, setCommunicateDismissed] = useState(false)
+  const [copiedPhrase, setCopiedPhrase] = useState<1 | 2 | null>(null)
 
   useEffect(() => {
     let alive = true
@@ -166,6 +169,28 @@ export default function CheckInPost() {
     // 🔴 Come nel pre: niente scintillio sopra una bandiera rossa.
     const hasRedFlag = signals.some((s) => s.is_red_flag)
 
+    /**
+     * Commento Figma id:1883481937: un suggerimento su come dirlo al coach —
+     * non un obbligo, non un modulo da compilare. Compare solo se ha nominato
+     * qualcosa quest'oggi; la bandiera rossa (se c'è) viene prima delle altre
+     * perché è quella che più vale la pena dire ad alta voce.
+     */
+    const featuredSignal = signals.find((s) => s.is_red_flag) ?? signals[0]
+    const communicatePhrases = featuredSignal
+      ? [t.checkin.post.communicate.phrase1, t.checkin.post.communicate.phrase2].map((tpl) =>
+          fill(tpl, {
+            region: regionLabel(featuredSignal.region as RegionCode, locale),
+            sensation: (SENSATIONS.find((s) => s.code === featuredSignal.sensation)?.label[locale]
+              ?? featuredSignal.sensation).toLowerCase(),
+          }))
+      : []
+
+    async function copyPhrase(i: 0 | 1) {
+      try { await navigator.clipboard.writeText(communicatePhrases[i]) }
+      catch { /* niente: la frase resta visibile, si copia a mano */ }
+      setCopiedPhrase((i + 1) as 1 | 2)
+    }
+
     return (
       <div className="flex flex-col gap-5 pt-2">
         <p className="bab-label">{t.checkin.post.learnLabel}</p>
@@ -201,6 +226,28 @@ export default function CheckInPost() {
           <p className="text-[14px]">
             {plural(signals.length, t.checkin.post.recapSignalsOne, t.checkin.post.recapSignals)}
           </p>
+        )}
+
+        {featuredSignal && !communicateDismissed && (
+          <section className="bab-card flex flex-col gap-2.5 px-4 py-4">
+            <h2 className="font-display text-[16px]">{t.checkin.post.communicate.title}</h2>
+            <p className="text-[13px] text-[var(--color-ink-soft)]">{t.checkin.post.communicate.help}</p>
+            {communicatePhrases.map((p, i) => (
+              <button key={i} type="button" onClick={() => void copyPhrase(i as 0 | 1)}
+                      className="bab-card px-3.5 py-3 text-left text-[14px] italic">
+                “{p}”
+              </button>
+            ))}
+            {copiedPhrase && (
+              <p className="text-[12.5px]" style={{ color: 'var(--color-teal)' }}>
+                {t.checkin.post.communicate.copied}
+              </p>
+            )}
+            <button type="button" onClick={() => setCommunicateDismissed(true)}
+                    className="self-start text-[13px] underline text-[var(--color-ink-soft)]">
+              {t.checkin.post.communicate.notToday}
+            </button>
+          </section>
         )}
 
         <section className="bab-card flex flex-col gap-2 px-4 py-4"

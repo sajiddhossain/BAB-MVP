@@ -40,7 +40,7 @@ const META = 'meta'
  */
 export const TABLES = [
   'athletes', 'consents', 'check_ins', 'body_signals',
-  'red_flags', 'cycle_events', 'journey_progress', 'shares', 'ux_events',
+  'red_flags', 'cycle_events', 'journal_entries', 'journey_progress', 'shares', 'ux_events',
   'athlete_schedule', 'athlete_events', 'athlete_sports',
 ] as const
 

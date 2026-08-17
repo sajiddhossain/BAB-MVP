@@ -411,7 +411,10 @@ export const it = {
       },
       communicate: {
         title: 'C\'è qualcosa che vale la pena dire a qualcuno?',
-        copy: 'Copia una frase per il coach',
+        help: 'Non sei obbligata — ma se ti va, eccoti due modi per dirlo. Tocca per copiare.',
+        phrase1: 'Oggi ho sentito {sensation} — {region}. Ne parliamo quando hai un minuto?',
+        phrase2: '{region}: {sensation}. Voglio tenerlo d\'occhio, te lo dico così lo sai anche tu.',
+        copied: 'Copiata — incollala dove vuoi.',
         notToday: 'Non oggi',
       },
       recoverLabel: 'Recupera — cosa chiede il tuo corpo adesso',
@@ -543,6 +546,23 @@ export const it = {
     storyBody: 'Qualcosa da far vedere a un coach o a un genitore',
     storyCta: 'Preparane una',
     storyLocked: 'Si sblocca dopo la tua prima settimana intera',
+    journalTitle: 'Il mio diario',
+    journalBody: 'Qualcos\'altro che vuoi condividere con BAB? Puoi scriverlo qui — lo vedi solo tu.',
+    journalCta: 'Apri il diario',
+  },
+
+  /** Note libere, quando vuole lei — non solo dopo un allenamento. Le vede solo lei: mai una vista coach/admin la legge. */
+  journal: {
+    title: 'Il mio diario',
+    help: 'Puoi scrivere quando vuoi, non solo dopo un allenamento. Lo vedi solo tu — nessun coach, nessun admin.',
+    placeholder: 'Qualcos\'altro che vuoi condividere con BAB?',
+    save: 'Salva',
+    empty: 'Ancora niente qui. Quando ti va di scrivere qualcosa, questo è il posto.',
+    deleteLabel: 'Elimina',
+    deleteConfirmTitle: 'Eliminare questa nota?',
+    deleteConfirmBody: 'Non si può annullare.',
+    deleteConfirmYes: 'Sì, elimina',
+    deleteConfirmNo: 'Annulla',
   },
 
   story: {

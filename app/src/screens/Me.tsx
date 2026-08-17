@@ -152,6 +152,16 @@ export default function Me() {
         )}
       </Card>
 
+      {/* 5 · Il mio diario — solo lei lo vede, mai un coach o un admin. */}
+      <Card>
+        <h2 className="font-display text-[18px]">{t.me.journalTitle}</h2>
+        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.me.journalBody}</p>
+        <Link to="/diario" className="bab-pill self-start px-4 py-2 text-[14px]"
+              style={{ background: 'var(--color-lime)' }}>
+          {t.me.journalCta}
+        </Link>
+      </Card>
+
       {/* 🔴 Sopra ogni ipotesi, sempre. Vale anche quando le ipotesi non ci sono
           ancora: insegna da subito come vanno prese. */}
       <p className="px-1 text-[13px] text-[var(--color-ink-soft)]">{t.me.insightCaveat}</p>

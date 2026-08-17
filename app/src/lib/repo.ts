@@ -164,6 +164,32 @@ export async function cycleDates(): Promise<string[]> {
   return all.filter((r) => r.kind === 'period_start').map((r) => String(r.event_date))
 }
 
+/**
+ * Il diario — vedi `journal_entries` in schema.sql per il perché è una
+ * tabella a sé e non un allargamento della nota di fine check-in: quella è
+ * legata a un allenamento, questo si scrive quando vuole.
+ *
+ * Ordinato per `created_at` (non `local_date` come check-in/segnali): qui può
+ * scriverne più di uno lo stesso giorno, e contano nell'ordine in cui li ha
+ * scritti davvero.
+ */
+export async function saveJournalEntry(athleteId: string, body: string): Promise<string> {
+  const id = newId()
+  const ts = stamp()
+  await db.put('journal_entries', id, { id, athlete_id: athleteId, body, created_at: ts }, ts)
+  void flush()
+  return id
+}
+
+export async function recentJournalEntries(limit = 100) {
+  return db.list('journal_entries', { limit, desc: true })
+}
+
+export async function removeJournalEntry(id: string): Promise<void> {
+  await db.remove('journal_entries', id)
+  void flush()
+}
+
 /* ── Profilo, consensi, calendario ───────────────────────────────────────── */
 
 export type AthleteDraft = {
