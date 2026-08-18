@@ -238,14 +238,20 @@ export const FRONT: Partial<Record<RegionCode, Shape>> = {
   arm_r: { k: 'rect', x: 149, y: 132.2, w: 48, h: 242.8 - 132.2, cx: 173, cy: 187.5 },
   hand_l: { k: 'rect', x: 0, y: 240, w: 48, h: 56, cx: 24, cy: 268 },
   hand_r: { k: 'rect', x: 152, y: 240, w: 48, h: 56, cx: 176, cy: 268 },
-  quad_l: { k: 'rect', x: 48, y: 296, w: 52, h: 199, cx: 74, cy: 395.5 },
-  quad_r: { k: 'rect', x: 100, y: 296, w: 52, h: 199, cx: 126, cy: 395.5 },
-  knee_l: { k: 'rect', x: 55, y: 402, w: 45, h: 39, cx: 77, cy: 421.5 },
-  knee_r: { k: 'rect', x: 100, y: 402, w: 45, h: 39, cx: 123, cy: 421.5 },
-  shin_l: { k: 'rect', x: 55, y: 495, w: 45, h: 90, cx: 77, cy: 540 },
-  shin_r: { k: 'rect', x: 100, y: 495, w: 45, h: 90, cx: 123, cy: 540 },
-  foot_l: { k: 'rect', x: 48, y: 585, w: 52, h: 38, cx: 74, cy: 604 },
-  foot_r: { k: 'rect', x: 100, y: 585, w: 52, h: 38, cx: 126, cy: 604 },
+  // 🔴 Le gambe, disegnate a mano, si toccano: non c'è un vero spazio vuoto
+  // fra sinistra e destra nella maschera, quindi il "centro" della coppia
+  // sta verso x=90, non x=100. Misurato riga per riga sui pixel della
+  // maschera (non a occhio): qui sotto ogni rettangolo è abbastanza largo da
+  // coprire la sua metà vera, anche se si sovrappone un po' al centro — il
+  // ritaglio pensa lui a tagliare sul bordo giusto.
+  quad_l: { k: 'rect', x: 42, y: 296, w: 63, h: 199, cx: 73.5, cy: 395.5 },
+  quad_r: { k: 'rect', x: 95, y: 296, w: 63, h: 199, cx: 126.5, cy: 395.5 },
+  knee_l: { k: 'rect', x: 45, y: 402, w: 58, h: 39, cx: 74, cy: 421.5 },
+  knee_r: { k: 'rect', x: 97, y: 402, w: 58, h: 39, cx: 126, cy: 421.5 },
+  shin_l: { k: 'rect', x: 48, y: 495, w: 55, h: 90, cx: 75.5, cy: 540 },
+  shin_r: { k: 'rect', x: 97, y: 495, w: 55, h: 90, cx: 124.5, cy: 540 },
+  foot_l: { k: 'rect', x: 42, y: 585, w: 60, h: 38, cx: 72, cy: 604 },
+  foot_r: { k: 'rect', x: 98, y: 585, w: 60, h: 38, cx: 128, cy: 604 },
 }
 
 export const GEOMETRY: Record<Side, Partial<Record<RegionCode, Shape>>> = {
