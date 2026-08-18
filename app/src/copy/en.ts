@@ -610,8 +610,11 @@ export const en: Copy = {
   },
 
   onboarding: {
-    welcomeTitle: 'This is about learning to read yourself',
-    welcomeBody: 'Most sports apps measure you from the outside and tell you what to do. BAB does the opposite: it helps you learn what your own body is telling you — so you know when to push, when to rest, and how to say it out loud.',
+    welcomeEyebrow: 'Welcome to BAB',
+    welcomeTitle: 'Learn to read your own body.',
+    welcomeBody1: 'Your body texts you all day — **tired**, **wired**, **heavy**, **buzzy**, **nervous**, **ready**. Most people never learn to read the messages.',
+    welcomeBody2: "Athletes who do get a kind of superpower: they know what they've got **before** they step on the court. BAB teaches you that, a minute at a time.",
+    welcomeCta: 'Show me how',
     back: 'Back',
     consentAthlete: "I've read it and I'm in",
     consentGuardian: 'I confirm a parent or guardian has read this together with me and agrees',

@@ -699,8 +699,11 @@ export const it = {
   },
 
   onboarding: {
-    welcomeTitle: 'Qui si impara a leggersi',
-    welcomeBody: 'Quasi tutte le app sportive ti misurano da fuori e ti dicono cosa fare. BAB fa l\'opposto: ti aiuta a capire cosa ti sta dicendo il tuo corpo — così sai quando spingere, quando riposare, e come dirlo ad alta voce.',
+    welcomeEyebrow: 'Benvenuta in BAB',
+    welcomeTitle: 'Impara a leggere il tuo corpo.',
+    welcomeBody1: 'Il tuo corpo ti manda messaggi tutto il giorno — **stanca**, **in tensione**, **pesante**, **formicolante**, **nervosa**, **pronta**. Quasi nessuna impara a leggerli.',
+    welcomeBody2: 'Le atlete che ci riescono hanno una specie di superpotere: sanno cosa hanno addosso **prima** di scendere in campo. BAB te lo insegna, un minuto alla volta.',
+    welcomeCta: 'Mostrami come',
     back: 'Indietro',
     consentAthlete: 'Ho letto e ci sto',
     consentGuardian: 'Dichiaro che un genitore o chi si prende cura di me ha letto questo testo insieme a me e acconsente',

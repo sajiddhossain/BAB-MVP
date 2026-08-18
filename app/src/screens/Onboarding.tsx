@@ -63,6 +63,18 @@ function DartboardIcon({ size = 34 }: { size?: number }) {
   )
 }
 
+/** Il pallone — le sue cuciture curve, disegnate a linea come il resto delle icone dell'app. */
+function VolleyballIcon({ size = 34 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 34 34" fill="none" aria-hidden>
+      <circle cx="17" cy="17" r="15" fill="var(--color-surface)" stroke="var(--color-ink)" strokeWidth="2" />
+      <path d="M17 2c-6 5-6 15 3 22" stroke="var(--color-ink)" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M5.5 11c7 1 15-2 21 4" stroke="var(--color-ink)" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M6.5 24c5-4 13-3 16-11" stroke="var(--color-ink)" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 /** Un passo del metodo, numerato — la schermata «Indovina. Poi senti davvero.» */
 function NumberedStep({ n, title, body }: { n: number; title: string; body: string }) {
   return (
@@ -84,13 +96,16 @@ function NumberedStep({ n, title, body }: { n: number; title: string; body: stri
  * sarebbe un tipo di componente nuovo a ogni render, React smonterebbe il
  * sottoalbero e il campo del nome perderebbe il fuoco a ogni lettera battuta.
  */
-function Frame({ title, icon, eyebrow, help, children, next, canNext, back, onBack, labels, at, of, extra, mascot }: {
+function Frame({ title, icon, eyebrow, help, children, next, nextLabel, canNext, back, onBack, labels, at, of, extra, mascot }: {
   title: string; help?: string; children?: React.ReactNode
   /** Icona sopra l'eyebrow — sotto la barra di avanzamento, prima di ogni testo. */
   icon?: React.ReactNode
   /** Etichetta piccola sopra il titolo — solo dove il titolo da solo non basta. */
   eyebrow?: string
-  next?: () => void; canNext?: boolean; back?: boolean; onBack?: () => void
+  next?: () => void
+  /** Sostituisce `labels.continue` solo per questo passo — raro, di proposito. */
+  nextLabel?: string
+  canNext?: boolean; back?: boolean; onBack?: () => void
   labels: { back: string; continue: string }
   at: number; of: number
   /** Un secondo bottone, più leggero — oggi solo "non me lo ricordo". */
@@ -130,7 +145,7 @@ function Frame({ title, icon, eyebrow, help, children, next, canNext, back, onBa
                 style={canNext === false
                   ? undefined
                   : { background: 'var(--color-lime)', boxShadow: 'var(--shadow-lg)' }}>
-          {labels.continue}
+          {nextLabel ?? labels.continue}
         </button>
       )}
       {extra && (
@@ -304,12 +319,12 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }
 
   if (step === 'welcome') return (
-    <Frame title={t.onboarding.welcomeTitle} help={t.onboarding.welcomeBody}
-           next={() => setStep('heartConcept')} {...F}>
-      {/* 🔴 Stessa mascotte di tutto il resto del percorso: qui accoglie
-          all'inizio, come alla fine (schermata "done" più sotto). */}
-      <div className="flex justify-center py-2">
-        <Mascot size={64} />
+    <Frame title={t.onboarding.welcomeTitle} icon={<VolleyballIcon size={40} />}
+           eyebrow={t.onboarding.welcomeEyebrow}
+           next={() => setStep('heartConcept')} nextLabel={t.onboarding.welcomeCta} {...F}>
+      <div className="flex flex-col gap-3 text-[15px] leading-relaxed [&_strong]:text-[var(--color-lavender)]">
+        <p><Rich text={t.onboarding.welcomeBody1} /></p>
+        <p><Rich text={t.onboarding.welcomeBody2} /></p>
       </div>
     </Frame>
   )
