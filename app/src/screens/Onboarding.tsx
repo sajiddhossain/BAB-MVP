@@ -460,14 +460,14 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           <SunIcon size={19} color="var(--color-gold)" />
           <div>
             <p className="text-[13.5px] font-bold">{t.heart.checkinTitle}</p>
-            <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkinBody}</p>
+            <p className="text-[12.5px] font-normal text-[var(--color-ink)]">{t.heart.checkinBody}</p>
           </div>
         </div>
         <div className="flex items-start gap-2.5">
           <MoonIcon size={19} color="var(--color-vividteal)" />
           <div>
             <p className="text-[13.5px] font-bold">{t.heart.checkoutTitle}</p>
-            <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkoutBody}</p>
+            <p className="text-[12.5px] font-normal text-[var(--color-ink)]">{t.heart.checkoutBody}</p>
           </div>
         </div>
       </div>
