@@ -110,14 +110,15 @@ const UPPER: P[] = [
   [100, 12],
   [88.1, 13.5], [81.7, 22], [80, 34], [82.2, 47], [86.4, 56],  // testa
   [87.9, 62.6], [87.2, 74.1],                                  // collo
-  [80.5, 76.4], [74.5, 81.7], [66.2, 91.1],                    // trapezio
-  [62.5, 100.6], [62.1, 112.1],                                // deltoide
-  // 🔴 Il braccio sta un po' più in fuori di quanto vorrebbe l'anatomia,
-  // stessa ragione di prima: con l'ombra dura uno spiraglio troppo stretto fra
-  // braccio e fianco sembra una sbarra nera, non un'apertura.
-  [59.5, 126.8], [58.4, 145.7], [57.6, 162.5],                 // braccio, fuori
-  [57.2, 173], [57.2, 179.3],                                  // polso
-  [52.8, 186.7], [48.4, 199.4], [51.2, 210.4], [57.6, 214.1], [62.8, 206.7], // mano
+  [80.5, 76.4], [74.5, 81.7], [68.7, 91.1],                    // trapezio
+  // 🔴 Le spalle sono state strette apposta (erano più larghe dei fianchi:
+  // il segno del corpo maschile a "V", non di quello femminile). Solo il
+  // bordo ESTERNO del braccio si muove: il bordo interno/l'ascella restano
+  // gli stessi, così `SPLIT`/`ARM` non si scollano dal profilo.
+  [65.5, 100.6], [65.5, 112.1],                                // deltoide
+  [62.5, 126.8], [61.4, 145.7], [60.6, 162.5],                 // braccio, fuori
+  [60.2, 173], [60.2, 179.3],                                  // polso
+  [55.8, 186.7], [51.4, 199.4], [54.2, 210.4], [60.6, 214.1], [65.8, 206.7], // mano
   [66.6, 193], [67.4, 179.3],                                  // polso, dentro
   [68.5, 164.6], [70, 145.7], [71.5, 126.8],                   // braccio, dentro
   [74.1, 107.9],                                                // ⟵ ASCELLA
@@ -133,7 +134,7 @@ const LOWER: P[] = [
   // come un corpo femminile — nemmeno stilizzato. Curva morbida: più punti,
   // salti piccoli fra uno e l'altro, niente spigoli.
   [85, 171.5],                                                  // vita, il punto stretto
-  [80, 178.5], [73, 185.5], [69, 191],                          // fianco, si riallarga
+  [79, 178.5], [71, 185.5], [66, 191],                          // fianco, si riallarga
   [73.5, 196.1],                                                // inguine, si richiude
   [66.4, 212.8], [67.6, 237.2], [69.2, 261.6],                 // coscia, fuori
   [70, 273.8], [70, 295.8],                                    // ginocchio, fuori
