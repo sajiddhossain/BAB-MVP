@@ -82,7 +82,7 @@ export function Progress({ at, of }: { at: number; of: number }) {
       aria-valuemin={1}
       aria-valuemax={of}
       aria-valuenow={at}
-      className="h-[10px] flex-1 overflow-hidden rounded-full border-2 border-[var(--color-sand)] bg-[var(--color-surface)]"
+      className="h-[10px] flex-1 overflow-hidden rounded-full border-2 border-[var(--color-ink)] bg-[var(--color-surface)]"
     >
       <div
         className="h-full rounded-full transition-[width] duration-200"

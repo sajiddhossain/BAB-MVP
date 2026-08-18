@@ -342,16 +342,14 @@ export default function BodyMap({
               <path d={HALF} />
               <path d={HALF} transform={MIRROR} />
             </clipPath>
-            <filter id={`${clipId}-blur`} x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="3.5" />
-            </filter>
           </defs>
 
-          {/* L'ombra morbida: stessa sagoma, sfumata invece che spostata a
-              specchio d'inchiostro — coerente con le card, che ora usano
-              un'ombra diffusa e non più un doppione duro dello stesso bordo. */}
+          {/* 🔴 L'ombra dura, la stessa di ogni card dell'app: la sagoma
+              disegnata una seconda volta, piena d'inchiostro e spostata.
+              BAB non sfuma mai un'ombra, e questa figura non fa eccezione —
+              prima aveva un'ellisse grigia sfumata sotto i piedi, l'unica
+              cosa in tutta l'app che assomigliasse a un'ombra vera. */}
           <g transform={`translate(${SHADOW.dx},${SHADOW.dy})`} fill="var(--color-ink)"
-             opacity={0.16} filter={`url(#${clipId}-blur)`}
              pointerEvents="none" aria-hidden>
             <path d={HALF} />
             <path d={HALF} transform={MIRROR} />

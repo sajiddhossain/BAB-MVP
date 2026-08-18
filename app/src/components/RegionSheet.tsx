@@ -91,8 +91,8 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="bab-sheet flex max-h-[86dvh] flex-col gap-2.5 overflow-y-auto bg-[var(--color-surface)] px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3"
-        style={{ borderTopLeftRadius: 26, borderTopRightRadius: 26, boxShadow: '0 -12px 34px color-mix(in srgb, var(--color-ink) 16%, transparent)' }}
+        className="bab-sheet flex max-h-[86dvh] flex-col gap-2.5 overflow-y-auto border-t-[3px] border-[var(--color-ink)] bg-[var(--color-surface)] px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3"
+        style={{ borderTopLeftRadius: 22, borderTopRightRadius: 22 }}
       >
         {/* 🔴 Il foglio è alto: deve starci dentro anche l'ultimo gruppo, quello
             delle bandiere rosse. Un elenco tagliato in fondo nasconde proprio
