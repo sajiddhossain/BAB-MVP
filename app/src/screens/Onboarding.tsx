@@ -464,7 +464,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
           </div>
         </div>
         <div className="flex items-start gap-2.5">
-          <MoonIcon size={19} color="var(--color-lavender)" />
+          <MoonIcon size={19} color="var(--color-vividteal)" />
           <div>
             <p className="text-[13.5px] font-bold">{t.heart.checkoutTitle}</p>
             <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkoutBody}</p>
