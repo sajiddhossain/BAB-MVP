@@ -63,8 +63,10 @@ function NumberedStep({ n, title, body }: { n: number; title: string; body: stri
  * sarebbe un tipo di componente nuovo a ogni render, React smonterebbe il
  * sottoalbero e il campo del nome perderebbe il fuoco a ogni lettera battuta.
  */
-function Frame({ title, eyebrow, help, children, next, canNext, back, onBack, labels, at, of, extra, mascot }: {
+function Frame({ title, icon, eyebrow, help, children, next, canNext, back, onBack, labels, at, of, extra, mascot }: {
   title: string; help?: string; children?: React.ReactNode
+  /** Icona sopra l'eyebrow — sotto la barra di avanzamento, prima di ogni testo. */
+  icon?: React.ReactNode
   /** Etichetta piccola sopra il titolo — solo dove il titolo da solo non basta. */
   eyebrow?: string
   next?: () => void; canNext?: boolean; back?: boolean; onBack?: () => void
@@ -91,6 +93,7 @@ function Frame({ title, eyebrow, help, children, next, canNext, back, onBack, la
         )}
         <Progress at={at} of={of} />
       </div>
+      {icon}
       {eyebrow && <p className="bab-label">{eyebrow}</p>}
       <h1 className="font-display text-[24px] leading-tight">{title}</h1>
       {help && <p className="text-[14px] text-[var(--color-ink-soft)]">{help}</p>}
@@ -397,9 +400,9 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }
 
   if (step === 'heartWrap') return (
-    <Frame title={t.heart.wrapTitle} eyebrow={t.heart.wrapReady} help={t.heart.wrapBody}
+    <Frame title={t.heart.wrapTitle} icon={<TargetIcon size={34} color="var(--color-lavender)" />}
+           eyebrow={t.heart.wrapReady} help={t.heart.wrapBody}
            next={() => setStep('whoSees')} canNext back onBack={() => setStep('heartReveal')} {...F}>
-      <TargetIcon size={34} color="var(--color-lavender)" />
       <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
         <div className="flex items-start gap-2.5">
           <SunIcon size={19} color="var(--color-gold)" />
