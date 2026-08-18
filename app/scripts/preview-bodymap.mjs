@@ -34,18 +34,24 @@ const el = (s, cls) =>
     : `<path class="${cls}" d="${s.d}"${s.mirror ? ` transform="${MIRROR}"` : ''}/>`
 
 /** Le decorazioni: si ridisegnano qui perché in `BodyMap.tsx` sono JSX. */
+const KNEES = `<g opacity="0.4">
+  <ellipse cx="81" cy="311" rx="11" ry="13" fill="none" stroke="#5C6A86" stroke-width="1.3"/>
+  <ellipse cx="119" cy="311" rx="11" ry="13" fill="none" stroke="#5C6A86" stroke-width="1.3"/></g>`
+
 const DECOR = {
   front: `<g class="ink">
     <path opacity="0.3" d="M80.1,36 C80.3,20 89,12 100,12 C111,12 119.7,20 119.9,36
       C114.5,29 108.5,32 100,32 C91.5,32 85.6,29 80.1,36 Z"/>
     <circle cx="93.2" cy="41" r="2.4"/><circle cx="106.8" cy="41" r="2.4"/>
-    <path d="M94.5,49 Q100,53.5 105.5,49" fill="none" stroke="#5C6A86" stroke-width="1.8" stroke-linecap="round"/></g>`,
+    <path d="M94.5,49 Q100,53.5 105.5,49" fill="none" stroke="#5C6A86" stroke-width="1.8" stroke-linecap="round"/>
+    ${KNEES}</g>`,
   back: `<g class="ink">
     <ellipse cx="100" cy="35" rx="19.9" ry="23" opacity="0.3"/>
     <path opacity="0.3" d="M100,52 C106.6,60.3 107.4,76.4 104.1,93.2 C102.5,101.6 97.5,101.6 95.9,93.2
       C92.6,76.4 93.4,60.3 100,52 Z"/>
     <path d="M100,122.6 L100,175.1" stroke="#5C6A86" stroke-width="2.2" stroke-dasharray="4 6"
-          stroke-linecap="round" fill="none" opacity="0.4"/></g>`,
+          stroke-linecap="round" fill="none" opacity="0.4"/>
+    ${KNEES}</g>`,
 }
 
 const figure = (side, map, states = {}, caption) => `

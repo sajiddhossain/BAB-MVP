@@ -81,6 +81,16 @@ type Props = {
 function Decor({ side }: { side: Side }) {
   const ink = 'var(--color-ink-soft)'
   const hair = { fill: ink, opacity: 0.3 }
+  /* Il cerchio del ginocchio: la convenzione dei figurini di moda per
+     segnare l'articolazione senza disegnarla nel profilo. Il profilo resta
+     una gamba liscia, e il cerchio — leggero, non un contorno vero — dice
+     dov'è la piega senza tagliarla a fette. */
+  const knees = (
+    <g opacity={0.4}>
+      <ellipse cx={81} cy={311} rx={11} ry={13} fill="none" stroke={ink} strokeWidth={1.3} />
+      <ellipse cx={119} cy={311} rx={11} ry={13} fill="none" stroke={ink} strokeWidth={1.3} />
+    </g>
+  )
   if (side === 'front') {
     return (
       <g pointerEvents="none" aria-hidden>
@@ -92,6 +102,7 @@ function Decor({ side }: { side: Side }) {
         <circle cx={106.8} cy={41} r={2.4} fill={ink} />
         <path d="M94.5,49 Q100,53.5 105.5,49" fill="none" stroke={ink}
               strokeWidth={1.8} strokeLinecap="round" />
+        {knees}
       </g>
     )
   }
@@ -104,6 +115,7 @@ function Decor({ side }: { side: Side }) {
                C92.6,76.4 93.4,60.3 100,52 Z" {...hair} />
       <path d="M100,122.6 L100,175.1" fill="none" stroke={ink} strokeWidth={2.2}
             strokeDasharray="4 6" strokeLinecap="round" opacity={0.4} />
+      {knees}
     </g>
   )
 }

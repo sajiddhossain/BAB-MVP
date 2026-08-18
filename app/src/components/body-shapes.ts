@@ -58,7 +58,7 @@ export type Shape =
     }
 
 /** Il riquadro del disegno. Tutte le coordinate qui sotto vivono dentro questo. */
-export const VIEW = { w: 200, h: 400 }
+export const VIEW = { w: 200, h: 460 }
 
 type P = [number, number]
 
@@ -87,16 +87,17 @@ function spline(pts: P[]): string {
 }
 
 /* ── Il profilo ────────────────────────────────────────────────────────────
-   Figura di ~7,5 teste: testa 12→58, ascelle 108, vita 175, inguine 198,
-   ginocchio 274, terra 385.
+   Figura di ~9 teste, tipo figurino di moda: testa 12→58, ascelle 108,
+   vita 171, fianchi 191, inguine 196, ginocchio 297, terra 442.
 
-   🔴 Cambio deliberato (su richiesta esplicita, sapendo il rischio): la
-   versione precedente era volutamente tozza — ~6 teste — perché una prova
-   più anatomica sembrava "un manichino da vetrina" a schermo piccolo. Questa
-   torna verso proporzioni più verosimili: spalle e fianchi più stretti,
-   gambe e collo più lunghi. Se in piccolo si legge peggio di prima, il primo
-   posto dove tornare a stringere è la larghezza (i fattori qui sotto), non le
-   proporzioni testa/corpo.
+   🔴 Cambio deliberato (su richiesta esplicita, sapendo il rischio, su un
+   riferimento di figurino di moda): le versioni precedenti erano più tozze
+   — prima ~6 teste per la leggibilità a schermo piccolo, poi ~7,5 "verosimili"
+   — perché una prova più slanciata sembrava "un manichino da vetrina". Questa
+   va oltre: gambe lunghe e strette, caviglia sottile, piede a punta, un
+   cerchio leggero al ginocchio invece di un taglio nel profilo (la
+   convenzione dei figurini). Se in piccolo si legge peggio, il primo posto
+   dove tornare indietro è la lunghezza delle gambe, non le spalle/fianchi.
 
    Il punto dove le due liste si toccano — l'ASCELLA — è uno spigolo vero:
    sopra, braccio e tronco sono un pezzo solo; sotto si aprono e in mezzo c'è
@@ -136,17 +137,22 @@ const LOWER: P[] = [
   [85, 171.5],                                                  // vita, il punto stretto
   [79, 178.5], [71, 185.5], [66, 191],                          // fianco, si riallarga
   [73.5, 196.1],                                                // inguine, si richiude
-  [66.4, 212.8], [67.6, 237.2], [69.2, 261.6],                 // coscia, fuori
-  [70, 273.8], [70, 295.8],                                    // ginocchio, fuori
-  [66.8, 312.9], [67.2, 330], [70.8, 344.6],                   // polpaccio, fuori
-  [74, 351.9], [74.8, 358],                                    // caviglia
-  [71.6, 365.3], [68.8, 375.1], [69.6, 381.2],                 // piede, fuori
-  [75.2, 384.9], [86.4, 384.9], [88.4, 381.2],                 // pianta
-  [88.8, 372.7], [87.6, 358],                                  // piede, dentro
-  [87.2, 345.8], [89.2, 331.2], [90.4, 315.3], [88.4, 298.2],  // polpaccio, dentro
-  [87.2, 295.8], [87, 273.8],                                  // ginocchio, dentro
-  [88, 256.8], [90, 229.9], [92, 210.4], [95.2, 199.4],        // coscia, dentro
-  [97.8, 197.2], [100, 196.1],                                 // inguine
+  // 🔴 Da qui in giù la gamba è più lunga e più stretta di prima (richiesto
+  // esplicitamente, su un riferimento di figurino di moda): le proporzioni
+  // "verosimili" restano un compromesso, questo va oltre verso lo stilizzato
+  // slanciato. La caviglia si stringe fino quasi a un punto e il piede
+  // diventa una punta, non più un tallone arrotondato.
+  [69, 217.8], [70, 249.6], [71.5, 281.3],                     // coscia, fuori
+  [72, 297.1], [72, 325.7],                                    // ginocchio, fuori
+  [69, 348], [70, 370.2], [74, 389.2],                         // polpaccio, fuori
+  [80, 398.7], [81, 406.6],                                    // caviglia, stretta
+  [78, 416.1], [74, 428.8], [74, 436.8],                       // piede, fuori
+  [79, 441.6], [83, 444], [87, 436.8],                         // pianta, a punta
+  [89, 425.7], [88, 406.6],                                    // piede, dentro
+  [85, 390.7], [87, 371.8], [88, 351.1], [86, 328.9],          // polpaccio, dentro
+  [85, 325.7], [85, 297.1],                                    // ginocchio, dentro
+  [86, 275], [88, 240.1], [91, 214.7], [95, 200.4],            // coscia, dentro
+  [97.8, 197.6], [100, 196.1],                                 // inguine
 ]
 
 /** Metà profilo. Tracciato APERTO: si richiude da solo sulla linea mediana. */
@@ -188,11 +194,11 @@ const S_NECK = seam(76, 2.3)      // collo / spalle
 const S_YOKE = seam(106, -8.4)    // spalle / petto — il carré delle clavicole
 const S_RIBS = seam(152, 5.3)     // petto / pancia — l'arcata costale
 const S_WAIST = seam(175, 3.2)    // pancia / fianchi
-const S_CROTCH = seam(198, -6.3)  // fianchi / cosce — l'inguine sale al centro
+const S_CROTCH = seam(199, -6.3)  // fianchi / cosce — l'inguine sale al centro
 
 const S_RIBS_B = seam(156, 4.2)   // schiena alta / schiena bassa
 const S_WAIST_B = seam(177, 3.2)  // schiena bassa / sedere
-const S_FOLD = seam(208, -5.3)    // 🔴 la piega gluteale sta SOTTO l'inguine
+const S_FOLD = seam(212, -5.3)    // 🔴 la piega gluteale sta SOTTO l'inguine
 
 /**
  * Il taglio braccio/tronco.
@@ -233,20 +239,20 @@ const cutBack = (y: number, bow: number) => `Q53,${y + bow} 6,${y}`
 const thigh = (top: P[], bottom: number) =>
   `M6,${top[0][1]} ${spline(top.slice(0, 4))} L100,${bottom} ${cutBack(bottom, KNEE_BOW)} Z`
 
-const KNEE_D = `M6,274 ${cut(274, KNEE_BOW)} L100,296 L6,296 Z`
-const KNEE_HIT = { x: 62, y: 274, w: 38, h: 22 }
-const SHIN_D = `M6,296 L100,296 L100,352 ${cutBack(352, SHIN_BOW)} Z`
-const SHIN_HIT = { x: 62, y: 296, w: 38, h: 56 }
-const FOOT_D = `M6,352 ${cut(352, SHIN_BOW)} L100,401 L6,401 Z`
-const FOOT_HIT = { x: 57, y: 352, w: 43, h: 49 }
-const CALF_D = `M6,296 L100,296 L100,347 ${cutBack(347, ANKLE_BOW)} Z`
-const CALF_HIT = { x: 62, y: 296, w: 38, h: 51 }
-const ANKLE_D = `M6,347 ${cut(347, ANKLE_BOW)} L100,401 L6,401 Z`
+const KNEE_D = `M6,297 ${cut(297, KNEE_BOW)} L100,326 L6,326 Z`
+const KNEE_HIT = { x: 62, y: 297, w: 38, h: 29 }
+const SHIN_D = `M6,326 L100,326 L100,399 ${cutBack(399, SHIN_BOW)} Z`
+const SHIN_HIT = { x: 62, y: 326, w: 38, h: 73 }
+const FOOT_D = `M6,399 ${cut(399, SHIN_BOW)} L100,466 L6,466 Z`
+const FOOT_HIT = { x: 57, y: 399, w: 43, h: 64 }
+const CALF_D = `M6,326 L100,326 L100,392 ${cutBack(392, ANKLE_BOW)} Z`
+const CALF_HIT = { x: 62, y: 326, w: 38, h: 66 }
+const ANKLE_D = `M6,392 ${cut(392, ANKLE_BOW)} L100,466 L6,466 Z`
 const ANKLE_HIT = { x: 57, y: 347, w: 43, h: 54 }
 
 /* ── Le fasce ──────────────────────────────────────────────────────────────
    Le quote in y sono punti di repere del corpo, e sono le STESSE davanti e
-   dietro: 58 mento, 76 base del collo, 106 carré, 198 inguine, 274 ginocchio.
+   dietro: 58 mento, 76 base del collo, 106 carré, 199 inguine, 297 ginocchio.
    Se le due viste divergessero, la stessa altezza toccata sul fronte e sul
    retro darebbe due parti diverse.
 
@@ -290,14 +296,14 @@ export const FRONT: Partial<Record<RegionCode, Shape>> = {
     hit: { x: 43, y: 175, w: 114, h: 26 },
   },
   ...ARMS,
-  quad_l: { k: 'path', cx: 81, cy: 232, d: thigh(S_CROTCH, 274), hit: { x: 64, y: 194, w: 36, h: 80 } },
-  quad_r: { k: 'path', cx: 119, cy: 232, d: thigh(S_CROTCH, 274), mirror: true, hit: { x: 100, y: 194, w: 36, h: 80 } },
-  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 285, hit: KNEE_HIT },
-  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 285, hit: KNEE_HIT },
-  shin_l: { k: 'path', d: SHIN_D, cx: 81, cy: 324, hit: SHIN_HIT },
-  shin_r: { k: 'path', d: SHIN_D, mirror: true, cx: 119, cy: 324, hit: SHIN_HIT },
-  foot_l: { k: 'path', d: FOOT_D, cx: 78, cy: 376, hit: FOOT_HIT },
-  foot_r: { k: 'path', d: FOOT_D, mirror: true, cx: 122, cy: 376, hit: FOOT_HIT },
+  quad_l: { k: 'path', cx: 81, cy: 245, d: thigh(S_CROTCH, 297), hit: { x: 64, y: 193, w: 36, h: 104 } },
+  quad_r: { k: 'path', cx: 119, cy: 245, d: thigh(S_CROTCH, 297), mirror: true, hit: { x: 100, y: 193, w: 36, h: 104 } },
+  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 311, hit: KNEE_HIT },
+  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 311, hit: KNEE_HIT },
+  shin_l: { k: 'path', d: SHIN_D, cx: 81, cy: 362, hit: SHIN_HIT },
+  shin_r: { k: 'path', d: SHIN_D, mirror: true, cx: 119, cy: 362, hit: SHIN_HIT },
+  foot_l: { k: 'path', d: FOOT_D, cx: 78, cy: 431, hit: FOOT_HIT },
+  foot_r: { k: 'path', d: FOOT_D, mirror: true, cx: 122, cy: 431, hit: FOOT_HIT },
 }
 
 export const BACK: Partial<Record<RegionCode, Shape>> = {
@@ -313,14 +319,14 @@ export const BACK: Partial<Record<RegionCode, Shape>> = {
     hit: { x: 43, y: 177, w: 114, h: 31 },
   },
   ...ARMS,
-  ham_l: { k: 'path', cx: 81, cy: 237, d: thigh(S_FOLD, 274), hit: { x: 62, y: 203, w: 38, h: 71 } },
-  ham_r: { k: 'path', cx: 119, cy: 237, d: thigh(S_FOLD, 274), mirror: true, hit: { x: 100, y: 203, w: 38, h: 71 } },
-  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 285, hit: KNEE_HIT },
-  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 285, hit: KNEE_HIT },
-  calf_l: { k: 'path', d: CALF_D, cx: 81, cy: 321, hit: CALF_HIT },
-  calf_r: { k: 'path', d: CALF_D, mirror: true, cx: 119, cy: 321, hit: CALF_HIT },
-  ankle_l: { k: 'path', d: ANKLE_D, cx: 78, cy: 374, hit: ANKLE_HIT },
-  ankle_r: { k: 'path', d: ANKLE_D, mirror: true, cx: 122, cy: 374, hit: ANKLE_HIT },
+  ham_l: { k: 'path', cx: 81, cy: 251, d: thigh(S_FOLD, 297), hit: { x: 62, y: 205, w: 38, h: 92 } },
+  ham_r: { k: 'path', cx: 119, cy: 251, d: thigh(S_FOLD, 297), mirror: true, hit: { x: 100, y: 205, w: 38, h: 92 } },
+  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 311, hit: KNEE_HIT },
+  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 311, hit: KNEE_HIT },
+  calf_l: { k: 'path', d: CALF_D, cx: 81, cy: 359, hit: CALF_HIT },
+  calf_r: { k: 'path', d: CALF_D, mirror: true, cx: 119, cy: 359, hit: CALF_HIT },
+  ankle_l: { k: 'path', d: ANKLE_D, cx: 78, cy: 427, hit: ANKLE_HIT },
+  ankle_r: { k: 'path', d: ANKLE_D, mirror: true, cx: 122, cy: 427, hit: ANKLE_HIT },
 }
 
 export const GEOMETRY: Record<Side, Partial<Record<RegionCode, Shape>>> = {
