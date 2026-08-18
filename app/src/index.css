@@ -63,15 +63,16 @@
   --phase-ovulation: color-mix(in srgb, var(--color-gold) 22%, transparent);
   --phase-luteal: color-mix(in srgb, var(--color-lavender) 22%, transparent);
 
-  /* ── Shape: hard offset shadows, never blurred. This is the most
-        recognisable part of the brand. Scaled down for small screens:
-        4px in lists, 6px for cards, 8px reserved for the single
-        protagonist of a screen — which enforces "one dominant next
-        step" automatically. ── */
-  --bab-border: 3px;
-  --shadow-sm: 4px 4px 0 0 var(--color-ink);
-  --shadow-md: 6px 6px 0 0 var(--color-ink);
-  --shadow-lg: 8px 8px 0 0 var(--color-ink);
+  /* ── Shape: soft, blurred, colour-tinted shadows — no offset, no hard
+        black outline. Un cambio deliberato rispetto al neo-brutalismo della
+        landing (vedi docs/03-design/01-design-system.md): qui la profondità
+        viene dall'ombra e dal colore pieno, non dal contorno d'inchiostro.
+        La scala resta la stessa idea di prima — più piccola in lista, più
+        grande sul protagonista della schermata — solo più morbida. ── */
+  --bab-border: 1.5px;
+  --shadow-sm: 0 2px 10px color-mix(in srgb, var(--color-ink) 10%, transparent);
+  --shadow-md: 0 6px 20px color-mix(in srgb, var(--color-ink) 12%, transparent);
+  --shadow-lg: 0 12px 34px color-mix(in srgb, var(--color-ink) 15%, transparent);
 
   color-scheme: light;
   font-family: var(--font-body);
@@ -138,17 +139,17 @@ button, a[role="button"], input, select {
 
 @utility bab-card {
   background: var(--color-surface);
-  border: var(--bab-border) solid var(--color-ink);
-  border-radius: 16px;
+  border: var(--bab-border) solid var(--color-sand);
+  border-radius: 24px;
   box-shadow: var(--shadow-sm);
 }
 
 @utility bab-pill {
-  border: 2px solid var(--color-ink);
+  border: 2px solid var(--color-sand);
   border-radius: 999px;
   background: var(--color-surface);
   font-weight: 700;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
 }
 
 @utility bab-label {
@@ -167,7 +168,7 @@ button, a[role="button"], input, select {
 .bab-edge {
   fill: none;
   stroke: var(--color-ink);
-  stroke-width: 4;
+  stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;
@@ -226,7 +227,7 @@ button, a[role="button"], input, select {
 .bab-vas::-webkit-slider-runnable-track {
   height: 14px;
   border-radius: 999px;
-  border: var(--bab-border) solid var(--color-ink);
+  border: var(--bab-border) solid var(--color-sand);
   background: linear-gradient(
     to right,
     var(--color-teal) var(--vas-fill, 0%),
@@ -236,7 +237,7 @@ button, a[role="button"], input, select {
 .bab-vas::-moz-range-track {
   height: 14px;
   border-radius: 999px;
-  border: var(--bab-border) solid var(--color-ink);
+  border: var(--bab-border) solid var(--color-sand);
   background: linear-gradient(
     to right,
     var(--color-teal) var(--vas-fill, 0%),
@@ -250,17 +251,17 @@ button, a[role="button"], input, select {
   width: 30px;
   margin-top: -11px;
   border-radius: 999px;
-  border: var(--bab-border) solid var(--color-ink);
+  border: none;
   background: var(--color-lime);
-  box-shadow: 3px 3px 0 0 var(--color-ink);
+  box-shadow: var(--shadow-sm);
 }
 .bab-vas::-moz-range-thumb {
   height: 30px;
   width: 30px;
   border-radius: 999px;
-  border: var(--bab-border) solid var(--color-ink);
+  border: none;
   background: var(--color-lime);
-  box-shadow: 3px 3px 0 0 var(--color-ink);
+  box-shadow: var(--shadow-sm);
 }
 /* Non ancora risposto: la riga c'è, il cursore no. */
 .bab-vas[aria-valuetext="—"]::-webkit-slider-thumb { opacity: 0; }
