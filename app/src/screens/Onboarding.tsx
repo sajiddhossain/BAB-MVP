@@ -51,27 +51,27 @@ function Rich({ text }: { text: string }) {
  * disegno: doveva somigliare al bersaglio vero — anelli pieni, non un
  * cerchietto vuoto — quindi resta locale a questa schermata.
  */
-function DartboardIcon({ size = 34 }: { size?: number }) {
+/**
+ * Il razzo — l'SVG scelto dall'utente (svgrepo.com), colorato: il tratto era
+ * nero e piatto così com'è arrivato, qui prende un gradiente oro→corallo e
+ * l'oblò si riempie invece di restare vuoto.
+ */
+function RocketIcon({ size = 34 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden>
-      <circle cx="17" cy="17" r="16" fill="var(--color-coral)" />
-      <circle cx="17" cy="17" r="12.5" fill="var(--color-surface)" />
-      <circle cx="17" cy="17" r="9" fill="var(--color-coral)" />
-      <circle cx="17" cy="17" r="5.5" fill="var(--color-surface)" />
-      <circle cx="17" cy="17" r="2.2" fill="var(--color-coral)" />
-      <circle cx="17" cy="17" r="16" fill="none" stroke="var(--color-ink)" strokeWidth="1.6" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <defs>
+        <linearGradient id="rocket-grad" x1="4" y1="19" x2="20" y2="4" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="var(--color-coral)" />
+          <stop offset="1" stopColor="var(--color-gold)" />
+        </linearGradient>
+      </defs>
+      <circle cx="15.5" cy="8.5" r="1.4" fill="var(--color-gold)" />
+      <path stroke="url(#rocket-grad)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+            d="m15 14 2.045-1.533C19.469 10.648 20.542 6.98 20 4c-2.981-.542-6.649.531-8.467 2.955L10 9m5 5-3.5 2.5-4-4L10 9m5 5v2.667a4 4 0 0 1-.8 2.4l-.7.933-1-1M10 9H7.333a4 4 0 0 0-2.4.8L4 10.5l1 1M8.5 18 5 19l1.166-3.5m9.334-6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
     </svg>
   )
 }
 
-/**
- * Il pallone — a pannelli pieni come l'emoji 🏐, non l'emoji stessa.
- *
- * 🔴 L'emoji vera rende in modo diverso su ogni sistema (e piccola, sgranata
- * su schermi ad alta densità). Stesso principio di `DartboardIcon`: campiture
- * piene (oro e teal della palette BAB) dentro il cerchio, cuciture sopra —
- * uguale su ogni telefono.
- */
 /** Gli sparkles — l'SVG scelto dall'utente (svgrepo.com), a colori fissi come fornito. */
 function SparklesIcon({ size = 34 }: { size?: number }) {
   return (
@@ -449,7 +449,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }
 
   if (step === 'heartWrap') return (
-    <Frame title={t.heart.wrapTitle} icon={<DartboardIcon size={34} />}
+    <Frame title={t.heart.wrapTitle} icon={<RocketIcon size={34} />}
            eyebrow={t.heart.wrapReady} help={t.heart.wrapBody}
            next={() => setStep('whoSees')} canNext back onBack={() => setStep('heartReveal')} {...F}>
       <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
