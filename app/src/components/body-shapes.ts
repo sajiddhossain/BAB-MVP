@@ -12,53 +12,49 @@ import type { RegionCode } from '@/content/bodymap'
  * database: non si toccano. Qui c'è solo dove sono disegnati, che è
  * presentazione e si può cambiare quando si vuole.
  *
- * ── Come è fatta ────────────────────────────────────────────────────────────
+ * ── Due sistemi, uno per vista ──────────────────────────────────────────────
  *
- * Il disegno è UNA SAGOMA, non venti pezzi accostati.
+ * Il FRONTE è il disegno vero, fatto a mano (vedi `FRONT_LINE_ART` sotto e
+ * `public/bodymap-mask-front.png`), non più punti e spline. Il contorno
+ * visibile è quel tracciato, importato così com'è. Le zone toccabili sono
+ * rettangoli semplici (`FRONT` sotto) tagliati sulla sagoma tramite una
+ * MASCHERA raster — la stessa immagine, resa solida — perché il tracciato a
+ * mano non è un profilo pulito da un lato solo (è un disegno intero, con
+ * spessore d'inchiostro), e ricavarne un contorno vettoriale preciso non è
+ * praticabile. Il retro non c'è ancora: se lo disegna, si rifà uguale.
  *
- *   1. `UPPER` e `LOWER` sono metà del profilo esterno come ELENCO DI PUNTI.
- *      Una spline li trasforma in curve morbide. Scritto così, correggere le
- *      proporzioni vuol dire cambiare un numero in una tabella, non indovinare
- *      un punto di controllo di Bézier.
- *
- *   2. L'altra metà è la stessa, riflessa. La simmetria è esatta per
- *      costruzione e non può sbilanciarsi con una modifica distratta.
- *
- *   3. Quella sagoma diventa una `clipPath`. Le zone sono quindi FASCE che
- *      sbordano di proposito: il ritaglio le taglia sul profilo. Nessuna
- *      fessura bianca fra due zone, nessun bordo da far combaciare a mano, e
- *      il contorno spesso resta uno solo — quello vero.
- *
- *   4. Le cuciture fra le fasce sono CURVE, non righe. Dritte tagliavano la
- *      figura da parte a parte e tutto il disegno si leggeva come strisce di
- *      carta incollate. Curve seguono il corpo: le clavicole scendono sulle
- *      spalle, l'arcata costale scende sullo sterno, l'inguine sale al centro.
- *      È la differenza fra un disegno e uno schema di montaggio.
+ * Il RETRO usa ancora il sistema vecchio (profilo a punti + spline +
+ * cuciture), portato alla stessa altezza del fronte con un unico fattore di
+ * scala verticale, così le due viste condividono `VIEW` e i punti di repere
+ * condivisi (`knee_l`, ecc.) restano alla stessa quota su tutt'e due.
  *
  * ── Convenzione sinistra/destra ─────────────────────────────────────────────
  *
  * 🔴 La sua sinistra sta a SINISTRA dello schermo, in tutt'e due le viste.
- * È la convenzione dello specchio, quella già provata nei prototipi. Non è il
- * disegno anatomico da manuale (dove il fronte è speculare), ma è l'unica che
- * non le chiede un ribaltamento mentale mentre ha male. I codici salvati
- * restano corretti a prescindere da dove sono disegnati.
  */
 
 export type Side = 'front' | 'back'
 
 export type Shape =
   | { k: 'rect'; x: number; y: number; w: number; h: number; cx: number; cy: number }
-  /**
-   * Forma libera. `mirror` la ribalta su x=100 invece di riscriverla; `hit`
-   * dà il bersaglio del dito quando la forma è troppo sottile per fare da sé.
-   */
   | {
       k: 'path'; d: string; cx: number; cy: number; mirror?: boolean
       hit?: { x: number; y: number; w: number; h: number }
     }
 
 /** Il riquadro del disegno. Tutte le coordinate qui sotto vivono dentro questo. */
-export const VIEW = { w: 200, h: 460 }
+export const VIEW = { w: 200, h: 623 }
+
+/**
+ * Il tracciato a mano del fronte, già in scala con `VIEW`. Prodotto scalando
+ * l'SVG disegnato a mano di 200/615 (la larghezza originale) — vedi la
+ * cronologia di questa modifica per lo script usato.
+ */
+export const FRONT_LINE_ART =
+  "M86.26 0.84C76.41 3.40 69.69 10.12 67.61 19.31C67.05 21.87 66.96 24.08 67.09 29.15L67.27 35.74L66.05 36.74C64.97 37.65 64.84 38.08 64.84 40.30C64.84 41.64 65.23 44.03 65.70 45.50C66.18 46.97 66.57 48.45 66.57 48.71C66.57 49.84 68.83 53.91 70.08 55.08C70.91 55.86 71.86 57.47 72.43 59.07C72.95 60.55 73.99 62.80 74.77 64.01C76.15 66.23 76.15 66.40 76.20 71.60C76.24 75.42 76.02 77.72 75.50 79.71C73.73 86.26 71.47 88.60 62.93 92.76C56.04 96.10 52.18 97.53 42.90 100.18C35.14 102.34 31.36 104.21 28.46 107.24C24.95 111.02 21.87 118.04 20.13 126.28C19.01 131.74 18.79 141.50 19.70 149.74C20.39 156.02 20.22 161.01 18.88 174.93C18.40 179.92 17.75 189.28 17.36 195.74C16.58 210.01 16.45 210.83 13.24 222.19C8.90 237.46 8.21 242.18 6.95 264.69C5.87 284.15 5.43 290.57 4.57 299.81C4.09 304.58 3.44 312.17 3.09 316.72C2.70 321.23 2.14 326.39 1.79 328.08C0.71 333.15 -0.25 341.30 0.06 342.73C0.19 343.43 1.18 345.90 2.18 348.16C3.22 350.41 4.70 353.79 5.43 355.66C6.43 358.04 7.56 359.82 9.12 361.55C11.55 364.16 19.92 370.27 22.60 371.40C26.77 373.13 29.89 369.18 27.72 364.94C27.29 364.16 25.55 362.03 23.78 360.12C20.31 356.44 19.09 354.48 18.66 351.84L18.40 350.11L19.22 351.84C22.04 357.82 28.28 357.04 29.07 350.58C29.24 349.24 29.24 347.38 29.11 346.51C28.94 345.64 28.63 340.91 28.46 336.01L28.11 327.13L26.38 322.79C25.38 320.40 23.86 316.81 22.99 314.81L21.35 311.17L21.87 307.57C22.56 302.67 25.08 293.52 29.93 278.56C34.44 264.60 39.17 249.03 40.51 243.83C42.03 237.85 42.72 232.90 43.16 224.62C43.42 220.20 44.28 211.27 45.11 204.85C47.32 187.76 46.97 188.94 48.19 193.79C48.75 196.05 49.88 202.12 50.79 207.23C53.22 221.59 52.96 223.54 46.24 240.32C38.34 260.00 36.09 268.15 34.27 283.76C33.49 290.36 33.36 306.75 34.05 313.25C35.70 329.51 40.12 351.10 48.79 385.23C51.14 394.51 53.39 403.79 53.78 405.82C54.13 407.86 54.95 415.36 55.56 422.52C57.03 439.69 56.86 449.96 54.91 461.33C52.83 473.73 52.13 481.96 52.39 491.68C52.74 503.99 53.26 508.07 59.33 544.14C62.80 564.83 63.28 568.73 62.93 574.50C61.89 593.23 62.15 591.23 60.15 595.35C58.38 599.08 54.56 604.59 51.44 608.01C48.62 611.09 47.58 613.95 48.36 616.38C49.36 619.33 53.00 620.68 61.80 621.37C65.01 621.63 68.61 622.11 69.78 622.45C72.51 623.23 75.03 623.23 77.50 622.37C79.93 621.54 82.75 619.20 83.48 617.38L84.05 616.04L84.83 617.55C86.95 621.63 93.15 624.06 97.49 622.50C98.57 622.11 101.56 621.76 104.95 621.59C116.00 621.15 120.34 619.16 120.34 614.65C120.34 612.65 119.21 610.66 115.27 605.46C112.62 601.94 110.41 598.08 108.81 594.14C107.85 591.71 107.72 590.93 108.02 589.28C108.37 587.29 108.41 585.51 108.15 576.45C108.02 569.81 108.81 566.00 116.48 535.91C121.29 516.87 123.33 507.98 124.94 498.79C126.58 489.29 126.80 476.42 125.59 460.20C124.41 444.72 124.46 442.68 125.76 429.24C127.58 410.68 127.36 411.81 132.48 394.99C138.46 375.43 142.71 358.95 147.79 335.58C152.82 312.56 153.73 300.02 151.73 280.51C150.43 267.85 147.70 257.40 139.16 232.82C136.38 224.75 136.25 224.14 136.08 219.59C135.91 215.69 136.12 213.48 137.16 207.45C139.20 195.83 140.89 186.85 140.98 186.98C141.07 187.07 141.72 189.85 142.41 193.14C143.15 196.48 144.40 202.25 145.23 205.93C146.09 209.62 147.35 216.86 148.09 221.98C150.65 239.84 154.29 251.50 163.57 271.19C171.20 287.36 176.27 300.85 176.27 304.97C176.27 306.27 175.58 308.57 174.24 312.04L172.15 317.15L172.02 330.16C171.85 344.77 172.07 346.16 174.71 347.77C178.23 349.93 181.82 347.42 182.82 342.13C183.17 340.22 183.17 340.26 182.95 342.65C182.69 346.25 181.91 347.77 178.40 351.54C174.67 355.61 173.67 357.39 173.67 360.21C173.67 362.64 174.41 363.59 176.62 364.03C178.75 364.46 180.18 363.68 186.29 358.95C193.27 353.53 194.62 351.71 196.61 344.60C197.39 341.91 198.43 338.53 198.95 337.10C200.17 333.67 200.08 330.68 198.60 325.39C197.95 323.01 196.74 317.33 195.96 312.82C195.18 308.26 193.36 298.81 191.97 291.79C188.89 276.61 187.94 270.71 186.46 257.10C184.64 240.62 182.91 233.51 176.71 216.56C174.63 210.83 172.50 204.37 172.02 202.25C171.50 200.08 170.72 193.97 170.20 188.59C169.73 183.21 168.90 174.93 168.38 170.16C167.69 163.40 167.47 158.32 167.39 146.96C167.30 131.14 167.08 129.01 164.61 121.77C162.36 115.09 159.45 110.71 155.33 107.76C151.82 105.29 149.69 104.38 143.97 102.95C135.47 100.87 127.84 97.62 121.25 93.20C112.97 87.65 110.93 83.27 111.32 71.73C111.54 65.75 111.58 65.62 113.10 62.84C113.92 61.28 114.88 59.16 115.18 58.07C115.53 56.82 116.26 55.69 117.17 54.91C117.95 54.21 118.91 53.13 119.21 52.52C120.30 50.36 122.20 42.68 122.25 40.17C122.29 37.91 122.16 37.48 121.12 36.61L119.95 35.61L120.21 29.80C120.51 22.82 119.78 18.31 117.48 13.46C114.62 7.34 108.20 2.40 100.83 0.66C96.92 -0.29 90.12 -0.20 86.26 0.84ZM102.30 4.70C109.07 7.08 113.62 11.63 116.05 18.44C117.04 21.26 117.69 31.02 117.09 34.92C116.70 37.65 116.44 37.09 114.70 30.02C112.58 21.26 110.02 17.58 105.16 16.14C102.95 15.49 102.43 15.49 98.01 16.19C94.11 16.79 92.72 16.88 90.64 16.49C84.83 15.41 80.92 16.10 77.59 18.83C75.20 20.78 73.73 23.82 72.64 29.02C71.43 34.66 70.86 36.83 70.47 36.83C70.30 36.83 70.04 35.61 69.87 34.18C69.13 27.07 70.04 20.18 72.25 15.62C74.85 10.33 80.88 5.69 87.21 4.09C90.90 3.18 98.92 3.48 102.30 4.70ZM106.81 18.44C110.15 20.39 111.67 23.30 113.79 31.84C114.27 33.75 115.01 36.18 115.35 37.26C116.35 39.91 116.22 42.03 114.92 47.32C113.01 54.91 111.67 59.03 110.02 62.15C107.94 66.14 103.52 70.56 99.79 72.38C97.14 73.68 96.71 73.77 93.54 73.60C88.90 73.34 85.82 71.65 81.53 67.09C77.46 62.76 75.85 59.55 73.29 50.57C71.08 42.85 70.99 41.34 72.21 37.04C72.69 35.35 73.60 31.88 74.16 29.28C75.37 23.99 76.63 21.48 78.93 19.74C82.09 17.31 84.87 16.84 90.64 17.71C92.41 17.97 94.45 17.92 97.14 17.53C101.95 16.84 104.43 17.05 106.81 18.44ZM68.91 40.34C69.09 41.60 69.78 44.85 70.52 47.58C71.21 50.36 71.73 52.78 71.65 53.04C71.34 54.00 69.91 51.01 68.74 46.93C67.27 41.73 66.92 39.78 67.27 38.82C67.83 37.39 68.61 38.13 68.91 40.34ZM119.82 39.86C120.12 42.72 116.61 53.65 115.70 52.74C115.57 52.61 116.09 50.01 116.78 46.93C117.52 43.89 118.26 40.64 118.43 39.73C118.78 37.74 119.65 37.82 119.82 39.86ZM87.69 73.99C90.77 75.37 93.98 75.85 96.92 75.33C99.87 74.81 101.91 73.77 104.60 71.47L106.68 69.65L106.94 76.11C107.20 83.31 107.89 85.82 110.71 90.07C114.79 96.32 127.84 103.43 141.46 106.90C144.75 107.72 148.52 109.02 149.91 109.76C155.33 112.66 159.19 118.52 161.66 127.75L163.01 132.87L163.09 147.18C163.14 159.71 163.31 163.18 164.48 174.93C165.26 182.30 166.04 190.80 166.30 193.79C166.91 201.12 168.25 206.28 172.89 218.85C176.53 228.87 179.53 239.15 180.57 245.17C180.83 246.60 181.61 252.85 182.34 259.05C183.08 265.21 183.95 272.06 184.34 274.23C185.38 280.43 187.89 293.48 189.72 302.41C190.67 306.92 191.84 313.08 192.32 316.07C192.84 319.06 193.79 323.74 194.53 326.47C195.27 329.21 195.79 332.03 195.66 332.76C195.35 335.02 191.84 346.55 190.93 348.37C189.72 350.71 189.24 351.28 184.73 354.83C180.13 358.52 178.49 359.65 178.18 359.30C177.75 358.87 178.88 357.30 181.91 353.92C183.56 352.14 185.34 349.85 185.81 348.85C188.33 343.60 188.11 334.76 185.34 330.20C184.86 329.42 184.51 328.04 184.51 327.00C184.51 326.00 184.34 325.17 184.08 325.17C183.34 325.17 182.04 326.91 180.70 329.64C179.57 331.85 179.27 333.20 178.88 337.23C178.62 339.92 178.23 342.60 177.96 343.26C177.62 344.25 177.44 344.30 176.92 343.78C176.45 343.30 176.32 340.65 176.19 331.03L176.06 318.89L178.36 313.16C180.09 308.74 180.61 306.88 180.61 305.05C180.61 300.59 176.45 288.45 170.85 276.61C162.66 259.31 156.94 244.35 154.38 233.55C153.81 231.13 152.95 225.62 152.43 221.33C151.56 213.78 151.08 211.09 147.27 193.36C146.31 188.94 144.84 181.30 143.93 176.32L142.32 167.34L143.10 163.18C143.80 159.58 143.80 158.45 143.36 154.20C142.93 149.52 142.93 149.22 144.01 145.23C145.62 139.42 145.70 138.98 145.10 139.33C144.36 139.81 143.15 142.41 141.85 146.31C140.85 149.35 140.72 150.43 140.81 154.77C140.89 160.19 140.37 163.18 138.72 166.73C134.86 174.97 125.28 178.40 115.74 174.97C114.31 174.45 111.49 172.89 109.54 171.50C107.59 170.12 105.86 169.12 105.68 169.29C105.16 169.81 110.28 174.15 113.36 175.75C118.86 178.62 125.15 179.35 130.40 177.75C132.96 176.97 136.56 174.84 137.34 173.67C138.42 172.11 136.64 185.16 134.04 198.13C130.40 216.34 130.40 222.15 134.04 232.30C145.23 263.47 148.09 276.87 148.09 297.60C148.09 309.61 146.79 319.28 142.84 337.10C138.25 357.74 133.35 376.73 128.49 392.38C123.72 407.82 123.07 410.90 121.64 425.34C120.25 439.00 120.04 447.88 120.77 457.21C122.68 479.84 122.07 491.12 117.95 510.11C117.39 512.71 114.18 525.89 110.84 539.38C103.30 569.77 103.25 570.03 103.65 579.27C103.86 584.21 103.78 587.03 103.43 588.42C102.26 593.01 106.16 601.73 113.79 611.48C115.35 613.52 115.66 614.17 115.31 614.73C114.57 615.86 111.62 616.51 105.64 616.82L100.13 617.12L99.01 615.56C97.88 614.17 95.58 612.87 95.02 613.39C94.89 613.52 95.19 614.39 95.62 615.30C96.10 616.21 96.49 617.16 96.49 617.42C96.49 618.16 92.20 617.94 90.81 617.12C88.43 615.69 88.08 613.48 89.21 605.93C89.86 601.47 90.12 597.26 90.20 589.89C90.29 581.48 90.46 579.35 91.24 576.23C94.28 563.79 95.41 540.33 93.89 520.30C92.98 508.55 92.63 495.41 93.02 490.16C93.28 487.26 94.15 480.79 95.02 475.81C97.05 463.54 97.23 459.20 96.06 446.15C94.45 427.90 94.45 422.13 96.10 405.61C97.40 392.56 97.53 390.00 97.57 376.34C97.57 368.10 97.31 356.78 97.01 351.19C96.36 339.92 96.75 328.04 98.09 319.62C98.70 315.55 98.96 314.90 100.57 312.69C101.56 311.34 103.25 308.96 104.30 307.40C105.34 305.84 106.94 303.67 107.89 302.54C108.81 301.41 109.50 300.24 109.41 299.98C109.15 299.20 106.68 301.54 102.99 306.05C98.66 311.43 97.53 312.43 95.32 312.99C91.94 313.90 90.20 313.16 86.73 309.26C81.62 303.58 77.28 299.33 77.07 299.94C76.98 300.20 77.76 301.50 78.84 302.71C81.83 306.31 85.48 311.34 86.47 313.34C87.65 315.68 89.08 324.39 89.38 331.25C89.64 336.97 88.73 348.11 86.95 360.95C85.56 370.70 85.39 384.62 86.30 402.57C87.47 424.95 87.08 432.10 83.87 448.97C82.70 455.26 82.62 462.28 83.61 471.95C85.22 487.04 85.04 494.97 82.62 513.57C80.32 531.18 79.54 540.94 79.28 555.42C79.10 566.60 79.19 569.99 79.75 574.06C80.32 578.09 80.36 581.13 80.14 589.67C80.01 595.53 79.84 603.46 79.80 607.32C79.75 612.05 79.58 614.69 79.19 615.39C78.32 616.99 76.20 618.03 73.81 617.99C70.95 617.94 70.43 617.34 71.91 615.78C74.55 613.04 72.30 612.65 69.35 615.34L67.40 617.12L61.80 616.64C55.86 616.12 53.13 615.34 53.13 614.17C53.13 613.78 54.78 611.40 56.82 608.88C61.07 603.55 63.41 599.78 65.36 595.00C66.66 591.88 66.79 591.23 66.79 586.64C66.79 583.91 67.09 579.66 67.44 577.23C68.22 571.38 67.66 565.95 63.15 538.73C57.86 506.81 56.99 499.53 56.90 487.99C56.86 479.67 57.29 475.07 59.50 461.98C61.85 447.75 61.89 440.38 59.81 417.53C58.90 407.08 58.42 404.74 52.48 380.89C38.43 324.22 35.83 303.97 39.43 279.86C41.34 267.11 43.63 259.27 49.88 243.87C55.60 229.65 56.60 226.10 56.60 219.29C56.60 213.48 55.78 207.45 53.35 195.53C51.61 187.07 50.09 177.44 50.09 174.80V173.80L51.31 174.63C58.77 179.92 68.22 179.87 76.94 174.50C79.84 172.72 83.35 169.73 83.01 169.34C82.83 169.16 81.01 170.12 78.89 171.46C72.86 175.23 71.17 175.75 65.05 175.80C60.02 175.80 59.72 175.75 56.90 174.37C53.09 172.46 50.14 169.55 48.32 165.82L46.84 162.79L46.80 155.63V148.48L45.15 144.71C44.24 142.67 43.16 140.63 42.68 140.20C42.25 139.81 41.86 139.55 41.86 139.72C41.86 139.85 42.55 142.02 43.42 144.58C44.89 149.00 44.94 149.35 44.50 152.08C43.59 158.11 43.55 159.36 44.20 162.57C45.15 167.00 45.11 167.52 43.37 181.65C39.99 209.05 39.21 216.43 38.82 224.75C38.60 229.56 38.30 233.86 38.17 234.33C38.04 234.81 37.39 237.67 36.65 240.66C35.18 246.95 30.54 262.30 24.95 279.65C19.79 295.60 17.57 304.66 17.49 310.34C17.44 312.90 18.05 314.64 22.69 325.39C23.69 327.73 23.86 328.77 24.12 335.80C24.30 340.09 24.60 345.08 24.77 346.90C24.95 348.94 24.90 350.50 24.60 350.97C24.21 351.71 24.12 351.67 23.52 350.50C23.17 349.76 22.60 347.98 22.34 346.47C21.69 342.87 20.39 338.66 19.53 337.40C19.05 336.75 18.40 336.45 17.44 336.45C16.14 336.45 15.93 336.66 14.84 338.83C13.80 340.96 13.67 341.74 13.67 345.38C13.67 350.06 14.63 355.31 15.93 357.91C16.40 358.87 18.49 361.25 20.52 363.25C22.56 365.20 24.08 366.93 23.95 367.10C23.43 367.58 15.10 361.60 12.76 359.08C11.03 357.22 9.99 355.53 8.82 352.66C7.95 350.54 6.52 347.25 5.65 345.34C3.87 341.39 3.87 341.78 5.69 330.47C6.26 326.78 6.95 320.92 7.17 317.46C7.43 313.94 7.99 307.27 8.47 302.63C9.90 288.32 10.59 279.82 11.07 270.11C12.37 244.39 13.46 236.24 17.10 224.36C20.39 213.69 21.13 209.14 21.69 196.61C22.08 187.68 22.69 179.05 23.65 169.51C24.69 159.28 24.73 154.16 23.82 147.27C22.56 137.94 23.65 128.32 26.90 119.21C29.02 113.23 32.10 109.15 35.83 107.29C36.96 106.72 41.16 105.34 45.15 104.25C53.95 101.82 59.24 99.87 65.05 96.97C70.47 94.28 73.90 91.98 75.68 89.86C77.41 87.73 79.45 83.48 79.84 81.14C80.01 80.10 80.23 79.36 80.32 79.49C80.40 79.58 81.27 82.66 82.23 86.30C83.79 92.46 84.78 95.06 84.78 92.94C84.78 90.90 83.74 86.00 82.18 80.40C81.01 76.24 80.45 73.42 80.45 71.60V68.91L82.92 70.95C84.31 72.04 86.43 73.42 87.69 73.99ZM93.72 319.41C93.41 321.05 93.20 321.53 93.11 320.84C93.02 320.23 92.81 319.10 92.59 318.32C92.24 317.07 92.33 316.94 93.20 316.94C94.15 316.94 94.15 316.98 93.72 319.41ZM93.15 373.74C93.24 384.14 93.07 389.56 92.41 396.50C91.98 401.49 91.46 405.87 91.29 406.17C91.16 406.47 90.77 400.92 90.46 393.81C89.90 380.16 90.16 371.61 91.50 360.95C91.85 358.08 92.15 355.44 92.20 355.09C92.24 354.74 92.46 355.70 92.68 357.26C92.89 358.82 93.11 366.24 93.15 373.74ZM92.11 453.87C92.72 459.81 92.50 462.50 90.51 474.51L89.29 481.79L88.34 472.12C87.08 459.59 87.12 457.34 88.64 448.97C89.34 445.15 90.07 440.86 90.25 439.43C90.59 436.87 90.59 436.96 91.11 442.68C91.37 445.89 91.85 450.92 92.11 453.87ZM89.55 524.20C90.25 534.21 89.90 554.07 88.90 562.57C88.51 565.91 87.60 571.29 86.86 574.50C85.65 579.83 85.52 581.13 85.39 589.33C85.26 597.65 84.61 606.93 84.05 607.45C83.92 607.58 83.96 605.24 84.09 602.25C84.83 586.55 84.83 579.05 84.18 574.93C83.35 570.03 83.22 552.99 83.92 543.49C84.52 535.60 87.82 507.59 88.30 506.42C88.34 506.29 88.51 508.46 88.69 511.19C88.86 513.92 89.25 519.78 89.55 524.20Z"
+
+/** La maschera raster che riempie l'interno del disegno a mano, per ritagliarci le zone. */
+export const FRONT_MASK_URL = '/bodymap-mask-front.png'
 
 type P = [number, number]
 
@@ -67,10 +63,7 @@ const flip = (pts: P[]): P[] => pts.map(([x, y]): P => [VIEW.w - x, y])
 
 /**
  * Catmull-Rom → Bézier: fa passare una curva morbida per TUTTI i punti dati.
- *
- * È la ragione per cui il profilo può essere una tabella di coordinate invece
- * di punti di controllo: i punti si leggono («la vita sta a 30 dal centro»),
- * i punti di controllo di Bézier no.
+ * Usata solo dal RETRO — il fronte è il tracciato a mano, non punti.
  */
 function spline(pts: P[]): string {
   const out: string[] = []
@@ -86,76 +79,43 @@ function spline(pts: P[]): string {
   return out.join(' ')
 }
 
-/* ── Il profilo ────────────────────────────────────────────────────────────
-   Figura di ~9 teste, tipo figurino di moda: testa 12→58, ascelle 108,
-   vita 171, fianchi 191, inguine 196, ginocchio 297, terra 442.
+/* ── Il profilo del RETRO ─────────────────────────────────────────────────── */
 
-   🔴 Cambio deliberato (su richiesta esplicita, sapendo il rischio, su un
-   riferimento di figurino di moda): le versioni precedenti erano più tozze
-   — prima ~6 teste per la leggibilità a schermo piccolo, poi ~7,5 "verosimili"
-   — perché una prova più slanciata sembrava "un manichino da vetrina". Questa
-   va oltre: gambe lunghe e strette, caviglia sottile, piede a punta, un
-   cerchio leggero al ginocchio invece di un taglio nel profilo (la
-   convenzione dei figurini). Se in piccolo si legge peggio, il primo posto
-   dove tornare indietro è la lunghezza delle gambe, non le spalle/fianchi.
-
-   Il punto dove le due liste si toccano — l'ASCELLA — è uno spigolo vero:
-   sopra, braccio e tronco sono un pezzo solo; sotto si aprono e in mezzo c'è
-   aria. Per questo sono due spline separate e non una sola: una curva morbida
-   che ci passa dentro arrotonderebbe l'unica angolazione che deve restare
-   secca.
-   ────────────────────────────────────────────────────────────────────────── */
-
-/** Cima della testa → braccio → ascella. */
 const UPPER: P[] = [
-  [100, 12],
-  [88.1, 13.5], [81.7, 22], [80, 34], [82.2, 47], [86.4, 56],  // testa
-  [87.9, 62.6], [87.2, 74.1],                                  // collo
-  [80.5, 76.4], [74.5, 81.7], [68.7, 91.1],                    // trapezio
-  // 🔴 Le spalle sono state strette apposta (erano più larghe dei fianchi:
-  // il segno del corpo maschile a "V", non di quello femminile). Solo il
-  // bordo ESTERNO del braccio si muove: il bordo interno/l'ascella restano
-  // gli stessi, così `SPLIT`/`ARM` non si scollano dal profilo.
-  [64.5, 100.6], [64, 112.1],                                  // deltoide
-  [60.5, 126.8], [59.2, 145.7], [58.4, 162.5],                 // braccio, fuori
-  [58.2, 173], [58.2, 179.3],                                  // polso
-  [55.8, 186.7], [51.4, 199.4], [54.2, 210.4], [60.6, 214.1], [65.8, 206.7], // mano
-  [66.6, 193], [67.4, 179.3],                                  // polso, dentro
-  [68.5, 164.6], [70, 145.7], [71.5, 126.8],                   // braccio, dentro
-  [74.1, 107.9],                                                // ⟵ ASCELLA
+  [100, 16.3],
+  [88.1, 18.3], [81.7, 29.8], [80, 46], [82.2, 63.7], [86.4, 75.8],
+  [87.9, 84.8], [87.2, 100.4],
+  [80.5, 103.5], [74.5, 110.7], [68.7, 123.4],
+  [64.5, 136.2], [64, 151.8],
+  [60.5, 171.7], [59.2, 197.3], [58.4, 220.1],
+  [58.2, 234.3], [58.2, 242.8],
+  [55.8, 252.9], [51.4, 270.1], [54.2, 285], [60.6, 290], [65.8, 279.9],
+  [66.6, 261.4], [67.4, 242.8],
+  [68.5, 222.9], [70, 197.3], [71.5, 171.7],
+  [74.1, 146.1],
 ]
 
-/** Ascella → fianco → gamba → inguine. */
 const LOWER: P[] = [
-  [74.1, 107.9],
-  [75.2, 122.6], [76.5, 137.3], [77.3, 152], [81, 162],        // costole → vita
-  // 🔴 La vita si stringe (x cresce, si avvicina al centro) e i fianchi
-  // RIALLARGANO (x cala) prima di richiudersi sull'inguine: senza questa
-  // mossa il fianco è un tubo che si assottiglia e basta, e non si legge
-  // come un corpo femminile — nemmeno stilizzato. Curva morbida: più punti,
-  // salti piccoli fra uno e l'altro, niente spigoli.
-  [80, 171.5],                                                  // vita, il punto stretto
-  [76, 178.5], [69, 185.5], [64, 191],                          // fianco, si riallarga
-  [71.5, 196.1],                                                // inguine, si richiude
-  // 🔴 Gambe lunghe (richiesto su un riferimento di figurino di moda), ma con
-  // peso vero: la prima prova era troppo filiforme — caviglia quasi a un
-  // punto e coscia sottile su una figura di 9 teste si legge come un corpo
-  // malato, non slanciato. La lunghezza resta, la larghezza torna sana.
-  [66, 217.8], [67, 249.6], [68.5, 281.3],                     // coscia, fuori
-  [69, 297.1], [69, 325.7],                                    // ginocchio, fuori
-  [66, 348], [67, 370.2], [70.5, 389.2],                       // polpaccio, fuori
-  [75.5, 398.7], [76.5, 406.6],                                // caviglia
-  [78, 416.1], [74, 428.8], [74, 436.8],                       // piede, fuori
-  [79, 441.6], [83, 444], [87, 436.8],                         // pianta, a punta
-  [89, 425.7], [88, 406.6],                                    // piede, dentro
-  [85, 390.7], [87, 371.8], [88, 351.1], [86, 328.9],          // polpaccio, dentro
-  [85, 325.7], [85, 297.1],                                    // ginocchio, dentro
-  [86, 275], [88, 240.1], [91, 214.7], [95, 200.4],            // coscia, dentro
-  [97.8, 197.6], [100, 196.1],                                 // inguine
+  [74.1, 146.1],
+  [75.2, 166], [76.5, 186], [77.3, 205.9], [81, 219.4],
+  [80, 232.3],
+  [76, 241.8], [69, 251.2], [64, 258.7],
+  [71.5, 265.6],
+  [66, 295], [67, 338], [68.5, 381],
+  [69, 402.2], [69, 441.5],
+  [66, 471.3], [67, 501.4], [70.5, 527.1],
+  [75.5, 540], [76.5, 550.7],
+  [78, 563.5], [74, 580.7], [74, 591.6],
+  [79, 598.1], [83, 601.3], [87, 591.6],
+  [89, 576.5], [88, 550.7],
+  [85, 529.1], [87, 503.5], [88, 475.5], [86, 445.4],
+  [85, 441.5], [85, 402.2],
+  [86, 372.4], [88, 325.2], [91, 290.8], [95, 271.4],
+  [97.8, 267.6], [100, 265.6],
 ]
 
-/** Metà profilo. Tracciato APERTO: si richiude da solo sulla linea mediana. */
-export const HALF = `M100,12 ${spline(UPPER)} ${spline(LOWER)}`
+/** Metà profilo del retro. Tracciato APERTO: si richiude da solo sulla linea mediana. */
+export const HALF = `M100,16.3 ${spline(UPPER)} ${spline(LOWER)}`
 
 /** La trasformazione che riflette una forma sull'asse del corpo. */
 export const MIRROR = `translate(${VIEW.w},0) scale(-1,1)`
@@ -163,74 +123,41 @@ export const MIRROR = `translate(${VIEW.w},0) scale(-1,1)`
 /**
  * Lo scostamento dell'ombra dura.
  *
- * 🔴 BAB non sfuma mai un'ombra: è la cosa più riconoscibile del marchio, e
- * vale anche qui. La figura è la stessa sagoma disegnata due volte, la copia
- * sotto piena d'inchiostro e spostata — come ogni card dell'app. Prima c'era
- * un'ellisse grigia sfumata sotto i piedi: teneva la figura per terra, ma era
- * l'unica cosa in tutta l'app che assomigliasse a un'ombra vera.
+ * 🔴 BAB non sfuma mai un'ombra: è la cosa più riconoscibile del marchio.
  */
 export const SHADOW = { dx: 3, dy: 4 }
 
-/* ── Le cuciture ───────────────────────────────────────────────────────────
-   Una cucitura è una curva che attraversa il corpo. `sag` è di quanto cade al
-   centro: positivo scende (arcata costale, vita), negativo sale (il carré
-   delle clavicole, l'inguine).
-   ────────────────────────────────────────────────────────────────────────── */
+/* ── Le cuciture del RETRO ─────────────────────────────────────────────────── */
 
 function seam(y: number, sag: number): P[] {
   const half: P[] = [[6, y - sag], [40, y - sag * 0.35], [72, y + sag * 0.6]]
   return [...half, [100, y + sag], ...rev(flip(half))]
 }
 
-/** La fascia di corpo fra due cuciture. Sborda ai lati: ci pensa il ritaglio. */
 function band(top: P[], bottom: P[]): string {
   const end = bottom[bottom.length - 1]
   return `M${top[0][0]},${top[0][1]} ${spline(top)} L${end[0]},${end[1]} ${spline(rev(bottom))} Z`
 }
 
-const S_CHIN = seam(58, 3)        // testa / collo
-const S_NECK = seam(76, 2.3)      // collo / spalle
-const S_YOKE = seam(106, -8.4)    // spalle / petto — il carré delle clavicole
-const S_RIBS = seam(152, 5.3)     // petto / pancia — l'arcata costale
-const S_WAIST = seam(175, 3.2)    // pancia / fianchi
-const S_CROTCH = seam(199, -6.3)  // fianchi / cosce — l'inguine sale al centro
+const S_CHIN = seam(78.6, 4.1)      // testa / collo
+const S_NECK = seam(102.9, 3.1)     // collo / spalle
+const S_YOKE = seam(143.6, -11.4)   // spalle / petto — il carré delle clavicole
+const S_RIBS_B = seam(211.3, 5.7)   // schiena alta / schiena bassa
+const S_WAIST_B = seam(239.7, 4.3)  // schiena bassa / sedere
+const S_FOLD = seam(287.1, -7.2)    // 🔴 la piega gluteale sta SOTTO l'inguine
 
-const S_RIBS_B = seam(156, 4.2)   // schiena alta / schiena bassa
-const S_WAIST_B = seam(177, 3.2)  // schiena bassa / sedere
-const S_FOLD = seam(212, -5.3)    // 🔴 la piega gluteale sta SOTTO l'inguine
-
-/**
- * Il taglio braccio/tronco.
- *
- * È il bordo interno del braccio spostato di 1,6 verso il corpo: sopra
- * l'ascella coincide con la cucitura vera, sotto passa NELL'ARIA fra braccio e
- * fianco — dove basta che ci resti dentro, perché il ritaglio butta via tutto
- * quello che finisce fuori dalla sagoma. Deriva dagli stessi punti del
- * profilo, quindi non può scollarsi da esso.
- */
 const YOKE_L: P[] = S_YOKE.slice(0, 4)
-const ARM_INNER: P[] = UPPER.slice(UPPER.length - 5)   // da [57,170] all'ascella
+const ARM_INNER: P[] = UPPER.slice(UPPER.length - 5)
 const SPLIT: P[] = [
   YOKE_L[YOKE_L.length - 1],
-  // L'ascella resta esatta: lì è una cucitura vera, non una linea nell'aria.
-  ...rev(ARM_INNER).map(([x, y], i): P => (i === 0 ? [x, y] : [x + 1.3, y])),
+  ...rev(ARM_INNER).map(([x, y], i): P => (i === 0 ? [x, y] : [x + 1.8, y])),
 ]
 
 /** Il braccio sinistro: sopra segue il carré, dentro `SPLIT`, fuori sborda. */
-const ARM = `M6,114 ${spline(YOKE_L)} ${spline(SPLIT)} L6,177 Z`
+const ARM = `M6,154 ${spline(YOKE_L)} ${spline(SPLIT)} L6,240 Z`
 
-/**
- * Le giunture della gamba non sono righelli.
- *
- * Ginocchio, caviglia: un taglio dritto le fa leggere come fette di salame
- * impilate, non come un corpo che si piega lì. Ogni cucitura qui sotto è
- * condivisa fra le due forme che si toccano — la stessa curva, scritta una
- * volta sola — così il bordo resta uno solo anche quando due forme si
- * sovrappongono nell'ordine di disegno.
- */
-const KNEE_BOW = 3
-const SHIN_BOW = 3
-const ANKLE_BOW = -3
+const KNEE_BOW = 4
+const ANKLE_BOW = -4
 const cut = (y: number, bow: number) => `Q53,${y + bow} 100,${y}`
 const cutBack = (y: number, bow: number) => `Q53,${y + bow} 6,${y}`
 
@@ -238,94 +165,87 @@ const cutBack = (y: number, bow: number) => `Q53,${y + bow} 6,${y}`
 const thigh = (top: P[], bottom: number) =>
   `M6,${top[0][1]} ${spline(top.slice(0, 4))} L100,${bottom} ${cutBack(bottom, KNEE_BOW)} Z`
 
-const KNEE_D = `M6,297 ${cut(297, KNEE_BOW)} L100,326 L6,326 Z`
-const KNEE_HIT = { x: 62, y: 297, w: 38, h: 29 }
-const SHIN_D = `M6,326 L100,326 L100,399 ${cutBack(399, SHIN_BOW)} Z`
-const SHIN_HIT = { x: 62, y: 326, w: 38, h: 73 }
-const FOOT_D = `M6,399 ${cut(399, SHIN_BOW)} L100,466 L6,466 Z`
-const FOOT_HIT = { x: 57, y: 399, w: 43, h: 64 }
-const CALF_D = `M6,326 L100,326 L100,392 ${cutBack(392, ANKLE_BOW)} Z`
-const CALF_HIT = { x: 62, y: 326, w: 38, h: 66 }
-const ANKLE_D = `M6,392 ${cut(392, ANKLE_BOW)} L100,466 L6,466 Z`
-const ANKLE_HIT = { x: 57, y: 347, w: 43, h: 54 }
-
-/* ── Le fasce ──────────────────────────────────────────────────────────────
-   Le quote in y sono punti di repere del corpo, e sono le STESSE davanti e
-   dietro: 58 mento, 76 base del collo, 106 carré, 199 inguine, 297 ginocchio.
-   Se le due viste divergessero, la stessa altezza toccata sul fronte e sul
-   retro darebbe due parti diverse.
-
-   L'ordine dei campi conta: si disegnano in quest'ordine, e le braccia stanno
-   DOPO il tronco perché il loro bordo interno è quello che deve vincere.
-   ────────────────────────────────────────────────────────────────────────── */
+const KNEE_D = `M6,402 ${cut(402, KNEE_BOW)} L100,441 L6,441 Z`
+const KNEE_HIT = { x: 62, y: 402, w: 38, h: 39 }
+const CALF_D = `M6,441 L100,441 L100,531 ${cutBack(531, ANKLE_BOW)} Z`
+const CALF_HIT = { x: 62, y: 441, w: 38, h: 90 }
+const ANKLE_D = `M6,531 ${cut(531, ANKLE_BOW)} L100,631 L6,631 Z`
+const ANKLE_HIT = { x: 57, y: 470, w: 43, h: 73 }
 
 const HEAD_NECK: Partial<Record<RegionCode, Shape>> = {
   head: {
-    k: 'path', cx: 100, cy: 35,
-    d: `M6,0 L194,0 L194,55 ${spline(rev(S_CHIN))} Z`,
+    k: 'path', cx: 100, cy: 47,
+    d: `M6,0 L194,0 L194,74 ${spline(rev(S_CHIN))} Z`,
   },
   neck: {
-    k: 'path', cx: 100, cy: 68,
+    k: 'path', cx: 100, cy: 92,
     d: band(S_CHIN, S_NECK),
-    hit: { x: 69, y: 56, w: 61, h: 25 },
+    hit: { x: 69, y: 76, w: 61, h: 34 },
   },
 }
 
 const SHOULDERS: Partial<Record<RegionCode, Shape>> = {
-  shoulders: { k: 'path', cx: 100, cy: 89, d: band(S_NECK, S_YOKE) },
+  shoulders: { k: 'path', cx: 100, cy: 121, d: band(S_NECK, S_YOKE) },
 }
 
-const ARMS: Partial<Record<RegionCode, Shape>> = {
-  arm_l: { k: 'path', d: ARM, cx: 63, cy: 139 },
-  arm_r: { k: 'path', d: ARM, cx: 137, cy: 139, mirror: true },
-  hand_l: { k: 'rect', x: 30, y: 177, w: 38, h: 41, cx: 49, cy: 197 },
-  hand_r: { k: 'rect', x: 132, y: 177, w: 38, h: 41, cx: 151, cy: 197 },
-}
-
-export const FRONT: Partial<Record<RegionCode, Shape>> = {
-  ...HEAD_NECK,
-  ...SHOULDERS,
-  chest: { k: 'path', cx: 100, cy: 129, d: band(S_YOKE, S_RIBS) },
-  core: {
-    k: 'path', cx: 100, cy: 164, d: band(S_RIBS, S_WAIST),
-    hit: { x: 43, y: 152, w: 114, h: 25 },
-  },
-  hips: {
-    k: 'path', cx: 100, cy: 188, d: band(S_WAIST, S_CROTCH),
-    hit: { x: 43, y: 175, w: 114, h: 26 },
-  },
-  ...ARMS,
-  quad_l: { k: 'path', cx: 81, cy: 245, d: thigh(S_CROTCH, 297), hit: { x: 64, y: 193, w: 36, h: 104 } },
-  quad_r: { k: 'path', cx: 119, cy: 245, d: thigh(S_CROTCH, 297), mirror: true, hit: { x: 100, y: 193, w: 36, h: 104 } },
-  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 311, hit: KNEE_HIT },
-  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 311, hit: KNEE_HIT },
-  shin_l: { k: 'path', d: SHIN_D, cx: 81, cy: 362, hit: SHIN_HIT },
-  shin_r: { k: 'path', d: SHIN_D, mirror: true, cx: 119, cy: 362, hit: SHIN_HIT },
-  foot_l: { k: 'path', d: FOOT_D, cx: 78, cy: 431, hit: FOOT_HIT },
-  foot_r: { k: 'path', d: FOOT_D, mirror: true, cx: 122, cy: 431, hit: FOOT_HIT },
+const ARMS_B: Partial<Record<RegionCode, Shape>> = {
+  arm_l: { k: 'path', d: ARM, cx: 63, cy: 188 },
+  arm_r: { k: 'path', d: ARM, cx: 137, cy: 188, mirror: true },
+  hand_l: { k: 'rect', x: 30, y: 240, w: 38, h: 56, cx: 49, cy: 268 },
+  hand_r: { k: 'rect', x: 132, y: 240, w: 38, h: 56, cx: 151, cy: 268 },
 }
 
 export const BACK: Partial<Record<RegionCode, Shape>> = {
   ...HEAD_NECK,
   ...SHOULDERS,
-  upper_back: { k: 'path', cx: 100, cy: 131, d: band(S_YOKE, S_RIBS_B) },
+  upper_back: { k: 'path', cx: 100, cy: 177, d: band(S_YOKE, S_RIBS_B) },
   lower_back: {
-    k: 'path', cx: 100, cy: 167, d: band(S_RIBS_B, S_WAIST_B),
-    hit: { x: 43, y: 156, w: 114, h: 23 },
+    k: 'path', cx: 100, cy: 226, d: band(S_RIBS_B, S_WAIST_B),
+    hit: { x: 43, y: 211, w: 114, h: 31 },
   },
   glutes: {
-    k: 'path', cx: 100, cy: 192, d: band(S_WAIST_B, S_FOLD),
-    hit: { x: 43, y: 177, w: 114, h: 31 },
+    k: 'path', cx: 100, cy: 260, d: band(S_WAIST_B, S_FOLD),
+    hit: { x: 43, y: 240, w: 114, h: 42 },
   },
-  ...ARMS,
-  ham_l: { k: 'path', cx: 81, cy: 251, d: thigh(S_FOLD, 297), hit: { x: 62, y: 205, w: 38, h: 92 } },
-  ham_r: { k: 'path', cx: 119, cy: 251, d: thigh(S_FOLD, 297), mirror: true, hit: { x: 100, y: 205, w: 38, h: 92 } },
-  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 311, hit: KNEE_HIT },
-  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 311, hit: KNEE_HIT },
-  calf_l: { k: 'path', d: CALF_D, cx: 81, cy: 359, hit: CALF_HIT },
-  calf_r: { k: 'path', d: CALF_D, mirror: true, cx: 119, cy: 359, hit: CALF_HIT },
-  ankle_l: { k: 'path', d: ANKLE_D, cx: 78, cy: 427, hit: ANKLE_HIT },
-  ankle_r: { k: 'path', d: ANKLE_D, mirror: true, cx: 122, cy: 427, hit: ANKLE_HIT },
+  ...ARMS_B,
+  ham_l: { k: 'path', cx: 81, cy: 340, d: thigh(S_FOLD, 402), hit: { x: 62, y: 278, w: 38, h: 125 } },
+  ham_r: { k: 'path', cx: 119, cy: 340, d: thigh(S_FOLD, 402), mirror: true, hit: { x: 100, y: 278, w: 38, h: 125 } },
+  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 421, hit: KNEE_HIT },
+  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 421, hit: KNEE_HIT },
+  calf_l: { k: 'path', d: CALF_D, cx: 81, cy: 486, hit: CALF_HIT },
+  calf_r: { k: 'path', d: CALF_D, mirror: true, cx: 119, cy: 486, hit: CALF_HIT },
+  ankle_l: { k: 'path', d: ANKLE_D, cx: 78, cy: 578, hit: ANKLE_HIT },
+  ankle_r: { k: 'path', d: ANKLE_D, mirror: true, cx: 122, cy: 578, hit: ANKLE_HIT },
+}
+
+/* ── Il FRONTE: rettangoli semplici, ritagliati dalla maschera ──────────────
+   Non servono cuciture curve qui: il ritaglio è il disegno a mano, quindi
+   ogni rettangolo prende già la forma vera ai bordi. Le quote sono lette a
+   occhio sul disegno (vedi gli screenshot con la griglia usati per tarale). */
+
+export const FRONT: Partial<Record<RegionCode, Shape>> = {
+  // 🔴 head/neck/shoulders/arm/hand/knee sono condivisi col retro: le quote
+  // qui sotto sono le STESSE del retro (vedi HEAD_NECK/SHOULDERS/ARMS_B più
+  // sotto), non lette a occhio sul disegno — altrimenti la stessa altezza
+  // toccata sulle due facce darebbe due parti del corpo diverse.
+  head: { k: 'rect', x: 50, y: 0, w: 100, h: 82.7, cx: 100, cy: 41.4 },
+  neck: { k: 'rect', x: 78, y: 74.5, w: 44, h: 31.5, cx: 100, cy: 90.3 },
+  shoulders: { k: 'rect', x: 35, y: 102.9 - 3.1, w: 130, h: 155 - (102.9 - 3.1), cx: 100, cy: 127.4 },
+  chest: { k: 'rect', x: 42, y: 145, w: 116, h: 40, cx: 100, cy: 165 },
+  core: { k: 'rect', x: 40, y: 185, w: 120, h: 75, cx: 100, cy: 222 },
+  hips: { k: 'rect', x: 38, y: 260, w: 124, h: 62, cx: 100, cy: 291 },
+  arm_l: { k: 'rect', x: 3, y: 132.2, w: 48, h: 242.8 - 132.2, cx: 27, cy: 187.5 },
+  arm_r: { k: 'rect', x: 149, y: 132.2, w: 48, h: 242.8 - 132.2, cx: 173, cy: 187.5 },
+  hand_l: { k: 'rect', x: 0, y: 240, w: 48, h: 56, cx: 24, cy: 268 },
+  hand_r: { k: 'rect', x: 152, y: 240, w: 48, h: 56, cx: 176, cy: 268 },
+  quad_l: { k: 'rect', x: 48, y: 296, w: 52, h: 199, cx: 74, cy: 395.5 },
+  quad_r: { k: 'rect', x: 100, y: 296, w: 52, h: 199, cx: 126, cy: 395.5 },
+  knee_l: { k: 'rect', x: 55, y: 402, w: 45, h: 39, cx: 77, cy: 421.5 },
+  knee_r: { k: 'rect', x: 100, y: 402, w: 45, h: 39, cx: 123, cy: 421.5 },
+  shin_l: { k: 'rect', x: 55, y: 495, w: 45, h: 90, cx: 77, cy: 540 },
+  shin_r: { k: 'rect', x: 100, y: 495, w: 45, h: 90, cx: 123, cy: 540 },
+  foot_l: { k: 'rect', x: 48, y: 585, w: 52, h: 38, cx: 74, cy: 604 },
+  foot_r: { k: 'rect', x: 100, y: 585, w: 52, h: 38, cx: 126, cy: 604 },
 }
 
 export const GEOMETRY: Record<Side, Partial<Record<RegionCode, Shape>>> = {
@@ -353,14 +273,6 @@ export function area(s: Shape): number {
 /**
  * Il bersaglio invisibile: la forma stessa, allargata al minimo che un dito
  * riesce a prendere. 44px CSS su una mappa larga 250px sono ~35 unità qui.
- *
- * 🔴 «Su una mappa larga 250px» era il punto debole: la regola dei 44px sta in
- * pixel dello schermo, questa costante in unità di disegno, e le due cose
- * coincidono solo a quella larghezza precisa. Da quando la figura si adatta
- * all'altezza che le resta, la larghezza cambia con il telefono — e su uno
- * schermo corto 36 unità diventano 30px, cioè un bersaglio che il pollice
- * manca. Chi disegna la mappa misura quanto è larga davvero e passa il minimo
- * giusto; questo resta il valore per il caso più comodo.
  */
 export const MIN_HIT = 36
 

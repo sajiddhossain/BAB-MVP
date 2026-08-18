@@ -2,7 +2,8 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useCopy, useLocale, fill as tpl } from '@/copy'
 import { REGIONS, regionLabel, type RegionCode } from '@/content/bodymap'
 import {
-  GEOMETRY, HALF, MIN_HIT, MIRROR, SHADOW, VIEW, area, hitBox, type Shape, type Side,
+  FRONT_LINE_ART, FRONT_MASK_URL, GEOMETRY, HALF, MIN_HIT, MIRROR, SHADOW, VIEW,
+  area, hitBox, type Shape, type Side,
 } from './body-shapes'
 import { FlagIcon } from './icons'
 
@@ -68,54 +69,35 @@ type Props = {
 }
 
 /**
- * Decorazioni: non si toccano, non salvano niente, e non sono decorazione.
+ * Decorazioni del RETRO: non si toccano, non salvano niente.
  *
- * Vengono dai prototipi originali, e servono a una cosa sola: far capire in un
- * decimo di secondo se stai guardando il davanti o il dietro. Una faccia
- * davanti, uno chignon e la linea della schiena dietro. Senza, le due viste
- * sono due sagome identiche e l'atleta deve fidarsi dell'etichetta del bottone.
+ * Il fronte non ne ha bisogno: è il disegno a mano (`FRONT_LINE_ART`), che ha
+ * già faccia, capelli e le pieghe di ginocchio/vita disegnate dentro di sé.
+ * Il retro invece è ancora il vecchio profilo a punti, e gli serve dire in un
+ * decimo di secondo «stai guardando il dietro»: uno chignon, la linea della
+ * schiena, il cerchio del ginocchio (convenzione dei figurini di moda).
  *
  * `pointer-events: none` è obbligatorio: se intercettassero un tocco, un dito
- * sulla faccia non registrerebbe «testa».
+ * sulla schiena non registrerebbe «schiena».
  */
-function Decor({ side }: { side: Side }) {
+function BackDecor() {
   const ink = 'var(--color-ink-soft)'
   const hair = { fill: ink, opacity: 0.3 }
-  /* Il cerchio del ginocchio: la convenzione dei figurini di moda per
-     segnare l'articolazione senza disegnarla nel profilo. Il profilo resta
-     una gamba liscia, e il cerchio — leggero, non un contorno vero — dice
-     dov'è la piega senza tagliarla a fette. */
-  const knees = (
-    <g opacity={0.4}>
-      <ellipse cx={81} cy={311} rx={11} ry={13} fill="none" stroke={ink} strokeWidth={1.3} />
-      <ellipse cx={119} cy={311} rx={11} ry={13} fill="none" stroke={ink} strokeWidth={1.3} />
-    </g>
-  )
-  if (side === 'front') {
-    return (
-      <g pointerEvents="none" aria-hidden>
-        {/* La frangia. Serve anche a far leggere la testa come una testa e non
-            come un ovale: senza, la faccia galleggia in mezzo al nulla. */}
-        <path d="M80.1,36 C80.3,20 89,12 100,12 C111,12 119.7,20 119.9,36
-                 C114.5,29 108.5,32 100,32 C91.5,32 85.6,29 80.1,36 Z" {...hair} />
-        <circle cx={93.2} cy={41} r={2.4} fill={ink} />
-        <circle cx={106.8} cy={41} r={2.4} fill={ink} />
-        <path d="M94.5,49 Q100,53.5 105.5,49" fill="none" stroke={ink}
-              strokeWidth={1.8} strokeLinecap="round" />
-        {knees}
-      </g>
-    )
-  }
   return (
     <g pointerEvents="none" aria-hidden>
       {/* Nuca e coda. Dicono «stai guardando il dietro» senza scrivere una
           parola — che è l'unico modo di dirlo in un decimo di secondo. */}
-      <ellipse cx={100} cy={35} rx={19.9} ry={23} {...hair} />
-      <path d="M100,52 C106.6,60.3 107.4,76.4 104.1,93.2 C102.5,101.6 97.5,101.6 95.9,93.2
-               C92.6,76.4 93.4,60.3 100,52 Z" {...hair} />
-      <path d="M100,122.6 L100,175.1" fill="none" stroke={ink} strokeWidth={2.2}
+      <ellipse cx={100} cy={47} rx={19.9} ry={23} {...hair} />
+      <path d="M100,64 C106.6,72.3 107.4,88.4 104.1,105.2 C102.5,113.6 97.5,113.6 95.9,105.2
+               C92.6,88.4 93.4,72.3 100,64 Z" {...hair} />
+      <path d="M100,166 L100,237" fill="none" stroke={ink} strokeWidth={2.2}
             strokeDasharray="4 6" strokeLinecap="round" opacity={0.4} />
-      {knees}
+      {/* Il cerchio del ginocchio: segna l'articolazione senza tagliarla nel
+          profilo. */}
+      <g opacity={0.4}>
+        <ellipse cx={81} cy={421} rx={13} ry={16} fill="none" stroke={ink} strokeWidth={1.3} />
+        <ellipse cx={119} cy={421} rx={13} ry={16} fill="none" stroke={ink} strokeWidth={1.3} />
+      </g>
     </g>
   )
 }
@@ -356,24 +338,39 @@ export default function BodyMap({
           role="group" aria-label={t.checkin.pre.pinpoint.title}
         >
           <defs>
-            <clipPath id={clipId}>
-              <path d={HALF} />
-              <path d={HALF} transform={MIRROR} />
-            </clipPath>
+            {side === 'front' ? (
+              /* Il fronte è mascherato da un'immagine raster: il disegno a
+                 mano non è un profilo pulito da un lato solo, ricavarne un
+                 contorno vettoriale non è praticabile. La maschera è la
+                 stessa sagoma, resa solida (vedi body-shapes.ts). */
+              <mask id={clipId} maskUnits="userSpaceOnUse" x={0} y={0} width={VIEW.w} height={VIEW.h}>
+                <image href={FRONT_MASK_URL} x={0} y={0} width={VIEW.w} height={VIEW.h}
+                       preserveAspectRatio="none" />
+              </mask>
+            ) : (
+              <clipPath id={clipId}>
+                <path d={HALF} />
+                <path d={HALF} transform={MIRROR} />
+              </clipPath>
+            )}
           </defs>
 
           {/* 🔴 L'ombra dura, la stessa di ogni card dell'app: la sagoma
-              disegnata una seconda volta, piena d'inchiostro e spostata.
-              BAB non sfuma mai un'ombra, e questa figura non fa eccezione —
-              prima aveva un'ellisse grigia sfumata sotto i piedi, l'unica
-              cosa in tutta l'app che assomigliasse a un'ombra vera. */}
+              piena d'inchiostro e spostata. BAB non sfuma mai un'ombra. */}
           <g transform={`translate(${SHADOW.dx},${SHADOW.dy})`} fill="var(--color-ink)"
              pointerEvents="none" aria-hidden>
-            <path d={HALF} />
-            <path d={HALF} transform={MIRROR} />
+            {side === 'front' ? (
+              <rect x={0} y={0} width={VIEW.w} height={VIEW.h} mask={`url(#${clipId})`} />
+            ) : (
+              <>
+                <path d={HALF} />
+                <path d={HALF} transform={MIRROR} />
+              </>
+            )}
           </g>
 
-          <g clipPath={`url(#${clipId})`} pointerEvents="none">
+          <g {...(side === 'front' ? { mask: `url(#${clipId})` } : { clipPath: `url(#${clipId})` })}
+             pointerEvents="none">
             {/* Il corpo è pieno PRIMA delle zone, altrimenti il quadretto della
                 carta si vedrebbe attraverso la pancia. Sabbia e non bianco: è
                 il colore "carta" del sistema, e stacca dalla tela senza
@@ -397,11 +394,18 @@ export default function BodyMap({
             )}
           </g>
 
-          {/* Il contorno: uno solo, spesso, sopra tutto. È quello che fa
-              leggere venti zone come un corpo. */}
-          <path className="bab-edge" d={HALF} />
-          <path className="bab-edge" d={HALF} transform={MIRROR} />
-          <Decor side={side} />
+          {/* Il contorno: sopra tutto, quello che fa leggere le zone come un
+              corpo. Sul fronte è il disegno a mano, con dentro faccia e
+              pieghe; sul retro è ancora il profilo spesso + le decorazioni. */}
+          {side === 'front' ? (
+            <path d={FRONT_LINE_ART} fill="var(--color-ink)" pointerEvents="none" aria-hidden />
+          ) : (
+            <>
+              <path className="bab-edge" d={HALF} />
+              <path className="bab-edge" d={HALF} transform={MIRROR} />
+              <BackDecor />
+            </>
+          )}
 
           {/* Un punto sulle zone già segnate: la tinta da sola, su una gamba
               larga otto millimetri, non si vede. */}
