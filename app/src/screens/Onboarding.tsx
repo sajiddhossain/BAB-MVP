@@ -17,7 +17,7 @@ import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
 import BabLogo from '@/components/BabLogo'
-import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
+import { ArrowLeftIcon, CheckIcon, ContentIcon, EarIcon, EyeIcon, HeartIcon, TempoIcon } from '@/components/icons'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -454,14 +454,14 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
            next={() => setStep('whoSees')} canNext back onBack={() => setStep('heartReveal')} {...F}>
       <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
         <div className="flex items-start gap-2.5">
-          <SunIcon size={19} color="var(--color-gold)" />
+          <EarIcon size={19} color="var(--color-gold)" />
           <div>
             <p className="text-[13.5px] font-bold">{t.heart.checkinTitle}</p>
             <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkinBody}</p>
           </div>
         </div>
         <div className="flex items-start gap-2.5">
-          <MoonIcon size={19} color="var(--color-lavender)" />
+          <EyeIcon size={19} color="var(--color-lavender)" />
           <div>
             <p className="text-[13.5px] font-bold">{t.heart.checkoutTitle}</p>
             <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkoutBody}</p>
