@@ -131,7 +131,8 @@ function Frame({ title, icon, headerRight, eyebrow, help, children, next, nextLa
   mascot?: boolean
 }) {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col gap-3 px-5 py-6">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col gap-3 px-5 pb-6"
+         style={{ paddingTop: 'max(2.75rem, calc(env(safe-area-inset-top) + 0.75rem))' }}>
       <div className="flex items-center gap-3">
         {back && (
           <button type="button" onClick={onBack} aria-label={labels.back}
