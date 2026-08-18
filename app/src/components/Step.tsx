@@ -117,10 +117,13 @@ export default function Step({
   return (
     <section className={`flex flex-col pt-1 ${
       fill
-        // Altezza esatta e niente scorrimento: quello che c'è dentro si stringe.
-        // 🔴 -24px è il `pb-6` di <main> in App.tsx: senza contarlo qui,
-        // l'ombra da 8px del bottone finiva spinta appena sotto il bordo
-        // dello schermo, tagliata invece che intera.
+        // Altezza esatta e niente scorrimento: quello che c'è dentro si
+        // stringe. 🔴 -24px è il `pb-6` di <main> in App.tsx: senza
+        // contarlo qui, il bottone finiva spinto appena sotto il bordo
+        // dello schermo. Il `pr-2` sul footer (sotto) è lo spazio per
+        // l'ombra da 8px del bottone: `overflow-hidden` la taglia se non le
+        // si lascia posto apposta, dato che il bottone qui è sempre largo
+        // quanto la sezione, non quanto lo schermo meno il padding esterno.
         ? 'h-[calc(100dvh-96px-24px-env(safe-area-inset-top))] gap-3 overflow-hidden'
         : 'min-h-[calc(100dvh-96px)] gap-5'
     }`}>
@@ -189,7 +192,7 @@ export default function Step({
         {children}
       </div>
 
-      <footer className={`flex shrink-0 flex-col gap-2 ${fill ? 'pb-1' : 'pb-2'}`}>
+      <footer className={`flex shrink-0 flex-col gap-2 ${fill ? 'pb-1 pr-2' : 'pb-2'}`}>
         {onSkip && (
           <button type="button" onClick={onSkip}
                   className="self-center px-3 py-2 text-[14px] underline text-[var(--color-ink-soft)]">
