@@ -118,7 +118,10 @@ export default function Step({
     <section className={`flex flex-col pt-1 ${
       fill
         // Altezza esatta e niente scorrimento: quello che c'è dentro si stringe.
-        ? 'h-[calc(100dvh-96px-env(safe-area-inset-top))] gap-3 overflow-hidden'
+        // 🔴 -24px è il `pb-6` di <main> in App.tsx: senza contarlo qui,
+        // l'ombra da 8px del bottone finiva spinta appena sotto il bordo
+        // dello schermo, tagliata invece che intera.
+        ? 'h-[calc(100dvh-96px-24px-env(safe-area-inset-top))] gap-3 overflow-hidden'
         : 'min-h-[calc(100dvh-96px)] gap-5'
     }`}>
       <header className="flex items-center gap-3">
