@@ -73,21 +73,22 @@ function DartboardIcon({ size = 34 }: { size?: number }) {
  * uguale su ogni telefono.
  */
 function VolleyballIcon({ size = 34 }: { size?: number }) {
+  // Tre spicchi da 120°, dal centro al bordo: le cuciture SONO i bordi degli
+  // spicchi, non curve decorative a parte — prima si vedevano staccate dai
+  // colori sotto, adesso combaciano per costruzione.
+  const top = '17,2'
+  const right = '29.99,24.5'
+  const left = '4.01,24.5'
   return (
     <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden>
-      <defs>
-        <clipPath id="ball-clip"><circle cx="17" cy="17" r="15" /></clipPath>
-      </defs>
-      <g clipPath="url(#ball-clip)">
-        <rect x="0" y="0" width="34" height="34" fill="var(--color-surface)" />
-        <ellipse cx="9" cy="9" rx="15" ry="9" fill="var(--color-gold)" transform="rotate(-32 9 9)" />
-        <ellipse cx="25" cy="25" rx="15" ry="9" fill="var(--color-teal)" transform="rotate(-32 25 25)" />
-      </g>
+      <path d={`M17,17 L${top} A15,15 0 0,1 ${right} Z`} fill="var(--color-gold)" />
+      <path d={`M17,17 L${right} A15,15 0 0,1 ${left} Z`} fill="var(--color-teal)" />
+      <path d={`M17,17 L${left} A15,15 0 0,1 ${top} Z`} fill="var(--color-surface)" />
       <circle cx="17" cy="17" r="15" fill="none" stroke="var(--color-ink)" strokeWidth="2" />
-      <g fill="none" stroke="var(--color-ink)" strokeWidth="1.6" strokeLinecap="round">
-        <path d="M17 2c-6 5-6 15 3 22" />
-        <path d="M5.5 11c7 1 15-2 21 4" />
-        <path d="M6.5 24c5-4 13-3 16-11" />
+      <g stroke="var(--color-ink)" strokeWidth="1.6" strokeLinecap="round">
+        <line x1="17" y1="17" x2="17" y2="2" />
+        <line x1="17" y1="17" x2="29.99" y2="24.5" />
+        <line x1="17" y1="17" x2="4.01" y2="24.5" />
       </g>
     </svg>
   )
