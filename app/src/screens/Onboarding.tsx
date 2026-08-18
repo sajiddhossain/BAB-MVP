@@ -16,7 +16,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
-import BabLogo from '@/components/BabLogo'
+import { BabLogoShort } from '@/components/BabLogo'
 import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
 
 /**
@@ -333,7 +333,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'welcome') return (
     <Frame title={t.onboarding.welcomeTitle}
-           headerRight={<BabLogo className="h-5 w-[59px] shrink-0 text-[var(--color-lavender)]" />}
+           headerRight={<BabLogoShort className="h-5 w-[44px] shrink-0 text-[var(--color-lavender)]" />}
            icon={<SparklesIcon size={40} />}
            eyebrow={t.onboarding.welcomeEyebrow}
            next={() => setStep('heartConcept')} nextLabel={t.onboarding.welcomeCta} {...F}>
