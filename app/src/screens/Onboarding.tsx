@@ -85,10 +85,12 @@ function NumberedStep({ n, title, body }: { n: number; title: string; body: stri
  * sarebbe un tipo di componente nuovo a ogni render, React smonterebbe il
  * sottoalbero e il campo del nome perderebbe il fuoco a ogni lettera battuta.
  */
-function Frame({ title, icon, eyebrow, help, children, next, nextLabel, canNext, back, onBack, labels, at, of, extra, mascot }: {
+function Frame({ title, icon, headerRight, eyebrow, help, children, next, nextLabel, canNext, back, onBack, labels, at, of, extra, mascot }: {
   title: string; help?: string; children?: React.ReactNode
   /** Icona sopra l'eyebrow — sotto la barra di avanzamento, prima di ogni testo. */
   icon?: React.ReactNode
+  /** Accanto alla barra di avanzamento, sulla stessa riga — oggi solo il marchio. */
+  headerRight?: React.ReactNode
   /** Etichetta piccola sopra il titolo — solo dove il titolo da solo non basta. */
   eyebrow?: string
   next?: () => void
@@ -117,6 +119,7 @@ function Frame({ title, icon, eyebrow, help, children, next, nextLabel, canNext,
           </button>
         )}
         <Progress at={at} of={of} />
+        {headerRight}
       </div>
       {icon}
       {eyebrow && <p className="bab-label">{eyebrow}</p>}
@@ -309,12 +312,8 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'welcome') return (
     <Frame title={t.onboarding.welcomeTitle}
-           icon={(
-             <div className="flex flex-col items-start gap-2.5">
-               <BabLogo className="h-6 w-[71px] shrink-0 text-[var(--color-ink)]" />
-               <span aria-hidden className="text-[34px] leading-none">🏐</span>
-             </div>
-           )}
+           headerRight={<BabLogo className="h-5 w-[59px] shrink-0 text-[var(--color-ink)]" />}
+           icon={<span aria-hidden className="text-[34px] leading-none">🏐</span>}
            eyebrow={t.onboarding.welcomeEyebrow}
            next={() => setStep('heartConcept')} nextLabel={t.onboarding.welcomeCta} {...F}>
       <div className="flex flex-col gap-3 text-[15px] leading-relaxed [&_strong]:text-[var(--color-lavender)]">
