@@ -208,7 +208,10 @@ export default function CheckInPost() {
         <section className="bab-card relative flex flex-col gap-3 px-5 py-5"
                  style={{ boxShadow: 'var(--shadow-lg)' }}>
           {!hasRedFlag && <Sparkle />}
-          <ContentIcon name={outcome.icon} size={38} color="var(--color-vividteal)" />
+          <span className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                style={{ background: `var(--tempo-${actual}-tint)` }}>
+            <ContentIcon name={outcome.icon} size={30} color={`var(--tempo-${actual})`} />
+          </span>
           <h1 className="font-display text-[24px] leading-tight">{outcome.title[locale]}</h1>
           <p className="text-[15px]"><Rich text={outcome.body[locale]} /></p>
         </section>
@@ -272,7 +275,8 @@ export default function CheckInPost() {
           </ul>
         </section>
 
-        <Link to="/senti" className="bab-pill flex items-center justify-center gap-2 px-4 py-3 text-[15px]">
+        <Link to="/senti" className="bab-pill flex items-center justify-center gap-2 px-4 py-3 text-[15px]"
+              style={{ background: 'transparent', borderColor: 'var(--color-teal)', color: 'var(--color-vividteal)' }}>
           <CompassIcon size={18} /> {t.checkin.post.bodySenseCta}
         </Link>
 
@@ -281,8 +285,9 @@ export default function CheckInPost() {
         </p>
 
         <button type="button" onClick={() => navigate('/today')}
-                className="bab-pill px-4 py-3.5 text-[17px]"
-                style={{ background: 'var(--color-lime)' }}>
+                className="bab-pill border-none px-4 py-3.5 text-[17px]"
+                style={{ background: 'linear-gradient(135deg, var(--color-lime), var(--color-gold))',
+                         boxShadow: '0 10px 26px color-mix(in srgb, var(--color-lime) 45%, transparent)' }}>
           {t.common.done}
         </button>
       </div>
