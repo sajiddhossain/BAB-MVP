@@ -112,7 +112,10 @@ export function TargetIcon({ size = 24, color = 'currentColor' }: IconProps) {
 export function TempoIcon({ code, size = 24, color = 'currentColor' }: IconProps & { code: 'upbeat' | 'steady' | 'gentle' }) {
   if (code === 'upbeat') return <BoltIcon size={size} color={color} />
   if (code === 'steady') return <WaveIcon size={size} color={color} />
-  return <LeafIcon size={size} color={color} />
+  // 🔴 "gentle" resta il codice interno (vedi content/tempo.ts), ma il nome
+  // mostrato è "Reset" — una foglia non c'entra più niente con quel nome,
+  // quindi l'icona segue il nome nuovo: le frecce del ricominciare.
+  return <RepeatIcon size={size} color={color} />
 }
 
 export function EyeIcon({ size = 24, color = 'currentColor' }: IconProps) {
