@@ -16,7 +16,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
-import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TargetIcon, TempoIcon } from '@/components/icons'
+import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -393,91 +393,44 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
     )
   }
 
-  /**
-   * 🔴 L'unica schermata scura di tutto l'onboarding, di proposito — su
-   * richiesta esplicita, riproduce fedelmente un riferimento visivo preciso
-   * (badge colorati, box per andatura, CTA a gradiente). Non usa `Frame`:
-   * quel guscio assume l'header/aiuto chiari di ogni altro passo, e qui
-   * serve il suo proprio sfondo da un bordo all'altro dello schermo.
-   */
-  if (step === 'heartWrap') {
-    const DARK = { bg: '#12162a', panel: '#1b2138', line: '#2a3350', ink: '#eef2fb', muted: '#94a1c4' }
-    return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col gap-4 px-5 py-6"
-           style={{ background: DARK.bg, color: DARK.ink }}>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setStep('heartReveal')} aria-label={F.labels.back}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-                  style={{ background: DARK.panel, border: `1.5px solid ${DARK.line}` }}>
-            <ArrowLeftIcon size={18} color={DARK.ink} />
-          </button>
-          <div className="h-[10px] flex-1 overflow-hidden rounded-full" style={{ background: DARK.line }}>
-            <div className="h-full rounded-full transition-[width] duration-200"
-                 style={{ width: `${Math.round((F.at / F.of) * 100)}%`, background: 'var(--color-lavender)' }} />
-          </div>
-        </div>
-
-        <TargetIcon size={34} color="var(--color-lavender)" />
-        <h1 className="font-display text-[26px] leading-tight">{t.heart.wrapTitle}</h1>
-        <p className="text-[14.5px] leading-relaxed" style={{ color: DARK.muted }}>{t.heart.wrapBody}</p>
-
-        <div className="flex flex-col gap-3.5 rounded-[18px] p-4"
-             style={{ background: DARK.panel, border: `1px solid ${DARK.line}` }}>
-          <div className="flex items-start gap-3">
-            <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px]"
-                  style={{ background: 'color-mix(in srgb, var(--color-gold) 16%, transparent)' }}>
-              <SunIcon size={18} color="var(--color-gold)" />
-            </span>
-            <div>
-              <p className="font-display text-[14.5px] font-extrabold">{t.heart.checkinTitle}</p>
-              <p className="text-[12.5px]" style={{ color: DARK.muted }}>{t.heart.checkinBody}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px]"
-                  style={{ background: 'color-mix(in srgb, var(--color-lavender) 16%, transparent)' }}>
-              <MoonIcon size={18} color="var(--color-lavender)" />
-            </span>
-            <div>
-              <p className="font-display text-[14.5px] font-extrabold">{t.heart.checkoutTitle}</p>
-              <p className="text-[12.5px]" style={{ color: DARK.muted }}>{t.heart.checkoutBody}</p>
-            </div>
-          </div>
-        </div>
-
-        <p className="text-[13.5px]">{t.heart.gearsIntro}</p>
-        <div className="grid grid-cols-3 gap-2">
-          {(Object.keys(TEMPOS) as TempoCode[]).map((code) => {
-            const tempo = TEMPOS[code]
-            return (
-              <div key={code} className="flex flex-col items-center gap-1 rounded-[14px] px-1 py-3 text-center"
-                   style={{ background: `color-mix(in srgb, var(${tempo.cssVar}) 10%, transparent)`,
-                            border: `1.5px solid color-mix(in srgb, var(${tempo.cssVar}) 45%, transparent)` }}>
-                <TempoIcon code={code} size={19} color={`var(${tempo.cssVar})`} />
-                <span className="font-display text-[13px] font-extrabold" style={{ color: `var(${tempo.cssVar})` }}>
-                  {tempo.name}
-                </span>
-                <span className="text-[10px]" style={{ color: DARK.muted }}>
-                  {tempo.tag[locale].split('—')[0]!.trim()}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-        <p className="text-[12px]" style={{ color: DARK.muted }}>{t.heart.wrapNote}</p>
-
-        <div className="flex-1" />
-
-        <button type="button" onClick={() => setStep('whoSees')}
-                className="rounded-full px-4 py-3.5 text-[16px] font-extrabold"
-                style={{ background: 'linear-gradient(135deg, var(--color-lavender), #8b83f5)',
-                         color: '#14102b',
-                         boxShadow: '0 12px 30px color-mix(in srgb, var(--color-lavender) 40%, transparent)' }}>
-          {F.labels.continue}
-        </button>
+  if (step === 'heartWrap') return (
+    <Frame title={t.heart.wrapTitle} help={t.heart.wrapBody}
+           next={() => setStep('whoSees')} canNext back onBack={() => setStep('heartReveal')} {...F}>
+      <div className="flex justify-center py-1">
+        <Mascot size={48} />
       </div>
-    )
-  }
+      <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
+        <div className="flex items-start gap-2.5">
+          <SunIcon size={19} color="var(--color-gold)" />
+          <div>
+            <p className="text-[13.5px] font-bold">{t.heart.checkinTitle}</p>
+            <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkinBody}</p>
+          </div>
+        </div>
+        <div className="flex items-start gap-2.5">
+          <MoonIcon size={19} color="var(--color-lavender)" />
+          <div>
+            <p className="text-[13.5px] font-bold">{t.heart.checkoutTitle}</p>
+            <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.heart.checkoutBody}</p>
+          </div>
+        </div>
+      </div>
+      <p className="text-[13px]">{t.heart.gearsIntro}</p>
+      <div className="grid grid-cols-3 gap-2">
+        {(Object.keys(TEMPOS) as TempoCode[]).map((code) => {
+          const tempo = TEMPOS[code]
+          return (
+            <div key={code} className="bab-card flex flex-col items-center gap-0.5 px-1 py-2.5 text-center"
+                 style={{ borderColor: `var(${tempo.cssVar})` }}>
+              <TempoIcon code={code} size={19} color={`var(${tempo.cssVar})`} />
+              <span className="text-[11.5px] font-bold">{tempo.name}</span>
+            </div>
+          )
+        })}
+      </div>
+      <p className="text-[12px] text-[var(--color-ink-soft)]">{t.heart.wrapNote}</p>
+    </Frame>
+  )
 
   // 🔴 Prima del consenso, non dopo.
   if (step === 'whoSees') return (
