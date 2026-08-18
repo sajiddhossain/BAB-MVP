@@ -126,14 +126,14 @@ const UPPER: P[] = [
 /** Ascella → fianco → gamba → inguine. */
 const LOWER: P[] = [
   [74.1, 107.9],
-  [75.2, 122.6], [77.1, 137.3], [78.2, 152], [75.5, 161],      // costole → vita
-  // 🔴 La vita si stringe e i fianchi RIALLARGANO prima di richiudersi
-  // sull'inguine: senza questa mossa il fianco è un tubo che si assottiglia e
-  // basta, e non si legge come un corpo — nemmeno stilizzato. Il restringimento
-  // resta lieve apposta: un'onda, non una tacca.
-  [71, 170.5],                                                  // vita, il punto stretto
-  [73, 179.3], [75.5, 189.3],                                   // fianco, si riallarga
-  [72.8, 196.1],                                                // inguine, si richiude
+  [75.2, 122.6], [76.5, 137.3], [77, 152], [79.5, 161],        // costole → vita
+  // 🔴 La vita si stringe (x cresce, si avvicina al centro) e i fianchi
+  // RIALLARGANO (x cala) prima di richiudersi sull'inguine: senza questa
+  // mossa il fianco è un tubo che si assottiglia e basta, e non si legge
+  // come un corpo femminile — nemmeno stilizzato.
+  [82.5, 170.5],                                                // vita, il punto stretto
+  [76.5, 179.8], [71.5, 188.5],                                 // fianco, si riallarga
+  [74.5, 196.1],                                                // inguine, si richiude
   [66.4, 212.8], [67.6, 237.2], [69.2, 261.6],                 // coscia, fuori
   [70, 273.8], [70, 295.8],                                    // ginocchio, fuori
   [66.8, 312.9], [67.2, 330], [70.8, 344.6],                   // polpaccio, fuori
