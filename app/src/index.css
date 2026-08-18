@@ -167,7 +167,7 @@ button, a[role="button"], input, select {
 .bab-edge {
   fill: none;
   stroke: var(--color-ink);
-  stroke-width: 4;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;

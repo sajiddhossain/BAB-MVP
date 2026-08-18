@@ -243,7 +243,12 @@ export default function BodyMap({
     if (flagged.includes(code)) return { fill: soft('var(--care)', 34), stroke: 'var(--care)', width: 2 }
     if (logged.includes(code)) return { fill: soft(accent, 34), stroke: accent, width: 1.8 }
     if (code === hover) return { fill: soft(accent, 15), stroke: 'var(--color-ink)', width: 1.5 }
-    return { fill: 'transparent', stroke: 'var(--color-ink)', width: 1.5 }
+    /**
+     * A riposo le zone non sono più trasparenti: una tinta appena percettibile
+     * dice, prima ancora di toccare, che il corpo è fatto di pezzi premibili
+     * e non è un disegno fisso. Su un touch non c'è hover che lo dica prima.
+     */
+    return { fill: soft(accent, 7), stroke: 'var(--color-ink)', width: 1.5 }
   }
 
   const heated = Object.keys(heat ?? {}) as RegionCode[]

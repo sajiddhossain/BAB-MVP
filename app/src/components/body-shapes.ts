@@ -126,8 +126,13 @@ const UPPER: P[] = [
 /** Ascella → fianco → gamba → inguine. */
 const LOWER: P[] = [
   [74.1, 107.9],
-  [75.2, 122.6], [77.1, 137.3], [78.2, 152], [77.5, 162.5],    // costole → vita
-  [73, 173], [68.5, 183.5], [68.1, 196.1],                     // bacino
+  [75.2, 122.6], [77.1, 137.3], [78.2, 152], [73.5, 161],      // costole → vita
+  // 🔴 La vita si stringe e i fianchi RIALLARGANO prima di richiudersi
+  // sull'inguine: senza questa mossa il fianco è un tubo che si assottiglia e
+  // basta, e non si legge come un corpo — nemmeno stilizzato.
+  [65.5, 170.5],                                                // vita, il punto stretto
+  [70.5, 179.3], [76.5, 189.3],                                 // fianco, si riallarga
+  [72.8, 196.1],                                                // inguine, si richiude
   [66.4, 212.8], [67.6, 237.2], [69.2, 261.6],                 // coscia, fuori
   [70, 273.8], [70, 295.8],                                    // ginocchio, fuori
   [66.8, 312.9], [67.2, 330], [70.8, 344.6],                   // polpaccio, fuori
@@ -156,7 +161,7 @@ export const MIRROR = `translate(${VIEW.w},0) scale(-1,1)`
  * un'ellisse grigia sfumata sotto i piedi: teneva la figura per terra, ma era
  * l'unica cosa in tutta l'app che assomigliasse a un'ombra vera.
  */
-export const SHADOW = { dx: 4, dy: 5 }
+export const SHADOW = { dx: 3, dy: 4 }
 
 /* ── Le cuciture ───────────────────────────────────────────────────────────
    Una cucitura è una curva che attraversa il corpo. `sag` è di quanto cade al
@@ -206,9 +211,35 @@ const SPLIT: P[] = [
 /** Il braccio sinistro: sopra segue il carré, dentro `SPLIT`, fuori sborda. */
 const ARM = `M6,114 ${spline(YOKE_L)} ${spline(SPLIT)} L6,177 Z`
 
-/** La coscia sinistra: sopra segue l'inguine, sotto taglia dritto al ginocchio. */
+/**
+ * Le giunture della gamba non sono righelli.
+ *
+ * Ginocchio, caviglia: un taglio dritto le fa leggere come fette di salame
+ * impilate, non come un corpo che si piega lì. Ogni cucitura qui sotto è
+ * condivisa fra le due forme che si toccano — la stessa curva, scritta una
+ * volta sola — così il bordo resta uno solo anche quando due forme si
+ * sovrappongono nell'ordine di disegno.
+ */
+const KNEE_BOW = 3
+const SHIN_BOW = 3
+const ANKLE_BOW = -3
+const cut = (y: number, bow: number) => `Q53,${y + bow} 100,${y}`
+const cutBack = (y: number, bow: number) => `Q53,${y + bow} 6,${y}`
+
+/** La coscia sinistra: sopra segue l'inguine, sotto un'onda verso il ginocchio. */
 const thigh = (top: P[], bottom: number) =>
-  `M6,${top[0][1]} ${spline(top.slice(0, 4))} L100,${bottom} L6,${bottom} Z`
+  `M6,${top[0][1]} ${spline(top.slice(0, 4))} L100,${bottom} ${cutBack(bottom, KNEE_BOW)} Z`
+
+const KNEE_D = `M6,274 ${cut(274, KNEE_BOW)} L100,296 L6,296 Z`
+const KNEE_HIT = { x: 62, y: 274, w: 38, h: 22 }
+const SHIN_D = `M6,296 L100,296 L100,352 ${cutBack(352, SHIN_BOW)} Z`
+const SHIN_HIT = { x: 62, y: 296, w: 38, h: 56 }
+const FOOT_D = `M6,352 ${cut(352, SHIN_BOW)} L100,401 L6,401 Z`
+const FOOT_HIT = { x: 57, y: 352, w: 43, h: 49 }
+const CALF_D = `M6,296 L100,296 L100,347 ${cutBack(347, ANKLE_BOW)} Z`
+const CALF_HIT = { x: 62, y: 296, w: 38, h: 51 }
+const ANKLE_D = `M6,347 ${cut(347, ANKLE_BOW)} L100,401 L6,401 Z`
+const ANKLE_HIT = { x: 57, y: 347, w: 43, h: 54 }
 
 /* ── Le fasce ──────────────────────────────────────────────────────────────
    Le quote in y sono punti di repere del corpo, e sono le STESSE davanti e
@@ -258,12 +289,12 @@ export const FRONT: Partial<Record<RegionCode, Shape>> = {
   ...ARMS,
   quad_l: { k: 'path', cx: 81, cy: 232, d: thigh(S_CROTCH, 274), hit: { x: 64, y: 194, w: 36, h: 80 } },
   quad_r: { k: 'path', cx: 119, cy: 232, d: thigh(S_CROTCH, 274), mirror: true, hit: { x: 100, y: 194, w: 36, h: 80 } },
-  knee_l: { k: 'rect', x: 62, y: 274, w: 38, h: 22, cx: 81, cy: 285 },
-  knee_r: { k: 'rect', x: 100, y: 274, w: 38, h: 22, cx: 119, cy: 285 },
-  shin_l: { k: 'rect', x: 62, y: 296, w: 38, h: 56, cx: 81, cy: 324 },
-  shin_r: { k: 'rect', x: 100, y: 296, w: 38, h: 56, cx: 119, cy: 324 },
-  foot_l: { k: 'rect', x: 57, y: 352, w: 43, h: 49, cx: 78, cy: 376 },
-  foot_r: { k: 'rect', x: 100, y: 352, w: 43, h: 49, cx: 122, cy: 376 },
+  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 285, hit: KNEE_HIT },
+  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 285, hit: KNEE_HIT },
+  shin_l: { k: 'path', d: SHIN_D, cx: 81, cy: 324, hit: SHIN_HIT },
+  shin_r: { k: 'path', d: SHIN_D, mirror: true, cx: 119, cy: 324, hit: SHIN_HIT },
+  foot_l: { k: 'path', d: FOOT_D, cx: 78, cy: 376, hit: FOOT_HIT },
+  foot_r: { k: 'path', d: FOOT_D, mirror: true, cx: 122, cy: 376, hit: FOOT_HIT },
 }
 
 export const BACK: Partial<Record<RegionCode, Shape>> = {
@@ -281,12 +312,12 @@ export const BACK: Partial<Record<RegionCode, Shape>> = {
   ...ARMS,
   ham_l: { k: 'path', cx: 81, cy: 237, d: thigh(S_FOLD, 274), hit: { x: 62, y: 203, w: 38, h: 71 } },
   ham_r: { k: 'path', cx: 119, cy: 237, d: thigh(S_FOLD, 274), mirror: true, hit: { x: 100, y: 203, w: 38, h: 71 } },
-  knee_l: { k: 'rect', x: 62, y: 274, w: 38, h: 22, cx: 81, cy: 285 },
-  knee_r: { k: 'rect', x: 100, y: 274, w: 38, h: 22, cx: 119, cy: 285 },
-  calf_l: { k: 'rect', x: 62, y: 296, w: 38, h: 51, cx: 81, cy: 321 },
-  calf_r: { k: 'rect', x: 100, y: 296, w: 38, h: 51, cx: 119, cy: 321 },
-  ankle_l: { k: 'rect', x: 57, y: 347, w: 43, h: 54, cx: 78, cy: 374 },
-  ankle_r: { k: 'rect', x: 100, y: 347, w: 43, h: 54, cx: 122, cy: 374 },
+  knee_l: { k: 'path', d: KNEE_D, cx: 81, cy: 285, hit: KNEE_HIT },
+  knee_r: { k: 'path', d: KNEE_D, mirror: true, cx: 119, cy: 285, hit: KNEE_HIT },
+  calf_l: { k: 'path', d: CALF_D, cx: 81, cy: 321, hit: CALF_HIT },
+  calf_r: { k: 'path', d: CALF_D, mirror: true, cx: 119, cy: 321, hit: CALF_HIT },
+  ankle_l: { k: 'path', d: ANKLE_D, cx: 78, cy: 374, hit: ANKLE_HIT },
+  ankle_r: { k: 'path', d: ANKLE_D, mirror: true, cx: 122, cy: 374, hit: ANKLE_HIT },
 }
 
 export const GEOMETRY: Record<Side, Partial<Record<RegionCode, Shape>>> = {
