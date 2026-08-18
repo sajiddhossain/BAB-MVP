@@ -82,11 +82,14 @@ export function Progress({ at, of }: { at: number; of: number }) {
       aria-valuemin={1}
       aria-valuemax={of}
       aria-valuenow={at}
-      className="h-[10px] flex-1 overflow-hidden rounded-full border-2 border-[var(--color-ink)] bg-[var(--color-surface)]"
+      className="h-[13px] flex-1 overflow-hidden rounded-full border-2 border-[var(--color-ink)] bg-[var(--color-surface)]"
     >
       <div
         className="h-full rounded-full transition-[width] duration-200"
-        style={{ width: `${Math.round((at / of) * 100)}%`, background: 'var(--color-lime)' }}
+        style={{
+          width: `${Math.round((at / of) * 100)}%`, background: 'var(--color-lime)',
+          boxShadow: 'inset 0 -2.5px 0 0 color-mix(in srgb, var(--color-lime) 55%, var(--color-ink))',
+        }}
       />
     </div>
   )

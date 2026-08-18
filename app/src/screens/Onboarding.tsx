@@ -63,14 +63,30 @@ function DartboardIcon({ size = 34 }: { size?: number }) {
   )
 }
 
-/** Il pallone — le sue cuciture curve, disegnate a linea come il resto delle icone dell'app. */
+/**
+ * Il pallone — a pannelli pieni come l'emoji 🏐, non solo a contorno.
+ *
+ * Stesso principio di `DartboardIcon`: doveva somigliare al pallone vero,
+ * quindi i pannelli sono campiture piene (oro e teal, i colori del pallone
+ * nella palette BAB) dentro il cerchio, con le cuciture disegnate sopra.
+ */
 function VolleyballIcon({ size = 34 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 34 34" fill="none" aria-hidden>
-      <circle cx="17" cy="17" r="15" fill="var(--color-surface)" stroke="var(--color-ink)" strokeWidth="2" />
-      <path d="M17 2c-6 5-6 15 3 22" stroke="var(--color-ink)" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M5.5 11c7 1 15-2 21 4" stroke="var(--color-ink)" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M6.5 24c5-4 13-3 16-11" stroke="var(--color-ink)" strokeWidth="1.8" strokeLinecap="round" />
+    <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden>
+      <defs>
+        <clipPath id="ball-clip"><circle cx="17" cy="17" r="15" /></clipPath>
+      </defs>
+      <g clipPath="url(#ball-clip)">
+        <rect x="0" y="0" width="34" height="34" fill="var(--color-surface)" />
+        <ellipse cx="9" cy="9" rx="15" ry="9" fill="var(--color-gold)" transform="rotate(-32 9 9)" />
+        <ellipse cx="25" cy="25" rx="15" ry="9" fill="var(--color-teal)" transform="rotate(-32 25 25)" />
+      </g>
+      <circle cx="17" cy="17" r="15" fill="none" stroke="var(--color-ink)" strokeWidth="2" />
+      <g fill="none" stroke="var(--color-ink)" strokeWidth="1.6" strokeLinecap="round">
+        <path d="M17 2c-6 5-6 15 3 22" />
+        <path d="M5.5 11c7 1 15-2 21 4" />
+        <path d="M6.5 24c5-4 13-3 16-11" />
+      </g>
     </svg>
   )
 }
