@@ -73,7 +73,7 @@ export const TEMPOS: Record<TempoCode, Tempo> = {
     },
   },
   gentle: {
-    code: 'gentle', name: 'Gentle', emoji: '🍃', cssVar: '--tempo-gentle',
+    code: 'gentle', name: 'Reset', emoji: '🍃', cssVar: '--tempo-gentle',
     tag: {
       it: 'Un giorno da ricostruire — è qui che cresci',
       en: 'A rebuild day — this is where you grow',

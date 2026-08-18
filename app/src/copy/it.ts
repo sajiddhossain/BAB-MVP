@@ -659,11 +659,11 @@ export const it = {
     wrapTitle: 'Questo è tutto il gioco.',
     wrapBody: 'Farai lo stesso giro — indovina, senti, impara lo scarto — in due momenti veloci a ogni allenamento:',
     checkinTitle: 'Check-in',
-    checkinBody: 'Nei 30 minuti prima di allenarti — indovina la tua giornata, poi sintonizzati.',
+    checkinBody: 'Nei 30 minuti prima di allenarti: indovina come si sente il tuo corpo, poi sintonizzati',
     checkoutTitle: 'Check-out',
-    checkoutBody: 'Nei 30 minuti dopo — guarda com\'è andata davvero.',
+    checkoutBody: 'Nei 30 minuti dopo, guarda com\'è andata e come si sente adesso',
     gearsIntro: 'Tutt\'e due ti aiutano a trovare la tua andatura di giornata:',
-    wrapNote: 'La tua andatura è solo quanto ha da dare il tuo corpo oggi. Nessuna andatura è giusta o sbagliata — la noti e la rispetti.',
+    wrapNote: 'La tua andatura è solo quanto ha da dare il tuo corpo oggi. Nessuna andatura è giusta o sbagliata: la noti, la rispetti e impari a lavorarci insieme',
   },
 
   bodySense: {

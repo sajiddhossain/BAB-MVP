@@ -570,11 +570,11 @@ export const en: Copy = {
     wrapTitle: 'This is the whole game.',
     wrapBody: "You'll run that same loop — guess, feel, learn the gap — in two quick moments each training day:",
     checkinTitle: 'Check-in',
-    checkinBody: 'In the 30 minutes before training — guess your day, then tune in.',
+    checkinBody: 'In the 30 minutes before training: guess how your body feels, then tune in',
     checkoutTitle: 'Check-out',
-    checkoutBody: 'In the 30 minutes after — see how it actually went.',
+    checkoutBody: 'In the 30 minutes after, see how it went and how it feels now',
     gearsIntro: 'Both help you find your gear for the day:',
-    wrapNote: "Your gear is just how much your body's got to give today. No gear is good or bad — you notice it and honour it.",
+    wrapNote: "Your tempo is just how much your body's got to give today. No tempo is good or bad: you notice it, honour it and learn to work with it",
   },
 
   bodySense: {
