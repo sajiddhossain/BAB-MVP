@@ -612,8 +612,8 @@ export const en: Copy = {
   onboarding: {
     welcomeEyebrow: 'Welcome to BAB',
     welcomeTitle: 'Learn to read your own body.',
-    welcomeBody1: 'Your body texts you all day — **tired**, **wired**, **heavy**, **buzzy**, **nervous**, **ready**. Most people never learn to read the messages.',
-    welcomeBody2: "Athletes who do get a kind of superpower: they know what they've got **before** they step on the court. BAB teaches you that, a minute at a time.",
+    welcomeBody1: 'Your body texts you all day — **tired**, **wired**, **heavy**, **buzzy**, **pumped**. Most people never learn to read the messages.',
+    welcomeBody2: 'BAB teaches you this superpower, a check-in at a time.',
     welcomeCta: 'Show me how',
     back: 'Back',
     consentAthlete: "I've read it and I'm in",

@@ -16,6 +16,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
+import BabLogo from '@/components/BabLogo'
 import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
 
 /**
@@ -59,34 +60,6 @@ function DartboardIcon({ size = 34 }: { size?: number }) {
       <circle cx="17" cy="17" r="5.5" fill="var(--color-surface)" />
       <circle cx="17" cy="17" r="2.2" fill="var(--color-coral)" />
       <circle cx="17" cy="17" r="16" fill="none" stroke="var(--color-ink)" strokeWidth="1.6" />
-    </svg>
-  )
-}
-
-/**
- * Il pallone — a pannelli pieni come l'emoji 🏐, non solo a contorno.
- *
- * Stesso principio di `DartboardIcon`: doveva somigliare al pallone vero,
- * quindi i pannelli sono campiture piene (oro e teal, i colori del pallone
- * nella palette BAB) dentro il cerchio, con le cuciture disegnate sopra.
- */
-function VolleyballIcon({ size = 34 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden>
-      <defs>
-        <clipPath id="ball-clip"><circle cx="17" cy="17" r="15" /></clipPath>
-      </defs>
-      <g clipPath="url(#ball-clip)">
-        <rect x="0" y="0" width="34" height="34" fill="var(--color-surface)" />
-        <ellipse cx="9" cy="9" rx="15" ry="9" fill="var(--color-gold)" transform="rotate(-32 9 9)" />
-        <ellipse cx="25" cy="25" rx="15" ry="9" fill="var(--color-teal)" transform="rotate(-32 25 25)" />
-      </g>
-      <circle cx="17" cy="17" r="15" fill="none" stroke="var(--color-ink)" strokeWidth="2" />
-      <g fill="none" stroke="var(--color-ink)" strokeWidth="1.6" strokeLinecap="round">
-        <path d="M17 2c-6 5-6 15 3 22" />
-        <path d="M5.5 11c7 1 15-2 21 4" />
-        <path d="M6.5 24c5-4 13-3 16-11" />
-      </g>
     </svg>
   )
 }
@@ -335,7 +308,13 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }
 
   if (step === 'welcome') return (
-    <Frame title={t.onboarding.welcomeTitle} icon={<VolleyballIcon size={40} />}
+    <Frame title={t.onboarding.welcomeTitle}
+           icon={(
+             <div className="flex flex-col items-start gap-2.5">
+               <BabLogo className="h-6 w-[71px] shrink-0 text-[var(--color-ink)]" />
+               <span aria-hidden className="text-[34px] leading-none">🏐</span>
+             </div>
+           )}
            eyebrow={t.onboarding.welcomeEyebrow}
            next={() => setStep('heartConcept')} nextLabel={t.onboarding.welcomeCta} {...F}>
       <div className="flex flex-col gap-3 text-[15px] leading-relaxed [&_strong]:text-[var(--color-lavender)]">

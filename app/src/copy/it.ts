@@ -701,8 +701,8 @@ export const it = {
   onboarding: {
     welcomeEyebrow: 'Benvenuta in BAB',
     welcomeTitle: 'Impara a leggere il tuo corpo.',
-    welcomeBody1: 'Il tuo corpo ti manda messaggi tutto il giorno — **stanca**, **in tensione**, **pesante**, **formicolante**, **nervosa**, **pronta**. Quasi nessuna impara a leggerli.',
-    welcomeBody2: 'Le atlete che ci riescono hanno una specie di superpotere: sanno cosa hanno addosso **prima** di scendere in campo. BAB te lo insegna, un minuto alla volta.',
+    welcomeBody1: 'Il tuo corpo ti manda messaggi tutto il giorno — **stanca**, **in tensione**, **pesante**, **formicolante**, **carica**. Quasi nessuna impara a leggerli.',
+    welcomeBody2: 'BAB ti insegna questo superpotere, un check-in alla volta.',
     welcomeCta: 'Mostrami come',
     back: 'Indietro',
     consentAthlete: 'Ho letto e ci sto',
