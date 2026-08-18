@@ -142,14 +142,30 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
                 ))}
               </ul>
             )}
-            {(['good', 'notice', 'flag'] as const).map((g) => (
-              <div key={g} className="flex flex-col gap-1.5">
-                <p className="text-[12px] text-[var(--color-ink-soft)]">{GROUP_LABEL[g][locale]}</p>
+            {/* «Va bene» e «Da notare» sono la stessa cosa da scegliere — un
+                unico flusso di pillole, senza due etichette a spezzarlo. Solo
+                «Da far vedere» resta a sé: è l'unico gruppo dove la
+                distinzione visiva porta un'informazione che conta davvero. */}
+            <PillGroup
+              size="sm"
+              label={t.checkin.pre.pinpoint.whatLike}
+              tone={tone}
+              options={[...sensationsIn('good'), ...sensationsIn('notice')].map((s) => ({
+                value: s.code, label: s.label[locale],
+                icon: s.icon ? <ContentIcon name={s.icon} size={14} /> : undefined,
+              }))}
+              value={sens}
+              onChange={pick}
+            />
+            {sensationsIn('flag').length > 0 && (
+              <div className="flex flex-col gap-1.5 border-l-[3px] pl-3"
+                   style={{ borderColor: 'var(--care)' }}>
+                <p className="text-[12px]" style={{ color: 'var(--care)' }}>{GROUP_LABEL.flag[locale]}</p>
                 <PillGroup
                   size="sm"
-                  label={GROUP_LABEL[g][locale]}
-                  tone={g === 'flag' ? 'care' : tone}
-                  options={sensationsIn(g).map((s) => ({
+                  label={GROUP_LABEL.flag[locale]}
+                  tone="care"
+                  options={sensationsIn('flag').map((s) => ({
                     value: s.code, label: s.label[locale],
                     icon: s.icon ? <ContentIcon name={s.icon} size={14} /> : undefined,
                     flag: s.redFlag,
@@ -158,7 +174,7 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
                   onChange={pick}
                 />
               </div>
-            ))}
+            )}
           </>
         ) : (
           <>

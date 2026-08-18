@@ -238,22 +238,26 @@ export default function CheckInPost() {
         )}
 
         {featuredSignal && !communicateDismissed && (
-          <section className="bab-card flex flex-col gap-2.5 px-4 py-4">
+          <section className="flex flex-col gap-1 border-l-[3px] py-0.5 pl-4"
+                    style={{ borderColor: 'var(--care)' }}>
             <h2 className="font-display text-[16px]">{t.checkin.post.communicate.title}</h2>
             <p className="text-[13px] text-[var(--color-ink-soft)]">{t.checkin.post.communicate.help}</p>
-            {communicatePhrases.map((p, i) => (
-              <button key={i} type="button" onClick={() => void copyPhrase(i as 0 | 1)}
-                      className="bab-card px-3.5 py-3 text-left text-[14px] italic">
-                “{p}”
-              </button>
-            ))}
+            <div className="mt-1.5 flex flex-col">
+              {communicatePhrases.map((p, i) => (
+                <button key={i} type="button" onClick={() => void copyPhrase(i as 0 | 1)}
+                        className="border-t border-dashed py-2.5 text-left first:border-t-0 first:pt-0"
+                        style={{ borderColor: 'var(--color-sand)' }}>
+                  <span className="text-[14px] italic leading-snug">“{p}”</span>
+                </button>
+              ))}
+            </div>
             {copiedPhrase && (
               <p className="text-[12.5px]" style={{ color: 'var(--color-teal)' }}>
                 {t.checkin.post.communicate.copied}
               </p>
             )}
             <button type="button" onClick={() => setCommunicateDismissed(true)}
-                    className="self-start text-[13px] underline text-[var(--color-ink-soft)]">
+                    className="mt-0.5 self-start text-[13px] underline text-[var(--color-ink-soft)]">
               {t.checkin.post.communicate.notToday}
             </button>
           </section>

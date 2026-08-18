@@ -6,6 +6,7 @@ import {
   closedLoops, dayStates, errorSeries, lastDays, sparkline, trend,
   type DayState, type Row,
 } from '@/lib/insights'
+import { ArrowRightIcon } from '@/components/icons'
 
 /**
  * Vista "Me" — la sua dashboard.
@@ -126,41 +127,36 @@ export default function Me() {
         <p className="text-[13px] text-[var(--color-ink-soft)]">{t.me.daysHelp}</p>
       </Card>
 
-      {/* 3 · Il mio corpo — la mappa che finalmente restituisce qualcosa.
-          🔴 Sta PRIMA della storia: la storia si condivide con qualcun altro,
-          questa è per lei. Prima capisci, poi racconti. */}
-      <Card>
-        <h2 className="font-display text-[18px]">{t.me.bodyTitle}</h2>
-        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.me.bodyBody}</p>
-        <Link to="/body" className="bab-pill self-start px-4 py-2 text-[14px]"
-              style={{ background: 'var(--color-lime)' }}>
-          {t.me.bodyCta}
-        </Link>
-      </Card>
-
-      {/* 4 · La mia storia — l'output "Communicate". */}
-      <Card>
-        <h2 className="font-display text-[18px]">{t.me.storyTitle}</h2>
-        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.me.storyBody}</p>
-        {storyReady ? (
-          <Link to="/story" className="bab-pill self-start px-4 py-2 text-[14px]"
-                style={{ background: 'var(--color-lime)' }}>
-            {t.me.storyCta}
-          </Link>
-        ) : (
-          <p className="text-[13px] text-[var(--color-ink-soft)]">{t.me.storyLocked}</p>
-        )}
-      </Card>
-
-      {/* 5 · Il mio diario — solo lei lo vede, mai un coach o un admin. */}
-      <Card>
-        <h2 className="font-display text-[18px]">{t.me.journalTitle}</h2>
-        <p className="text-[15px] text-[var(--color-ink-soft)]">{t.me.journalBody}</p>
-        <Link to="/diario" className="bab-pill self-start px-4 py-2 text-[14px]"
-              style={{ background: 'var(--color-lime)' }}>
-          {t.me.journalCta}
-        </Link>
-      </Card>
+      {/* 3 · Corpo, storia, diario — tre vie che portano fuori da questa
+          schermata, non tre schermate a sé. Prima erano tre bab-card intere,
+          una via l'altra: lo stesso peso di un vero contenuto, per quello che
+          in realtà sono solo dei link. Un solo riquadro, righe sottili fra le
+          voci — il peso torna proporzionato a quello che fanno. */}
+      <section className="bab-card flex flex-col px-1 py-1">
+        {[
+          { to: '/body', title: t.me.bodyTitle, body: t.me.bodyBody, locked: false },
+          { to: '/story', title: t.me.storyTitle, body: t.me.storyBody, locked: !storyReady, lockedNote: t.me.storyLocked },
+          { to: '/diario', title: t.me.journalTitle, body: t.me.journalBody, locked: false },
+        ].map((row, i) => (
+          row.locked ? (
+            <div key={row.to} className={`flex flex-col gap-1 px-3.5 py-3.5 ${
+              i > 0 ? 'border-t-2' : ''}`} style={{ borderColor: 'var(--color-sand)' }}>
+              <h2 className="font-display text-[16px]">{row.title}</h2>
+              <p className="text-[13.5px] text-[var(--color-ink-soft)]">{row.lockedNote}</p>
+            </div>
+          ) : (
+            <Link key={row.to} to={row.to}
+                  className={`flex items-center justify-between gap-3 px-3.5 py-3.5 ${
+                    i > 0 ? 'border-t-2' : ''}`} style={{ borderColor: 'var(--color-sand)' }}>
+              <div className="flex flex-col gap-0.5">
+                <h2 className="font-display text-[16px]">{row.title}</h2>
+                <p className="text-[13px] text-[var(--color-ink-soft)]">{row.body}</p>
+              </div>
+              <ArrowRightIcon size={18} color="var(--color-ink-soft)" />
+            </Link>
+          )
+        ))}
+      </section>
 
       {/* 🔴 Sopra ogni ipotesi, sempre. Vale anche quando le ipotesi non ci sono
           ancora: insegna da subito come vanno prese. */}
