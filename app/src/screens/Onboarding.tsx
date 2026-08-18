@@ -64,6 +64,35 @@ function DartboardIcon({ size = 34 }: { size?: number }) {
   )
 }
 
+/**
+ * Il pallone — a pannelli pieni come l'emoji 🏐, non l'emoji stessa.
+ *
+ * 🔴 L'emoji vera rende in modo diverso su ogni sistema (e piccola, sgranata
+ * su schermi ad alta densità). Stesso principio di `DartboardIcon`: campiture
+ * piene (oro e teal della palette BAB) dentro il cerchio, cuciture sopra —
+ * uguale su ogni telefono.
+ */
+function VolleyballIcon({ size = 34 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden>
+      <defs>
+        <clipPath id="ball-clip"><circle cx="17" cy="17" r="15" /></clipPath>
+      </defs>
+      <g clipPath="url(#ball-clip)">
+        <rect x="0" y="0" width="34" height="34" fill="var(--color-surface)" />
+        <ellipse cx="9" cy="9" rx="15" ry="9" fill="var(--color-gold)" transform="rotate(-32 9 9)" />
+        <ellipse cx="25" cy="25" rx="15" ry="9" fill="var(--color-teal)" transform="rotate(-32 25 25)" />
+      </g>
+      <circle cx="17" cy="17" r="15" fill="none" stroke="var(--color-ink)" strokeWidth="2" />
+      <g fill="none" stroke="var(--color-ink)" strokeWidth="1.6" strokeLinecap="round">
+        <path d="M17 2c-6 5-6 15 3 22" />
+        <path d="M5.5 11c7 1 15-2 21 4" />
+        <path d="M6.5 24c5-4 13-3 16-11" />
+      </g>
+    </svg>
+  )
+}
+
 /** Un passo del metodo, numerato — la schermata «Indovina. Poi senti davvero.» */
 function NumberedStep({ n, title, body }: { n: number; title: string; body: string }) {
   return (
@@ -313,7 +342,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   if (step === 'welcome') return (
     <Frame title={t.onboarding.welcomeTitle}
            headerRight={<BabLogo className="h-5 w-[59px] shrink-0 text-[var(--color-ink)]" />}
-           icon={<span aria-hidden className="text-[34px] leading-none">🏐</span>}
+           icon={<VolleyballIcon size={40} />}
            eyebrow={t.onboarding.welcomeEyebrow}
            next={() => setStep('heartConcept')} nextLabel={t.onboarding.welcomeCta} {...F}>
       <div className="flex flex-col gap-3 text-[15px] leading-relaxed [&_strong]:text-[var(--color-lavender)]">
