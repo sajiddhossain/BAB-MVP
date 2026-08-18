@@ -297,15 +297,22 @@ export default function CheckInPre() {
    * piega. Per indicare il ginocchio bisognava far salire la pagina, e la
    * figura si spostava sotto il dito mentre lo si appoggiava.
    *
-   * Niente etichetta di sezione: la domanda la dice già, e ogni riga
-   * risparmiata qui è una riga in più di figura.
+   * 🔴 Primo mock-up: sottotitolo e spiegazione tornano visibili (prima erano
+   * tagliati per lasciare tutto lo spazio alla figura). Se dopo averlo visto
+   * si stringe di nuovo, la riga da tagliare è questa, non `question`.
    */
   const bodyStep = () => (
-    <Step {...frame} fill
-          question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.mapHint}
+    <Step {...frame} fill section={t.checkin.pre.tuneIn.label}
+          question={t.checkin.pre.pinpoint.title}
           onNext={region === 'other' ? () => openSheet('other') : flow.onward}
           nextLabel={region === 'other' ? t.flow.next
             : signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
+      {/* Primo mock-up: sottotitolo + spiegazione lunga, prima riservati alla
+          figura. Si può stringere di nuovo una volta vista com'è. */}
+      <div className="flex shrink-0 flex-col gap-1">
+        <p className="font-display text-[15px] font-bold">{t.checkin.pre.pinpoint.label}</p>
+        <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.checkin.pre.pinpoint.help}</p>
+      </div>
       {/* Le zone già segnate: una riga sola che scorre di lato, così la
           figura non perde altezza a ogni sensazione aggiunta. */}
       {signals.length > 0 && (
@@ -329,6 +336,7 @@ export default function CheckInPre() {
       )}
       <BodyMap
         fit
+        hint={t.checkin.pre.pinpoint.mapHint}
         selected={region}
         logged={signals.map((s) => s.region as RegionCode)}
         flagged={signals.filter((s) => s.is_red_flag).map((s) => s.region as RegionCode)}

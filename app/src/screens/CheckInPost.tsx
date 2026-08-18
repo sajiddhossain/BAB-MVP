@@ -298,14 +298,17 @@ export default function CheckInPost() {
 
   /**
    * Una schermata sola, senza scorrere — vedi la nota in `CheckInPre`.
-   * Niente etichetta di sezione: lo spazio va alla figura.
    */
   const bodyStep = () => (
-    <Step {...frame} fill
-          question={t.checkin.pre.pinpoint.title} help={t.checkin.pre.pinpoint.mapHint}
+    <Step {...frame} fill section={t.checkin.pre.tuneIn.label}
+          question={t.checkin.pre.pinpoint.title}
           onNext={region === 'other' ? () => openSheet('other') : flow.onward}
           nextLabel={region === 'other' ? t.flow.next
             : signals.length ? t.checkin.common.thatsAll : t.checkin.common.nothingHere}>
+      <div className="flex shrink-0 flex-col gap-1">
+        <p className="font-display text-[15px] font-bold">{t.checkin.pre.pinpoint.label}</p>
+        <p className="text-[12.5px] text-[var(--color-ink-soft)]">{t.checkin.pre.pinpoint.help}</p>
+      </div>
       {signals.length > 0 && (
         <ul className="flex shrink-0 gap-2 overflow-x-auto pb-1">
           {signals.map((s, i) => (
@@ -327,6 +330,7 @@ export default function CheckInPost() {
       )}
       <BodyMap
         fit
+        hint={t.checkin.pre.pinpoint.mapHint}
         selected={region}
         logged={signals.map((s) => s.region as RegionCode)}
         flagged={signals.filter((s) => s.is_red_flag).map((s) => s.region as RegionCode)}

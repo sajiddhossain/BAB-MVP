@@ -294,10 +294,10 @@ export const en: Copy = {
         painkillersHelp: 'For any reason, sport-related or not.',
       },
       pinpoint: {
-        label: 'Pinpoint & name it',
+        label: 'Pinpoint it and name it',
         title: 'Where do you feel it?',
-        mapHint: 'As many as you notice, or none if all feels quiet.',
-        help: `Pausing to find where a sensation sits, and putting a word to it, is the heart of the skill: it's how a vague "I feel off" becomes something you actually understand.`,
+        mapHint: 'Tap a spot and choose what it feels like and how intense it is.',
+        help: `Pausing to find where a sensation sits, and putting a word to it, is how a vague "I feel off" turns into something you can understand, manage and communicate more effectively.`,
         front: 'Front',
         back: 'Back',
         allOver: 'All over',

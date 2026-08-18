@@ -355,10 +355,8 @@ export const it = {
       pinpoint: {
         label: 'Individua e nomina',
         title: 'Dove lo senti?',
-        /** Sulla mappa serve una riga, non un paragrafo: lo spazio va alla figura. */
-        mapHint: 'Quante ne noti, o nessuna se è tutto tranquillo.',
-        /** Il perché sta sulla schermata dove si dà il nome, che è dove serve. */
-        help: 'Fermarsi a trovare dove sta una sensazione, e metterci una parola sopra, è il cuore della competenza: è come un vago "mi sento strana" diventa qualcosa che capisci davvero.',
+        mapHint: 'Tocca un punto e scegli cosa senti e quanto è forte.',
+        help: 'Fermarsi a trovare dove sta una sensazione, e metterci una parola sopra, è come un vago "mi sento strana" diventa qualcosa che riesci a capire, gestire e comunicare meglio.',
         front: 'Fronte',
         back: 'Retro',
         allOver: 'Dappertutto',
