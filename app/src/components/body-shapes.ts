@@ -116,9 +116,9 @@ const UPPER: P[] = [
   // il segno del corpo maschile a "V", non di quello femminile). Solo il
   // bordo ESTERNO del braccio si muove: il bordo interno/l'ascella restano
   // gli stessi, così `SPLIT`/`ARM` non si scollano dal profilo.
-  [65.5, 100.6], [65.5, 112.1],                                // deltoide
-  [62.5, 126.8], [61.4, 145.7], [60.6, 162.5],                 // braccio, fuori
-  [60.2, 173], [60.2, 179.3],                                  // polso
+  [64.5, 100.6], [64, 112.1],                                  // deltoide
+  [60.5, 126.8], [59.2, 145.7], [58.4, 162.5],                 // braccio, fuori
+  [58.2, 173], [58.2, 179.3],                                  // polso
   [55.8, 186.7], [51.4, 199.4], [54.2, 210.4], [60.6, 214.1], [65.8, 206.7], // mano
   [66.6, 193], [67.4, 179.3],                                  // polso, dentro
   [68.5, 164.6], [70, 145.7], [71.5, 126.8],                   // braccio, dentro
@@ -134,18 +134,17 @@ const LOWER: P[] = [
   // mossa il fianco è un tubo che si assottiglia e basta, e non si legge
   // come un corpo femminile — nemmeno stilizzato. Curva morbida: più punti,
   // salti piccoli fra uno e l'altro, niente spigoli.
-  [85, 171.5],                                                  // vita, il punto stretto
-  [79, 178.5], [71, 185.5], [66, 191],                          // fianco, si riallarga
-  [73.5, 196.1],                                                // inguine, si richiude
-  // 🔴 Da qui in giù la gamba è più lunga e più stretta di prima (richiesto
-  // esplicitamente, su un riferimento di figurino di moda): le proporzioni
-  // "verosimili" restano un compromesso, questo va oltre verso lo stilizzato
-  // slanciato. La caviglia si stringe fino quasi a un punto e il piede
-  // diventa una punta, non più un tallone arrotondato.
-  [69, 217.8], [70, 249.6], [71.5, 281.3],                     // coscia, fuori
-  [72, 297.1], [72, 325.7],                                    // ginocchio, fuori
-  [69, 348], [70, 370.2], [74, 389.2],                         // polpaccio, fuori
-  [80, 398.7], [81, 406.6],                                    // caviglia, stretta
+  [80, 171.5],                                                  // vita, il punto stretto
+  [76, 178.5], [69, 185.5], [64, 191],                          // fianco, si riallarga
+  [71.5, 196.1],                                                // inguine, si richiude
+  // 🔴 Gambe lunghe (richiesto su un riferimento di figurino di moda), ma con
+  // peso vero: la prima prova era troppo filiforme — caviglia quasi a un
+  // punto e coscia sottile su una figura di 9 teste si legge come un corpo
+  // malato, non slanciato. La lunghezza resta, la larghezza torna sana.
+  [66, 217.8], [67, 249.6], [68.5, 281.3],                     // coscia, fuori
+  [69, 297.1], [69, 325.7],                                    // ginocchio, fuori
+  [66, 348], [67, 370.2], [70.5, 389.2],                       // polpaccio, fuori
+  [75.5, 398.7], [76.5, 406.6],                                // caviglia
   [78, 416.1], [74, 428.8], [74, 436.8],                       // piede, fuori
   [79, 441.6], [83, 444], [87, 436.8],                         // pianta, a punta
   [89, 425.7], [88, 406.6],                                    // piede, dentro
