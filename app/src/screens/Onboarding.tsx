@@ -72,14 +72,14 @@ function RocketIcon({ size = 34 }: { size?: number }) {
   )
 }
 
-/** Gli sparkles — l'SVG scelto dall'utente (svgrepo.com), ricolorato in lavanda con un bordo nero per stare nella palette della schermata invece dell'oro originale. */
+/** Gli sparkles — l'SVG scelto dall'utente (svgrepo.com), in oro/giallo con un bordo nero. */
 function SparklesIcon({ size = 34 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 512 512" aria-hidden>
       <g stroke="var(--color-ink)" strokeWidth="8" strokeLinejoin="round">
-        <path fill="var(--color-lavender)" d="M210.3 65.5c28.8 7.3 51.4 29.9 58.7 58.7c.7 2.8 4.3 2.8 5 0c7.3-28.8 29.9-51.4 58.7-58.7c2.8-.7 2.8-4.3 0-5c-28.8-7.3-51.4-29.9-58.7-58.7c-.7-2.8-4.3-2.8-5 0c-7.3 28.8-29.9 51.4-58.7 58.7c-2.8.7-2.8 4.3 0 5z" />
-        <path fill="color-mix(in srgb, var(--color-lavender) 70%, var(--color-ink))" d="M6.7 188.3c50.8 12.9 90.8 52.9 103.7 103.7c1.2 4.9 7.5 4.9 8.8 0c12.9-50.8 52.9-90.8 103.7-103.7c4.9-1.2 4.9-7.5 0-8.8C172 166.7 132 126.7 119.2 75.9c-1.2-4.9-7.5-4.9-8.8 0c-12.9 50.8-52.9 90.8-103.7 103.7c-4.9 1.2-4.9 7.5 0 8.7z" />
-        <path fill="color-mix(in srgb, var(--color-lavender) 45%, white)" d="M180 350.7c76 19.3 135.9 79.1 155.1 155.1c1.9 7.3 11.3 7.3 13.1 0c19.3-76 79.1-135.9 155.1-155.1c7.3-1.9 7.3-11.3 0-13.1c-76-19.3-135.9-79.1-155.1-155.1c-1.9-7.3-11.3-7.3-13.1 0c-19.3 76-79.1 135.9-155.1 155.1c-7.3 1.8-7.3 11.2 0 13.1z" />
+        <path fill="var(--color-gold)" d="M210.3 65.5c28.8 7.3 51.4 29.9 58.7 58.7c.7 2.8 4.3 2.8 5 0c7.3-28.8 29.9-51.4 58.7-58.7c2.8-.7 2.8-4.3 0-5c-28.8-7.3-51.4-29.9-58.7-58.7c-.7-2.8-4.3-2.8-5 0c-7.3 28.8-29.9 51.4-58.7 58.7c-2.8.7-2.8 4.3 0 5z" />
+        <path fill="color-mix(in srgb, var(--color-gold) 75%, var(--color-ink))" d="M6.7 188.3c50.8 12.9 90.8 52.9 103.7 103.7c1.2 4.9 7.5 4.9 8.8 0c12.9-50.8 52.9-90.8 103.7-103.7c4.9-1.2 4.9-7.5 0-8.8C172 166.7 132 126.7 119.2 75.9c-1.2-4.9-7.5-4.9-8.8 0c-12.9 50.8-52.9 90.8-103.7 103.7c-4.9 1.2-4.9 7.5 0 8.7z" />
+        <path fill="color-mix(in srgb, var(--color-gold) 55%, white)" d="M180 350.7c76 19.3 135.9 79.1 155.1 155.1c1.9 7.3 11.3 7.3 13.1 0c19.3-76 79.1-135.9 155.1-155.1c7.3-1.9 7.3-11.3 0-13.1c-76-19.3-135.9-79.1-155.1-155.1c-1.9-7.3-11.3-7.3-13.1 0c-19.3 76-79.1 135.9-155.1 155.1c-7.3 1.8-7.3 11.2 0 13.1z" />
       </g>
     </svg>
   )
@@ -334,7 +334,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
 
   if (step === 'welcome') return (
     <Frame title={t.onboarding.welcomeTitle}
-           headerRight={<BabLogoShort className="h-5 w-[44px] shrink-0 text-[var(--color-lavender)]" />}
+           headerRight={<BabLogoShort className="h-5 w-[44px] shrink-0 text-[var(--color-vividteal)]" />}
            icon={<SparklesIcon size={40} />}
            eyebrow={t.onboarding.welcomeEyebrow}
            next={() => setStep('heartConcept')} nextLabel={t.onboarding.welcomeCta} {...F}>
