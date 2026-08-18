@@ -192,7 +192,7 @@ export default function Step({
         {children}
       </div>
 
-      <footer className={`flex shrink-0 flex-col gap-2 ${fill ? 'pb-1 pr-2' : 'pb-2'}`}>
+      <footer className={`flex shrink-0 flex-col gap-2 ${fill ? 'pb-2 pr-2' : 'pb-2'}`}>
         {onSkip && (
           <button type="button" onClick={onSkip}
                   className="self-center px-3 py-2 text-[14px] underline text-[var(--color-ink-soft)]">
