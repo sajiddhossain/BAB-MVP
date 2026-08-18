@@ -142,21 +142,41 @@ export default function RegionSheet({ region, freeText = '', onCancel, onAdd, to
                 ))}
               </ul>
             )}
-            {/* «Va bene» e «Da notare» sono la stessa cosa da scegliere — un
-                unico flusso di pillole, senza due etichette a spezzarlo. Solo
-                «Da far vedere» resta a sé: è l'unico gruppo dove la
-                distinzione visiva porta un'informazione che conta davvero. */}
-            <PillGroup
-              size="sm"
-              label={t.checkin.pre.pinpoint.whatLike}
-              tone={tone}
-              options={[...sensationsIn('good'), ...sensationsIn('notice')].map((s) => ({
-                value: s.code, label: s.label[locale],
-                icon: s.icon ? <ContentIcon name={s.icon} size={14} /> : undefined,
-              }))}
-              value={sens}
-              onChange={pick}
-            />
+            {/* 🔴 «Va bene» e «Da notare» restano la stessa scelta — nessun
+                passo in più, nessun obbligo a spuntare l'uno prima
+                dell'altro — ma due etichette leggere li separano a colpo
+                d'occhio: undici pillole tutte uguali si scorrono, due
+                gruppetti da quattro e sette si leggono. Solo «Da far
+                vedere» aveva già questo trattamento; ora è coerente con gli
+                altri due invece di essere l'unico raggruppato. */}
+            <div className="flex flex-col gap-1.5">
+              <p className="bab-label">{GROUP_LABEL.good[locale]}</p>
+              <PillGroup
+                size="sm"
+                label={GROUP_LABEL.good[locale]}
+                tone={tone}
+                options={sensationsIn('good').map((s) => ({
+                  value: s.code, label: s.label[locale],
+                  icon: s.icon ? <ContentIcon name={s.icon} size={14} /> : undefined,
+                }))}
+                value={sens}
+                onChange={pick}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <p className="bab-label">{GROUP_LABEL.notice[locale]}</p>
+              <PillGroup
+                size="sm"
+                label={GROUP_LABEL.notice[locale]}
+                tone={tone}
+                options={sensationsIn('notice').map((s) => ({
+                  value: s.code, label: s.label[locale],
+                  icon: s.icon ? <ContentIcon name={s.icon} size={14} /> : undefined,
+                }))}
+                value={sens}
+                onChange={pick}
+              />
+            </div>
             {sensationsIn('flag').length > 0 && (
               <div className="flex flex-col gap-1.5 border-l-[3px] pl-3"
                    style={{ borderColor: 'var(--care)' }}>
