@@ -566,6 +566,7 @@ export const en: Copy = {
     revealMissNote: "Your guess and your count landed in different bands. That's **completely normal on day one**, and it's exactly the gap you'll get better at closing. You just found your starting point.",
     revealFooter: "That feeling — sensing something inside you, then checking it — is called interoception. It's a muscle, and you just did your first rep.",
 
+    wrapReady: "You're ready",
     wrapTitle: 'This is the whole game.',
     wrapBody: "You'll run that same loop — guess, feel, learn the gap — in two quick moments each training day:",
     checkinTitle: 'Check-in',

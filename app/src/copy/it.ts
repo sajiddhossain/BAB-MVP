@@ -655,6 +655,7 @@ export const it = {
     revealMissNote: 'La tua stima e quello che hai contato sono finiti in fasce diverse. **È del tutto normale il primo giorno**, ed è esattamente lo scarto che imparerai a chiudere. Hai appena trovato il tuo punto di partenza.',
     revealFooter: 'Quella sensazione — sentire qualcosa dentro di te, e poi controllarlo — si chiama interocezione. È un muscolo, e questo era il tuo primo allenamento.',
 
+    wrapReady: 'Sei pronta',
     wrapTitle: 'Questo è tutto il gioco.',
     wrapBody: 'Farai lo stesso giro — indovina, senti, impara lo scarto — in due momenti veloci a ogni allenamento:',
     checkinTitle: 'Check-in',
