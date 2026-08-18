@@ -16,7 +16,7 @@ import { bandFromBpm, type HeartBand } from '@/lib/heart'
 import TapCounter from '@/components/TapCounter'
 import Sparkle from '@/components/Sparkle'
 import Mascot from '@/components/Mascot'
-import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TargetIcon, TempoIcon } from '@/components/icons'
+import { ArrowLeftIcon, CheckIcon, ContentIcon, HeartIcon, MoonIcon, SunIcon, TempoIcon } from '@/components/icons'
 
 /**
  * Onboarding — la forma decisa in R3, estesa in R3-bis per gli sport multipli
@@ -39,6 +39,27 @@ function Rich({ text }: { text: string }) {
         p.startsWith('**') ? <strong key={i}>{p.slice(2, -2)}</strong> : <span key={i}>{p}</span>,
       )}
     </>
+  )
+}
+
+/**
+ * Il tabellone delle freccette — a cerchi pieni, non a contorno.
+ *
+ * 🔴 `TargetIcon` (in `components/icons.tsx`) è un contorno sottile, pensato
+ * per stare dentro un badge colorato altrove. Qui invece l'icona È il
+ * disegno: doveva somigliare al bersaglio vero — anelli pieni, non un
+ * cerchietto vuoto — quindi resta locale a questa schermata.
+ */
+function DartboardIcon({ size = 34 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 34 34" aria-hidden>
+      <circle cx="17" cy="17" r="16" fill="var(--color-coral)" />
+      <circle cx="17" cy="17" r="12.5" fill="var(--color-surface)" />
+      <circle cx="17" cy="17" r="9" fill="var(--color-coral)" />
+      <circle cx="17" cy="17" r="5.5" fill="var(--color-surface)" />
+      <circle cx="17" cy="17" r="2.2" fill="var(--color-coral)" />
+      <circle cx="17" cy="17" r="16" fill="none" stroke="var(--color-ink)" strokeWidth="1.6" />
+    </svg>
   )
 }
 
@@ -400,7 +421,7 @@ export default function Onboarding({ onDone }: { onDone: () => void }) {
   }
 
   if (step === 'heartWrap') return (
-    <Frame title={t.heart.wrapTitle} icon={<TargetIcon size={34} color="var(--color-lavender)" />}
+    <Frame title={t.heart.wrapTitle} icon={<DartboardIcon size={34} />}
            eyebrow={t.heart.wrapReady} help={t.heart.wrapBody}
            next={() => setStep('whoSees')} canNext back onBack={() => setStep('heartReveal')} {...F}>
       <div className="bab-card flex flex-col gap-2.5 px-3.5 py-3">
