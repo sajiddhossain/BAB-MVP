@@ -86,11 +86,11 @@ function Decor({ side }: { side: Side }) {
       <g pointerEvents="none" aria-hidden>
         {/* La frangia. Serve anche a far leggere la testa come una testa e non
             come un ovale: senza, la faccia galleggia in mezzo al nulla. */}
-        <path d="M76.6,36 C76.8,20 87,12 100,12 C113,12 123.2,20 123.4,36
-                 C117,29 110,32 100,32 C90,32 83,29 76.6,36 Z" {...hair} />
-        <circle cx={92} cy={41} r={2.4} fill={ink} />
-        <circle cx={108} cy={41} r={2.4} fill={ink} />
-        <path d="M93.5,49 Q100,53.5 106.5,49" fill="none" stroke={ink}
+        <path d="M80.1,36 C80.3,20 89,12 100,12 C111,12 119.7,20 119.9,36
+                 C114.5,29 108.5,32 100,32 C91.5,32 85.6,29 80.1,36 Z" {...hair} />
+        <circle cx={93.2} cy={41} r={2.4} fill={ink} />
+        <circle cx={106.8} cy={41} r={2.4} fill={ink} />
+        <path d="M94.5,49 Q100,53.5 105.5,49" fill="none" stroke={ink}
               strokeWidth={1.8} strokeLinecap="round" />
       </g>
     )
@@ -99,9 +99,10 @@ function Decor({ side }: { side: Side }) {
     <g pointerEvents="none" aria-hidden>
       {/* Nuca e coda. Dicono «stai guardando il dietro» senza scrivere una
           parola — che è l'unico modo di dirlo in un decimo di secondo. */}
-      <ellipse cx={100} cy={35} rx={23.4} ry={23} {...hair} />
-      <path d="M100,52 C108,60 109,74 105,90 C103,98 97,98 95,90 C91,74 92,60 100,52 Z" {...hair} />
-      <path d="M100,118 L100,168" fill="none" stroke={ink} strokeWidth={2.2}
+      <ellipse cx={100} cy={35} rx={19.9} ry={23} {...hair} />
+      <path d="M100,52 C106.6,60.3 107.4,76.4 104.1,93.2 C102.5,101.6 97.5,101.6 95.9,93.2
+               C92.6,76.4 93.4,60.3 100,52 Z" {...hair} />
+      <path d="M100,122.6 L100,175.1" fill="none" stroke={ink} strokeWidth={2.2}
             strokeDasharray="4 6" strokeLinecap="round" opacity={0.4} />
     </g>
   )

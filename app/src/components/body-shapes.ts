@@ -58,7 +58,7 @@ export type Shape =
     }
 
 /** Il riquadro del disegno. Tutte le coordinate qui sotto vivono dentro questo. */
-export const VIEW = { w: 200, h: 356 }
+export const VIEW = { w: 200, h: 400 }
 
 type P = [number, number]
 
@@ -87,16 +87,16 @@ function spline(pts: P[]): string {
 }
 
 /* ── Il profilo ────────────────────────────────────────────────────────────
-   Figura di ~7 teste: testa 12→60, ascelle 104, vita 156, inguine 188,
-   ginocchio 261, terra 343.
+   Figura di ~7,5 teste: testa 12→58, ascelle 108, vita 175, inguine 198,
+   ginocchio 274, terra 385.
 
-   NON sono le proporzioni di un manichino anatomico, ed è voluto. La prima
-   versione ne aveva 7,6 — corretta da manuale, e sullo schermo sembrava un
-   manichino da vetrina: lunga, magra, la testa in cima a un collo che non
-   finiva mai. Un corpo più tozzo si legge meglio in piccolo, ha arti
-   abbastanza larghi da colorarsi in modo visibile, e a dodici anni è più
-   facile riconoscercisi. Fra l'esattezza anatomica e una figura che si legge,
-   qui vince la seconda: i dati stanno nei codici, non nelle proporzioni.
+   🔴 Cambio deliberato (su richiesta esplicita, sapendo il rischio): la
+   versione precedente era volutamente tozza — ~6 teste — perché una prova
+   più anatomica sembrava "un manichino da vetrina" a schermo piccolo. Questa
+   torna verso proporzioni più verosimili: spalle e fianchi più stretti,
+   gambe e collo più lunghi. Se in piccolo si legge peggio di prima, il primo
+   posto dove tornare a stringere è la larghezza (i fattori qui sotto), non le
+   proporzioni testa/corpo.
 
    Il punto dove le due liste si toccano — l'ASCELLA — è uno spigolo vero:
    sopra, braccio e tronco sono un pezzo solo; sotto si aprono e in mezzo c'è
@@ -108,37 +108,37 @@ function spline(pts: P[]): string {
 /** Cima della testa → braccio → ascella. */
 const UPPER: P[] = [
   [100, 12],
-  [86, 13.5], [78.5, 22], [76.5, 34], [79, 47], [84, 56],      // testa
-  [85.8, 62], [85, 72],                                        // collo
-  [77, 74], [66, 79], [55, 88],                                // trapezio
-  [50, 97], [49.5, 108],                                       // deltoide
-  // 🔴 Il braccio sta 2 più in fuori di quanto vorrebbe l'anatomia. Con
-  // l'ombra dura lo spiraglio fra braccio e fianco era largo 7 e l'ombra ne
-  // occupava 5: da fuori sembrava una sbarra nera, non un'apertura.
-  [46, 122], [44.5, 140], [43.5, 156],                         // braccio, fuori
-  [43, 166], [43, 172],                                        // polso
-  [37, 179], [35.5, 191], [39, 200], [47, 203], [53.5, 197],   // mano
-  [55.5, 185], [56.5, 172],                                    // polso, dentro
-  [58, 158], [60, 140], [62, 122],                             // braccio, dentro
-  [65.5, 104],                                                 // ⟵ ASCELLA
+  [88.1, 13.5], [81.7, 22], [80, 34], [82.2, 47], [86.4, 56],  // testa
+  [87.9, 62.6], [87.2, 74.1],                                  // collo
+  [80.5, 76.4], [74.5, 81.7], [66.2, 91.1],                    // trapezio
+  [62.5, 100.6], [62.1, 112.1],                                // deltoide
+  // 🔴 Il braccio sta un po' più in fuori di quanto vorrebbe l'anatomia,
+  // stessa ragione di prima: con l'ombra dura uno spiraglio troppo stretto fra
+  // braccio e fianco sembra una sbarra nera, non un'apertura.
+  [59.5, 126.8], [58.4, 145.7], [57.6, 162.5],                 // braccio, fuori
+  [57.2, 173], [57.2, 179.3],                                  // polso
+  [52.8, 186.7], [48.4, 199.4], [51.2, 210.4], [57.6, 214.1], [62.8, 206.7], // mano
+  [66.6, 193], [67.4, 179.3],                                  // polso, dentro
+  [68.5, 164.6], [70, 145.7], [71.5, 126.8],                   // braccio, dentro
+  [74.1, 107.9],                                                // ⟵ ASCELLA
 ]
 
 /** Ascella → fianco → gamba → inguine. */
 const LOWER: P[] = [
-  [65.5, 104],
-  [67, 118], [69.5, 132], [71, 146], [70, 156],                // costole → vita
-  [64, 166], [58, 176], [57.5, 188],                           // bacino
-  [58, 202], [59.5, 222], [61.5, 242],                         // coscia, fuori
-  [62.5, 252], [62.5, 270],                                    // ginocchio, fuori
-  [58.5, 284], [59, 298], [63.5, 310],                         // polpaccio, fuori
-  [67.5, 316], [68.5, 321],                                    // caviglia
-  [64.5, 327], [61, 335], [62, 340],                           // piede, fuori
-  [69, 343], [83, 343], [85.5, 340],                           // pianta
-  [86, 333], [84.5, 321],                                      // piede, dentro
-  [84, 311], [86.5, 299], [88, 286], [85.5, 272],              // polpaccio, dentro
-  [84, 270], [83.8, 252],                                      // ginocchio, dentro
-  [85, 238], [87.5, 216], [90, 200], [94, 191],                // coscia, dentro
-  [97, 189], [100, 188],                                       // inguine
+  [74.1, 107.9],
+  [75.2, 122.6], [77.1, 137.3], [78.2, 152], [77.5, 162.5],    // costole → vita
+  [73, 173], [68.5, 183.5], [68.1, 196.1],                     // bacino
+  [66.4, 212.8], [67.6, 237.2], [69.2, 261.6],                 // coscia, fuori
+  [70, 273.8], [70, 295.8],                                    // ginocchio, fuori
+  [66.8, 312.9], [67.2, 330], [70.8, 344.6],                   // polpaccio, fuori
+  [74, 351.9], [74.8, 358],                                    // caviglia
+  [71.6, 365.3], [68.8, 375.1], [69.6, 381.2],                 // piede, fuori
+  [75.2, 384.9], [86.4, 384.9], [88.4, 381.2],                 // pianta
+  [88.8, 372.7], [87.6, 358],                                  // piede, dentro
+  [87.2, 345.8], [89.2, 331.2], [90.4, 315.3], [88.4, 298.2],  // polpaccio, dentro
+  [87.2, 295.8], [87, 273.8],                                  // ginocchio, dentro
+  [88, 256.8], [90, 229.9], [92, 210.4], [95.2, 199.4],        // coscia, dentro
+  [97.8, 197.2], [100, 196.1],                                 // inguine
 ]
 
 /** Metà profilo. Tracciato APERTO: si richiude da solo sulla linea mediana. */
@@ -175,16 +175,16 @@ function band(top: P[], bottom: P[]): string {
   return `M${top[0][0]},${top[0][1]} ${spline(top)} L${end[0]},${end[1]} ${spline(rev(bottom))} Z`
 }
 
-const S_CHIN = seam(58, 3)      // testa / collo
-const S_NECK = seam(74, 2)      // collo / spalle
-const S_YOKE = seam(102, -8)    // spalle / petto — il carré delle clavicole
-const S_RIBS = seam(146, 5)     // petto / pancia — l'arcata costale
-const S_WAIST = seam(168, 3)    // pancia / fianchi
-const S_CROTCH = seam(190, -6)  // fianchi / cosce — l'inguine sale al centro
+const S_CHIN = seam(58, 3)        // testa / collo
+const S_NECK = seam(76, 2.3)      // collo / spalle
+const S_YOKE = seam(106, -8.4)    // spalle / petto — il carré delle clavicole
+const S_RIBS = seam(152, 5.3)     // petto / pancia — l'arcata costale
+const S_WAIST = seam(175, 3.2)    // pancia / fianchi
+const S_CROTCH = seam(198, -6.3)  // fianchi / cosce — l'inguine sale al centro
 
-const S_RIBS_B = seam(150, 4)   // schiena alta / schiena bassa
-const S_WAIST_B = seam(170, 3)  // schiena bassa / sedere
-const S_FOLD = seam(198, -5)    // 🔴 la piega gluteale sta SOTTO l'inguine
+const S_RIBS_B = seam(156, 4.2)   // schiena alta / schiena bassa
+const S_WAIST_B = seam(177, 3.2)  // schiena bassa / sedere
+const S_FOLD = seam(208, -5.3)    // 🔴 la piega gluteale sta SOTTO l'inguine
 
 /**
  * Il taglio braccio/tronco.
@@ -200,11 +200,11 @@ const ARM_INNER: P[] = UPPER.slice(UPPER.length - 5)   // da [57,170] all'ascell
 const SPLIT: P[] = [
   YOKE_L[YOKE_L.length - 1],
   // L'ascella resta esatta: lì è una cucitura vera, non una linea nell'aria.
-  ...rev(ARM_INNER).map(([x, y], i): P => (i === 0 ? [x, y] : [x + 1.6, y])),
+  ...rev(ARM_INNER).map(([x, y], i): P => (i === 0 ? [x, y] : [x + 1.3, y])),
 ]
 
 /** Il braccio sinistro: sopra segue il carré, dentro `SPLIT`, fuori sborda. */
-const ARM = `M6,110 ${spline(YOKE_L)} ${spline(SPLIT)} L6,170 Z`
+const ARM = `M6,114 ${spline(YOKE_L)} ${spline(SPLIT)} L6,177 Z`
 
 /** La coscia sinistra: sopra segue l'inguine, sotto taglia dritto al ginocchio. */
 const thigh = (top: P[], bottom: number) =>
@@ -212,7 +212,7 @@ const thigh = (top: P[], bottom: number) =>
 
 /* ── Le fasce ──────────────────────────────────────────────────────────────
    Le quote in y sono punti di repere del corpo, e sono le STESSE davanti e
-   dietro: 58 mento, 74 base del collo, 102 carré, 188 inguine, 252 ginocchio.
+   dietro: 58 mento, 76 base del collo, 106 carré, 198 inguine, 274 ginocchio.
    Se le due viste divergessero, la stessa altezza toccata sul fronte e sul
    retro darebbe due parti diverse.
 
@@ -226,67 +226,67 @@ const HEAD_NECK: Partial<Record<RegionCode, Shape>> = {
     d: `M6,0 L194,0 L194,55 ${spline(rev(S_CHIN))} Z`,
   },
   neck: {
-    k: 'path', cx: 100, cy: 67,
+    k: 'path', cx: 100, cy: 68,
     d: band(S_CHIN, S_NECK),
-    hit: { x: 64, y: 56, w: 72, h: 22 },
+    hit: { x: 69, y: 56, w: 61, h: 25 },
   },
 }
 
 const SHOULDERS: Partial<Record<RegionCode, Shape>> = {
-  shoulders: { k: 'path', cx: 100, cy: 86, d: band(S_NECK, S_YOKE) },
+  shoulders: { k: 'path', cx: 100, cy: 89, d: band(S_NECK, S_YOKE) },
 }
 
 const ARMS: Partial<Record<RegionCode, Shape>> = {
-  arm_l: { k: 'path', d: ARM, cx: 50, cy: 134 },
-  arm_r: { k: 'path', d: ARM, cx: 150, cy: 134, mirror: true },
-  hand_l: { k: 'rect', x: 6, y: 170, w: 50, h: 36, cx: 44, cy: 189 },
-  hand_r: { k: 'rect', x: 144, y: 170, w: 50, h: 36, cx: 156, cy: 189 },
+  arm_l: { k: 'path', d: ARM, cx: 63, cy: 139 },
+  arm_r: { k: 'path', d: ARM, cx: 137, cy: 139, mirror: true },
+  hand_l: { k: 'rect', x: 30, y: 177, w: 38, h: 41, cx: 49, cy: 197 },
+  hand_r: { k: 'rect', x: 132, y: 177, w: 38, h: 41, cx: 151, cy: 197 },
 }
 
 export const FRONT: Partial<Record<RegionCode, Shape>> = {
   ...HEAD_NECK,
   ...SHOULDERS,
-  chest: { k: 'path', cx: 100, cy: 124, d: band(S_YOKE, S_RIBS) },
+  chest: { k: 'path', cx: 100, cy: 129, d: band(S_YOKE, S_RIBS) },
   core: {
-    k: 'path', cx: 100, cy: 157, d: band(S_RIBS, S_WAIST),
-    hit: { x: 24, y: 146, w: 152, h: 24 },
+    k: 'path', cx: 100, cy: 164, d: band(S_RIBS, S_WAIST),
+    hit: { x: 43, y: 152, w: 114, h: 25 },
   },
   hips: {
-    k: 'path', cx: 100, cy: 180, d: band(S_WAIST, S_CROTCH),
-    hit: { x: 24, y: 168, w: 152, h: 24 },
+    k: 'path', cx: 100, cy: 188, d: band(S_WAIST, S_CROTCH),
+    hit: { x: 43, y: 175, w: 114, h: 26 },
   },
   ...ARMS,
-  quad_l: { k: 'path', cx: 76, cy: 218, d: thigh(S_CROTCH, 252), hit: { x: 52, y: 186, w: 48, h: 66 } },
-  quad_r: { k: 'path', cx: 124, cy: 218, d: thigh(S_CROTCH, 252), mirror: true, hit: { x: 100, y: 186, w: 48, h: 66 } },
-  knee_l: { k: 'rect', x: 52, y: 252, w: 48, h: 18, cx: 73, cy: 261 },
-  knee_r: { k: 'rect', x: 100, y: 252, w: 48, h: 18, cx: 127, cy: 261 },
-  shin_l: { k: 'rect', x: 52, y: 270, w: 48, h: 46, cx: 74, cy: 292 },
-  shin_r: { k: 'rect', x: 100, y: 270, w: 48, h: 46, cx: 126, cy: 292 },
-  foot_l: { k: 'rect', x: 46, y: 316, w: 54, h: 40, cx: 72, cy: 332 },
-  foot_r: { k: 'rect', x: 100, y: 316, w: 54, h: 40, cx: 128, cy: 332 },
+  quad_l: { k: 'path', cx: 81, cy: 232, d: thigh(S_CROTCH, 274), hit: { x: 64, y: 194, w: 36, h: 80 } },
+  quad_r: { k: 'path', cx: 119, cy: 232, d: thigh(S_CROTCH, 274), mirror: true, hit: { x: 100, y: 194, w: 36, h: 80 } },
+  knee_l: { k: 'rect', x: 62, y: 274, w: 38, h: 22, cx: 81, cy: 285 },
+  knee_r: { k: 'rect', x: 100, y: 274, w: 38, h: 22, cx: 119, cy: 285 },
+  shin_l: { k: 'rect', x: 62, y: 296, w: 38, h: 56, cx: 81, cy: 324 },
+  shin_r: { k: 'rect', x: 100, y: 296, w: 38, h: 56, cx: 119, cy: 324 },
+  foot_l: { k: 'rect', x: 57, y: 352, w: 43, h: 49, cx: 78, cy: 376 },
+  foot_r: { k: 'rect', x: 100, y: 352, w: 43, h: 49, cx: 122, cy: 376 },
 }
 
 export const BACK: Partial<Record<RegionCode, Shape>> = {
   ...HEAD_NECK,
   ...SHOULDERS,
-  upper_back: { k: 'path', cx: 100, cy: 126, d: band(S_YOKE, S_RIBS_B) },
+  upper_back: { k: 'path', cx: 100, cy: 131, d: band(S_YOKE, S_RIBS_B) },
   lower_back: {
-    k: 'path', cx: 100, cy: 160, d: band(S_RIBS_B, S_WAIST_B),
-    hit: { x: 24, y: 150, w: 152, h: 22 },
+    k: 'path', cx: 100, cy: 167, d: band(S_RIBS_B, S_WAIST_B),
+    hit: { x: 43, y: 156, w: 114, h: 23 },
   },
   glutes: {
-    k: 'path', cx: 100, cy: 184, d: band(S_WAIST_B, S_FOLD),
-    hit: { x: 24, y: 170, w: 152, h: 28 },
+    k: 'path', cx: 100, cy: 192, d: band(S_WAIST_B, S_FOLD),
+    hit: { x: 43, y: 177, w: 114, h: 31 },
   },
   ...ARMS,
-  ham_l: { k: 'path', cx: 76, cy: 222, d: thigh(S_FOLD, 252), hit: { x: 52, y: 194, w: 48, h: 58 } },
-  ham_r: { k: 'path', cx: 124, cy: 222, d: thigh(S_FOLD, 252), mirror: true, hit: { x: 100, y: 194, w: 48, h: 58 } },
-  knee_l: { k: 'rect', x: 52, y: 252, w: 48, h: 18, cx: 73, cy: 261 },
-  knee_r: { k: 'rect', x: 100, y: 252, w: 48, h: 18, cx: 127, cy: 261 },
-  calf_l: { k: 'rect', x: 52, y: 270, w: 48, h: 42, cx: 74, cy: 290 },
-  calf_r: { k: 'rect', x: 100, y: 270, w: 48, h: 42, cx: 126, cy: 290 },
-  ankle_l: { k: 'rect', x: 46, y: 312, w: 54, h: 44, cx: 74, cy: 328 },
-  ankle_r: { k: 'rect', x: 100, y: 312, w: 54, h: 44, cx: 126, cy: 328 },
+  ham_l: { k: 'path', cx: 81, cy: 237, d: thigh(S_FOLD, 274), hit: { x: 62, y: 203, w: 38, h: 71 } },
+  ham_r: { k: 'path', cx: 119, cy: 237, d: thigh(S_FOLD, 274), mirror: true, hit: { x: 100, y: 203, w: 38, h: 71 } },
+  knee_l: { k: 'rect', x: 62, y: 274, w: 38, h: 22, cx: 81, cy: 285 },
+  knee_r: { k: 'rect', x: 100, y: 274, w: 38, h: 22, cx: 119, cy: 285 },
+  calf_l: { k: 'rect', x: 62, y: 296, w: 38, h: 51, cx: 81, cy: 321 },
+  calf_r: { k: 'rect', x: 100, y: 296, w: 38, h: 51, cx: 119, cy: 321 },
+  ankle_l: { k: 'rect', x: 57, y: 347, w: 43, h: 54, cx: 78, cy: 374 },
+  ankle_r: { k: 'rect', x: 100, y: 347, w: 43, h: 54, cx: 122, cy: 374 },
 }
 
 export const GEOMETRY: Record<Side, Partial<Record<RegionCode, Shape>>> = {
