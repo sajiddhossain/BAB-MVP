@@ -127,6 +127,9 @@ export default function App() {
    * dell'app reale (HurtButton + TabBar dove ci sono anche lì) così gli
    * screenshot non mentono su cosa c'è intorno alla schermata.
    */
+  if (import.meta.env.DEV && pathname === '/dev/blank') {
+    return <div className="min-h-dvh w-full" />
+  }
   if (import.meta.env.DEV && pathname.startsWith('/dev/')) {
     const key = pathname.slice('/dev/'.length)
     const screens: Record<string, React.ReactNode> = {
