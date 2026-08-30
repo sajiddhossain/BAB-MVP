@@ -245,6 +245,31 @@ async function playScript(page, cdp, steps, log) {
     await ghost(null, null)
   }
 
+  /* il campo di testo del pannello, e i tasti della nostra tastiera */
+  const findField = () =>
+    page.evaluate(() => {
+      const t = document.querySelector('textarea')
+      if (!t) return null
+      const r = t.getBoundingClientRect()
+      return { x: r.x + 40, y: r.y + r.height / 2 }
+    })
+  const findKey = (id) =>
+    page.evaluate((k) => {
+      const el = [...document.querySelectorAll('[data-key]')].find((e) => e.dataset.key === k)
+      if (!el) return null
+      const r = el.getBoundingClientRect()
+      return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
+    }, id)
+
+  /* un tasto si tocca piu' in fretta di un comando: chi scrive non esita */
+  const tapKey = async (pt) => {
+    await ghost(pt.x, pt.y)
+    await touch('touchStart', pt.x, pt.y)
+    await wait(45)
+    await touch('touchEnd', pt.x, pt.y)
+    await wait(55)
+  }
+
   for (const s of steps) {
     if (s.tap || s.cta || s.close || s.zone) {
       const pt = s.tap
@@ -274,6 +299,21 @@ async function playScript(page, cdp, steps, log) {
         }
         await touch('touchEnd', x1, y)
         await ghost(null, null)
+      }
+    } else if (s.write) {
+      const f = await findField()
+      if (!f) log(`  ⚠ campo di testo non trovato (schermo ${await page.evaluate(() => window.__step)})`)
+      else {
+        await tapAt(f)
+        await wait(460) // la tastiera sale
+        for (const ch of s.write) {
+          const pt = await findKey(ch === ' ' ? 'space' : ch.toLowerCase())
+          if (pt) await tapKey(pt)
+        }
+        await ghost(null, null)
+        await wait(500)
+        const done = await findKey('Done')
+        if (done) await tapAt(done)
       }
     } else if (s.scroll) {
       const x = (STAGE.w / 2) * SCALE

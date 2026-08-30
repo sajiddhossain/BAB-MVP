@@ -10,6 +10,7 @@
  *   { cta: true }         tocca il bottone principale in cima alla pila
  *   { zone: 'quad-r' }    tocca una zona del corpo
  *   { close: true }       tocca la ✕ del pannello
+ *   { write: 'testo' }     tocca il campo, scrive sulla tastiera, chiude
  *   { slide: {…} }        trascina uno slider
  *   { scroll: {…} }       scorre lo schermo col dito
  * Ogni azione puo' portarsi dietro `hold`: quanto restare fermi dopo.
@@ -30,7 +31,9 @@ export const SCRIPTS = {
     { cta: true, hold: 1500 },
 
     // la mappa del corpo: due punti, ognuno col suo nome
-    { zone: 'quad-r', hold: 1200 },
+    { zone: 'quad-r', hold: 1000 },
+    // il momento in cui si vede che e' un'app: la tastiera sale e si scrive
+    { write: 'Felt it on the last set', hold: 900 },
     { tap: 'sore', hold: 500 },
     { tap: 'tight', hold: 700 },
     { slide: { near: 'No pain', to: 0.62 }, hold: 900 },
@@ -62,7 +65,8 @@ export const SCRIPTS = {
     { cta: true, hold: 1500 },
 
     { tap: 'Back', hold: 900 },
-    { zone: 'ham-l', hold: 1300 },
+    { zone: 'ham-l', hold: 1100 },
+    { write: 'Tight but not painful', hold: 900 },
     { tap: 'achy', hold: 500 },
     { tap: 'tight', hold: 800 },
     { cta: true, hold: 1300 },

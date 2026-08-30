@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Slider } from './Slider'
 import { Touchable } from './Touchable'
+import { Keyboard } from './Keyboard'
+import { fakeKeyboard } from '../keyboard'
 import { useField, toggle } from '../state'
 import { useNav } from '../../proto/nav'
 import biceps from '../assets/icons/sens-biceps.svg'
@@ -130,6 +132,12 @@ export function SensationSheet({
   )
   const [note, setNote] = useField(`${field ?? 'sheet'}.note`, '')
   const [focus, setFocus] = useState(false)
+  /*
+   * Nel video e su computer la tastiera di sistema non esiste: la disegniamo
+   * noi. Su un telefono vero lasciamo salire quella di iOS, che e' migliore.
+   */
+  const kb = fakeKeyboard()
+  const box = useRef<HTMLTextAreaElement>(null)
 
   /*
    * "A little help ✨" e' una tendina, e la freccia deve aprirla e chiuderla.
@@ -294,8 +302,27 @@ export function SensationSheet({
             onChange={(e) => setNote(e.target.value)}
             onFocus={() => setFocus(true)}
             onBlur={() => setFocus(false)}
-            onPointerDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => {
+              e.stopPropagation()
+              /*
+               * Con la nostra tastiera mettiamo a fuoco noi, e senza far
+               * scorrere: il browser, mettendo a fuoco un campo, cerca di
+               * centrarlo e trascinava tutto il telefono su di una decina di
+               * pixel. Nel video si vedeva la cornice sobbalzare.
+               */
+              if (kb) {
+                e.preventDefault()
+                box.current?.focus({ preventScroll: true })
+              }
+            }}
             onPointerUp={(e) => e.stopPropagation()}
+            ref={box}
+            /*
+             * inputMode="none" tiene il cursore e la selezione ma dice al
+             * sistema di non alzare la sua tastiera: cosi' non se ne vedono
+             * due sovrapposte quando la nostra e' accesa.
+             */
+            inputMode={kb ? 'none' : undefined}
             style={{ left: 12.5, top: 8.5, width: 342, height: 38, fontSize: 14, color: '#111827', lineHeight: 'normal', margin: 0, fontFamily: 'inherit' }}
           />
         </div>
@@ -512,6 +539,14 @@ export function SensationSheet({
         )}
         </div>
       </div>
+
+      {/*
+        Sta FUORI dal pannello, non dentro: il pannello ha overflow hidden e la
+        tastiera dev'essere ancorata al fondo dello schermo, non al fondo del
+        pannello. Copre le pillole e il bottone, esattamente come fa iOS — per
+        quello sopra i tasti c'e' "Done", che e' il modo di riavere lo schermo.
+      */}
+      {kb && <Keyboard open={focus} value={note} onChange={setNote} onDone={() => box.current?.blur()} />}
     </div>
   )
 }
