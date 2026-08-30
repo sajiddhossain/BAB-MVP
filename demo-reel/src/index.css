@@ -44,3 +44,19 @@ body:has(.bab-proto) {
   60%  { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
+
+/* Il prototipo va usato col dito su un telefono, non letto come pagina web. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  /* manipulation toglie l'attesa di 300ms e lo zoom col doppio tocco: senza,
+     due tocchi rapidi su due zone del corpo zoomavano la pagina */
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-touch-callout: none;
+}
+/* dvh e non vh: su iOS vh conta la barra degli indirizzi anche quando e' sparita,
+   e lo stage risultava piu' alto dello schermo */
+html, body, #root { height: 100dvh; }

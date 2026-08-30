@@ -61,12 +61,10 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
           filter: 'drop-shadow(6px 5px 0px rgba(0,0,0,0.04))',
         }}
       />
-      {/* 129/330 e non 127.5/328.5: in Figma i figli di un contenitore con bordo
-          sono relativi al contenuto, quindi il bordo da 1.5px li sposta. */}
+      {/* qui la figura e' piu' alta che su checkin-3: 352 invece di 333 */}
       <BodyMap
-        left={129}
+        centerX={193.5}
         top={330}
-        width={128}
         height={352}
         side={side}
         selected={picked}

@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { FRONT_ZONES, BACK_ZONES, FRONT_VIEWBOX, BACK_VIEWBOX, BODY_SIZE } from '../bodyZones'
+import { FRONT_ZONES, BACK_ZONES, FRONT_INK, BACK_INK, BODY_SIZE } from '../bodyZones'
 import type { BodyZone } from '../bodyZones'
 import lineArt from '../assets/bodymap/body-map.svg'
 
@@ -30,17 +30,18 @@ export function labelOf(side: Side, id: string | null) {
  * senza doverlo allineare a mano.
  */
 export function BodyMap({
-  left,
+  centerX,
   top,
-  width,
   height,
   side,
   selected,
   onPick,
 }: {
-  left: number
+  /** asse verticale della figura: e' su quello che il disegno e' simmetrico */
+  centerX: number
   top: number
-  width: number
+  /** altezza della figura DI FRONTE. Di spalle le braccia sono piu' larghe:
+      la larghezza cambia, la scala no, cosi' il corpo non cresce cambiando lato */
   height: number
   side: Side
   selected: readonly string[]
@@ -50,6 +51,9 @@ export function BodyMap({
   const paths = useRef(new Map<string, SVGPathElement>())
   const down = useRef<{ x: number; y: number } | null>(null)
   const zones = zonesFor(side)
+  const ink = side === 'Back' ? BACK_INK : FRONT_INK
+  const k = height / FRONT_INK[3]
+  const box = { width: ink[2] * k, height: ink[3] * k }
 
   /** Tocco -> zona, nello spazio del viewBox. */
   const hit = (e: React.PointerEvent): BodyZone | null => {
@@ -78,9 +82,10 @@ export function BodyMap({
     <svg
       ref={svg}
       className="absolute"
-      style={{ left, top, width, height, touchAction: 'pan-y' }}
-      viewBox={side === 'Back' ? BACK_VIEWBOX : FRONT_VIEWBOX}
-      preserveAspectRatio="xMidYMid meet"
+      style={{ left: centerX - box.width / 2, top, ...box, touchAction: 'pan-y' }}
+      // il viewBox e' l'ingombro esatto del tratto: la figura tocca i bordi del
+      // riquadro, quindi le misure qui sopra sono quelle che si vedono davvero
+      viewBox={ink.join(' ')}
       onPointerDown={(e) => {
         e.stopPropagation()
         down.current = { x: e.clientX, y: e.clientY }
@@ -104,6 +109,7 @@ export function BodyMap({
               else paths.current.delete(z.id)
             }}
             d={z.d}
+            data-zone={z.id}
             fill={MARK}
             stroke={MARK}
             strokeWidth={on ? 6 : 0}

@@ -11,8 +11,12 @@
 // pretendere il centro esatto li renderebbe intoccabili.
 export type BodyZone = { id: string; label: string; d: string; c: [number, number] }
 
-export const FRONT_VIEWBOX = '196 90 388 1152'
-export const BACK_VIEWBOX = '749 90 402 1161'
+// Ingombro del tratto di ciascuna figura, come viewBox [x, y, w, h].
+// Le due figure stanno affiancate nello stesso disegno: il viewBox e' il
+// modo di ritagliare quella giusta.
+export type Ink = [number, number, number, number]
+export const FRONT_INK: Ink = [195.5, 90.0, 389.5, 1153.5]
+export const BACK_INK: Ink = [743.0, 91.0, 415.5, 1159.0]
 export const BODY_SIZE = 1366
 
 export const FRONT_ZONES: BodyZone[] = [

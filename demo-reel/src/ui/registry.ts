@@ -27,6 +27,12 @@ export type UiScreen = {
    * qui diciamo al diff quale porzione del riferimento confrontare.
    */
   refClip?: { x: number; y: number }
+  /**
+   * Soglia propria, quando il frame Figma e il comportamento giusto non possono
+   * combaciare. Va sempre col perche': senza motivo scritto e' solo un check
+   * spento.
+   */
+  tolerance?: number
 }
 
 export const UI_SCREENS: Record<string, UiScreen> = {
@@ -77,6 +83,13 @@ export const UI_SCREENS: Record<string, UiScreen> = {
     width: 402,
     height: 874,
     reference: 'src/assets/checkout/checkout-5-body-map.svg',
+    /*
+     * Il frame mostra la figura DI SPALLE mentre nel toggle e' acceso "Front":
+     * nell'export era un'immagine sola e le due linguette non giravano il corpo.
+     * Ora il corpo gira davvero, quindi con "Front" mostriamo il fronte e la
+     * figura non puo' coincidere con quella del frame. Il resto dello schermo si'.
+     */
+    tolerance: 3,
     node: '3588:167',
   },
   'checkout-3-satisfaction': {

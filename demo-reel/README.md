@@ -41,12 +41,19 @@ Un Δ di 1px e' arrotondamento del line box; un Δ di 5px e' il font sbagliato.
 | schermo | diff | | schermo | diff |
 |---|---|---|---|---|
 | checkout-1a-pick-tempo | 0.22% | | checkin-5-make-sense | 1.06% |
-| checkout-2-rpe | 0.42% | | checkout-5-body-map | 1.31% |
-| checkout-1b-reveal | 0.54% | | checkin-3-body-map | 1.44% |
-| checkin-1-predict | 0.90% | | checkin-2-tune-in | 1.55% |
-| checkout-4-energy | 0.94% | | checkin-4-sensation-sheet | 1.71% |
-| checkout-7-close-loop | 0.97% | | checkout-6-sensation-sheet | 1.95% |
-| | | | checkout-3-satisfaction | 2.08% |
+| checkout-2-rpe | 0.42% | | checkin-2-tune-in | 1.55% |
+| checkout-1b-reveal | 0.54% | | checkin-4-sensation-sheet | 1.71% |
+| checkin-1-predict | 0.86% | | checkout-6-sensation-sheet | 1.95% |
+| checkout-4-energy | 0.94% | | checkout-3-satisfaction | 2.08% |
+| checkout-7-close-loop | 0.97% | | checkin-3-body-map | 2.27% |
+| | | | checkout-5-body-map | 2.67%\* |
+
+\* soglia sua, dichiarata nel registry: il frame di checkout-5 mostra la figura DI
+SPALLE mentre nel toggle e' acceso "Front" — nell'export era un'immagine sola e le
+linguette non giravano il corpo. Ora il corpo gira davvero, quindi con "Front"
+mostriamo il fronte e la figura non puo' coincidere col frame. Il resto dello
+schermo si'. Le due body map hanno comunque un residuo alto per un motivo voluto:
+il frame ha le macchie rosse gia' dipinte, la nostra figura parte vuota.
 
 Il residuo e' antialiasing dei glifi — confrontiamo font vivo contro testo gia' in
 outline, sotto quella soglia non si scende. La percentuale cresce con la QUANTITA'
@@ -88,9 +95,47 @@ Figma `✨` e' addirittura un quadrato vuoto).
 - **Figma non centra sempre le etichette dei bottoni.** Su checkout-4 l'etichetta del
   CTA e' centrata in una scatola da 354 dentro un bottone da 342: centrarla sul
   bottone la sposta di 5px.
-- **La figura umana e' uno sprite** con fronte e retro affiancati: il toggle Front/Back
-  sposta il ritaglio, non cambia immagine. Le macchie rosse sono dipinte dentro il
-  raster, quindi non sono accendibili una a una.
+- **La figura umana era uno sprite** con le macchie rosse dipinte dentro: non
+  accendibili una a una. Ora e' un disegno vettoriale con le zone vive sopra —
+  vedi "La body map".
+
+## La body map
+
+Il disegno di partenza (`src/ui/assets/bodymap/body-map.svg`) e' **un path unico
+da 78 sottotracciati**: le zone del corpo non esistono come nodi, e non esistono
+nemmeno in Figma (il nodo e' un'immagine). Ma il disegno le contiene gia' come
+linee.
+
+`tools/extract-zones.py` le tira fuori: rasterizza a 2x, trova ogni area chiusa
+dalle linee, ne traccia il contorno e lo semplifica. Escono **66 zone** (33 per
+lato, dalla testa ai talloni) i cui contorni combaciano col tratto originale
+invece di stargli vicino.
+
+Tre cose imparate qui:
+
+- **`np.cross` su vettori 2D e' deprecato in numpy 2** e restituisce distanze
+  nulle: Douglas-Peucker riduceva ogni contorno a due punti e le zone sparivano
+  senza un errore.
+- **L'inseguimento di bordo alla Moore si incastra** rimbalzando fra due pixel
+  adiacenti. Sostituito col tracciamento dei bordi dei pixel — ogni pixel di
+  confine contribuisce il suo lato, poi si concatenano: esatto per costruzione.
+- **I punti di innesco messi a occhio non si possono verificare.** Un seme sul
+  braccio cadeva nel vuoto fra braccio e fianco e il riempimento esondava su
+  tutto lo sfondo, senza che si notasse. Ora le zone si abbinano per baricentro
+  a un elenco di aree gia' trovate, e un seme sbagliato e' un errore, non un
+  silenzio.
+
+Nel componente il tratto originale sta **sopra** le campiture come `<image>` nello
+stesso viewBox: il colore resta dentro le linee, le linee restano nitide, e non
+c'e' niente da allineare a mano. Il viewBox e' l'ingombro esatto del tratto, quindi
+le misure del riquadro sono quelle che si vedono.
+
+Il tocco e' tollerante: gomito e polso sono zone da ~180px, pretendere il centro
+esatto le renderebbe intoccabili. Se il dito non centra nessuna zona si prende la
+piu' vicina entro 46 unita' di disegno.
+
+`python3 tools/extract-zones.py --debug` scrive anche `out/diff/zones-debug.png`,
+la mappa colorata per controllare a occhio.
 
 ## Strumenti
 
@@ -109,7 +154,28 @@ npm run dev          # prototipo camminabile + reel, esposto anche in rete local
 npm run check:proto  # verifica che tap/scroll/swipe funzionino davvero
 npm run diff         # verifica la fedelta' contro Figma
 npm run record       # registra entrambe le clip in out/
+python3 tools/extract-zones.py --debug   # rigenera le zone della body map
 ```
+
+## Sul telefono
+
+Il prototipo e' installabile: aprilo dal telefono e "Aggiungi a Home". Da li'
+parte a schermo intero, senza barre del browser, con la sua icona — e funziona
+anche senza rete.
+
+Quello che lo fa sembrare un'app e non una pagina:
+
+- lo stage da 402x874 e' scalato per riempire lo schermo. **`shrink-0` e'
+  obbligatorio**: e' un flex item, e `transform: scale` non riduce la larghezza
+  di *layout*, quindi su uno schermo da 375 il flex lo stringeva e tutto il
+  contenuto (posizionato in assoluto) finiva tagliato a destra;
+- `viewport-fit=cover` e niente zoom col doppio tocco, che su un prototipo
+  tocca-e-trascina si attiva per sbaglio in continuazione;
+- `100dvh` e non `vh`: su iOS `vh` conta la barra degli indirizzi anche quando e'
+  sparita, e lo stage veniva piu' alto dello schermo;
+- il reel si carica **su richiesta**. Si porta dietro i 13 export di Figma
+  (~5MB di PNG in base64) e finiva nel bundle anche per chi apriva solo il
+  prototipo: 5.4MB → 271kB (81kB gzip).
 
 ## Il prototipo
 
@@ -135,7 +201,7 @@ Le altre viste restano dove erano: `?clip=checkin` il reel da registrare,
 |---|---|
 | checkin-1 / checkout-1a | i tre chip del tempo |
 | checkin-2 tune-in | 4 slider, le pillole della durata, i due toggle Si/No |
-| checkin-3 / checkout-5 | Front/Back, e il tap sul corpo aggiunge un punto |
+| checkin-3 / checkout-5 | Front/Back gira davvero il corpo; toccare una zona la accende e fa salire il sheet |
 | sensation sheet (×2) | 16 chip, Si/No, slider intensita', la ✕ chiude |
 | checkout-2 / checkout-4 | slider con scatti; su energy cambia anche la lettura |
 | checkout-3 | le 5 facce e le 6 pillole |
@@ -153,12 +219,11 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
 
 - L'accordion "Try this today" su checkin-5 non si apre: **lo stato aperto non
   esiste nel Figma**, mi inventerei il contenuto.
-- Su checkout-5 il toggle Front/Back cambia la linguetta ma non gira il corpo:
-  li' l'asset e' una figura sola, non lo sprite fronte/retro come su checkin-3.
 - Il testo della pillola di lettura su checkout-4 esiste in Figma solo per il
   valore 3: gli altri sei sono segnaposto miei, da far validare.
-- I campi di testo non si scrivono, e le macchie rosse dipinte nel raster restano
-  dove sono (i punti che aggiungi sono segni sovrapposti).
+- I campi di testo non si scrivono.
+- Il reel (`?clip=`) usa ancora gli export SVG di Figma, non i componenti: i due
+  video escono da li'. Rifarlo sui componenti e' il passo successivo.
 
 - `npm run record:checkin` / `npm run record:checkout` per una sola clip
 - `node scripts/record.mjs all --fps 60 --scale 3` per alzare qualita'

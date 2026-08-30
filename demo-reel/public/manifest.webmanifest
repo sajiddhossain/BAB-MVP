@@ -1,0 +1,16 @@
+{
+  "name": "BAB · Check-in",
+  "short_name": "BAB",
+  "description": "Check-in e check-out: come ti senti prima e dopo l'allenamento.",
+  "start_url": "./?flow=checkin",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E0E11",
+  "theme_color": "#0E0E11",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -66,6 +66,7 @@ function readRegistry() {
       height: num('height'),
       reference: ref[1],
       clip: cx && cy ? { x: +cx[1], y: +cy[1] } : null,
+      tolerance: num('tolerance'),
     }
   }
   return out
@@ -186,16 +187,19 @@ const main = async () => {
   }
 
   console.log('')
-  let worst = 0
+  let failed = 0
   for (const r of rows) {
-    const ok = r.pct <= THRESHOLD_PCT
-    worst = Math.max(worst, r.pct)
+    // una soglia propria vale solo se il registry dice perche' (vedi tolerance)
+    const limit = registry[r.id].tolerance ?? THRESHOLD_PCT
+    const ok = r.pct <= limit
+    if (!ok) failed++
+    const note = limit !== THRESHOLD_PCT ? `  (soglia sua: ${limit}%)` : ''
     console.log(
-      `${ok ? '✓' : '✗'} ${r.id.padEnd(30)} ${r.pct.toFixed(2).padStart(6)}%  (${r.bad} px su ${r.total})`,
+      `${ok ? '✓' : '✗'} ${r.id.padEnd(30)} ${r.pct.toFixed(2).padStart(6)}%  (${r.bad} px su ${r.total})${note}`,
     )
   }
   console.log(`\ndiff in out/diff/  ·  soglia ${THRESHOLD_PCT}%`)
-  process.exit(worst <= THRESHOLD_PCT ? 0 : 1)
+  process.exit(failed === 0 ? 0 : 1)
 }
 
 main().catch((e) => {

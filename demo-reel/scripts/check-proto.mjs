@@ -104,7 +104,61 @@ const after = (await state())['checkin.sleep']
 expect('lo slider si trascina', typeof after === 'number' && after > before, true)
 expect('...senza cambiare schermo', await step(), 1)
 
-// chip del sensation sheet
+// --- body map -----------------------------------------------------------
+/*
+ * Le zone del corpo sono ritagliate dal disegno da tools/extract-zones.py:
+ * se quel passaggio si rompe restano dei path vuoti e il tocco non prende piu'
+ * niente, senza che nulla sembri rotto. Qui si vede.
+ * I bersagli sono i baricentri delle zone, convertiti dallo spazio del disegno
+ * a quello dello schermo con la stessa scala che usa il componente.
+ */
+await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(300)
+await tap(...at(202, 806))
+await tap(...at(202, 806))
+expect('siamo sulla body map', await step(), 2)
+
+/** baricentro di una zona -> punto sullo schermo del telefono */
+const onBody = async (zoneId) =>
+  at(...(await page.evaluate((id) => {
+    const svg = document.querySelector('svg[viewBox]')
+    const path = svg.querySelector(`path[data-zone="${id}"]`)
+    const b = path.getBBox()
+    const stage = document.querySelector('.bab-proto > div > div').getBoundingClientRect()
+    const k = svg.getScreenCTM()
+    const p = new DOMPoint(b.x + b.width / 2, b.y + b.height / 2).matrixTransform(k)
+    const scale = stage.width / 402
+    return [(p.x - stage.left) / scale, (p.y - stage.top) / scale]
+  }, zoneId)))
+
+await tap(...(await onBody('quad-r')))
+expect('la zona si accende', ((await state())['checkin.zones'] ?? []).includes('quad-r'), true)
+expect('...e fa salire il sheet', await step(), 3)
+expect(
+  '...col nome della zona',
+  // il titolo del sheet e' l'unico testo da 26px: cercarlo per classe prendeva
+  // l'occhiello dello schermo che sta dietro
+  await page.evaluate(() =>
+    [...document.querySelectorAll('p')].find((e) => getComputedStyle(e).fontSize === '26px')
+      ?.textContent,
+  ),
+  'Right quad',
+)
+
+await tap(30, 60)
+expect('si torna alla body map', await step(), 2)
+await tap(...at(151, 271)) // linguetta "Back"
+expect('il toggle gira il corpo', (await state())['checkin.bodySide'], 'Back')
+// il gomito e' una zona da 191px: senza tolleranza sul tocco sarebbe intoccabile
+await tap(...(await onBody('elbow-l')))
+expect('anche una zona minuscola si prende', ((await state())['checkin.zones'] ?? []).includes('elbow-l'), true)
+
+// --- sensation sheet ----------------------------------------------------
+await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(300)
+await tap(...at(202, 806))
 await tap(...at(202, 806))
 await tap(...at(202, 806))
 expect('siamo sul sensation sheet', await step(), 3)

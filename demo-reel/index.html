@@ -2,8 +2,23 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BAB · Demo Reel</title>
+    <!-- viewport-fit=cover: sotto il notch ci va il fondale, non una barra bianca.
+         maximum-scale=1 toglie lo zoom col doppio tocco, che su un prototipo
+         tocca-e-trascina si attiva per sbaglio in continuazione. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <title>BAB · Check-in</title>
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <!-- lo stage e' centrato su fondale scuro: la barra di stato ci si appoggia sopra -->
+    <meta name="theme-color" content="#0E0E11" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="BAB" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   </head>
   <body>
     <div id="root"></div>

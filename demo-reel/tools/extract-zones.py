@@ -244,17 +244,22 @@ def assign(table, pool, side):
     return out
 
 
-def viewbox(zones):
-    x0 = min(z["region"]["box"][0] for z in zones) - PAD
-    y0 = min(z["region"]["box"][1] for z in zones) - PAD
-    x1 = max(z["region"]["box"][2] for z in zones) + PAD
-    y1 = max(z["region"]["box"][3] for z in zones) + PAD
-    return [round(x0), round(y0), round(x1 - x0), round(y1 - y0)]
+def ink_box(walls, lo, hi):
+    """Ingombro del TRATTO di una figura, non delle sue campiture.
+
+    E' quello che si vede: usarlo come viewBox vuol dire che la figura tocca
+    esattamente i bordi del riquadro, senza margini invisibili da compensare.
+    """
+    ys, xs = np.nonzero(walls[:, lo:hi])
+    x0, x1 = float(xs.min() + lo) / SCALE, float(xs.max() + lo) / SCALE
+    y0, y1 = float(ys.min()) / SCALE, float(ys.max()) / SCALE
+    return [round(x0, 1), round(y0, 1), round(x1 - x0, 1), round(y1 - y0, 1)]
 
 
 def main():
     debug = "--debug" in sys.argv
-    pool = regions(rasterize())
+    walls = rasterize()
+    pool = regions(walls)
     print(f"{len(pool)} aree chiuse nel disegno")
     front = assign(FRONT, [r for r in pool if r["c"][0] < VIEW / 2], "front")
     back = assign(BACK, [r for r in pool if r["c"][0] >= VIEW / 2], "back")
@@ -290,8 +295,12 @@ def main():
         "// cade sulla linea o appena fuori. Gomito e polso sono di pochi pixel:\n"
         "// pretendere il centro esatto li renderebbe intoccabili.\n"
         "export type BodyZone = { id: string; label: string; d: string; c: [number, number] }\n\n"
-        f"export const FRONT_VIEWBOX = '{' '.join(map(str, viewbox(front)))}'\n"
-        f"export const BACK_VIEWBOX = '{' '.join(map(str, viewbox(back)))}'\n"
+        "// Ingombro del tratto di ciascuna figura, come viewBox [x, y, w, h].\n"
+        "// Le due figure stanno affiancate nello stesso disegno: il viewBox e' il\n"
+        "// modo di ritagliare quella giusta.\n"
+        "export type Ink = [number, number, number, number]\n"
+        f"export const FRONT_INK: Ink = {ink_box(walls, 0, VIEW // 2 * SCALE)}\n"
+        f"export const BACK_INK: Ink = {ink_box(walls, VIEW // 2 * SCALE, VIEW * SCALE)}\n"
         f"export const BODY_SIZE = {VIEW}\n\n"
         f"export const FRONT_ZONES: BodyZone[] = {dump(front)}\n\n"
         f"export const BACK_ZONES: BodyZone[] = {dump(back)}\n",

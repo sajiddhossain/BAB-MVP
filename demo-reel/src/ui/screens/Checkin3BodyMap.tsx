@@ -68,10 +68,10 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
           schermo successivo, che ha come sfondo questo stesso schermo, quindi
           la zona resta colorata dietro al pannello */}
       <BodyMap
-        left={125}
-        top={335}
-        width={140}
-        height={352}
+        // misurati sull'export Figma: la figura sta in 113x333 centrata a 196
+        centerX={196}
+        top={346}
+        height={333}
         side={side}
         selected={picked}
         onPick={(z) => {
