@@ -157,6 +157,25 @@ npm run record       # registra entrambe le clip in out/
 python3 tools/extract-zones.py --debug   # rigenera le zone della body map
 ```
 
+## Il feel
+
+Le cose che tradiscono un prototipo non sono quasi mai grosse. Queste sono
+quelle che ho tolto di mezzo, e cosa dicevano:
+
+| | prima | ora |
+|---|---|---|
+| barretta "Check-in 3/5" | sempre a schermo | e' un attrezzo mio, si accende con `?dev=1` |
+| contorno dello stage | nero da lettore video | il colore dell'app: le bande sembrano la stessa superficie |
+| tastiera aperta | il visualViewport si dimezzava e l'app si rimpiccioliva sotto le dita | non si rimisura mentre scrivi: la tastiera COPRE, non restringe |
+| apertura | mezzo secondo di carattere di sistema, poi salto a Bricolage | il prototipo compare quando i font ci sono |
+| barre di scorrimento | visibili | via |
+| tocco | solo visto | e anche sentito, dove il dispositivo lo permette (`navigator.vibrate`; iOS Safari non ce l'ha, e li' non fingiamo) |
+| pannello che sale | lo schermo dietro si scuriva e basta | arretra, si arrotonda e rientra se trascini giu' — e' il gesto che dice "questo sta SOPRA a quello" |
+
+Sull'ultima: vale solo dentro al prototipo. E' la presentazione di uno schermo
+sopra un altro, e senza navigazione non c'e' niente da presentare — nel probe
+del diff lo sfondo del pannello e' un fondale, non uno schermo arretrato.
+
 ## Sul telefono
 
 Il prototipo e' installabile: aprilo dal telefono e "Aggiungi a Home". Da li'
@@ -253,10 +272,12 @@ accende quando rispondi. Vale dove il frame Figma mostra una risposta data:
 checkin-1, tune-in, checkout-3, e i due sensation sheet ("Add this sensation"
 senza nessuna sensazione nominata non aggiunge niente).
 
-L'eccezione e' **checkout-1a**: il suo frame ha il bottone acceso e nessuna
-andatura scelta. Spegnerlo vorrebbe dire allontanarsi dal disegno invece che
-avvicinarsi, quindi li' si passa anche senza rispondere. E' un'incoerenza del
-file di partenza, non una scorciatoia.
+Compreso **checkout-1a**, il cui frame mostra il bottone acceso senza nessuna
+andatura scelta: li' il filo ambra su "Gentle" e il bordo spesso su "Upbeat" non
+sono una scelta fatta — sono la previsione del mattino e una variazione di stile.
+Uniformarlo costa 0.22% -> 5.22% di diff, ed e' tutto il bottone; sta dichiarato
+nel registry col perche'. Un bottone acceso che non porta da nessuna parte e'
+peggio di uno spento che dice il motivo.
 
 ### I campi fanno quello che dicono
 
@@ -299,6 +320,9 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
   esiste nel Figma**, mi inventerei il contenuto.
 - Il testo della pillola di lettura su checkout-4 esiste in Figma solo per il
   valore 3: gli altri sei sono segnaposto miei, da far validare.
+- Una zona del corpo si accende ma non si spegne: "spots added" puo' solo
+  crescere. Serve un modo per togliere un punto (toccarlo di nuovo? tenerlo
+  premuto?) e in Figma non c'e'.
 - Non c'e' un tasto indietro DENTRO al bottom sheet: da li' si esce con la ✕,
   trascinando, o con lo swipe. Il tasto indietro appartiene allo schermo dietro,
   ed e' coperto dai veli.

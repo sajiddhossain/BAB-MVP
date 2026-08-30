@@ -99,7 +99,15 @@ export function Prototype({ flow }: { flow: Flow }) {
   const isSheet = current.enter === 'sheet' && (!move || move.dir === 1)
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-hidden bg-[#0e0e11]">
+    /*
+     * Il contorno prende il colore dell'app, non il nero da lettore video: su un
+     * telefono con proporzioni diverse dalle 402x874 le bande che restano devono
+     * sembrare la stessa superficie, non la cornice di un video.
+     */
+    <div
+      className="fixed inset-0 flex items-center justify-center overflow-hidden"
+      style={{ background: 'var(--bab-bg)' }}
+    >
       <div
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
@@ -180,7 +188,12 @@ export function Prototype({ flow }: { flow: Flow }) {
 
       </div>
 
-      <FlowSwitcher flow={flow} index={index} />
+      {/*
+        La barretta "Check-in 3/5" e' un attrezzo: dice che stai guardando un
+        prototipo. Serve a me per saltare fra i flussi, non a chi prova l'app.
+        Si accende con ?dev=1.
+      */}
+      {new URLSearchParams(location.search).has('dev') && <FlowSwitcher flow={flow} index={index} />}
     </div>
   )
 }

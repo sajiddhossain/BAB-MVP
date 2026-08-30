@@ -55,7 +55,14 @@ export function Checkout1aPickTempo() {
         <TempoChip left={244} label="Gentle" icon={leaf} iconSize={18} iconLeft={44.5} iconTop={8.5} tone={toneOf('gentle')} onTap={() => setSel('gentle')} />
       </div>
 
-      <CtaButton label="Next" left={19} top={778} width={354} shadowTop={4} labelColor="var(--bab-ink)" labelCenter={175.5} />
+      {/*
+        Qui il bottone si spegne come su ogni altra domanda, anche se il frame lo
+        mostra acceso senza nessuna andatura scelta. Nel frame il filo ambra su
+        "Gentle" e il bordo spesso su "Upbeat" non sono una scelta fatta: sono la
+        previsione del mattino e una variazione di stile. Un bottone acceso che
+        non porta da nessuna parte e' peggio di uno spento che dice perche'.
+      */}
+      <CtaButton label="Next" left={19} top={778} width={354} shadowTop={4} labelColor="var(--bab-ink)" labelCenter={175.5} enabled={!!sel} />
     </Frame>
   )
 }

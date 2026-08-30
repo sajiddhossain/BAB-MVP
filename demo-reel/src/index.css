@@ -118,3 +118,11 @@ body[data-capture="1"] .bab-enter > * { animation: none; }
   user-select: text;
 }
 .bab-field::placeholder { color: #6b7280; opacity: 1; }
+
+/* Niente lampeggio del carattere all'apertura. */
+html:not([data-fonts='ready']) .bab-proto { opacity: 0; }
+.bab-proto { transition: opacity 220ms ease-out; }
+
+/* Le barre di scorrimento sono un dettaglio da pagina web. */
+.bab-proto ::-webkit-scrollbar { display: none; }
+.bab-proto * { scrollbar-width: none; }

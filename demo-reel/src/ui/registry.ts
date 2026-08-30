@@ -55,6 +55,16 @@ export const UI_SCREENS: Record<string, UiScreen> = {
     width: 402,
     height: 874,
     reference: 'src/assets/checkout/checkout-1a-pick-tempo.svg',
+    /*
+     * Il frame mostra il bottone "Next" acceso senza nessuna andatura scelta.
+     * Nel prototipo si spegne, come su ogni altra domanda: nel frame il filo
+     * ambra su "Gentle" e il bordo spesso su "Upbeat" non sono una scelta fatta
+     * (sono la previsione del mattino e una variazione di stile), quindi un
+     * bottone acceso li' non porterebbe da nessuna parte.
+     * Costo: 0.22% -> 5.22%, ed e' tutto il bottone. Il resto dello schermo
+     * combacia come prima.
+     */
+    tolerance: 5.5,
     node: '3673:2',
   },
   'checkout-1b-reveal-comparison': {

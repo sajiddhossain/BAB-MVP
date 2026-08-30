@@ -3,6 +3,16 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
 
+/*
+ * I font arrivano dopo il primo disegno: senza questo si vede mezzo secondo di
+ * carattere di sistema che poi salta a Bricolage. Su una pagina si perdona, su
+ * un'app no. La regola sta in index.css e riguarda solo il prototipo, non il
+ * probe del diff (che aspetta i font per conto suo).
+ */
+document.fonts.ready.then(() => {
+  document.documentElement.dataset.fonts = 'ready'
+})
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

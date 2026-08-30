@@ -151,7 +151,27 @@ export function SensationSheet({
   const veil = entered ? Math.max(0, 1 - drag / 420) : 0
   return (
     <div className="bab-font-ui absolute inset-0">
-      {backdrop}
+      {/*
+        Lo schermo dietro arretra e si arrotonda mentre il pannello sale: e' il
+        gesto che dice "questo sta SOPRA a quello", invece di limitarsi a
+        scurirlo. Rientra da solo se trascini il pannello giu'.
+
+        Solo dentro al prototipo: e' la presentazione di uno schermo sopra un
+        altro, e senza navigazione non c'e' niente da presentare. Fuori (nel
+        probe del diff) lo sfondo e' un fondale, non uno schermo arretrato.
+      */}
+      {backdrop && (
+        <div
+          className="absolute inset-0 overflow-hidden"
+          style={{
+            transform: nav ? `scale(${1 - 0.062 * veil}) translateY(${-11 * veil}px)` : undefined,
+            borderRadius: nav ? 16 * veil : undefined,
+            transition: dragging ? 'none' : 'transform 460ms cubic-bezier(0.32,0.72,0,1), border-radius 460ms ease-out',
+          }}
+        >
+          {backdrop}
+        </div>
+      )}
       {/* due veli sovrapposti, come in Figma */}
       <div
         className="absolute inset-0"

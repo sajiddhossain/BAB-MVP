@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
+import { buzz } from '../haptics'
 
 /**
  * Zona toccabile.
@@ -64,7 +65,10 @@ export function Touchable({
       onPointerUp={(e) => {
         if (stop) e.stopPropagation()
         setDown(false)
-        onTap?.()
+        if (onTap) {
+          buzz()
+          onTap()
+        }
       }}
     >
       {children}

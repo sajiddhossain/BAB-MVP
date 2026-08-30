@@ -51,10 +51,14 @@ async function tap(x, y) {
  * Lo cerca nel DOM invece che a coordinate: su tune-in sta a y=1193 di 1262,
  * cioe' fuori schermo, e con la navigazione "solo se confermi" non c'e' piu' un
  * punto qualunque da toccare per andare avanti.
+ *
+ * Prende l'ULTIMO, non il primo: quando c'e' un pannello aperto in pagina ci
+ * sono due bottoni principali, quello del pannello e quello dello schermo che
+ * sta dietro, e vale quello sopra.
  */
 async function tapCta() {
   const box = await page.evaluate(() => {
-    const el = document.querySelector('[data-cta]')
+    const el = [...document.querySelectorAll('[data-cta]')].pop()
     if (!el) return null
     el.scrollIntoView({ block: 'center' })
     const r = el.getBoundingClientRect()
