@@ -65,6 +65,7 @@ export function SensationSheet({
   intensityDY = 0,
   ctaTop = 606,
   chipOverrides = {},
+  entered = true,
 }: {
   title: string
   selected: string[]
@@ -81,13 +82,25 @@ export function SensationSheet({
   intensityDY?: number
   ctaTop?: number
   chipOverrides?: Record<string, { y?: number; w?: number }>
+  /** false = sheet fuori schermo e velo trasparente: serve all'animazione d'ingresso */
+  entered?: boolean
 }) {
   return (
     <div className="bab-font-ui absolute inset-0">
       {backdrop}
       {/* due veli sovrapposti, come in Figma */}
-      <div className="absolute inset-0" style={{ background: 'rgba(23,21,21,0.41)', opacity: 0.85 }} />
-      <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.4)' }} />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'rgba(23,21,21,0.41)',
+          opacity: entered ? 0.85 : 0,
+          transition: 'opacity 380ms ease-out',
+        }}
+      />
+      <div
+        className="absolute inset-0"
+        style={{ background: 'rgba(0,0,0,0.4)', opacity: entered ? 1 : 0, transition: 'opacity 380ms ease-out' }}
+      />
 
       <div
         className="absolute overflow-hidden"
@@ -100,6 +113,8 @@ export function SensationSheet({
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)',
+          transform: entered ? 'none' : 'translateY(100%)',
+          transition: 'transform 460ms cubic-bezier(0.32,0.72,0,1)',
         }}
       >
         <div className="absolute" style={{ left: 183, top: 12, width: 36, height: 4, borderRadius: 2, background: '#d1d5db' }} />

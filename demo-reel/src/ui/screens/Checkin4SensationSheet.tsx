@@ -8,7 +8,7 @@ import { Checkin3BodyMap } from './Checkin3BodyMap'
  * Qui ci mettiamo lo schermo VERO: per il reel il sheet sale davvero sopra
  * la body map, invece che sopra una sua fotografia.
  */
-export function Checkin4SensationSheet({ backdrop = true }: { backdrop?: boolean }) {
+export function Checkin4SensationSheet({ backdrop = true, entered = true }: { backdrop?: boolean; entered?: boolean }) {
   return (
     <div className="relative overflow-hidden" style={{ width: 402, height: 874 }}>
       <SensationSheet
@@ -17,6 +17,7 @@ export function Checkin4SensationSheet({ backdrop = true }: { backdrop?: boolean
         intensityThumb={131}
         ctaLabel="Add this sensation"
         ctaLabelLeft={105}
+        entered={entered}
         backdrop={backdrop ? <Checkin3BodyMap /> : null}
       />
     </div>

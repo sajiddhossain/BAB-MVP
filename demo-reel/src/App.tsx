@@ -1,5 +1,7 @@
 import { CLIPS } from './reel/clips'
 import { UiProbe } from './dev/UiProbe'
+import { Prototype } from './proto/Prototype'
+import { FLOWS } from './proto/flows'
 import { Player, useTimeline } from './reel/Player'
 import { useClock } from './reel/useClock'
 
@@ -9,12 +11,21 @@ const clipId = params.get('clip') ?? location.hash.replace('#', '') ?? 'checkin'
 const clip = CLIPS[clipId] ?? CLIPS.checkin
 
 const probe = params.get('probe')
+// il reel serve alla registrazione: ci si arriva con ?clip=. Di default,
+// aprendo la pagina sul telefono, parte il prototipo camminabile.
+const isReel = capture || params.has('clip') || location.hash.startsWith('#reel')
+const flow = FLOWS[params.get('flow') ?? 'checkin'] ?? FLOWS.checkin
 
 if (capture || probe) document.body.dataset.capture = '1'
 
 export default function App() {
   if (probe) return <UiProbe id={probe} />
-  return <Reel />
+  if (isReel) return <Reel />
+  return (
+    <div className="bab-proto">
+      <Prototype flow={flow} />
+    </div>
+  )
 }
 
 function Reel() {

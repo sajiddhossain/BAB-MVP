@@ -17,3 +17,16 @@ body[data-capture="1"] .no-capture { display: none !important; }
 body:has(#probe) { background: transparent; }
 body:has(#probe) > #root { display: block; }
 #probe { position: absolute; left: 0; top: 0; }
+
+@keyframes bab-ripple {
+  from { transform: scale(0.35); opacity: 0.55; }
+  to   { transform: scale(1.5);  opacity: 0; }
+}
+
+/* Il prototipo e' a schermo intero: niente rimbalzo, niente selezione accidentale. */
+body:has(.bab-proto) {
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}

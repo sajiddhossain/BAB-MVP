@@ -105,9 +105,35 @@ Figma `✨` e' addirittura un quadrato vuoto).
 
 ```bash
 npm install
-npm run dev        # anteprima con timeline scrubabile su http://localhost:5199
-npm run record     # registra entrambe le clip in out/
+npm run dev          # prototipo camminabile + reel, esposto anche in rete locale
+npm run check:proto  # verifica che tap/scroll/swipe funzionino davvero
+npm run diff         # verifica la fedelta' contro Figma
+npm run record       # registra entrambe le clip in out/
 ```
+
+## Il prototipo
+
+Aprendo la pagina parte il **prototipo camminabile**: tocchi e passi allo schermo dopo.
+
+- **tap** ovunque → avanti; **tap in alto a sinistra** (il tasto indietro) → indietro
+- **swipe orizzontale** → avanti/indietro; **swipe verticale** → scorre lo schermo
+- `?flow=checkout` per l'altro flusso; frecce e barra spaziatrice su desktop
+
+Il frame da 402x874 viene scalato per riempire lo schermo del telefono
+(`useFit.ts`, che segue `visualViewport` perche' su iOS la barra degli indirizzi
+cambia l'altezza utile mentre scrolli).
+
+`npm run dev` stampa anche un indirizzo `Network:`: aprilo dal telefono sulla
+stessa wifi. Per un link stabile, `npm run build` e pubblica `dist/`.
+
+Le altre viste restano dove erano: `?clip=checkin` il reel da registrare,
+`?probe=<id>` un singolo schermo nudo per il diff.
+
+### Cosa NON fa ancora
+
+I chip non si selezionano, gli slider non si trascinano, e sulle body map il tap
+non accende il punto (le macchie rosse sono dipinte dentro il raster). Cammini
+dentro il flusso, non ci giochi.
 
 - `npm run record:checkin` / `npm run record:checkout` per una sola clip
 - `node scripts/record.mjs all --fps 60 --scale 3` per alzare qualita'
