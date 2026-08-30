@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: #0E0E11;
+  font-family: ui-sans-serif, -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* In modalita cattura vogliamo un fondale piatto e nessuna UI di controllo */
+body[data-capture="1"] { background: #0E0E11; }
+body[data-capture="1"] .no-capture { display: none !important; }
