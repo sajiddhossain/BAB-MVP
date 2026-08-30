@@ -1,3 +1,4 @@
+import { useState } from 'react'
 /**
  * Lo slider a gradiente. Ricorre in rpe, energy, tune-in e nei sensation sheet.
  * Le tacche sono un flex con gap fisso (come in Figma), non uno space-between:
@@ -53,6 +54,9 @@ export function Slider({
   snap?: [number, number]
 }) {
   const max = travel(width, thumbSize)
+  // il pallino cresce mentre lo tieni: e' il modo di dire "l'ho preso io"
+  // senza scrivercelo. A riposo niente transform, cosi' il diff non cambia.
+  const [grab, setGrab] = useState(false)
 
   const move = (e: React.PointerEvent) => {
     if (!onDrag) return
@@ -77,12 +81,14 @@ export function Slider({
           ? (e) => {
               e.stopPropagation()
               e.currentTarget.setPointerCapture(e.pointerId)
+              setGrab(true)
               move(e)
             }
           : undefined
       }
       onPointerMove={onDrag ? (e) => e.currentTarget.hasPointerCapture(e.pointerId) && move(e) : undefined}
-      onPointerUp={onDrag ? (e) => e.stopPropagation() : undefined}
+      onPointerUp={onDrag ? (e) => { e.stopPropagation(); setGrab(false) } : undefined}
+      onPointerCancel={onDrag ? () => setGrab(false) : undefined}
     >
       <div
         className="absolute left-0"
@@ -93,14 +99,16 @@ export function Slider({
         style={{
           left: thumbLeft,
           top: thumbTop,
-          transition: 'left 90ms ease-out',
+          transform: grab ? 'scale(1.22)' : undefined,
+          transition:
+            'left 90ms ease-out, transform 220ms cubic-bezier(0.34,1.56,0.64,1), box-shadow 220ms ease-out',
           width: thumbSize,
           height: thumbSize,
           borderRadius: thumbSize / 2,
           background: 'var(--bab-surface)',
           border: '3px solid var(--bab-ink)',
           boxSizing: 'border-box',
-          boxShadow: '0px 2px 6px 0px rgba(0,0,0,0.16)',
+          boxShadow: grab ? '0px 5px 14px 0px rgba(0,0,0,0.26)' : '0px 2px 6px 0px rgba(0,0,0,0.16)',
         }}
       />
     </div>

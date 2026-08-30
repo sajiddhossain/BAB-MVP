@@ -23,7 +23,9 @@ export function Frame({
 }) {
   return (
     <div
-      className="bab-font-body relative overflow-hidden"
+      /* bab-enter: i figli entrano sfalsati (vedi index.css). Sta qui e non
+         sui singoli schermi perche' i figli di Frame SONO i blocchi. */
+      className="bab-font-body bab-enter relative overflow-hidden"
       style={{ width, height, background: 'var(--bab-bg)' }}
     >
       {textureTops.map((t) => (

@@ -8,19 +8,13 @@ const TRANSITION_MS = 460
 
 type Move = { dir: 1 | -1; from: number } | null
 
-/** Un tocco e' un tocco solo se il dito non si e' spostato: altrimenti stava scorrendo. */
-const TAP_SLOP = 12
-const TAP_MS = 400
-
 export function Prototype({ flow }: { flow: Flow }) {
   const scale = useFit()
   const [index, setIndex] = useState(0)
   const [move, setMove] = useState<Move>(null)
   const [animating, setAnimating] = useState(false)
   const [entered, setEntered] = useState(true)
-  const [ripple, setRipple] = useState<{ x: number; y: number; k: number } | null>(null)
   const busy = useRef(false)
-  const rippleKey = useRef(0)
 
   const go = useCallback(
     (dir: 1 | -1) => {
@@ -67,33 +61,24 @@ export function Prototype({ flow }: { flow: Flow }) {
   const onPointerDown = (e: React.PointerEvent) => {
     down.current = { x: e.clientX, y: e.clientY, t: Date.now() }
   }
+  /*
+   * Si va AVANTI solo confermando: il bottone principale, oppure un comando che
+   * chiude il suo passo (una zona del corpo che apre il pannello). Un tocco a
+   * vuoto non deve fare niente.
+   *
+   * Prima bastava toccare un punto qualunque dello schermo. Era comodo per
+   * scorrere i frame, ma è la cosa che più di tutte tradisce che non è un'app:
+   * appoggi il pollice per leggere e ti ritrovi due schermi più avanti.
+   *
+   * Indietro invece resta un gesto: lo swipe da sinistra, come ovunque.
+   */
   const onPointerUp = (e: React.PointerEvent) => {
     const d = down.current
     down.current = null
     if (!d) return
     const dx = e.clientX - d.x
     const dy = e.clientY - d.y
-    const dist = Math.hypot(dx, dy)
-
-    // swipe orizzontale = indietro/avanti
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      go(dx > 0 ? -1 : 1)
-      return
-    }
-    if (dist > TAP_SLOP || Date.now() - d.t > TAP_MS) return
-
-    const box = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    const x = (e.clientX - box.left) / scale
-    const y = (e.clientY - box.top) / scale
-
-    // il bottone indietro sta in alto a sinistra su tutti gli schermi
-    if (x < 80 && y < 115) {
-      go(-1)
-      return
-    }
-    rippleKey.current += 1
-    setRipple({ x, y, k: rippleKey.current })
-    go(1)
+    if (dx > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && Date.now() - d.t < 700) go(-1)
   }
 
   const nav = useMemo(() => ({ next: () => go(1), back: () => go(-1) }), [go])
@@ -134,12 +119,22 @@ export function Prototype({ flow }: { flow: Flow }) {
           const enter = flow.screens[index].enter
           let tx = 0
           let opacity = 1
+          // lo schermo che se ne va si spegne un po': da' profondita' e dice
+          // qual e' quello vivo, senza disegnare un velo sopra
+          let dim = 1
+          let shadow: string | undefined
 
           if (move && enter !== 'sheet') {
             const outgoing = role === 'out'
             if (enter === 'push') {
-              if (outgoing) tx = animating ? -STAGE.w * 0.28 * dir : 0
-              else tx = animating ? 0 : STAGE.w * dir
+              if (outgoing) {
+                tx = animating ? -STAGE.w * 0.28 * dir : 0
+                dim = animating ? 0.9 : 1
+              } else {
+                tx = animating ? 0 : STAGE.w * dir
+                // il bordo che entra proietta ombra su quello sotto
+                shadow = `${-18 * dir}px 0 28px rgba(0,0,0,0.18)`
+              }
             } else {
               opacity = outgoing ? (animating ? 0 : 1) : animating ? 1 : 0
             }
@@ -154,8 +149,10 @@ export function Prototype({ flow }: { flow: Flow }) {
               style={{
                 transform: `translate3d(${tx}px,0,0)`,
                 opacity,
+                filter: dim === 1 ? undefined : `brightness(${dim})`,
+                boxShadow: shadow,
                 transition: move
-                  ? `transform ${TRANSITION_MS}ms cubic-bezier(0.32,0.72,0,1), opacity ${TRANSITION_MS}ms ease-out`
+                  ? `transform ${TRANSITION_MS}ms cubic-bezier(0.32,0.72,0,1), opacity ${TRANSITION_MS}ms ease-out, filter ${TRANSITION_MS}ms ease-out`
                   : undefined,
                 WebkitOverflowScrolling: 'touch',
                 /*
@@ -176,21 +173,6 @@ export function Prototype({ flow }: { flow: Flow }) {
           )
         })}
 
-        {ripple && (
-          <span
-            key={ripple.k}
-            className="pointer-events-none absolute rounded-full"
-            style={{
-              left: ripple.x - 40,
-              top: ripple.y - 40,
-              width: 80,
-              height: 80,
-              border: '2px solid rgba(44,44,58,0.4)',
-              animation: 'bab-ripple 620ms ease-out forwards',
-            }}
-            onAnimationEnd={() => setRipple(null)}
-          />
-        )}
       </div>
 
       <FlowSwitcher flow={flow} index={index} />

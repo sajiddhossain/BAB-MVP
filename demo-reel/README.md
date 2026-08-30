@@ -196,6 +196,55 @@ stessa wifi. Per un link stabile, `npm run build` e pubblica `dist/`.
 Le altre viste restano dove erano: `?clip=checkin` il reel da registrare,
 `?probe=<id>` un singolo schermo nudo per il diff.
 
+## Come si muove
+
+La fedelta' statica e' una cosa, il fatto che sembri un'app e' un'altra. Le
+schermate restano identiche al frame Figma **da ferme** — il diff continua a
+passare su tutte e 13 — e tutto quello che segue vive nel movimento e nel
+comportamento, che nel frame non ci sono.
+
+**Si va avanti solo confermando.** Prima bastava toccare un punto qualunque
+dello schermo. Era comodo per scorrere i frame, ma e' la cosa che piu' di tutte
+tradisce che non e' un'app: appoggi il pollice per leggere e ti ritrovi due
+schermi piu' avanti. Ora avanza il bottone principale, o un comando che chiude
+il suo passo (una zona del corpo, "Somewhere else"). Indietro resta un gesto: lo
+swipe da sinistra.
+
+**I blocchi entrano sfalsati.** All'ingresso di uno schermo salgono di 10px in
+sequenza invece di comparire tutti insieme. Il dettaglio che lo rende possibile:
+`animation-fill-mode: backwards` e non `both` — con `both` l'ultimo fotogramma
+resta applicato per sempre e il suo `transform: none` batte lo `scale` in linea
+del tocco, quindi i bottoni smettevano di affondare quando li premevi.
+
+**Il resto del movimento**, e cosa dice ognuno:
+
+| dove | cosa fa | perche' |
+|---|---|---|
+| passaggio fra schermi | quello che esce si spegne e scala, quello che entra proietta ombra | dice qual e' lo schermo vivo senza disegnarci sopra un velo |
+| bottoni e chip | affondano svelti, risalgono con un rimbalzo; i colori sfumano | il tocco diventa una cosa fisica invece di un cambio di colore |
+| barra di avanzamento | si riempie da dov'era, non salta al valore nuovo | il passo avanti si vede |
+| pallino degli slider | cresce mentre lo tieni | dice "l'ho preso io" senza scriverlo |
+| zone del corpo | pulsano quando si accendono | conferma che il dito ha preso quella e non la vicina |
+| bottom sheet | si trascina via dalla maniglia, e i veli si alzano insieme | il gesto e' collegato a quello che c'e' sotto |
+
+`prefers-reduced-motion` spegne tutto, e in cattura le animazioni non partono:
+altrimenti il diff fotograferebbe gli schermi a meta' ingresso.
+
+### I campi fanno quello che dicono
+
+| comando | prima | ora |
+|---|---|---|
+| "Describe it in your own words..." | testo che sembrava un campo | campo vero, scrive e ricorda; il bordo si accende |
+| "A little help ✨" con la freccia | freccia ferma | apre e chiude i chip, e il pannello si **accorcia** invece di restare col buco |
+| "Somewhere else ⓘ" | bottone morto | apre il pannello intestato "Somewhere else" |
+| ✕ del pannello | chiudeva | chiude, e si puo' anche trascinare via il pannello |
+
+La tendina che si chiude e' l'unico punto un po' insidioso: il blocco sotto e'
+avvolto in un `div` senza posizionamento, che sta all'origine del pannello e ha
+altezza zero. I figli in assoluto risolvono quindi sulle stesse coordinate di
+prima, ma il `transform` del `div` gli fa da blocco contenitore e li porta su
+tutti insieme.
+
 ### Cosa si tocca davvero
 
 | schermo | comandi |
@@ -222,6 +271,9 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
   esiste nel Figma**, mi inventerei il contenuto.
 - Il testo della pillola di lettura su checkout-4 esiste in Figma solo per il
   valore 3: gli altri sei sono segnaposto miei, da far validare.
+- Non c'e' un tasto indietro DENTRO al bottom sheet: da li' si esce con la ✕,
+  trascinando, o con lo swipe. Il tasto indietro appartiene allo schermo dietro,
+  ed e' coperto dai veli.
 - I campi di testo non si scrivono.
 - Il reel (`?clip=`) usa ancora gli export SVG di Figma, non i componenti: i due
   video escono da li'. Rifarlo sui componenti e' il passo successivo.

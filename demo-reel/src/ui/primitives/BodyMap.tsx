@@ -13,7 +13,11 @@ export function zonesFor(side: Side) {
   return side === 'Back' ? BACK_ZONES : FRONT_ZONES
 }
 
+/** Zona finta per "Somewhere else": non sta sul disegno, ma e' una scelta vera. */
+export const ELSEWHERE = 'elsewhere'
+
 export function labelOf(side: Side, id: string | null) {
+  if (id === ELSEWHERE) return 'Somewhere else'
   return zonesFor(side).find((z) => z.id === id)?.label ?? null
 }
 

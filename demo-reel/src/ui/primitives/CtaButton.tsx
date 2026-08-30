@@ -60,6 +60,7 @@ export function CtaButton({
   return (
     <Touchable
       className="absolute"
+      data-cta
       style={{ left, top, width, height: height + shadowTop }}
       onTap={nav ? nav.next : undefined}
       press={nav ? 0.975 : 1}

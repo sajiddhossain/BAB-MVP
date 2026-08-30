@@ -2,7 +2,7 @@ import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { SegmentedToggle } from '../primitives/SegmentedToggle'
-import { BodyMap } from '../primitives/BodyMap'
+import { BodyMap, ELSEWHERE } from '../primitives/BodyMap'
 import type { Side } from '../primitives/BodyMap'
 import { useField, toggle } from '../state'
 import { useNav } from '../../proto/nav'
@@ -47,7 +47,15 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
 
       <SegmentedToggle left={20} top={251} options={['Front', 'Back']} active={side} onSelect={setSide} />
 
-      <SomewhereElse right={402 - 378} top={251} />
+      <SomewhereElse
+        right={402 - 378}
+        top={251}
+        onTap={() => {
+          setPicked(picked.includes(ELSEWHERE) ? picked : toggle(picked, ELSEWHERE))
+          setLast(ELSEWHERE)
+          nav?.next()
+        }}
+      />
 
       {/* la card della mappa ha un'ombra dura sfalsata 6px/5px, non morbida */}
       <div

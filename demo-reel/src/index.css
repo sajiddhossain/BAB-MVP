@@ -18,11 +18,6 @@ body:has(#probe) { background: transparent; }
 body:has(#probe) > #root { display: block; }
 #probe { position: absolute; left: 0; top: 0; }
 
-@keyframes bab-ripple {
-  from { transform: scale(0.35); opacity: 0.55; }
-  to   { transform: scale(1.5);  opacity: 0; }
-}
-
 /* Il prototipo e' a schermo intero: niente rimbalzo, niente selezione accidentale. */
 body:has(.bab-proto) {
   overscroll-behavior: none;
@@ -60,3 +55,66 @@ body {
 /* dvh e non vh: su iOS vh conta la barra degli indirizzi anche quando e' sparita,
    e lo stage risultava piu' alto dello schermo */
 html, body, #root { height: 100dvh; }
+
+/* ── Ingresso di uno schermo ────────────────────────────────────────────────
+   I blocchi salgono di poco e sfalsati, invece di apparire tutti insieme.
+   E' la differenza fra "e' comparsa una pagina" e "si e' aperta una schermata".
+
+   fill-mode BACKWARDS e non both: con `both` l'ultimo fotogramma resta
+   applicato per sempre, e `transform: none` batte lo `scale` in linea del
+   tocco — i bottoni smettevano di affondare quando li premi. */
+@keyframes bab-rise {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+.bab-enter > * {
+  animation: bab-rise 420ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+/* la texture di fondo non "entra": e' il foglio su cui il resto si posa */
+.bab-enter > img:first-child { animation: none; }
+  .bab-enter > *:nth-child(3) { animation-delay: 24ms; }
+  .bab-enter > *:nth-child(4) { animation-delay: 48ms; }
+  .bab-enter > *:nth-child(5) { animation-delay: 72ms; }
+  .bab-enter > *:nth-child(6) { animation-delay: 96ms; }
+  .bab-enter > *:nth-child(7) { animation-delay: 120ms; }
+  .bab-enter > *:nth-child(8) { animation-delay: 144ms; }
+  .bab-enter > *:nth-child(9) { animation-delay: 168ms; }
+  .bab-enter > *:nth-child(10) { animation-delay: 192ms; }
+  .bab-enter > *:nth-child(11) { animation-delay: 216ms; }
+  .bab-enter > *:nth-child(12) { animation-delay: 240ms; }
+  .bab-enter > *:nth-child(13) { animation-delay: 264ms; }
+  .bab-enter > *:nth-child(14) { animation-delay: 288ms; }
+  .bab-enter > *:nth-child(n+15) { animation-delay: 300ms; }
+
+/* In cattura vogliamo lo stato finale al primo fotogramma, o il diff contro
+   Figma fotografa gli schermi a meta' ingresso. */
+body[data-capture="1"] .bab-enter > * { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+  }
+}
+
+/* Selezione: i chip cambiano colore in dissolvenza, non a scatto.
+   Vale per i figli perche' il contenitore ha gia' la sua transizione in linea
+   (il transform del tocco), e una regola di classe non la batterebbe. */
+.bab-touch * {
+  transition: background-color 180ms ease-out, border-color 180ms ease-out,
+    color 180ms ease-out, filter 180ms ease-out;
+}
+
+/* Il campo di testo del sensation sheet: dev'essere trasparente e senza
+   cornice sua, perche' la cornice e' il riquadro che lo contiene. */
+.bab-field {
+  border: 0;
+  outline: none;
+  padding: 0;
+  background: transparent;
+  resize: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+.bab-field::placeholder { color: #6b7280; opacity: 1; }

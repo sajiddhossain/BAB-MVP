@@ -18,6 +18,7 @@ export function Touchable({
   className = '',
   press = 0.97,
   stop = true,
+  ...rest
 }: {
   children?: ReactNode
   onTap?: () => void
@@ -27,16 +28,30 @@ export function Touchable({
   press?: number
   /** false per lasciar passare il tocco allo stage (avanza di schermo) */
   stop?: boolean
+  /** attributi passanti: serve a data-cta, il gancio dei test */
+  'data-cta'?: boolean
 }) {
   const [down, setDown] = useState(false)
 
   return (
     <div
-      className={className}
+      {...rest}
+      className={`bab-touch ${className}`.trim()}
       style={{
         ...style,
-        transform: `${style?.transform ?? ''} scale(${down ? press : 1})`.trim(),
-        transition: 'transform 120ms ease-out',
+        /*
+         * A riposo NIENTE transform, nemmeno scale(1): un transform crea un
+         * livello a se' e cambia di un filo l'antialiasing del testo, che sul
+         * diff contro Figma si vede.
+         */
+        transform: down ? `${style?.transform ?? ''} scale(${press})`.trim() : style?.transform,
+        // affonda svelto, risale con un rimbalzo: e' quello che fa sembrare
+        // il tocco una cosa fisica invece di un cambio di colore
+        transition: `${
+          down
+            ? 'transform 90ms cubic-bezier(0.4,0,1,1)'
+            : 'transform 320ms cubic-bezier(0.34,1.56,0.64,1)'
+        }, background-color 180ms ease-out, border-color 180ms ease-out, color 180ms ease-out, filter 180ms ease-out`,
         cursor: onTap ? 'pointer' : undefined,
         touchAction: 'manipulation',
       }}

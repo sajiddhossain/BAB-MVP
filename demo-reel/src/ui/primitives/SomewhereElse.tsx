@@ -1,11 +1,18 @@
+import { Touchable } from './Touchable'
+
 /**
- * Il bottone "Somewhere else ⓘ".
+ * Il bottone "Somewhere else ⓘ": per quando quello che senti non sta in nessuna
+ * delle zone del disegno. Apre lo stesso pannello, intestato "Somewhere else".
+ *
  * Nota: il glifo ⓘ non esiste in Space Grotesk, quindi Figma e Chrome ripiegano
  * su fallback diversi. E' l'unico punto di questi schermi che non converge.
  */
-export function SomewhereElse({ right, top }: { right: number; top: number }) {
+export function SomewhereElse({ right, top, onTap }: { right: number; top: number; onTap?: () => void }) {
   return (
-    <div
+    <Touchable
+      onTap={onTap}
+      press={onTap ? 0.95 : 1}
+      stop={!!onTap}
       className="absolute flex items-center justify-center gap-[8px]"
       style={{
         right,
@@ -27,6 +34,6 @@ export function SomewhereElse({ right, top }: { right: number; top: number }) {
           ⓘ
         </p>
       </div>
-    </div>
+    </Touchable>
   )
 }

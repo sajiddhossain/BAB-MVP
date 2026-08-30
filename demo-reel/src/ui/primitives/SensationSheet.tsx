@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Slider } from './Slider'
 import { Touchable } from './Touchable'
@@ -95,6 +96,54 @@ export function SensationSheet({
   const [picked, setPicked] = useField<readonly string[]>(`${field ?? 'sheet'}.chips`, selected)
   const [side, setSide] = useField<'Yes' | 'No'>(`${field ?? 'sheet'}.side`, 'Yes')
   const [thumb, setThumb] = useField(`${field ?? 'sheet'}.intensity`, intensityThumb)
+  const [note, setNote] = useField(`${field ?? 'sheet'}.note`, '')
+  const [focus, setFocus] = useState(false)
+
+  /*
+   * "A little help ✨" e' una tendina, e la freccia deve aprirla e chiuderla.
+   *
+   * Chiudendola il pannello si ACCORCIA: parte piu' in basso ed e' piu' corto,
+   * come fa un bottom sheet vero. Nascondere solo i chip lascerebbe un buco in
+   * mezzo, che e' peggio di una freccia che non fa niente.
+   */
+  const [help, setHelp] = useField(`${field ?? 'sheet'}.help`, true)
+  const HELP_H = 176
+
+  /*
+   * Trascinare il pannello via.
+   *
+   * Il gesto parte solo dalla fascia in alto (maniglia + titolo): sotto ci sono
+   * i chip e lo slider, e un pannello che scappa mentre trascini l'intensita'
+   * sarebbe peggio che non poterlo trascinare affatto. La ✕ ferma il tocco per
+   * conto suo, quindi li' non parte.
+   */
+  const [drag, setDrag] = useState(0)
+  const grab = useRef<number | null>(null)
+  const CLOSE_AT = 110
+
+  const onDown = (e: React.PointerEvent) => {
+    if (!nav) return
+    const box = e.currentTarget.getBoundingClientRect()
+    const k = box.width / width
+    if ((e.clientY - box.top) / k > 72) return
+    grab.current = e.clientY
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+  const onMove = (e: React.PointerEvent) => {
+    if (grab.current === null) return
+    const box = e.currentTarget.getBoundingClientRect()
+    setDrag(Math.max(0, (e.clientY - grab.current) / (box.width / width)))
+  }
+  const onUp = () => {
+    if (grab.current === null) return
+    grab.current = null
+    if (drag > CLOSE_AT) nav?.back()
+    setDrag(0)
+  }
+  const dragging = grab.current !== null
+  // i veli si alzano insieme al pannello: e' quello che fa sentire il gesto
+  // collegato a quello che c'e' sotto, invece di due cose separate
+  const veil = entered ? Math.max(0, 1 - drag / 420) : 0
   return (
     <div className="bab-font-ui absolute inset-0">
       {backdrop}
@@ -103,28 +152,34 @@ export function SensationSheet({
         className="absolute inset-0"
         style={{
           background: 'rgba(23,21,21,0.41)',
-          opacity: entered ? 0.85 : 0,
-          transition: 'opacity 380ms ease-out',
+          opacity: veil * 0.85,
+          transition: dragging ? 'none' : 'opacity 380ms ease-out',
         }}
       />
       <div
         className="absolute inset-0"
-        style={{ background: 'rgba(0,0,0,0.4)', opacity: entered ? 1 : 0, transition: 'opacity 380ms ease-out' }}
+        style={{ background: 'rgba(0,0,0,0.4)', opacity: veil, transition: dragging ? 'none' : 'opacity 380ms ease-out' }}
       />
 
       <div
         className="absolute overflow-hidden"
+        onPointerDown={nav ? onDown : undefined}
+        onPointerMove={nav ? onMove : undefined}
+        onPointerUp={nav ? onUp : undefined}
+        onPointerCancel={nav ? onUp : undefined}
         style={{
           left: sheetLeft,
-          top: sheetTop,
+          top: help ? sheetTop : sheetTop + HELP_H,
           width,
-          height: sheetHeight,
+          height: help ? sheetHeight : sheetHeight - HELP_H,
           background: 'var(--bab-surface)',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
           boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)',
-          transform: entered ? 'none' : 'translateY(100%)',
-          transition: 'transform 460ms cubic-bezier(0.32,0.72,0,1)',
+          transform: drag > 0 ? `translateY(${drag}px)` : entered ? undefined : 'translateY(100%)',
+          transition: dragging
+            ? 'none'
+            : 'transform 460ms cubic-bezier(0.32,0.72,0,1), top 320ms cubic-bezier(0.22,1,0.36,1), height 320ms cubic-bezier(0.22,1,0.36,1)',
         }}
       >
         <div className="absolute" style={{ left: 183, top: 12, width: 36, height: 4, borderRadius: 2, background: '#d1d5db' }} />
@@ -147,21 +202,48 @@ export function SensationSheet({
         <p className="absolute whitespace-nowrap font-bold" style={{ left: 16, top: 79.5, fontSize: 15, color: '#111827', lineHeight: 'normal', margin: 0 }}>
           What does it feel like?
         </p>
+        {/*
+          * Un campo vero, non un testo che sembra un campo. Il segnaposto e' la
+          * stessa stringa nella stessa posizione, quindi a riposo e' identico al
+          * frame; quando ci scrivi dentro pero' scrive davvero, e il bordo si
+          * accende come in qualsiasi campo.
+          */}
         <div
           className="absolute"
-          style={{ left: 16, top: 107.5, width: 370, height: 56, borderRadius: 16, background: 'var(--bab-surface)', border: '1.5px solid #d1d5db', boxSizing: 'border-box' }}
+          style={{ left: 16, top: 107.5, width: 370, height: 56, borderRadius: 16, background: 'var(--bab-surface)', border: `1.5px solid ${focus ? SEL_LINE : '#d1d5db'}`, boxSizing: 'border-box', transition: 'border-color 180ms ease-out' }}
         >
-          <p className="absolute" style={{ left: 12.5, top: 8.5, width: 342, fontSize: 14, color: '#6b7280', lineHeight: 'normal', margin: 0 }}>
-            Describe it in your own words...
-          </p>
+          <textarea
+            className="bab-field absolute"
+            value={note}
+            placeholder="Describe it in your own words..."
+            onChange={(e) => setNote(e.target.value)}
+            onFocus={() => setFocus(true)}
+            onBlur={() => setFocus(false)}
+            onPointerDown={(e) => e.stopPropagation()}
+            onPointerUp={(e) => e.stopPropagation()}
+            style={{ left: 12.5, top: 8.5, width: 342, height: 38, fontSize: 14, color: '#111827', lineHeight: 'normal', margin: 0, fontFamily: 'inherit' }}
+          />
         </div>
 
-        <p className="absolute whitespace-nowrap" style={{ left: 16, top: 178.5, fontSize: 14, fontWeight: 600, color: SEL_TEXT, lineHeight: 'normal', margin: 0 }}>
-          A little help ✨
-        </p>
-        <img src={chevron} alt="" className="absolute" style={{ left: 370, top: 179, width: 16, height: 16 }} />
+        <Touchable
+          className="absolute"
+          onTap={() => setHelp(!help)}
+          press={0.99}
+          style={{ left: 12, top: 172, width: 378, height: 30 }}
+        >
+          <p className="absolute whitespace-nowrap" style={{ left: 4, top: 6.5, fontSize: 14, fontWeight: 600, color: SEL_TEXT, lineHeight: 'normal', margin: 0 }}>
+            A little help ✨
+          </p>
+          <img
+            src={chevron}
+            alt=""
+            className="absolute"
+            style={{ left: 358, top: 7, width: 16, height: 16, transform: help ? undefined : 'rotate(-90deg)', transition: 'transform 260ms cubic-bezier(0.22,1,0.36,1)' }}
+          />
+        </Touchable>
 
-        {SENSATION_CHIPS.map((c) => {
+        {help &&
+          SENSATION_CHIPS.map((c) => {
           const on = picked.includes(c.label)
           return (
             <Touchable
@@ -193,9 +275,22 @@ export function SensationSheet({
                 {c.label}
               </p>
             </Touchable>
-          )
-        })}
+            )
+          })}
 
+        {/*
+          * Da qui in giu' il blocco sale quando la tendina e' chiusa. E' avvolto
+          * in un div senza posizionamento: sta all'origine del pannello e ha
+          * altezza zero, quindi i figli in assoluto risolvono sulle stesse
+          * coordinate di prima — ma il transform gli fa da blocco contenitore,
+          * e li porta su tutti insieme.
+          */}
+        <div
+          style={{
+            transform: help ? undefined : `translateY(-${HELP_H}px)`,
+            transition: 'transform 320ms cubic-bezier(0.22,1,0.36,1)',
+          }}
+        >
         <div className="absolute" style={{ left: 16, top: 381.5, width: 370, height: 1, background: '#e5e7eb' }} />
         <p className="absolute whitespace-nowrap font-bold" style={{ left: 16, top: 394.5, fontSize: 14, color: '#111827', lineHeight: 'normal', margin: 0 }}>
           Only on one side?
@@ -252,18 +347,28 @@ export function SensationSheet({
         </p>
 
         {/* qui il CTA e' verde pieno, non a gradiente, e l'ombra sta sopra */}
-        <div
+        <Touchable
           className="absolute"
-          style={{ left: 24, top: ctaTop, width: width - 48, height: 56, borderRadius: 100, background: '#d4f369', border: 'var(--bab-border-w) solid var(--bab-border)', boxSizing: 'border-box', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.05))' }}
+          data-cta
+          style={{ left: 24, top: ctaTop, width: width - 48, height: 62 }}
+          onTap={nav ? nav.next : undefined}
+          press={nav ? 0.975 : 1}
+          stop={!!nav}
         >
-          <p
-            className="bab-font-body absolute whitespace-nowrap font-bold"
-            style={{ left: ctaLabelLeft, top: 16.5, fontSize: 16, color: 'var(--bab-ink-max)', lineHeight: 'normal', margin: 0 }}
+          <div
+            className="absolute left-0 top-0"
+            style={{ width: width - 48, height: 56, borderRadius: 100, background: '#d4f369', border: 'var(--bab-border-w) solid var(--bab-border)', boxSizing: 'border-box', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.05))' }}
           >
-            {ctaLabel}
-          </p>
+            <p
+              className="bab-font-body absolute whitespace-nowrap font-bold"
+              style={{ left: ctaLabelLeft, top: 16.5, fontSize: 16, color: 'var(--bab-ink-max)', lineHeight: 'normal', margin: 0 }}
+            >
+              {ctaLabel}
+            </p>
+          </div>
+          <div className="absolute" style={{ left: 0, top: 6, width: width - 48, height: 56, borderRadius: 100, background: 'var(--bab-shadow)' }} />
+        </Touchable>
         </div>
-        <div className="absolute" style={{ left: 24, top: ctaTop + 6, width: width - 48, height: 56, borderRadius: 100, background: 'var(--bab-shadow)' }} />
       </div>
     </div>
   )

@@ -1,6 +1,16 @@
+import { useEffect, useState } from 'react'
 import arrowLeft from '../assets/icons/arrow-left.svg'
 import { Touchable } from './Touchable'
 import { useNav } from '../../proto/nav'
+
+/*
+ * Quanto era piena la barra sullo schermo precedente.
+ *
+ * Vive fuori da React apposta: ogni schermo monta una NavBar nuova, quindi
+ * senza memoria condivisa la barra apparirebbe gia' al valore giusto e il
+ * passo avanti non si vedrebbe. Cosi' invece parte da dov'era e si riempie.
+ */
+let lastProgress = 0
 
 /** Barra in alto: bottone indietro + progress. progress e' 0..1. */
 export function NavBar({
@@ -23,6 +33,16 @@ export function NavBar({
   const trackW = trackWidth
   const innerW = trackW - inset * 2
   const nav = useNav()
+  // in cattura serve il valore finale al primo fotogramma, o il diff fotografa
+  // la barra a meta' corsa
+  const still = typeof document !== 'undefined' && document.body.dataset.capture === '1'
+  const [shown, setShown] = useState(still ? progress : lastProgress)
+  useEffect(() => {
+    lastProgress = progress
+    if (still) return
+    const r = requestAnimationFrame(() => requestAnimationFrame(() => setShown(progress)))
+    return () => cancelAnimationFrame(r)
+  }, [progress, still])
   return (
     <div className="absolute" style={{ left, top, width: 60 + trackW, height: 44 }}>
       <Touchable
@@ -68,7 +88,8 @@ export function NavBar({
             left: inset,
             top: inset,
             height: 8,
-            width: innerW * Math.max(0, Math.min(1, progress)),
+            width: innerW * Math.max(0, Math.min(1, shown)),
+            transition: 'width 620ms cubic-bezier(0.22,1,0.36,1)',
             borderRadius: 100,
             background: 'linear-gradient(to right, var(--bab-lime-from), var(--bab-lime-to))',
           }}
