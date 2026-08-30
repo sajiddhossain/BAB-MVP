@@ -4,7 +4,7 @@ import { CtaButton } from '../primitives/CtaButton'
 import { SegmentedToggle } from '../primitives/SegmentedToggle'
 import { BodyMap, ELSEWHERE } from '../primitives/BodyMap'
 import type { Side } from '../primitives/BodyMap'
-import { useField, toggle } from '../state'
+import { useField } from '../state'
 import { useNav } from '../../proto/nav'
 import { SomewhereElse } from '../primitives/SomewhereElse'
 import gps from '../assets/icons/gps.svg'
@@ -13,10 +13,10 @@ import gps from '../assets/icons/gps.svg'
 const NO_ZONES: string[] = []
 
 /** node 3588:167 — checkout-5-body-map */
-export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
+export function Checkout5BodyMap({ spots = 1, pending = null }: { spots?: number; pending?: string | null }) {
   const nav = useNav()
   const [side, setSide] = useField<Side>('checkout.bodySide', 'Front')
-  const [picked, setPicked] = useField<readonly string[]>('checkout.zones', NO_ZONES)
+  const [picked] = useField<readonly string[]>('checkout.zones', NO_ZONES)
   const [, setLast] = useField<string | null>('checkout.lastZone', null)
   // il frame dice "1 spots added": e' lo stato di chi ha gia' segnato
   // qualcosa. Nel prototipo si parte da zero (vedi proto/blank.ts).
@@ -52,7 +52,6 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
         right={402 - 378}
         top={251}
         onTap={() => {
-          setPicked(picked.includes(ELSEWHERE) ? picked : toggle(picked, ELSEWHERE))
           setLast(ELSEWHERE)
           nav?.next()
         }}
@@ -78,9 +77,11 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
         top={330}
         height={352}
         side={side}
-        selected={picked}
+        // `pending` e' la zona che stai nominando adesso: si accende subito ma
+        // conta solo quando confermi. Arriva dal pannello, che ci sta sopra —
+        // sulla mappa da sola non c'e' niente in sospeso.
+        selected={pending && !picked.includes(pending) ? [...picked, pending] : picked}
         onPick={(z) => {
-          setPicked(picked.includes(z.id) ? picked : toggle(picked, z.id))
           setLast(z.id)
           nav?.next()
         }}
@@ -101,7 +102,8 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
         to it helps you understand, manage and communicate it.
       </p>
 
-      <CtaButton label="Next" left={31} top={778} width={342} labelTop={15.5} />
+      {/* il pannello e' lo schermo dopo, ma ora si apre toccando una zona: qui lo scavalchiamo */}
+      <CtaButton label="Next" left={31} top={778} width={342} labelTop={15.5} onTap={() => nav?.go(2)} />
 
       <p
         className="absolute whitespace-nowrap font-bold"

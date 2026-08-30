@@ -44,6 +44,11 @@ export const SENSATION_CHIPS: Chip[] = [
   { x: 113, y: 341.5, w: 65, label: 'hot', icon: thermo },
 ]
 
+/** costanti di modulo: un riferimento nuovo a ogni render manda lo store in loop */
+const NO_CHIPS: string[] = []
+/** mezzo dello slider del pannello (largo 370, pallino 24) */
+const MID_INTENSITY = 173
+
 const SEL_BG = '#e5f5f2'
 const SEL_LINE = '#4ab5a0'
 const SEL_TEXT = '#367569'
@@ -71,6 +76,9 @@ export function SensationSheet({
   chipOverrides = {},
   entered = true,
   field,
+  saved = false,
+  onSave,
+  onRemove,
 }: {
   title: string
   selected: string[]
@@ -89,13 +97,37 @@ export function SensationSheet({
   chipOverrides?: Record<string, { y?: number; w?: number }>
   /** false = sheet fuori schermo e velo trasparente: serve all'animazione d'ingresso */
   entered?: boolean
-  /** chiave dello store: i due sheet tengono selezioni separate */
+  /** chiave dello store: OGNI punto del corpo ha la sua */
   field?: string
+  /** true = questo punto e' gia' stato salvato, quindi lo stai correggendo */
+  saved?: boolean
+  /** conferma: salva il punto e torna alla mappa */
+  onSave?: () => void
+  /** toglie il punto dalla mappa */
+  onRemove?: () => void
 }) {
   const nav = useNav()
-  const [picked, setPicked] = useField<readonly string[]>(`${field ?? 'sheet'}.chips`, selected)
-  const [side, setSide] = useField<'Yes' | 'No' | null>(`${field ?? 'sheet'}.side`, 'Yes')
-  const [thumb, setThumb] = useField(`${field ?? 'sheet'}.intensity`, intensityThumb)
+  /*
+   * Un punto nuovo si apre vuoto, non con le risposte del frame.
+   *
+   * Le chiavi sono una per zona, quindi blank.ts non puo' elencarle: segna
+   * invece che la sessione parte da foglio bianco, e qui scegliamo i default
+   * di conseguenza. Il probe del diff non tocca lo store, quindi legge false e
+   * cade sui valori del frame.
+   */
+  const [blank] = useField('proto.blank', false)
+  const [picked, setPicked] = useField<readonly string[]>(
+    `${field ?? 'sheet'}.chips`,
+    blank ? NO_CHIPS : selected,
+  )
+  const [side, setSide] = useField<'Yes' | 'No' | null>(
+    `${field ?? 'sheet'}.side`,
+    blank ? null : 'Yes',
+  )
+  const [thumb, setThumb] = useField(
+    `${field ?? 'sheet'}.intensity`,
+    blank ? MID_INTENSITY : intensityThumb,
+  )
   const [note, setNote] = useField(`${field ?? 'sheet'}.note`, '')
   const [focus, setFocus] = useState(false)
 
@@ -112,7 +144,7 @@ export function SensationSheet({
   // "Add this sensation" con nessuna sensazione nominata non aggiunge niente:
   // finche' non scegli un chip o scrivi qualcosa, il bottone resta spento
   const named = picked.length > 0 || note.trim().length > 0
-  const live = named && !!nav
+  const live = named && !!nav && !!onSave
 
   /*
    * Trascinare il pannello via.
@@ -376,7 +408,7 @@ export function SensationSheet({
           className="absolute"
           data-cta
           style={{ left: 24, top: ctaTop, width: width - 48, height: 62 }}
-          onTap={live ? nav.next : undefined}
+          onTap={live ? onSave : undefined}
           press={live ? 0.975 : 1}
           stop={!!nav}
         >
@@ -384,15 +416,50 @@ export function SensationSheet({
             className="absolute left-0 top-0"
             style={{ width: width - 48, height: 56, borderRadius: 100, background: named ? '#d4f369' : 'var(--bab-surface)', border: 'var(--bab-border-w) solid var(--bab-border)', boxSizing: 'border-box', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.05))', transition: 'background 220ms ease-out' }}
           >
+            {/*
+              Correggendo un punto gia' salvato "Add" e' la parola sbagliata.
+              L'etichetta di ricambio e' centrata e non ancorata: l'ancoraggio di
+              Figma e' misurato su "Add this sensation", non su una frase piu'
+              lunga. (Copy mia, non esiste nel file.)
+            */}
             <p
               className="bab-font-body absolute whitespace-nowrap font-bold"
-              style={{ left: ctaLabelLeft, top: 16.5, fontSize: 16, color: named ? 'var(--bab-ink-max)' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0, transition: 'color 220ms ease-out' }}
+              style={
+                saved
+                  ? { left: 0, top: 16.5, width: width - 48, textAlign: 'center', fontSize: 16, color: named ? 'var(--bab-ink-max)' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0, transition: 'color 220ms ease-out' }
+                  : { left: ctaLabelLeft, top: 16.5, fontSize: 16, color: named ? 'var(--bab-ink-max)' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0, transition: 'color 220ms ease-out' }
+              }
             >
-              {ctaLabel}
+              {saved ? 'Update this sensation' : ctaLabel}
             </p>
           </div>
           <div className="absolute" style={{ left: 0, top: 6, width: width - 48, height: 56, borderRadius: 100, background: 'var(--bab-shadow)' }} />
         </Touchable>
+
+        {/*
+          "Rimuovi" compare solo su un punto gia' salvato: e' l'unico momento in
+          cui ha senso, e vuol dire che nello stato del frame (dove nessuna zona
+          e' segnata) non c'e' — quindi il confronto con Figma non cambia.
+
+          Sta SOPRA il bottone e non sotto: sotto finiva negli ultimi 34px del
+          frame, che Figma lascia liberi apposta perche' li' ci passa la barra
+          home dell'iPhone. Sarebbe stato un comando che non si riesce a toccare.
+        */}
+        {saved && onRemove && (
+          <Touchable
+            className="absolute"
+            onTap={onRemove}
+            press={0.94}
+            style={{ left: 24, top: ctaTop - 32, width: width - 48, height: 20 }}
+          >
+            <p
+              className="bab-font-body absolute w-full text-center font-bold"
+              style={{ left: 0, top: 2, fontSize: 13, color: '#ec6a5e', lineHeight: 'normal', margin: 0 }}
+            >
+              Remove this spot
+            </p>
+          </Touchable>
+        )}
         </div>
       </div>
     </div>

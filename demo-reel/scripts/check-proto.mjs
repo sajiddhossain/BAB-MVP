@@ -198,8 +198,13 @@ const onBody = async (zoneId) =>
     return [(p.x - stage.left) / scale, (p.y - stage.top) / scale]
   }, zoneId)))
 
+const spots = () =>
+  page.evaluate(() =>
+    [...document.querySelectorAll('p')].find((e) => /spots added/.test(e.textContent))?.textContent,
+  )
+
 await tap(...(await onBody('quad-r')))
-expect('la zona si accende', ((await state())['checkin.zones'] ?? []).includes('quad-r'), true)
+expect('la zona si accende', (await state())['checkin.lastZone'], 'quad-r')
 expect('...e fa salire il sheet', await step(), 3)
 expect(
   '...col nome della zona',
@@ -219,11 +224,19 @@ expect(
  */
 await tapLabel('✕')
 expect('la ✕ chiude il pannello', await step(), 2)
+/*
+ * Un punto vale solo se lo confermi: toccare la zona lo mette "in sospeso" e
+ * apre il pannello, ma uscendo con la ✕ non deve restare niente. Altrimenti
+ * basterebbe sfiorare il corpo per ritrovarsi punti che non hai mai nominato.
+ */
+expect('...e un punto non confermato non conta', await spots(), '0 spots added')
+
 await tap(...at(151, 271)) // linguetta "Back"
 expect('il toggle gira il corpo', (await state())['checkin.bodySide'], 'Back')
 // il gomito e' una zona da 191px: senza tolleranza sul tocco sarebbe intoccabile
 await tap(...(await onBody('elbow-l')))
-expect('anche una zona minuscola si prende', ((await state())['checkin.zones'] ?? []).includes('elbow-l'), true)
+expect('anche una zona minuscola si prende', (await state())['checkin.lastZone'], 'elbow-l')
+await tapLabel('✕')
 
 // --- sensation sheet ----------------------------------------------------
 await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
@@ -240,7 +253,7 @@ await tapCta()
 expect('il pannello non aggiunge una sensazione senza nome', await step(), 3)
 // il sheet parte a y=175, i chip a 205.5 al suo interno -> 380.5 assoluti
 await tap(...at(58, 394)) // chip "strong"
-const chips = (await state())['checkin.sheet.chips']
+const chips = (await state())['checkin.spot.quad-r.chips']
 expect('il chip del sheet si aggiunge', Array.isArray(chips) && chips.includes('strong'), true)
 expect('...senza cambiare schermo', await step(), 3)
 
@@ -249,7 +262,7 @@ await page.fill('textarea', 'tira quando salgo le scale')
 await page.waitForTimeout(200)
 expect(
   'il campo di testo scrive davvero',
-  (await state())['checkin.sheet.note'],
+  (await state())['checkin.spot.quad-r.note'],
   'tira quando salgo le scale',
 )
 
@@ -264,14 +277,49 @@ const sheetTop = () =>
   })
 const topOpen = await sheetTop()
 await tapLabel('A little help ✨')
-expect('la tendina si chiude', (await state())['checkin.sheet.help'], false)
+expect('la tendina si chiude', (await state())['checkin.spot.quad-r.help'], false)
 expect('...e il pannello si accorcia', (await sheetTop()) > topOpen + 100, true)
 await tapLabel('A little help ✨')
 await page.waitForTimeout(400)
-expect('e si riapre', (await state())['checkin.sheet.help'], true)
+expect('e si riapre', (await state())['checkin.spot.quad-r.help'], true)
+
+// --- salvare, riaprire, togliere -----------------------------------------
+await tapCta()
+expect('il bottone salva il punto e riporta alla mappa', await step(), 2)
+expect('...e ora il contatore conta', await spots(), '1 spots added')
+
+await tap(...(await onBody('quad-r')))
+expect('ritoccando un punto salvato si riapre', await step(), 3)
+expect(
+  '...con le parole che avevi scritto',
+  await page.evaluate(() => document.querySelector('textarea').value),
+  'tira quando salgo le scale',
+)
+expect(
+  '...e il bottone dice che stai correggendo',
+  await page.evaluate(() =>
+    [...document.querySelectorAll('[data-cta] p')].pop()?.textContent,
+  ),
+  'Update this sensation',
+)
+
+// un altro punto: le risposte sono sue, non quelle del primo
+await tapLabel('✕')
+await tap(...(await onBody('chest-l')))
+expect(
+  'un punto nuovo si apre vuoto',
+  await page.evaluate(() => document.querySelector('textarea').value),
+  '',
+)
+await tapLabel('✕')
+
+// e si toglie
+await tap(...(await onBody('quad-r')))
+await tapLabel('Remove this spot')
+expect('"Remove this spot" toglie il punto', await step(), 2)
+expect('...e il contatore torna indietro', await spots(), '0 spots added')
 
 // "Somewhere else": per quello che non sta in nessuna zona del disegno
-await tapLabel('✕')
 await tapLabel('Somewhere else')
 expect('"Somewhere else" apre il pannello', await step(), 3)
 expect(
@@ -283,7 +331,13 @@ expect(
   'Somewhere else',
 )
 
-/* Arrivato in fondo non deve sfondare. */
+/*
+ * Arrivato in fondo non deve sfondare.
+ * Si riparte dalla mappa: dal pannello il bottone salva e torna indietro, non
+ * porta avanti, quindi da li' non si arriverebbe mai alla fine.
+ */
+await tapLabel('✕')
+expect('si torna alla mappa', await step(), 2)
 for (let i = 0; i < 6; i++) await tapCta()
 expect("in fondo si ferma sull'ultimo", await step(), 4)
 

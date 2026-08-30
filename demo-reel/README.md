@@ -279,6 +279,39 @@ Uniformarlo costa 0.22% -> 5.22% di diff, ed e' tutto il bottone; sta dichiarato
 nel registry col perche'. Un bottone acceso che non porta da nessuna parte e'
 peggio di uno spento che dice il motivo.
 
+### La vita di un punto sul corpo
+
+Non basta che una zona si accenda: deve poter tornare indietro. Il giro completo:
+
+1. **tocchi una zona** — si accende e il pannello sale, ma il punto e' solo *in
+   sospeso*: il contatore non si muove;
+2. **"Add this sensation"** — ora il punto e' salvato, il pannello si chiude e si
+   torna alla mappa, dove il contatore e' salito. Non si va avanti: e' "Almost
+   done" che porta allo schermo dopo, scavalcando il pannello;
+3. **esci con la ✕** invece di confermare e non resta niente. Altrimenti
+   basterebbe sfiorare il corpo per ritrovarsi punti mai nominati;
+4. **ritocchi un punto salvato** — si riapre con le TUE parole, i tuoi chip e la
+   tua intensita', e il bottone dice "Update this sensation";
+5. **"Remove this spot"** lo toglie, e il contatore torna indietro.
+
+Ogni punto tiene le sue risposte: la chiave dello store porta l'id della zona
+(`checkin.spot.quad-r.chips`), non una sola condivisa. Segni ginocchio e poi
+spalla e non ti ritrovi le parole del ginocchio.
+
+Due dettagli che non si vedono ma contano:
+
+- **"Remove this spot" sta SOPRA il bottone.** Sotto finiva negli ultimi 34px del
+  frame, che Figma lascia liberi apposta: li' ci passa la barra home dell'iPhone,
+  e sarebbe stato un comando che non si riesce a toccare.
+- **Un punto nuovo si apre vuoto** anche se il frame ha tre chip gia' scelti. Le
+  chiavi sono una per zona, quindi `blank.ts` non puo' elencarle: segna che la
+  sessione parte da foglio bianco, e il pannello sceglie i default di
+  conseguenza. Il probe del diff non tocca lo store, legge `false`, e cade sui
+  valori del frame.
+
+Copy inventata da me, da far validare: **"Update this sensation"** e
+**"Remove this spot"** non esistono nel Figma.
+
 ### I campi fanno quello che dicono
 
 | comando | prima | ora |
@@ -320,9 +353,8 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
   esiste nel Figma**, mi inventerei il contenuto.
 - Il testo della pillola di lettura su checkout-4 esiste in Figma solo per il
   valore 3: gli altri sei sono segnaposto miei, da far validare.
-- Una zona del corpo si accende ma non si spegne: "spots added" puo' solo
-  crescere. Serve un modo per togliere un punto (toccarlo di nuovo? tenerlo
-  premuto?) e in Figma non c'e'.
+- Un punto segnato "Somewhere else" conta nel totale ma non si vede sulla
+  figura: non e' una zona del disegno. Si riapre solo dal bottone.
 - Non c'e' un tasto indietro DENTRO al bottom sheet: da li' si esce con la ✕,
   trascinando, o con lo swipe. Il tasto indietro appartiene allo schermo dietro,
   ed e' coperto dai veli.

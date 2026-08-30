@@ -16,13 +16,18 @@ import { setField } from '../ui/state'
  * Gli slider fanno eccezione: un cursore non ha uno stato "vuoto", ha una
  * posizione. Partono dal mezzo, che su una scala 1–7 e' il 4 e su una 0–10 e'
  * il 5 — la risposta neutra, non una risposta gia' data. Sono tutti larghi 302
- * con pallino da 24, quindi il mezzo e' 139 per tutti; quello del pannello e'
- * largo 370, mezzo a 173.
+ * con pallino da 24, quindi il mezzo e' 139 per tutti.
  */
 const MID_302 = 139
-const MID_370 = 173
 
 const BLANK: Record<string, unknown> = {
+  /*
+   * Le risposte del pannello stanno su una chiave per ZONA, e le zone non si
+   * possono elencare qui. Segnaliamo invece che la sessione parte da foglio
+   * bianco: SensationSheet legge questo e sceglie i default vuoti.
+   */
+  'proto.blank': true,
+
   // check-in
   'checkin.tempo': null,
   'checkin.sleep': MID_302,
@@ -31,10 +36,6 @@ const BLANK: Record<string, unknown> = {
   'checkin.school': MID_302,
   'checkin.sleepDuration': null,
   'checkin.spotsBase': 0,
-  'checkin.sheet.chips': [],
-  'checkin.sheet.side': null,
-  'checkin.sheet.intensity': MID_370,
-  'checkin.sheet.note': '',
 
   // check-out
   'checkout.tempo': null,
@@ -43,10 +44,6 @@ const BLANK: Record<string, unknown> = {
   'checkout.takeHome': [],
   'checkout.energy': MID_302,
   'checkout.spotsBase': 0,
-  'checkout.sheet.chips': [],
-  'checkout.sheet.side': null,
-  'checkout.sheet.intensity': MID_370,
-  'checkout.sheet.note': '',
   'checkout.protective': null,
 }
 

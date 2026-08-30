@@ -19,6 +19,7 @@ export function CtaButton({
   labelWidth,
   labelCenter,
   enabled = true,
+  onTap,
 }: {
   label: string
   left: number
@@ -48,6 +49,8 @@ export function CtaButton({
    * vorrebbe dire allontanarsi dal disegno, non avvicinarsi.
    */
   enabled?: boolean
+  /** per chi non va semplicemente "allo schermo dopo" (vedi la body map) */
+  onTap?: () => void
 }) {
   const lw = labelWidth ?? width
   const lc = labelCenter ?? width / 2
@@ -71,7 +74,7 @@ export function CtaButton({
       className="absolute"
       data-cta
       style={{ left, top, width, height: height + shadowTop }}
-      onTap={live ? nav.next : undefined}
+      onTap={live ? (onTap ?? nav.next) : undefined}
       press={live ? 0.975 : 1}
       stop={!!nav}
     >

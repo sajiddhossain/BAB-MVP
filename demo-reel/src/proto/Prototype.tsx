@@ -22,11 +22,12 @@ export function Prototype({ flow }: { flow: Flow }) {
   const busy = useRef(false)
 
   const go = useCallback(
-    (dir: 1 | -1) => {
-      const next = index + dir
-      if (busy.current || next < 0 || next >= flow.screens.length) return
+    (delta: number) => {
+      const next = index + delta
+      if (busy.current || delta === 0 || next < 0 || next >= flow.screens.length) return
       busy.current = true
 
+      const dir: 1 | -1 = delta > 0 ? 1 : -1
       const target = flow.screens[next]
       setMove({ dir, from: index })
       setIndex(next)
@@ -86,7 +87,7 @@ export function Prototype({ flow }: { flow: Flow }) {
     if (dx > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && Date.now() - d.t < 700) go(-1)
   }
 
-  const nav = useMemo(() => ({ next: () => go(1), back: () => go(-1) }), [go])
+  const nav = useMemo(() => ({ next: () => go(1), back: () => go(-1), go }), [go])
 
   const layers: { i: number; role: 'out' | 'in' }[] = move
     ? [
