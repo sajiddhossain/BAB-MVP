@@ -173,7 +173,15 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
           const scrolls = s.h > STAGE.h
           return (
             <div
-              key={`${i}-${role}`}
+              /*
+               * La chiave e' l'indice dello schermo, NON indice+ruolo.
+               * Con `${i}-${role}` lo schermo che esce cambiava chiave nel
+               * momento in cui iniziava la transizione: React lo buttava via e
+               * lo ricostruiva, quindi rifaceva da capo l'animazione d'ingresso
+               * mentre scivolava via — si vedeva sbiadire e ricomparire. E si
+               * perdeva anche la sua posizione di scorrimento.
+               */
+              key={i}
               className={scrolls ? 'absolute inset-0 overflow-y-auto' : 'absolute inset-0 overflow-hidden'}
               style={{
                 transform: `translate3d(${tx}px,0,0)`,
