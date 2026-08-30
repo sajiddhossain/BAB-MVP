@@ -6,6 +6,26 @@ import pin from '../assets/icons/pin-coral.svg'
 import bulletTeal from '../assets/icons/bullet-teal.svg'
 import bulletCoral from '../assets/icons/bullet-coral.svg'
 import chevron from '../assets/icons/chevron-down-18.svg'
+import { Touchable } from '../primitives/Touchable'
+import { useField } from '../state'
+
+/*
+ * Il contenuto di "Try this today".
+ *
+ * Non e' copy mia: e' arrivata gia' scritta. Il riquadro viola qui sotto dice
+ * "BAB never tells you to train or not to train", e queste quattro righe stanno
+ * dentro quella regola — dicono come ascoltarsi mentre ti alleni, non se
+ * allenarti.
+ */
+const TRY_TITLE = 'Small changes, not sitting it out.'
+const TRY_STEPS = [
+  'Warm up that leg properly, then check it again before the first hard rep.',
+  'If it eases, train as planned and keep noticing it.',
+  'If it stays or sharpens, keep the load lighter on that side and tell your coach before you start.',
+  'If it makes you limp or guard it, stop that movement. That’s not quitting — that’s the read working.',
+]
+/** quanto cresce la card aperta: misurato sul contenuto, non tirato a caso */
+const TRY_H = 186
 
 const ACHES = [
   {
@@ -24,6 +44,7 @@ const ACHES = [
 
 /** node 3554:4 — checkin-5-make-sense */
 export function Checkin5MakeSense() {
+  const [open, setOpen] = useField('checkin.tryToday', false)
   return (
     <Frame width={404}>
       <NavBar progress={289 / 293} left={25} top={54} trackWidth={298} />
@@ -85,32 +106,90 @@ export function Checkin5MakeSense() {
         ))}
       </div>
 
-      {/* accordion chiuso */}
-      <div
-        className="absolute flex items-center justify-between"
+      {/*
+        La tendina "Try this today". Chiusa e' identica al frame; aperta cresce
+        e spinge giu' il riquadro viola, che finisce a 756 — sotto il bottone,
+        che resta dov'e'.
+      */}
+      <Touchable
+        className="absolute"
+        onTap={() => setOpen(!open)}
+        press={0.985}
         style={{
           left: 25,
           top: 454,
           width: 354,
-          height: 48,
-          padding: '14px 16px',
+          height: open ? 48 + TRY_H : 48,
           borderRadius: 22,
           background: 'var(--bab-surface)',
           boxSizing: 'border-box',
+          overflow: 'hidden',
           outline: 'var(--bab-border-w) solid var(--bab-border)',
           outlineOffset: 'calc(var(--bab-border-w) * -1)',
           filter: 'drop-shadow(0px 6px 9px rgba(0,0,0,0.05))',
+          transition: 'height 340ms cubic-bezier(0.22,1,0.36,1)',
         }}
       >
-        <p className="shrink-0 whitespace-nowrap font-bold" style={{ fontSize: 14, color: 'var(--bab-ink)', lineHeight: 'normal', margin: 0 }}>
-          Try this today
-        </p>
-        <img src={chevron} alt="" className="shrink-0" style={{ width: 18, height: 18 }} />
-      </div>
+        <div
+          className="absolute left-0 top-0 flex items-center justify-between"
+          style={{ width: 354, height: 48, padding: '14px 16px', boxSizing: 'border-box' }}
+        >
+          <p className="shrink-0 whitespace-nowrap font-bold" style={{ fontSize: 14, color: 'var(--bab-ink)', lineHeight: 'normal', margin: 0 }}>
+            Try this today
+          </p>
+          <img
+            src={chevron}
+            alt=""
+            className="shrink-0"
+            style={{
+              width: 18,
+              height: 18,
+              transform: open ? 'rotate(180deg)' : undefined,
+              transition: 'transform 340ms cubic-bezier(0.22,1,0.36,1)',
+            }}
+          />
+        </div>
+
+        <div
+          className="absolute"
+          style={{
+            left: 16,
+            top: 44,
+            width: 322,
+            opacity: open ? 1 : 0,
+            transition: open ? 'opacity 240ms ease-out 100ms' : 'opacity 120ms ease-out',
+          }}
+        >
+          <p style={{ fontSize: 11.5, lineHeight: '15px', color: 'var(--bab-ink-mute)', margin: 0 }}>
+            {TRY_TITLE}
+          </p>
+          {TRY_STEPS.map((t, i) => (
+            <div key={i} className="flex" style={{ gap: 10, marginTop: 11 }}>
+              <span
+                className="flex shrink-0 items-center justify-center font-bold"
+                style={{ width: 18, height: 18, borderRadius: 9, background: '#f1effd', color: '#4a3fc0', fontSize: 10.5 }}
+              >
+                {i + 1}
+              </span>
+              <p style={{ fontSize: 11.5, lineHeight: '15px', color: 'var(--bab-ink-soft)', margin: 0 }}>{t}</p>
+            </div>
+          ))}
+        </div>
+      </Touchable>
 
       <div
         className="absolute"
-        style={{ left: 25, top: 510, width: 354, height: 68, borderRadius: 16, background: '#f1effd', border: '1px solid #dcd7fb', boxSizing: 'border-box' }}
+        style={{
+          left: 25,
+          top: open ? 510 + TRY_H : 510,
+          width: 354,
+          height: 68,
+          borderRadius: 16,
+          background: '#f1effd',
+          border: '1px solid #dcd7fb',
+          boxSizing: 'border-box',
+          transition: 'top 340ms cubic-bezier(0.22,1,0.36,1)',
+        }}
       >
         <p
           className="absolute"

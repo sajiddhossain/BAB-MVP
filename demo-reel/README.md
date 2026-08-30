@@ -327,12 +327,16 @@ Due dettagli che non si vedono ma contano:
   valori del frame.
 
 Copy inventata da me, da far validare: **"Update this sensation"** e
-**"Remove this spot"** non esistono nel Figma.
+**"Remove this spot"** non esistono nel Figma. Il contenuto di "Try this today"
+invece **non e' mio**: e' arrivato gia' scritto, e sta dentro la regola che il
+riquadro viola dichiara due centimetri piu' sotto ("BAB never tells you to train
+or not to train") — dice come ascoltarsi mentre ti alleni, non se allenarti.
 
 ### I campi fanno quello che dicono
 
 | comando | prima | ora |
 |---|---|---|
+| "Try this today" su checkin-5 | tendina che non si apriva | si apre e mostra i quattro passi; il riquadro con l'avvertenza scende sotto |
 | "Describe it in your own words..." | testo che sembrava un campo | campo vero, scrive e ricorda; il bordo si accende |
 | "A little help ✨" con la freccia | freccia ferma | apre e chiude i chip, e il pannello si **accorcia** invece di restare col buco |
 | "Somewhere else ⓘ" | bottone morto | apre il pannello intestato "Somewhere else" |
@@ -366,8 +370,6 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
 
 ### Cosa NON fa ancora
 
-- L'accordion "Try this today" su checkin-5 non si apre: **lo stato aperto non
-  esiste nel Figma**, mi inventerei il contenuto.
 - Il testo della pillola di lettura su checkout-4 esiste in Figma solo per il
   valore 3: gli altri sei sono segnaposto miei, da far validare.
 - Un punto segnato "Somewhere else" conta nel totale ma non si vede sulla

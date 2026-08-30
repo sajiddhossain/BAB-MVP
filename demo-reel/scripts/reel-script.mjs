@@ -40,7 +40,8 @@ export const SCRIPTS = {
     { tap: 'stiff', hold: 800 },
     { cta: true, hold: 1400 },
 
-    { cta: true, hold: 2600 },
+    { cta: true, hold: 1400 },
+    { tap: 'Try this today', hold: 3000 },
   ],
 
   checkout: [

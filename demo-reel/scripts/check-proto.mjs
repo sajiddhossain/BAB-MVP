@@ -391,6 +391,33 @@ expect('si torna alla mappa', await step(), 2)
 for (let i = 0; i < 6; i++) await tapCta()
 expect("in fondo si ferma sull'ultimo", await step(), 4)
 
+/*
+ * "Try this today" era una tendina che non si apriva. Ora si apre, e il
+ * riquadro con l'avvertenza scende sotto invece di restarci sotto sepolto.
+ */
+const boxTop = () =>
+  page.evaluate(() => {
+    const p = [...document.querySelectorAll('p')].find((e) =>
+      e.textContent.startsWith('BAB never tells'),
+    )
+    return Math.round(p.parentElement.getBoundingClientRect().top)
+  })
+const chiuso = await boxTop()
+await tapLabel('Try this today')
+expect('la tendina "Try this today" si apre', (await state())['checkin.tryToday'], true)
+expect("...e l'avvertenza scende sotto", (await boxTop()) > chiuso + 150, true)
+expect(
+  '...senza finire sotto il bottone',
+  await page.evaluate(() => {
+    const p = [...document.querySelectorAll('p')].find((e) =>
+      e.textContent.startsWith('BAB never tells'),
+    )
+    const cta = document.querySelector('[data-cta]')
+    return p.parentElement.getBoundingClientRect().bottom < cta.getBoundingClientRect().top
+  }),
+  true,
+)
+
 await browser.close()
 
 let bad = 0
