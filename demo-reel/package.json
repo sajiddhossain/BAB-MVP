@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview --port 5199 --host",
+    "preview": "vite preview --port 5198 --host",
     "record": "node scripts/record.mjs",
     "record:checkin": "node scripts/record.mjs checkin",
     "record:checkout": "node scripts/record.mjs checkout",

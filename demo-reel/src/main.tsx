@@ -19,3 +19,14 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {})
   })
 }
+
+/*
+ * ...e in sviluppo va tolto di mezzo. Un service worker registrato da una
+ * `vite preview` sulla stessa origine resta attivo anche sul dev server e
+ * continua a servire la build vecchia: sembra che le modifiche non arrivino.
+ * (Il preview ora sta su una porta sua, ma chi l'ha gia' registrato se lo
+ * ritroverebbe comunque.)
+ */
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()))
+}

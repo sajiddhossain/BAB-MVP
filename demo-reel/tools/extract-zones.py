@@ -15,6 +15,7 @@ il riempimento esonda su tutto lo sfondo senza che si veda.
   python3 tools/extract-zones.py --debug    # e anche un'immagine di controllo
 """
 import json
+import re
 import subprocess
 import sys
 from collections import deque
@@ -105,6 +106,21 @@ BACK = [
     ("heel-l",      "Left heel",        905, 1208),
     ("heel-r",      "Right heel",       994, 1207),
 ]
+
+
+def outline_path():
+    """Il tratto del disegno come singolo path.
+
+    Lo inlineiamo invece di puntare al file con <image href>: un riferimento
+    esterno dentro un SVG e' la parte fragile (WebKit lo rende male, e in mezzo
+    ci sono una richiesta separata e la cache), e sono gli stessi byte che
+    scaricheremmo comunque.
+    """
+    svg = SRC.read_text(encoding="utf8")
+    n = svg.count("<path")
+    if n != 1:
+        raise SystemExit(f"il disegno ha {n} path, non uno: il tratto va rivisto")
+    return re.search(r'\sd="([^"]+)"', svg).group(1)
 
 
 def rasterize():
@@ -302,6 +318,10 @@ def main():
         f"export const FRONT_INK: Ink = {ink_box(walls, 0, VIEW // 2 * SCALE)}\n"
         f"export const BACK_INK: Ink = {ink_box(walls, VIEW // 2 * SCALE, VIEW * SCALE)}\n"
         f"export const BODY_SIZE = {VIEW}\n\n"
+        "// Il tratto del disegno, inlineato: un <image href> verso l'SVG esterno\n"
+        "// e' la parte fragile (resa in WebKit, richiesta separata, cache) e sono\n"
+        "// gli stessi byte.\n"
+        f"export const OUTLINE = {json.dumps(outline_path())}\n\n"
         f"export const FRONT_ZONES: BodyZone[] = {dump(front)}\n\n"
         f"export const BACK_ZONES: BodyZone[] = {dump(back)}\n",
         encoding="utf8",

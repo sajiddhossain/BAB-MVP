@@ -1,7 +1,6 @@
 import { useRef } from 'react'
-import { FRONT_ZONES, BACK_ZONES, FRONT_INK, BACK_INK, BODY_SIZE } from '../bodyZones'
+import { FRONT_ZONES, BACK_ZONES, FRONT_INK, BACK_INK, OUTLINE } from '../bodyZones'
 import type { BodyZone } from '../bodyZones'
-import lineArt from '../assets/bodymap/body-map.svg'
 
 const MARK = '#ec6a5e'
 
@@ -25,9 +24,9 @@ export function labelOf(side: Side, id: string | null) {
  * da tools/extract-zones.py riempiendo le aree chiuse dalle linee, quindi i
  * contorni combaciano col tratto invece di stargli vicino.
  *
- * Il tratto originale sta SOPRA le zone come <image>: le campiture restano
- * dentro le linee e le linee restano nitide. Stesso viewBox, quindi combacia
- * senza doverlo allineare a mano.
+ * Il tratto originale sta SOPRA le zone: le campiture restano dentro le linee e
+ * le linee restano nitide. Stesse coordinate, quindi combacia senza allineare
+ * niente a mano.
  */
 export function BodyMap({
   centerX,
@@ -126,14 +125,7 @@ export function BodyMap({
         )
       })}
       {/* il tratto per ultimo, cosi' le campiture non lo coprono */}
-      <image
-        href={lineArt}
-        x={0}
-        y={0}
-        width={BODY_SIZE}
-        height={BODY_SIZE}
-        style={{ pointerEvents: 'none' }}
-      />
+      <path d={OUTLINE} fill="#000" style={{ pointerEvents: 'none' }} />
     </svg>
   )
 }
