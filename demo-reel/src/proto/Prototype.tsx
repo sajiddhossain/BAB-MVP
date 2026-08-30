@@ -5,7 +5,12 @@ import { useFit } from './useFit'
 import { NavContext } from './nav'
 import { startBlank } from './blank'
 
-const TRANSITION_MS = 460
+/*
+ * 350ms come lo scorrimento nativo iOS: a 460 il tocco sembrava seguito con un
+ * attimo di ritardo. La tendina della sensazione resta piu' lenta apposta —
+ * un pannello che sale non e' uno schermo che scorre.
+ */
+const TRANSITION_MS = 350
 
 type Move = { dir: 1 | -1; from: number } | null
 
@@ -104,6 +109,20 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
 
   const nav = useMemo(() => ({ next: () => go(1), back: () => go(-1), go }), [go])
 
+  /*
+   * Schermi arrivati scorrendo: il loro contenuto NON entra a scaglioni.
+   * Lo scaglionamento (.bab-enter) e' bello alla primissima apertura, ma se
+   * parte insieme allo scorrimento lo schermo arriva mezzo vuoto e finisce di
+   * riempirsi dopo essersi gia' fermato — misurato: 15 elementi su 16 ancora
+   * invisibili a inizio corsa, completo solo a 416ms. Su iOS lo schermo che
+   * entra e' gia' finito. Le tendine sono escluse: non scorrono, salgono.
+   *
+   * L'indice resta nell'insieme per sempre, cosi' la classe non cambia a meta'
+   * vita dello strato: toglierla farebbe partire l'animazione in ritardo.
+   */
+  const slid = useRef<Set<number>>(new Set())
+  if (move && flow.screens[index].enter !== 'sheet') slid.current.add(index)
+
   const layers: { i: number; role: 'out' | 'in' }[] = move
     ? [
         { i: move.from, role: 'out' },
@@ -182,7 +201,9 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
                * perdeva anche la sua posizione di scorrimento.
                */
               key={i}
-              className={scrolls ? 'absolute inset-0 overflow-y-auto' : 'absolute inset-0 overflow-hidden'}
+              className={`absolute inset-0 ${scrolls ? 'overflow-y-auto' : 'overflow-hidden'}${
+                slid.current.has(i) ? ' bab-arrived' : ''
+              }`}
               style={{
                 transform: `translate3d(${tx}px,0,0)`,
                 opacity,

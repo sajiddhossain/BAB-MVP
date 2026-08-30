@@ -85,6 +85,10 @@ html, body, #root { height: 100dvh; }
 /* Il probe del diff deve mostrare lo stato finale al primo fotogramma, o il
    confronto con Figma fotografa gli schermi a meta' ingresso. Il reel invece le
    animazioni le vuole: e' tutto il punto. */
+.bab-arrived .bab-enter > * {
+  animation: none;
+}
+
 body[data-capture="1"] .bab-enter > * { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {
