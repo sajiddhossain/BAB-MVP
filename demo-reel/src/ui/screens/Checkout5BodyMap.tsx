@@ -2,21 +2,22 @@ import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { SegmentedToggle } from '../primitives/SegmentedToggle'
-import { BodySprite } from '../primitives/BodySprite'
-import { BodyMarkers } from '../primitives/BodyMarkers'
-import type { Marker } from '../primitives/BodyMarkers'
-import { useField } from '../state'
+import { BodyMap } from '../primitives/BodyMap'
+import type { Side } from '../primitives/BodyMap'
+import { useField, toggle } from '../state'
+import { useNav } from '../../proto/nav'
 import { SomewhereElse } from '../primitives/SomewhereElse'
 import gps from '../assets/icons/gps.svg'
 
-const NO_MARKERS: Marker[] = []
+/** costante di modulo: un array nuovo a ogni render manderebbe lo store in loop */
+const NO_ZONES: string[] = []
 
 /** node 3588:167 — checkout-5-body-map */
 export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
-  // qui l'asset e' una figura sola, non lo sprite fronte/retro: il toggle
-  // cambia la linguetta ma non puo' girare il corpo
-  const [side, setSide] = useField('checkout.bodySide', 'Front')
-  const [marks, setMarks] = useField<readonly Marker[]>('checkout.bodyMarks', NO_MARKERS)
+  const nav = useNav()
+  const [side, setSide] = useField<Side>('checkout.bodySide', 'Front')
+  const [picked, setPicked] = useField<readonly string[]>('checkout.zones', NO_ZONES)
+  const [, setLast] = useField<string | null>('checkout.lastZone', null)
   return (
     <Frame>
       <NavBar progress={162 / 285} left={20} top={55} trackWidth={290} />
@@ -60,26 +61,20 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
           filter: 'drop-shadow(6px 5px 0px rgba(0,0,0,0.04))',
         }}
       />
-      <BodySprite
-        src="back"
-        // 129/330 e non 127.5/328.5: in Figma i figli di un contenitore con bordo
-        // sono relativi al contenuto, quindi il bordo da 1.5px li sposta.
+      {/* 129/330 e non 127.5/328.5: in Figma i figli di un contenitore con bordo
+          sono relativi al contenuto, quindi il bordo da 1.5px li sposta. */}
+      <BodyMap
         left={129}
         top={330}
         width={128}
         height={352}
-        imgWidthPct={128.45}
-        imgHeightPct={104.17}
-        imgLeftPct={-14.5}
-        imgTopPct={-2.34}
-      />
-      <BodyMarkers
-        left={20}
-        top={308}
-        width={358}
-        height={397}
-        markers={marks}
-        onAdd={(m) => setMarks([...marks, m])}
+        side={side}
+        selected={picked}
+        onPick={(z) => {
+          setPicked(picked.includes(z.id) ? picked : toggle(picked, z.id))
+          setLast(z.id)
+          nav?.next()
+        }}
       />
 
       <p
@@ -103,7 +98,7 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
         className="absolute whitespace-nowrap font-bold"
         style={{ left: 154, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
-        {spots + marks.length} spots added
+        {spots + picked.length} spots added
       </p>
     </Frame>
   )

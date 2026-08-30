@@ -35,3 +35,12 @@ body:has(.bab-proto) {
   from { transform: scale(0.2); opacity: 0; }
   to   { transform: scale(1);   opacity: 1; }
 }
+
+/* La zona del corpo che si accende: la campitura sfuma, la forma pulsa.
+   transform-box: fill-box perche' l'origine deve essere il centro della zona,
+   non quello del viewBox — altrimenti le zone lontane dal centro schizzano via. */
+@keyframes bab-zone-pop {
+  0%   { transform: scale(0.82); }
+  60%  { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}

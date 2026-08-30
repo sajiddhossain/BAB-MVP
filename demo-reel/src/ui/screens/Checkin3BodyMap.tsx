@@ -2,27 +2,22 @@ import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { SegmentedToggle } from '../primitives/SegmentedToggle'
-import { BodySprite } from '../primitives/BodySprite'
-import { BodyMarkers } from '../primitives/BodyMarkers'
-import type { Marker } from '../primitives/BodyMarkers'
-import { useField } from '../state'
+import { BodyMap } from '../primitives/BodyMap'
+import type { Side } from '../primitives/BodyMap'
+import { useField, toggle } from '../state'
+import { useNav } from '../../proto/nav'
 import { SomewhereElse } from '../primitives/SomewhereElse'
 import gps from '../assets/icons/gps.svg'
 
-const NO_MARKERS: Marker[] = []
-
-/*
- * Lo sprite contiene fronte e retro affiancati: passare a "Back" significa
- * spostare il ritaglio di mezza immagine (396.34 / 2 = 198.17px su un
- * contenitore da 140, cioe' -141.55 punti percentuali).
- */
-const FRONT_LEFT_PCT = -29.74
-const BACK_LEFT_PCT = FRONT_LEFT_PCT - 141.55
+/** costante di modulo: un array nuovo a ogni render manderebbe lo store in loop */
+const NO_ZONES: string[] = []
 
 /** node 3523:251 — checkin-3-body-map */
 export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
-  const [side, setSide] = useField('checkin.bodySide', 'Front')
-  const [marks, setMarks] = useField<readonly Marker[]>('checkin.bodyMarks', NO_MARKERS)
+  const nav = useNav()
+  const [side, setSide] = useField<Side>('checkin.bodySide', 'Front')
+  const [picked, setPicked] = useField<readonly string[]>('checkin.zones', NO_ZONES)
+  const [, setLast] = useField<string | null>('checkin.lastZone', null)
   return (
     <Frame>
       <NavBar progress={162 / 285} left={20} top={55} trackWidth={290} />
@@ -69,23 +64,21 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
           filter: 'drop-shadow(6px 5px 0px rgba(0,0,0,0.04))',
         }}
       />
-      <BodySprite
+      {/* toccare una zona la accende e fa salire il sheet: la tendina e' lo
+          schermo successivo, che ha come sfondo questo stesso schermo, quindi
+          la zona resta colorata dietro al pannello */}
+      <BodyMap
         left={125}
         top={335}
         width={140}
         height={352}
-        imgWidthPct={283.1}
-        imgHeightPct={112.1}
-        imgLeftPct={side === 'Back' ? BACK_LEFT_PCT : FRONT_LEFT_PCT}
-        imgTopPct={-4.19}
-      />
-      <BodyMarkers
-        left={20}
-        top={308}
-        width={358}
-        height={397}
-        markers={marks}
-        onAdd={(m) => setMarks([...marks, m])}
+        side={side}
+        selected={picked}
+        onPick={(z) => {
+          setPicked(picked.includes(z.id) ? picked : toggle(picked, z.id))
+          setLast(z.id)
+          nav?.next()
+        }}
       />
 
       <p
@@ -109,7 +102,7 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
         className="absolute whitespace-nowrap font-bold"
         style={{ left: 153, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
-        {spots + marks.length} spots added
+        {spots + picked.length} spots added
       </p>
     </Frame>
   )

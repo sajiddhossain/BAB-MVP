@@ -1,7 +1,11 @@
 import { Touchable } from './Touchable'
 
-/** Il pill Front/Back: contenitore beige, la linguetta attiva e' bianca con ombra. */
-export function SegmentedToggle({
+/**
+ * Il pill Front/Back: contenitore beige, la linguetta attiva e' bianca con ombra.
+ * Generico sulle opzioni cosi' chi lo usa con un'unione ('Front' | 'Back') non
+ * si ritrova un `string` in mano.
+ */
+export function SegmentedToggle<T extends string>({
   left,
   top,
   options,
@@ -10,9 +14,9 @@ export function SegmentedToggle({
 }: {
   left: number
   top: number
-  options: string[]
-  active: string
-  onSelect?: (o: string) => void
+  options: readonly T[]
+  active: T
+  onSelect?: (o: T) => void
 }) {
   return (
     <div

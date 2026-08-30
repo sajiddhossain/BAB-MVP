@@ -4,8 +4,28 @@
     {
       "name": "bab-app",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "app"],
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "app"
+      ],
       "port": 5180
+    },
+    {
+      "name": "bab-demo-reel",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "--prefix",
+        "demo-reel",
+        "--",
+        "--port",
+        "5199",
+        "--strictPort"
+      ],
+      "port": 5199
     }
   ]
 }

@@ -113,7 +113,13 @@ export function Prototype({ flow }: { flow: Flow }) {
       <div
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
-        className="relative overflow-hidden bg-[#f0ebe6]"
+        /*
+         * shrink-0 e' obbligatorio: lo stage e' un flex item largo 402 dentro
+         * uno schermo da 375, e il transform: scale NON riduce la larghezza di
+         * layout. Senza, il flex lo stringeva a 375 e tutto il contenuto
+         * (posizionato in assoluto su coordinate fisse) finiva tagliato a destra.
+         */
+        className="relative shrink-0 overflow-hidden bg-[#f0ebe6]"
         style={{
           width: STAGE.w,
           height: STAGE.h,

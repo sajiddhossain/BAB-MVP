@@ -273,8 +273,10 @@ def main():
         print(f"  {z['id']:<12} {z['region']['area']:>7} px  {z['n']:>3} punti")
 
     def dump(zones):
-        return json.dumps([{"id": z["id"], "label": z["label"], "d": z["d"]} for z in zones],
-                          indent=2, ensure_ascii=False)
+        return json.dumps(
+            [{"id": z["id"], "label": z["label"], "d": z["d"],
+              "c": [round(z["region"]["c"][0], 1), round(z["region"]["c"][1], 1)]}
+             for z in zones], indent=2, ensure_ascii=False)
 
     OUT_TS.write_text(
         "// GENERATO da tools/extract-zones.py — non modificare a mano.\n"
@@ -284,7 +286,10 @@ def main():
         "// seguono esattamente il tratto originale.\n"
         "// I path sono nello spazio del viewBox originale (1366); il viewBox per lato\n"
         "// ritaglia la figura giusta.\n\n"
-        "export type BodyZone = { id: string; label: string; d: string }\n\n"
+        "// `c` e' il baricentro: serve a scegliere la zona piu' vicina quando il dito\n"
+        "// cade sulla linea o appena fuori. Gomito e polso sono di pochi pixel:\n"
+        "// pretendere il centro esatto li renderebbe intoccabili.\n"
+        "export type BodyZone = { id: string; label: string; d: string; c: [number, number] }\n\n"
         f"export const FRONT_VIEWBOX = '{' '.join(map(str, viewbox(front)))}'\n"
         f"export const BACK_VIEWBOX = '{' '.join(map(str, viewbox(back)))}'\n"
         f"export const BODY_SIZE = {VIEW}\n\n"
