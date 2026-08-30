@@ -2,6 +2,10 @@
  * Service worker minimo: serve solo a rendere il prototipo installabile e a
  * farlo aprire anche senza rete. Nessuna precache generata a build time —
  * si riempie da sola con quello che la pagina chiede davvero.
+ *
+ * Conseguenza da sapere: la prima apertura installa il worker ma non passa
+ * ancora da lui, quindi non lascia niente in cache. Offline funziona dalla
+ * seconda in poi — che e' comunque dopo l'"aggiungi a home".
  */
 const CACHE = 'bab-proto-v1'
 

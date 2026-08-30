@@ -160,8 +160,9 @@ python3 tools/extract-zones.py --debug   # rigenera le zone della body map
 ## Sul telefono
 
 Il prototipo e' installabile: aprilo dal telefono e "Aggiungi a Home". Da li'
-parte a schermo intero, senza barre del browser, con la sua icona — e funziona
-anche senza rete.
+parte a schermo intero, senza barre del browser, con la sua icona. Funziona anche
+senza rete, ma dalla seconda apertura: la prima installa il service worker senza
+ancora passarci attraverso, quindi non lascia niente in cache.
 
 Quello che lo fa sembrare un'app e non una pagina:
 
