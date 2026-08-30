@@ -1,4 +1,7 @@
 import { SensationSheet } from '../primitives/SensationSheet'
+
+/** costante di modulo: un array nuovo a ogni render manderebbe lo store in loop */
+const DEFAULT_CHIPS = ['sore', 'tight', 'burning']
 import { Checkin3BodyMap } from './Checkin3BodyMap'
 
 /**
@@ -13,7 +16,8 @@ export function Checkin4SensationSheet({ backdrop = true, entered = true }: { ba
     <div className="relative overflow-hidden" style={{ width: 402, height: 874 }}>
       <SensationSheet
         title="Right quad"
-        selected={['sore', 'tight', 'burning']}
+        selected={DEFAULT_CHIPS}
+        field="checkin.sheet"
         intensityThumb={131}
         ctaLabel="Add this sensation"
         ctaLabelLeft={105}

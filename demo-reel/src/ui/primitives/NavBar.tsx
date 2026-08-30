@@ -1,4 +1,6 @@
 import arrowLeft from '../assets/icons/arrow-left.svg'
+import { Touchable } from './Touchable'
+import { useNav } from '../../proto/nav'
 
 /** Barra in alto: bottone indietro + progress. progress e' 0..1. */
 export function NavBar({
@@ -20,10 +22,14 @@ export function NavBar({
 }) {
   const trackW = trackWidth
   const innerW = trackW - inset * 2
+  const nav = useNav()
   return (
     <div className="absolute" style={{ left, top, width: 60 + trackW, height: 44 }}>
-      <div
+      <Touchable
         className="absolute left-0 top-0"
+        onTap={nav ? nav.back : undefined}
+        press={nav ? 0.9 : 1}
+        stop={!!nav}
         style={{
           width: 44,
           height: 44,
@@ -40,7 +46,7 @@ export function NavBar({
           className="absolute"
           style={{ left: 11.5, top: 11.5, width: 18, height: 18 }}
         />
-      </div>
+      </Touchable>
 
       <div
         className="absolute"

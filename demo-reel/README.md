@@ -129,11 +129,36 @@ stessa wifi. Per un link stabile, `npm run build` e pubblica `dist/`.
 Le altre viste restano dove erano: `?clip=checkin` il reel da registrare,
 `?probe=<id>` un singolo schermo nudo per il diff.
 
+### Cosa si tocca davvero
+
+| schermo | comandi |
+|---|---|
+| checkin-1 / checkout-1a | i tre chip del tempo |
+| checkin-2 tune-in | 4 slider, le pillole della durata, i due toggle Si/No |
+| checkin-3 / checkout-5 | Front/Back, e il tap sul corpo aggiunge un punto |
+| sensation sheet (×2) | 16 chip, Si/No, slider intensita', la ✕ chiude |
+| checkout-2 / checkout-4 | slider con scatti; su energy cambia anche la lettura |
+| checkout-3 | le 5 facce e le 6 pillole |
+| checkout-7 | Si/No sulla domanda finale |
+
+Lo stato sta in `src/ui/state.ts`, fuori da React: sopravvive alla navigazione,
+quindi tornando indietro ritrovi le tue scelte. I componenti restano
+renderizzabili senza provider, cosi' il diff contro Figma continua a funzionare
+(nessuno scrive nello store, quindi ogni campo cade sul default = stato Figma).
+
+Il tocco su un comando **non** fa cambiare schermo: `Touchable` ferma la
+propagazione, altrimenti il tocco arriverebbe anche allo stage.
+
 ### Cosa NON fa ancora
 
-I chip non si selezionano, gli slider non si trascinano, e sulle body map il tap
-non accende il punto (le macchie rosse sono dipinte dentro il raster). Cammini
-dentro il flusso, non ci giochi.
+- L'accordion "Try this today" su checkin-5 non si apre: **lo stato aperto non
+  esiste nel Figma**, mi inventerei il contenuto.
+- Su checkout-5 il toggle Front/Back cambia la linguetta ma non gira il corpo:
+  li' l'asset e' una figura sola, non lo sprite fronte/retro come su checkin-3.
+- Il testo della pillola di lettura su checkout-4 esiste in Figma solo per il
+  valore 3: gli altri sei sono segnaposto miei, da far validare.
+- I campi di testo non si scrivono, e le macchie rosse dipinte nel raster restano
+  dove sono (i punti che aggiungi sono segni sovrapposti).
 
 - `npm run record:checkin` / `npm run record:checkout` per una sola clip
 - `node scripts/record.mjs all --fps 60 --scale 3` per alzare qualita'

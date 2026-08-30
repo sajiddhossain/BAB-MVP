@@ -3,11 +3,20 @@ import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { SegmentedToggle } from '../primitives/SegmentedToggle'
 import { BodySprite } from '../primitives/BodySprite'
+import { BodyMarkers } from '../primitives/BodyMarkers'
+import type { Marker } from '../primitives/BodyMarkers'
+import { useField } from '../state'
 import { SomewhereElse } from '../primitives/SomewhereElse'
 import gps from '../assets/icons/gps.svg'
 
+const NO_MARKERS: Marker[] = []
+
 /** node 3588:167 — checkout-5-body-map */
 export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
+  // qui l'asset e' una figura sola, non lo sprite fronte/retro: il toggle
+  // cambia la linguetta ma non puo' girare il corpo
+  const [side, setSide] = useField('checkout.bodySide', 'Front')
+  const [marks, setMarks] = useField<readonly Marker[]>('checkout.bodyMarks', NO_MARKERS)
   return (
     <Frame>
       <NavBar progress={162 / 285} left={20} top={55} trackWidth={290} />
@@ -34,7 +43,7 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
         Tap a spot, then name what you feel.
       </p>
 
-      <SegmentedToggle left={20} top={251} options={['Front', 'Back']} active="Front" />
+      <SegmentedToggle left={20} top={251} options={['Front', 'Back']} active={side} onSelect={setSide} />
       <SomewhereElse right={402 - 378} top={251} />
 
       <div
@@ -64,6 +73,14 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
         imgLeftPct={-14.5}
         imgTopPct={-2.34}
       />
+      <BodyMarkers
+        left={20}
+        top={308}
+        width={358}
+        height={397}
+        markers={marks}
+        onAdd={(m) => setMarks([...marks, m])}
+      />
 
       <p
         className="absolute"
@@ -86,7 +103,7 @@ export function Checkout5BodyMap({ spots = 1 }: { spots?: number }) {
         className="absolute whitespace-nowrap font-bold"
         style={{ left: 154, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
-        {spots} spots added
+        {spots + marks.length} spots added
       </p>
     </Frame>
   )

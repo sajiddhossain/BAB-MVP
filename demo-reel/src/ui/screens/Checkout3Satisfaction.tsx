@@ -1,6 +1,8 @@
 import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
+import { Touchable } from '../primitives/Touchable'
+import { useField, toggle } from '../state'
 import rotate from '../assets/icons/rotate-ccw.svg'
 import sad from '../assets/icons/face-sad.svg'
 import meh from '../assets/icons/face-meh.svg'
@@ -16,22 +18,28 @@ import pencil from '../assets/icons/pencil.svg'
 const FACES = [
   { icon: sad, label: 'Disappointed', x: 0, labelX: 0, faceX: 1 },
   { icon: meh, label: 'Frustrated', x: 60.5, labelX: 5.5, faceX: 0 },
-  { icon: smile, label: 'Satisfied', x: 120, labelX: 8, faceX: 0, on: true },
+  { icon: smile, label: 'Satisfied', x: 120, labelX: 8, faceX: 0 },
   { icon: grin, label: 'Confident', x: 179.5, labelX: 5.5, faceX: 0 },
   { icon: smilePlus, label: 'Proud', x: 239, labelX: 15, faceX: 0 },
 ]
 
+/** costanti di modulo: riferimenti stabili per lo store */
+const DEFAULT_FACE = 'Satisfied'
+const DEFAULT_PILLS = ['Listened to my body', 'Showed kindness to myself']
+
 const PILLS = [
   { w: 175, text: 'Learned something new' },
-  { w: 156, text: 'Listened to my body', on: true },
+  { w: 156, text: 'Listened to my body' },
   { w: 149, text: 'Helped a teammate' },
-  { w: 194, text: 'Showed kindness to myself', on: true },
+  { w: 194, text: 'Showed kindness to myself' },
   { w: 142, text: 'Nailed an exercise' },
   { w: 127, text: 'Add your own...', dashed: true },
 ]
 
 /** node 3568:4 — checkout-3-satisfaction */
 export function Checkout3Satisfaction() {
+  const [face, setFace] = useField('checkout.face', DEFAULT_FACE)
+  const [pills, setPills] = useField<readonly string[]>('checkout.takeHome', DEFAULT_PILLS)
   return (
     <Frame>
       <NavBar progress={89 / 288} left={24} top={56} trackWidth={294} borderWidth="1px" inset={3} />
@@ -87,26 +95,30 @@ export function Checkout3Satisfaction() {
             nella striscia da 110 (items-center in Figma), non attaccato in alto.
           */}
           <div className="absolute inset-x-0" style={{ top: '50%', height: 64, transform: 'translateY(-50%)' }}>
-          {FACES.map((f) => (
+          {FACES.map((f) => {
+            const on = face === f.label
+            return (
             <div key={f.label}>
-              <div
+              <Touchable
                 className="absolute flex flex-col items-center justify-center"
+                onTap={() => setFace(f.label)}
+                press={0.9}
                 style={{ left: 6 + f.x + f.faceX, top: 0, width: 56, height: 56 }}
               >
                 <div
                   className="flex items-center justify-center"
                   style={{
-                    width: f.on ? 48 : 44,
-                    height: f.on ? 48 : 44,
-                    borderRadius: f.on ? 24 : 22,
-                    background: f.on ? '#e5f5f2' : '#f6f5f1',
-                    border: f.on ? '2px solid #10b981' : undefined,
+                    width: on ? 48 : 44,
+                    height: on ? 48 : 44,
+                    borderRadius: on ? 24 : 22,
+                    background: on ? '#e5f5f2' : '#f6f5f1',
+                    border: on ? '2px solid #10b981' : undefined,
                     boxSizing: 'border-box',
                   }}
                 >
                   <img src={f.icon} alt="" style={{ width: 36, height: 36 }} />
                 </div>
-              </div>
+              </Touchable>
               <p
                 className="absolute whitespace-nowrap"
                 style={{
@@ -115,14 +127,15 @@ export function Checkout3Satisfaction() {
                   fontSize: 9,
                   lineHeight: 'normal',
                   margin: 0,
-                  fontWeight: f.on ? 700 : 500,
-                  color: f.on ? '#0b7a5a' : 'var(--bab-ink-soft)',
+                  fontWeight: on ? 700 : 500,
+                  color: on ? '#0b7a5a' : 'var(--bab-ink-soft)',
                 }}
               >
                 {f.label}
               </p>
             </div>
-          ))}
+            )
+          })}
           </div>
         </div>
       </div>
@@ -174,24 +187,28 @@ export function Checkout3Satisfaction() {
             className="absolute flex flex-wrap content-start items-start gap-[6px]"
             style={{ left: 16.5, top: 60.5, width: 306 }}
           >
-            {PILLS.map((p) => (
-              <div
+            {PILLS.map((p) => {
+              const on = !p.dashed && pills.includes(p.text)
+              return (
+              <Touchable
                 key={p.text}
                 className="flex shrink-0 items-center gap-[6px]"
+                onTap={p.dashed ? undefined : () => setPills(toggle(pills, p.text))}
+                press={p.dashed ? 1 : 0.96}
                 style={{
                   width: p.w,
                   padding: '7px 10px 7px 9px',
                   borderRadius: 999,
                   boxSizing: 'border-box',
-                  background: p.on ? '#e5f5f2' : '#f7f5f1',
-                  outline: `1.5px ${p.dashed ? 'dashed' : 'solid'} ${p.on ? '#10b981' : 'var(--bab-border)'}`,
+                  background: on ? '#e5f5f2' : '#f7f5f1',
+                  outline: `1.5px ${p.dashed ? 'dashed' : 'solid'} ${on ? '#10b981' : 'var(--bab-border)'}`,
                   outlineOffset: -1.5,
                 }}
               >
                 <div className="relative shrink-0" style={{ width: 16, height: 16 }}>
                   {p.dashed ? (
                     <img src={pencil} alt="" className="absolute" style={{ left: 1, top: 1, width: 14, height: 14 }} />
-                  ) : p.on ? (
+                  ) : on ? (
                     <>
                       <img src={checkEllipse} alt="" className="absolute inset-0" style={{ width: 16, height: 16 }} />
                       <img src={checkMark} alt="" className="absolute" style={{ left: 3.5, top: 4.5, width: 9, height: 7 }} />
@@ -207,14 +224,15 @@ export function Checkout3Satisfaction() {
                     fontSize: 11.5,
                     lineHeight: '14px',
                     margin: 0,
-                    fontWeight: p.on ? 700 : 400,
-                    color: p.on ? '#0b7a5a' : p.dashed ? 'var(--bab-ink-soft)' : 'var(--bab-ink)',
+                    fontWeight: on ? 700 : 400,
+                    color: on ? '#0b7a5a' : p.dashed ? 'var(--bab-ink-soft)' : 'var(--bab-ink)',
                   }}
                 >
                   {p.text}
                 </p>
-              </div>
-            ))}
+              </Touchable>
+              )
+            })}
           </div>
         </div>
       </div>

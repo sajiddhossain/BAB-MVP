@@ -1,13 +1,16 @@
 import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
-import { Slider, SliderTicks, SliderEnds } from '../primitives/Slider'
+import { Slider, SliderTicks, SliderEnds, valueFromThumb } from '../primitives/Slider'
+import { useField } from '../state'
 import rotate from '../assets/icons/rotate-ccw.svg'
 
 const TICKS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
 
 /** node 3565:4 — checkout-2-rpe */
 export function Checkout2Rpe() {
+  const [thumb, setThumb] = useField('checkout.rpe', 137)
+  const value = valueFromThumb(thumb, 302, 0, 10)
   return (
     <Frame>
       <NavBar progress={62 / 284} left={26} top={56} trackWidth={290} borderWidth="1px" inset={3} />
@@ -48,8 +51,8 @@ export function Checkout2Rpe() {
         >
           Effort
         </p>
-        <Slider left={19} top={47} width={302} thumbLeft={137} />
-        <SliderTicks left={21} top={83} width={301} ticks={TICKS} active="5" />
+        <Slider left={19} top={47} width={302} thumbLeft={thumb} onDrag={setThumb} snap={[0, 10]} />
+        <SliderTicks left={21} top={83} width={301} ticks={TICKS} active={String(value)} />
         <SliderEnds top={113} leftX={13} rightX={327} leftLabel="Nothing at all" rightLabel="All-out" />
       </div>
 

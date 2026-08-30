@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FLOWS, STAGE } from './flows'
 import type { Flow } from './flows'
 import { useFit } from './useFit'
+import { NavContext } from './nav'
 
 const TRANSITION_MS = 460
 
@@ -95,6 +96,8 @@ export function Prototype({ flow }: { flow: Flow }) {
     go(1)
   }
 
+  const nav = useMemo(() => ({ next: () => go(1), back: () => go(-1) }), [go])
+
   const layers: { i: number; role: 'out' | 'in' }[] = move
     ? [
         { i: move.from, role: 'out' },
@@ -159,7 +162,9 @@ export function Prototype({ flow }: { flow: Flow }) {
               }}
             >
               <div style={{ marginLeft: (STAGE.w - s.w) / 2 }}>
-                <Comp entered={role === 'in' && isSheet ? entered : true} />
+                <NavContext.Provider value={nav}>
+                  <Comp entered={role === 'in' && isSheet ? entered : true} />
+                </NavContext.Provider>
               </div>
             </div>
           )

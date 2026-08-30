@@ -1,5 +1,7 @@
 import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
+import { Touchable } from '../primitives/Touchable'
+import { useField } from '../state'
 import star from '../assets/icons/star.svg'
 import arrowRight from '../assets/icons/arrow-right.svg'
 import dotGreen from '../assets/icons/dot-green.svg'
@@ -20,6 +22,7 @@ const ACHES = [
 
 /** node 3594:4 — checkout-7-close-loop */
 export function Checkout7CloseLoop() {
+  const [answer, setAnswer] = useField<'Yes' | 'No'>('checkout.protective', 'No')
   return (
     <Frame>
       {/* qui la track e' beige traslucida con raggio 8, non bianca con raggio 99 */}
@@ -172,22 +175,37 @@ export function Checkout7CloseLoop() {
           </p>
         </div>
         <div className="relative shrink-0" style={{ width: 300, height: 28 }}>
-          <div
-            className="absolute"
-            style={{ left: 12, top: 0, width: 146, height: 28, borderRadius: 100, background: 'var(--bab-surface)', border: 'var(--bab-border-w) solid var(--bab-border)', boxSizing: 'border-box' }}
-          >
-            <p className="absolute whitespace-nowrap font-bold" style={{ left: 61.5, top: 5, fontSize: 12, color: 'var(--bab-ink-soft)', lineHeight: 'normal', margin: 0 }}>
-              Yes
-            </p>
-          </div>
-          <div
-            className="absolute flex items-center justify-center"
-            style={{ left: 166, top: 0, width: 146, height: 28, borderRadius: 100, background: 'var(--bab-surface)', border: 'var(--bab-border-w) solid var(--bab-border)', boxSizing: 'border-box' }}
-          >
-            <p className="whitespace-nowrap font-bold" style={{ fontSize: 12, color: '#0b7a5a', lineHeight: 'normal', margin: 0 }}>
-              No
-            </p>
-          </div>
+          {([
+            { label: 'Yes' as const, left: 12, labelLeft: 61.5 },
+            { label: 'No' as const, left: 166, labelLeft: 64 },
+          ]).map((b) => {
+            const on = answer === b.label
+            return (
+              <Touchable
+                key={b.label}
+                className="absolute"
+                onTap={() => setAnswer(b.label)}
+                press={0.95}
+                style={{
+                  left: b.left,
+                  top: 0,
+                  width: 146,
+                  height: 28,
+                  borderRadius: 100,
+                  background: 'var(--bab-surface)',
+                  border: 'var(--bab-border-w) solid var(--bab-border)',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <p
+                  className="absolute whitespace-nowrap font-bold"
+                  style={{ left: b.labelLeft, top: 5, fontSize: 12, color: on ? '#0b7a5a' : 'var(--bab-ink-soft)', lineHeight: 'normal', margin: 0 }}
+                >
+                  {b.label}
+                </p>
+              </Touchable>
+            )
+          })}
         </div>
       </div>
 

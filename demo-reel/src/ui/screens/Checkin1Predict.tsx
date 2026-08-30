@@ -1,4 +1,6 @@
 import { Frame } from '../primitives/Frame'
+import { TempoChip } from '../primitives/TempoChip'
+import { useField } from '../state'
 import { NavBar } from '../primitives/NavBar'
 import { Eyebrow } from '../primitives/Eyebrow'
 import { CtaButton } from '../primitives/CtaButton'
@@ -9,14 +11,24 @@ import leaf from '../assets/icons/leaf.svg'
 
 export type Tempo = 'upbeat' | 'steady' | 'gentle'
 
-const TEMPI: { id: Tempo; label: string; icon: string; iconSize: number; iconTop: number }[] = [
-  { id: 'upbeat', label: 'Upbeat', icon: flash, iconSize: 16, iconTop: 10 },
-  { id: 'steady', label: 'Steady', icon: waves, iconSize: 16, iconTop: 10.5 },
-  { id: 'gentle', label: 'Gentle', icon: leaf, iconSize: 18, iconTop: 10.5 },
+/** Figma ancora le etichette invece di centrarle: 29.5 / 31 / 31.5. */
+const TEMPI: {
+  id: Tempo
+  label: string
+  icon: string
+  iconSize: number
+  iconTop: number
+  labelLeft: number
+  labelTop: number
+}[] = [
+  { id: 'upbeat', label: 'Upbeat', icon: flash, iconSize: 16, iconTop: 10, labelLeft: 29.5, labelTop: 32 },
+  { id: 'steady', label: 'Steady', icon: waves, iconSize: 16, iconTop: 10.5, labelLeft: 31, labelTop: 32.5 },
+  { id: 'gentle', label: 'Gentle', icon: leaf, iconSize: 18, iconTop: 10.5, labelLeft: 31.5, labelTop: 32.5 },
 ]
 
 /** node 3530:4 — checkin-1-predict */
 export function Checkin1Predict({ selected = 'upbeat' }: { selected?: Tempo }) {
+  const [sel, setSel] = useField<Tempo>('checkin.tempo', selected)
   return (
     <Frame width={404}>
       <NavBar progress={78 / 284} />
@@ -63,62 +75,21 @@ export function Checkin1Predict({ selected = 'upbeat' }: { selected?: Tempo }) {
 
       {/* riga dei tempi: 3 chip da 110px con 12px di gap */}
       <div className="absolute" style={{ left: 25, top: 384, width: 354, height: 62 }}>
-        {TEMPI.map((tempo, i) => {
-          const on = tempo.id === selected
-          return (
-            <div key={tempo.id} className="absolute top-0" style={{ left: i * 122, width: 110, height: 62 }}>
-              <div
-                className="absolute"
-                style={{
-                  left: 4,
-                  top: 4,
-                  width: 110,
-                  height: 62,
-                  borderRadius: 16,
-                  background: on ? 'var(--bab-amber-shadow)' : 'var(--bab-shadow)',
-                }}
-              />
-              <div
-                className="absolute left-0 top-0"
-                style={{
-                  width: 110,
-                  height: 62,
-                  borderRadius: 16,
-                  boxSizing: 'border-box',
-                  background: on ? 'var(--bab-amber-bg)' : 'var(--bab-surface)',
-                  border: on
-                    ? '2px solid var(--bab-amber-line)'
-                    : 'var(--bab-border-w) solid var(--bab-border)',
-                }}
-              >
-                <img
-                  src={tempo.icon}
-                  alt=""
-                  className="absolute"
-                  style={{
-                    left: (110 - tempo.iconSize) / 2,
-                    top: tempo.iconTop,
-                    width: tempo.iconSize,
-                    height: tempo.iconSize,
-                  }}
-                />
-                <p
-                  className="bab-font-ui absolute w-full text-center font-bold"
-                  style={{
-                    left: 0,
-                    top: 32,
-                    fontSize: 13,
-                    lineHeight: 'normal',
-                    color: on ? 'var(--bab-ink-strong)' : 'var(--bab-ink)',
-                    margin: 0,
-                  }}
-                >
-                  {tempo.label}
-                </p>
-              </div>
-            </div>
-          )
-        })}
+        {TEMPI.map((tempo, i) => (
+          <TempoChip
+            key={tempo.id}
+            left={i * 122}
+            label={tempo.label}
+            icon={tempo.icon}
+            iconSize={tempo.iconSize}
+            iconLeft={(110 - tempo.iconSize) / 2}
+            iconTop={tempo.iconTop}
+            labelLeft={tempo.labelLeft}
+            labelTop={tempo.labelTop}
+            tone={sel === tempo.id ? 'amber-fill' : 'plain'}
+            onTap={() => setSel(tempo.id)}
+          />
+        ))}
       </div>
 
       {/* card informativa */}

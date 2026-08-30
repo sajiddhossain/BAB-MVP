@@ -30,3 +30,8 @@ body:has(.bab-proto) {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+
+@keyframes bab-pop {
+  from { transform: scale(0.2); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}

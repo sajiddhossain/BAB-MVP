@@ -3,11 +3,26 @@ import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { SegmentedToggle } from '../primitives/SegmentedToggle'
 import { BodySprite } from '../primitives/BodySprite'
+import { BodyMarkers } from '../primitives/BodyMarkers'
+import type { Marker } from '../primitives/BodyMarkers'
+import { useField } from '../state'
 import { SomewhereElse } from '../primitives/SomewhereElse'
 import gps from '../assets/icons/gps.svg'
 
+const NO_MARKERS: Marker[] = []
+
+/*
+ * Lo sprite contiene fronte e retro affiancati: passare a "Back" significa
+ * spostare il ritaglio di mezza immagine (396.34 / 2 = 198.17px su un
+ * contenitore da 140, cioe' -141.55 punti percentuali).
+ */
+const FRONT_LEFT_PCT = -29.74
+const BACK_LEFT_PCT = FRONT_LEFT_PCT - 141.55
+
 /** node 3523:251 — checkin-3-body-map */
 export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
+  const [side, setSide] = useField('checkin.bodySide', 'Front')
+  const [marks, setMarks] = useField<readonly Marker[]>('checkin.bodyMarks', NO_MARKERS)
   return (
     <Frame>
       <NavBar progress={162 / 285} left={20} top={55} trackWidth={290} />
@@ -35,7 +50,7 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
         Tap a spot, then name what you feel.
       </p>
 
-      <SegmentedToggle left={20} top={251} options={['Front', 'Back']} active="Front" />
+      <SegmentedToggle left={20} top={251} options={['Front', 'Back']} active={side} onSelect={setSide} />
 
       <SomewhereElse right={402 - 378} top={251} />
 
@@ -61,8 +76,16 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
         height={352}
         imgWidthPct={283.1}
         imgHeightPct={112.1}
-        imgLeftPct={-29.74}
+        imgLeftPct={side === 'Back' ? BACK_LEFT_PCT : FRONT_LEFT_PCT}
         imgTopPct={-4.19}
+      />
+      <BodyMarkers
+        left={20}
+        top={308}
+        width={358}
+        height={397}
+        markers={marks}
+        onAdd={(m) => setMarks([...marks, m])}
       />
 
       <p
@@ -86,7 +109,7 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
         className="absolute whitespace-nowrap font-bold"
         style={{ left: 153, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
-        {spots} spots added
+        {spots + marks.length} spots added
       </p>
     </Frame>
   )

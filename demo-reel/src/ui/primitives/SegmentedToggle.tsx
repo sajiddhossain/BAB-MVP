@@ -1,14 +1,18 @@
+import { Touchable } from './Touchable'
+
 /** Il pill Front/Back: contenitore beige, la linguetta attiva e' bianca con ombra. */
 export function SegmentedToggle({
   left,
   top,
   options,
   active,
+  onSelect,
 }: {
   left: number
   top: number
   options: string[]
   active: string
+  onSelect?: (o: string) => void
 }) {
   return (
     <div
@@ -18,9 +22,11 @@ export function SegmentedToggle({
       {options.map((o) => {
         const on = o === active
         return (
-          <div
+          <Touchable
             key={o}
             className="flex items-start"
+            onTap={onSelect ? () => onSelect(o) : undefined}
+            press={onSelect ? 0.94 : 1}
             style={{
               padding: '9px 25px',
               borderRadius: 100,
@@ -39,7 +45,7 @@ export function SegmentedToggle({
             >
               {o}
             </p>
-          </div>
+          </Touchable>
         )
       })}
     </div>

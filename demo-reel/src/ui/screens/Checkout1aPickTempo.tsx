@@ -2,13 +2,22 @@ import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { TempoChip } from '../primitives/TempoChip'
+import type { ChipTone } from '../primitives/TempoChip'
+import { useField } from '../state'
 import rotate from '../assets/icons/rotate-ccw.svg'
 import flash from '../assets/icons/flash.svg'
 import waves from '../assets/icons/waves.svg'
 import leaf from '../assets/icons/leaf.svg'
 
 /** node 3673:2 — checkout-1a-pick-tempo */
+/** Tono di partenza in Figma: Upbeat e' la previsione (bordo spesso), Gentle ha il filo ambra. */
+const BASE: Record<string, ChipTone> = { upbeat: 'thick', steady: 'plain', gentle: 'amber-line' }
+
 export function Checkout1aPickTempo() {
+  const [sel, setSel] = useField<string | null>('checkout.tempo', null)
+  /** finche' non scegli, ogni chip resta come in Figma */
+  const toneOf = (id: string): ChipTone =>
+    sel === id ? 'amber-fill' : sel === null ? BASE[id] : id === 'upbeat' ? 'thick' : 'plain'
   return (
     <Frame>
       {/* qui la track e' 294 e il bordo 1px, non 1.5 come negli altri schermi */}
@@ -41,9 +50,9 @@ export function Checkout1aPickTempo() {
       </p>
 
       <div className="absolute" style={{ left: 24, top: 341, width: 354, height: 62 }}>
-        <TempoChip left={0} label="Upbeat" icon={flash} iconSize={18} iconLeft={44} iconTop={8} labelLeft={29.5} labelTop={32} tone="thick" />
-        <TempoChip left={122} label="Steady" icon={waves} iconSize={16} iconLeft={44.5} iconTop={8.5} labelLeft={31} />
-        <TempoChip left={244} label="Gentle" icon={leaf} iconSize={18} iconLeft={44.5} iconTop={8.5} tone="amber-line" />
+        <TempoChip left={0} label="Upbeat" icon={flash} iconSize={18} iconLeft={44} iconTop={8} labelLeft={29.5} labelTop={32} tone={toneOf('upbeat')} onTap={() => setSel('upbeat')} />
+        <TempoChip left={122} label="Steady" icon={waves} iconSize={16} iconLeft={44.5} iconTop={8.5} labelLeft={31} tone={toneOf('steady')} onTap={() => setSel('steady')} />
+        <TempoChip left={244} label="Gentle" icon={leaf} iconSize={18} iconLeft={44.5} iconTop={8.5} tone={toneOf('gentle')} onTap={() => setSel('gentle')} />
       </div>
 
       <CtaButton label="Next" left={19} top={778} width={354} shadowTop={4} labelColor="var(--bab-ink)" labelCenter={175.5} />

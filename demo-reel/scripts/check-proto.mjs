@@ -73,8 +73,53 @@ expect('due tap avanzano di due', await step(), 2)
 await tap(30, 60)
 expect('il tasto indietro torna indietro', await step(), 1)
 
-// arrivato in fondo non deve sfondare
-for (let i = 0; i < 8; i++) await tap(196, 600)
+// --- interazioni vere ---------------------------------------------------
+// Il rischio grosso: toccare un comando seleziona MA cambia anche pagina,
+// perche' il tocco arriva anche allo stage. Qui si vede subito.
+const state = () => page.evaluate(() => window.__babState())
+const K = 852 / 874 // lo stage e' scalato per riempire il telefono
+const at = (x, y) => [x * K + 1, y * K]
+
+await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(300)
+
+await tap(...at(328, 415)) // chip "Gentle"
+expect('il chip si seleziona', (await state())['checkin.tempo'], 'gentle')
+expect('...senza cambiare schermo', await step(), 0)
+
+await tap(...at(202, 806)) // CTA
+expect('il CTA porta avanti', await step(), 1)
+
+// slider Sleep su tune-in: trascinare deve spostare il pallino
+const before = (await state())['checkin.sleep'] ?? 139
+await touch('touchStart', ...at(150, 306))
+for (const x of [200, 250, 280]) {
+  await touch('touchMove', ...at(x, 306))
+  await page.waitForTimeout(30)
+}
+await touch('touchEnd', ...at(280, 306))
+await page.waitForTimeout(300)
+const after = (await state())['checkin.sleep']
+expect('lo slider si trascina', typeof after === 'number' && after > before, true)
+expect('...senza cambiare schermo', await step(), 1)
+
+// chip del sensation sheet
+await tap(...at(202, 806))
+await tap(...at(202, 806))
+expect('siamo sul sensation sheet', await step(), 3)
+// il sheet parte a y=175, i chip a 205.5 al suo interno -> 380.5 assoluti
+await tap(...at(58, 394)) // chip "strong"
+const chips = (await state())['checkin.sheet.chips']
+expect('il chip del sheet si aggiunge', Array.isArray(chips) && chips.includes('strong'), true)
+expect('...senza cambiare schermo', await step(), 3)
+
+/*
+ * Arrivato in fondo non deve sfondare.
+ * Nota: qui si tocca il CTA (y=809), non un punto qualunque. A meta' sheet ci
+ * sono i comandi, che giustamente fermano il tocco e non fanno cambiare pagina.
+ */
+for (let i = 0; i < 6; i++) await tap(...at(201, 809))
 expect("in fondo si ferma sull'ultimo", await step(), 4)
 
 await browser.close()

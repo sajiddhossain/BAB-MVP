@@ -6,6 +6,20 @@
 export const SLIDER_GRADIENT =
   'linear-gradient(90deg, rgb(95, 207, 168) 0%, rgb(204, 233, 101) 33%, rgb(245, 200, 122) 66%, rgb(243, 144, 127) 100%)'
 
+/** Corsa utile del pallino: la larghezza meno il pallino stesso. */
+export const travel = (width: number, thumbSize = 24) => width - thumbSize
+
+/** Da posizione in px al valore sulla scala, per accendere la tacca giusta. */
+export function valueFromThumb(thumbLeft: number, width: number, min: number, max: number, thumbSize = 24) {
+  const t = travel(width, thumbSize)
+  return Math.round(min + (thumbLeft / t) * (max - min))
+}
+
+/** Da valore a posizione in px: usata per agganciare il pallino agli scatti. */
+export function thumbFromValue(value: number, width: number, min: number, max: number, thumbSize = 24) {
+  return ((value - min) / (max - min)) * travel(width, thumbSize)
+}
+
 export function Slider({
   left,
   top,
@@ -16,6 +30,8 @@ export function Slider({
   trackTop = 13,
   thumbSize = 24,
   thumbTop = 6,
+  onDrag,
+  snap,
 }: {
   left: number
   top: number
@@ -27,9 +43,47 @@ export function Slider({
   trackTop?: number
   thumbSize?: number
   thumbTop?: number
+  /**
+   * Se presente lo slider diventa trascinabile e riporta la nuova posizione in px.
+   * Restando in px la posizione di default resta quella esatta di Figma: agganciare
+   * subito agli scatti sposterebbe il pallino di un paio di pixel e il diff lo vedrebbe.
+   */
+  onDrag?: (thumbLeft: number) => void
+  /** [min, max] per agganciare agli scatti mentre trascini */
+  snap?: [number, number]
 }) {
+  const max = travel(width, thumbSize)
+
+  const move = (e: React.PointerEvent) => {
+    if (!onDrag) return
+    const track = e.currentTarget.getBoundingClientRect()
+    // lo stage e' scalato per riempire il telefono: riportiamo i px a scala 1
+    const k = track.width / width
+    let x = (e.clientX - track.left) / k - thumbSize / 2
+    x = Math.max(0, Math.min(max, x))
+    if (snap) {
+      const v = valueFromThumb(x, width, snap[0], snap[1], thumbSize)
+      x = thumbFromValue(v, width, snap[0], snap[1], thumbSize)
+    }
+    onDrag(x)
+  }
+
   return (
-    <div className="absolute" style={{ left, top, width, height: 36 }}>
+    <div
+      className="absolute"
+      style={{ left, top, width, height: 36, touchAction: onDrag ? 'none' : undefined }}
+      onPointerDown={
+        onDrag
+          ? (e) => {
+              e.stopPropagation()
+              e.currentTarget.setPointerCapture(e.pointerId)
+              move(e)
+            }
+          : undefined
+      }
+      onPointerMove={onDrag ? (e) => e.currentTarget.hasPointerCapture(e.pointerId) && move(e) : undefined}
+      onPointerUp={onDrag ? (e) => e.stopPropagation() : undefined}
+    >
       <div
         className="absolute left-0"
         style={{ top: trackTop, width, height: trackHeight, borderRadius: 99, backgroundImage: gradient }}
@@ -39,6 +93,7 @@ export function Slider({
         style={{
           left: thumbLeft,
           top: thumbTop,
+          transition: 'left 90ms ease-out',
           width: thumbSize,
           height: thumbSize,
           borderRadius: thumbSize / 2,

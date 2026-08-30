@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react'
 import { Slider } from './Slider'
+import { Touchable } from './Touchable'
+import { useField, toggle } from '../state'
+import { useNav } from '../../proto/nav'
 import biceps from '../assets/icons/sens-biceps.svg'
 import cloud from '../assets/icons/sens-cloud.svg'
 import bandage from '../assets/icons/sens-bandage.svg'
@@ -66,6 +69,7 @@ export function SensationSheet({
   ctaTop = 606,
   chipOverrides = {},
   entered = true,
+  field,
 }: {
   title: string
   selected: string[]
@@ -84,7 +88,13 @@ export function SensationSheet({
   chipOverrides?: Record<string, { y?: number; w?: number }>
   /** false = sheet fuori schermo e velo trasparente: serve all'animazione d'ingresso */
   entered?: boolean
+  /** chiave dello store: i due sheet tengono selezioni separate */
+  field?: string
 }) {
+  const nav = useNav()
+  const [picked, setPicked] = useField<readonly string[]>(`${field ?? 'sheet'}.chips`, selected)
+  const [side, setSide] = useField<'Yes' | 'No'>(`${field ?? 'sheet'}.side`, 'Yes')
+  const [thumb, setThumb] = useField(`${field ?? 'sheet'}.intensity`, intensityThumb)
   return (
     <div className="bab-font-ui absolute inset-0">
       {backdrop}
@@ -122,14 +132,17 @@ export function SensationSheet({
         <p className="absolute whitespace-nowrap font-bold" style={{ left: 16, top: 30.5, fontSize: 26, color: '#111827', lineHeight: 'normal', margin: 0 }}>
           {title}
         </p>
-        <div
+        <Touchable
           className="absolute"
+          onTap={nav ? nav.back : undefined}
+          press={nav ? 0.88 : 1}
+          stop={!!nav}
           style={{ left: 356, top: 30, width: 30, height: 30, borderRadius: 18, background: 'var(--bab-surface)', border: '1.5px solid #d1d5db', boxSizing: 'border-box' }}
         >
           <p className="absolute whitespace-nowrap" style={{ left: 6.5, top: 3.5, fontSize: 16, color: '#6b7280', lineHeight: 'normal', margin: 0 }}>
             ✕
           </p>
-        </div>
+        </Touchable>
 
         <p className="absolute whitespace-nowrap font-bold" style={{ left: 16, top: 79.5, fontSize: 15, color: '#111827', lineHeight: 'normal', margin: 0 }}>
           What does it feel like?
@@ -149,11 +162,13 @@ export function SensationSheet({
         <img src={chevron} alt="" className="absolute" style={{ left: 370, top: 179, width: 16, height: 16 }} />
 
         {SENSATION_CHIPS.map((c) => {
-          const on = selected.includes(c.label)
+          const on = picked.includes(c.label)
           return (
-            <div
+            <Touchable
               key={c.label}
               className="absolute"
+              onTap={() => setPicked(toggle(picked, c.label))}
+              press={0.93}
               style={{
                 left: c.x,
                 top: chipOverrides[c.label]?.y ?? c.y,
@@ -177,7 +192,7 @@ export function SensationSheet({
               >
                 {c.label}
               </p>
-            </div>
+            </Touchable>
           )
         })}
 
@@ -185,22 +200,37 @@ export function SensationSheet({
         <p className="absolute whitespace-nowrap font-bold" style={{ left: 16, top: 394.5, fontSize: 14, color: '#111827', lineHeight: 'normal', margin: 0 }}>
           Only on one side?
         </p>
-        <div
-          className="absolute"
-          style={{ left: 16, top: 421.5, width: 181, height: 37, borderRadius: 24, background: SEL_BG, border: `1.5px solid ${SEL_LINE}`, boxSizing: 'border-box' }}
-        >
-          <p className="absolute whitespace-nowrap" style={{ left: 77, top: 8.5, fontSize: 14, fontWeight: 600, color: SEL_TEXT, lineHeight: 'normal', margin: 0 }}>
-            Yes
-          </p>
-        </div>
-        <div
-          className="absolute"
-          style={{ left: 205, top: 421.5, width: 181, height: 37, borderRadius: 24, background: 'var(--bab-surface)', border: '1.5px solid #d1d5db', boxSizing: 'border-box' }}
-        >
-          <p className="absolute whitespace-nowrap" style={{ left: 79.5, top: 8.5, fontSize: 14, fontWeight: 600, color: '#1f2937', lineHeight: 'normal', margin: 0 }}>
-            No
-          </p>
-        </div>
+        {([
+          { label: 'Yes' as const, left: 16, labelLeft: 77 },
+          { label: 'No' as const, left: 205, labelLeft: 79.5 },
+        ]).map((b) => {
+          const on = side === b.label
+          return (
+            <Touchable
+              key={b.label}
+              className="absolute"
+              onTap={() => setSide(b.label)}
+              press={0.96}
+              style={{
+                left: b.left,
+                top: 421.5,
+                width: 181,
+                height: 37,
+                borderRadius: 24,
+                boxSizing: 'border-box',
+                background: on ? SEL_BG : 'var(--bab-surface)',
+                border: `1.5px solid ${on ? SEL_LINE : '#d1d5db'}`,
+              }}
+            >
+              <p
+                className="absolute whitespace-nowrap"
+                style={{ left: b.labelLeft, top: 8.5, fontSize: 14, fontWeight: 600, color: on ? SEL_TEXT : '#1f2937', lineHeight: 'normal', margin: 0 }}
+              >
+                {b.label}
+              </p>
+            </Touchable>
+          )
+        })}
         <div className="absolute" style={{ left: 16, top: 470.5, width: 370, height: 1, background: '#e5e7eb' }} />
 
         <p className="absolute whitespace-nowrap font-bold" style={{ left: 16 + intensityDX, top: 483.5 + intensityDY, fontSize: 14, color: '#111827', lineHeight: 'normal', margin: 0 }}>
@@ -210,7 +240,8 @@ export function SensationSheet({
           left={15 + intensityDX}
           top={521 + intensityDY}
           width={370}
-          thumbLeft={intensityThumb}
+          thumbLeft={thumb}
+          onDrag={setThumb}
           gradient="linear-gradient(90deg, rgb(103, 205, 167) 0%, rgb(206, 231, 103) 36.058%, rgb(246, 194, 122) 70.192%, rgb(235, 149, 118) 100%)"
         />
         <p className="absolute whitespace-nowrap" style={{ left: 16 + intensityDX, top: 550.5 + intensityDY, fontSize: 12, color: '#35353f', lineHeight: 'normal', margin: 0 }}>

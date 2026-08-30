@@ -3,6 +3,8 @@ import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { Slider } from '../primitives/Slider'
+import { Touchable } from '../primitives/Touchable'
+import { useField } from '../state'
 import { TickRow, EndLabel } from '../primitives/TickRow'
 import music from '../assets/icons/music-tunein.svg'
 
@@ -65,6 +67,11 @@ const DURATION = [
 
 /** node 3532:4 — checkin-2-tune-in (schermo che scorre: 1262 di altezza) */
 export function Checkin2TuneIn() {
+  const [sleep, setSleep] = useField('checkin.sleep', 139)
+  const [energy, setEnergy] = useField('checkin.energy', 240)
+  const [mood, setMood] = useField('checkin.mood', 190)
+  const [school, setSchool] = useField('checkin.school', 90)
+  const [dur, setDur] = useField('checkin.sleepDuration', '7–8h')
   return (
     <Frame width={404} height={1262} textureTops={[0, 868]}>
       <NavBar progress={84 / 277} left={31} top={56} trackWidth={282} />
@@ -89,7 +96,7 @@ export function Checkin2TuneIn() {
       {/* Sleep */}
       <Card left={29} top={247} height={228.538} shadowLeft={33} shadowTop={250.46}>
         <CardHead title="Sleep" subtitle="How rested do you feel from last night?" />
-        <Slider left={23} top={56} width={302} thumbLeft={139} gradient={TUNE_GRADIENT} />
+        <Slider left={23} top={56} width={302} thumbLeft={sleep} gradient={TUNE_GRADIENT} onDrag={setSleep} snap={[1, 7]} />
         <TickRow centerX={174} top={92} />
         <EndLabel centerX={27.5} top={105.5} width={36} lines={['Barely slept']} lineHeight={9} />
         <EndLabel centerX={316} top={105.5} width={35} lines={['Well rested']} lineHeight={9} />
@@ -98,35 +105,40 @@ export function Checkin2TuneIn() {
           Roughly how long did you sleep?
         </p>
         <div className="absolute" style={{ left: 20, top: 179, width: 302, height: 34 }}>
-          {DURATION.map((d) => (
-            <div
+          {DURATION.map((d) => {
+            const on = dur === d.label
+            return (
+            <Touchable
               key={d.label}
               className="absolute top-0"
+              onTap={() => setDur(d.label)}
+              press={0.94}
               style={{
                 left: d.x,
                 width: d.w,
                 height: 32,
                 borderRadius: 100,
                 boxSizing: 'border-box',
-                background: d.on ? '#e6f5f2' : 'var(--bab-surface)',
-                border: d.on ? '1.5px solid #4ab5a0' : '1px solid var(--bab-border)',
+                background: on ? '#e6f5f2' : 'var(--bab-surface)',
+                border: on ? '1.5px solid #4ab5a0' : '1px solid var(--bab-border)',
               }}
             >
               <p
                 className="absolute text-center font-bold"
-                style={{ left: d.labelLeft, top: d.labelTop, width: d.labelW, fontSize: 12, color: d.on ? '#4ab5a0' : 'var(--bab-ink)', lineHeight: 'normal', margin: 0 }}
+                style={{ left: d.labelLeft, top: d.labelTop, width: d.labelW, fontSize: 12, color: on ? '#4ab5a0' : 'var(--bab-ink)', lineHeight: 'normal', margin: 0 }}
               >
                 {d.label}
               </p>
-            </div>
-          ))}
+            </Touchable>
+            )
+          })}
         </div>
       </Card>
 
       {/* Energy */}
       <Card left={29} top={492} height={147.717} shadowLeft={33} shadowTop={495.28}>
         <CardHead title="Energy" subtitle="Where's your energy gauge sitting?" />
-        <Slider left={23} top={57} width={302} thumbLeft={240} gradient={TUNE_GRADIENT} />
+        <Slider left={23} top={57} width={302} thumbLeft={energy} gradient={TUNE_GRADIENT} onDrag={setEnergy} snap={[1, 7]} />
         <TickRow centerX={173} top={93} />
         <EndLabel centerX={26} top={108.5} width={41} lines={['Running empty']} />
         <EndLabel centerX={316} top={108.5} width={41} lines={['Fully', 'charged']} />
@@ -135,7 +147,7 @@ export function Checkin2TuneIn() {
       {/* Mood */}
       <Card left={29} top={656} height={173} shadowLeft={33} shadowTop={660}>
         <CardHead title="Mood" subtitle="Slide to where you are today." />
-        <Slider left={20} top={72} width={302} thumbLeft={190} gradient={TUNE_GRADIENT} />
+        <Slider left={20} top={72} width={302} thumbLeft={mood} gradient={TUNE_GRADIENT} onDrag={setMood} snap={[1, 7]} />
         <TickRow centerX={170} top={108} />
         <EndLabel centerX={23} top={128.5} width={41} lines={['Worst I’ve', 'fell']} />
         <EndLabel centerX={313} top={128.5} width={41} lines={['Worst I’ve', 'fell']} />
@@ -144,7 +156,7 @@ export function Checkin2TuneIn() {
       {/* School */}
       <Card left={30} top={842} height={173} shadowLeft={34} shadowTop={846} shadowHeight={174}>
         <CardHead title="School" subtitle="How’s the pressure right now?" />
-        <Slider left={18.5} top={70.5} width={302} thumbLeft={90} gradient={TUNE_GRADIENT} />
+        <Slider left={18.5} top={70.5} width={302} thumbLeft={school} gradient={TUNE_GRADIENT} onDrag={setSchool} snap={[1, 7]} />
         <TickRow centerX={171} top={106.5} />
         <EndLabel centerX={27.5} top={128.5} width={26} lines={['Chilled']} />
         <EndLabel centerX={314.5} top={125.5} width={26} lines={['Exam week']} />
@@ -152,18 +164,8 @@ export function Checkin2TuneIn() {
 
       {/* due card di contesto affiancate */}
       <div className="absolute flex items-start gap-[10px]" style={{ left: 34, top: 1033, width: 342 }}>
-        <ContextCard
-          question="On your period?"
-          toggleTop={46.5}
-          yes={{ on: true, left: 4, width: 66, top: 3, height: 27, labelDX: -11, labelTop: 5 }}
-          no={{ on: false, left: 62, width: 81, top: -1, height: 35, labelDX: -8.5, labelTop: 9 }}
-        />
-        <ContextCard
-          question="Taken pain relief?"
-          toggleTop={44.5}
-          yes={{ on: false, left: 4, width: 66, top: 3, height: 27, labelDX: -11, labelTop: 5 }}
-          no={{ on: true, left: 70, width: 66, top: 3, height: 27, labelDX: -8, labelTop: 5 }}
-        />
+        <ContextCard question="On your period?" field="checkin.period" fallback="Yes" toggleTop={46.5} />
+        <ContextCard question="Taken pain relief?" field="checkin.painRelief" fallback="No" toggleTop={44.5} />
       </div>
 
       <CtaButton label="Pinpoint how it feels" left={29} top={1165} width={342} shadowTop={1} labelTop={15.5} />
@@ -171,49 +173,54 @@ export function Checkin2TuneIn() {
   )
 }
 
-type Tab = {
-  on: boolean
-  left: number
-  width: number
-  top: number
-  height: number
-  /** scostamento del testo dal centro della linguetta */
-  labelDX: number
-  labelTop: number
-}
-
+/**
+ * Le due card di contesto.
+ *
+ * In Figma le due linguette sono disegnate con geometrie diverse fra le due card
+ * (la "No" non selezionata e' larga 81, quella selezionata 66). Le etichette pero'
+ * cadono nello stesso punto: unifichiamo la geometria e cambiamo solo l'aspetto,
+ * cosi' il toggle si puo' davvero premere senza spostare nulla.
+ */
 function ContextCard({
   question,
+  field,
+  fallback,
   toggleTop,
-  yes,
-  no,
 }: {
   question: string
+  field: string
+  fallback: 'Yes' | 'No'
   toggleTop: number
-  yes: Tab
-  no: Tab
 }) {
-  const tab = (t: Tab, label: string) => (
-    <div
-      className="absolute"
-      style={{
-        left: t.left,
-        top: t.top,
-        width: t.width,
-        height: t.height,
-        borderRadius: 100,
-        background: t.on ? 'var(--bab-surface)' : 'transparent',
-        filter: t.on ? 'drop-shadow(0px 2px 3px rgba(0,0,0,0.08))' : undefined,
-      }}
-    >
-      <p
-        className="absolute whitespace-nowrap font-bold"
-        style={{ left: t.width / 2 + t.labelDX, top: t.labelTop, fontSize: 13, color: t.on ? '#866bf2' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0 }}
+  const [value, setValue] = useField<'Yes' | 'No'>(field, fallback)
+
+  const tab = (label: 'Yes' | 'No', left: number, labelLeft: number) => {
+    const on = value === label
+    return (
+      <Touchable
+        className="absolute"
+        onTap={() => setValue(label)}
+        press={0.94}
+        style={{
+          left,
+          top: 3,
+          width: 66,
+          height: 27,
+          borderRadius: 100,
+          background: on ? 'var(--bab-surface)' : 'transparent',
+          filter: on ? 'drop-shadow(0px 2px 3px rgba(0,0,0,0.08))' : undefined,
+        }}
       >
-        {label}
-      </p>
-    </div>
-  )
+        <p
+          className="absolute whitespace-nowrap font-bold"
+          style={{ left: labelLeft, top: 5, fontSize: 13, color: on ? '#866bf2' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0 }}
+        >
+          {label}
+        </p>
+      </Touchable>
+    )
+  }
+
   return (
     <div
       className="relative shrink-0"
@@ -223,8 +230,8 @@ function ContextCard({
         {question}
       </p>
       <div className="absolute" style={{ left: 12.5, top: toggleTop, width: 139, height: 33, borderRadius: 100, background: 'var(--bab-bg)' }}>
-        {tab(yes, 'Yes')}
-        {tab(no, 'No')}
+        {tab('Yes', 4, 22)}
+        {tab('No', 70, 25)}
       </div>
     </div>
   )

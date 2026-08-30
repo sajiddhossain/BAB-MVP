@@ -1,15 +1,33 @@
 import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
-import { Slider, SliderTicks, SliderEnds } from '../primitives/Slider'
+import { Slider, SliderTicks, SliderEnds, valueFromThumb } from '../primitives/Slider'
+import { useField } from '../state'
 import music from '../assets/icons/music.svg'
 
 /** gradiente invertito rispetto a rpe: qui il rosso e' "scarico" */
 const ENERGY_GRADIENT =
   'linear-gradient(90deg, rgb(243, 144, 127) 0%, rgb(245, 200, 122) 33%, rgb(204, 233, 101) 66%, rgb(95, 207, 168) 100%)'
 
+/**
+ * Testo della pillola di lettura.
+ * Figma mostra solo il caso 3: quello lo teniamo identico parola per parola,
+ * gli altri sono segnaposto miei — copy da far validare.
+ */
+const READOUT: Record<number, string> = {
+  1: '1 · Drained',
+  2: '2 · Running low',
+  3: '3 · A bit low · Something in between',
+  4: '4 · Steady',
+  5: '5 · Good',
+  6: '6 · Strong',
+  7: '7 · Still buzzing',
+}
+
 /** node 3590:4 — checkout-4-energy */
 export function Checkout4Energy() {
+  const [thumb, setThumb] = useField('checkout.energy', 87)
+  const value = valueFromThumb(thumb, 302, 1, 7)
   return (
     <Frame>
       <NavBar progress={120.84 / 289} left={24} top={56} trackWidth={294} />
@@ -52,9 +70,9 @@ export function Checkout4Energy() {
         >
           Energy
         </p>
-        <Slider left={18.5} top={46.5} width={302} thumbLeft={87} gradient={ENERGY_GRADIENT} />
+        <Slider left={18.5} top={46.5} width={302} thumbLeft={thumb} gradient={ENERGY_GRADIENT} onDrag={setThumb} snap={[1, 7]} />
         {/* qui le tacche sono distribuite, non a gap fisso come su rpe */}
-        <SliderTicks left={12.5} top={82.5} width={314} ticks={['1', '2', '3', '4', '5', '6', '7']} active="3" fontSize={11.5} />
+        <SliderTicks left={12.5} top={82.5} width={314} ticks={['1', '2', '3', '4', '5', '6', '7']} active={String(value)} fontSize={11.5} />
         <SliderEnds top={112.5} leftX={12.5} rightX={326.5} leftLabel="Drained" rightLabel="Still buzzing" fontSize={11.5} />
 
         <div
@@ -74,7 +92,7 @@ export function Checkout4Energy() {
             className="absolute w-full text-center font-bold"
             style={{ left: 0, top: 7, fontSize: 13, color: 'var(--bab-ink)', lineHeight: 'normal', margin: 0, whiteSpace: 'nowrap' }}
           >
-            3 · A bit low · Something in between
+            {READOUT[value]}
           </p>
         </div>
       </div>

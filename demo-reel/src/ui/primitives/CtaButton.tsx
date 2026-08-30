@@ -2,6 +2,9 @@
  * Il bottone principale. L'ombra e' sfalsata solo in basso di 6px
  * (nel frame l'ombra sta a top+6, il corpo a top+0).
  */
+import { Touchable } from './Touchable'
+import { useNav } from '../../proto/nav'
+
 export function CtaButton({
   label,
   left,
@@ -40,6 +43,7 @@ export function CtaButton({
 }) {
   const lw = labelWidth ?? width
   const lc = labelCenter ?? width / 2
+  const nav = useNav()
   const shadow = (
     <div
       className="absolute"
@@ -54,7 +58,13 @@ export function CtaButton({
     />
   )
   return (
-    <div className="absolute" style={{ left, top, width, height: height + shadowTop }}>
+    <Touchable
+      className="absolute"
+      style={{ left, top, width, height: height + shadowTop }}
+      onTap={nav ? nav.next : undefined}
+      press={nav ? 0.975 : 1}
+      stop={!!nav}
+    >
       {!shadowOnTop && shadow}
       <div
         className="absolute left-0 top-0"
@@ -83,6 +93,6 @@ export function CtaButton({
         </p>
       </div>
       {shadowOnTop && shadow}
-    </div>
+    </Touchable>
   )
 }

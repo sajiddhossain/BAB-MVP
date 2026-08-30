@@ -1,3 +1,5 @@
+import { Touchable } from './Touchable'
+
 export type ChipTone = 'plain' | 'amber-fill' | 'amber-line' | 'thick'
 
 /**
@@ -19,6 +21,7 @@ export function TempoChip({
   height = 62,
   shadow,
   labelColor,
+  onTap,
 }: {
   left: number
   label: string
@@ -35,6 +38,7 @@ export function TempoChip({
   /** l'ombra non segue sempre il tono: nello stato "rivelato" sono disaccoppiati */
   shadow?: string
   labelColor?: string
+  onTap?: () => void
 }) {
   const border =
     tone === 'amber-fill'
@@ -46,7 +50,13 @@ export function TempoChip({
           : 'var(--bab-border-w) solid var(--bab-border)'
 
   return (
-    <div className="absolute top-0" style={{ left, width, height }}>
+    <Touchable
+      className="absolute top-0"
+      style={{ left, width, height }}
+      onTap={onTap}
+      press={onTap ? 0.95 : 1}
+      stop={!!onTap}
+    >
       <div
         className="absolute"
         style={{
@@ -92,6 +102,6 @@ export function TempoChip({
           {label}
         </p>
       </div>
-    </div>
+    </Touchable>
   )
 }
