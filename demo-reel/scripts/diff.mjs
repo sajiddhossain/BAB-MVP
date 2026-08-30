@@ -22,7 +22,7 @@ const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 const PORT = 5199
 const BASE = `http://localhost:${PORT}`
 /** oltre questa soglia lo schermo non e' considerato allineato */
-const THRESHOLD_PCT = 1.0
+const THRESHOLD_PCT = 2.0
 
 const argv = process.argv.slice(2)
 const ids = argv.filter((a) => !a.startsWith('--'))

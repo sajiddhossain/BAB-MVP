@@ -8,25 +8,54 @@ export function CtaButton({
   top,
   width,
   height = 56,
+  labelTop = 16.5,
+  shadowTop = 6,
+  labelColor = 'var(--bab-ink-max)',
+  shadowInsetX = 0,
+  shadowOnTop = false,
+  labelWidth,
+  labelCenter,
 }: {
   label: string
   left: number
   top: number
   width: number
   height?: number
+  /** Figma non lo tiene costante fra schermi: 16.5 su alcuni, 15.5 su altri. */
+  labelTop?: number
+  /** nemmeno l'ombra: 6px sui check-in, 4px sui check-out */
+  shadowTop?: number
+  labelColor?: string
+  /** su checkout-4 l'ombra deborda di 3px per lato */
+  shadowInsetX?: number
+  /** e sta SOPRA il bottone nell'ordine di Figma, non sotto */
+  shadowOnTop?: boolean
+  /**
+   * Figma centra l'etichetta in una scatola che non coincide sempre col bottone
+   * (su checkout-4 e' larga 354 dentro un bottone da 342, centrata a 175.5).
+   * Centrarla sul bottone la sposta di 5px.
+   */
+  labelWidth?: number
+  labelCenter?: number
 }) {
+  const lw = labelWidth ?? width
+  const lc = labelCenter ?? width / 2
+  const shadow = (
+    <div
+      className="absolute"
+      style={{
+        left: -shadowInsetX,
+        top: shadowTop,
+        width: width + shadowInsetX * 2,
+        height,
+        borderRadius: 100,
+        background: 'var(--bab-shadow)',
+      }}
+    />
+  )
   return (
-    <div className="absolute" style={{ left, top, width, height: height + 6 }}>
-      <div
-        className="absolute left-0"
-        style={{
-          top: 6,
-          width,
-          height,
-          borderRadius: 100,
-          background: 'var(--bab-shadow)',
-        }}
-      />
+    <div className="absolute" style={{ left, top, width, height: height + shadowTop }}>
+      {!shadowOnTop && shadow}
       <div
         className="absolute left-0 top-0"
         style={{
@@ -41,11 +70,11 @@ export function CtaButton({
         <p
           className="absolute text-center font-bold"
           style={{
-            left: 0,
-            top: 16.5,
-            width,
+            left: lc - lw / 2,
+            top: labelTop,
+            width: lw,
             fontSize: 16,
-            color: 'var(--bab-ink-max)',
+            color: labelColor,
             lineHeight: 'normal',
             margin: 0,
           }}
@@ -53,6 +82,7 @@ export function CtaButton({
           {label}
         </p>
       </div>
+      {shadowOnTop && shadow}
     </div>
   )
 }

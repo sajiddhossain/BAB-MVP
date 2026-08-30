@@ -1,0 +1,10 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="music" clip-path="url(#clip0_0_4)">
+<path id="Vector" d="M5.625 11.25V3.125L13.125 1.875V10M5.625 11.25C5.625 12.2855 4.78553 13.125 3.75 13.125C2.71447 13.125 1.875 12.2855 1.875 11.25C1.875 10.2145 2.71447 9.375 3.75 9.375C4.78553 9.375 5.625 10.2145 5.625 11.25ZM13.125 10C13.125 11.0355 12.2855 11.875 11.25 11.875C10.2145 11.875 9.375 11.0355 9.375 10C9.375 8.96447 10.2145 8.125 11.25 8.125C12.2855 8.125 13.125 8.96447 13.125 10Z" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+</g>
+<defs>
+<clipPath id="clip0_0_4">
+<rect width="15" height="15" fill="white"/>
+</clipPath>
+</defs>
+</svg>
