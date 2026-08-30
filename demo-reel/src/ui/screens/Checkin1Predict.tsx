@@ -28,7 +28,7 @@ const TEMPI: {
 
 /** node 3530:4 — checkin-1-predict */
 export function Checkin1Predict({ selected = 'upbeat' }: { selected?: Tempo }) {
-  const [sel, setSel] = useField<Tempo>('checkin.tempo', selected)
+  const [sel, setSel] = useField<Tempo | null>('checkin.tempo', selected)
   return (
     <Frame width={404}>
       <NavBar progress={78 / 284} />
@@ -134,7 +134,7 @@ export function Checkin1Predict({ selected = 'upbeat' }: { selected?: Tempo }) {
         </div>
       </div>
 
-      <CtaButton label="Now let's tune in" left={31} top={778} width={342} />
+      <CtaButton label="Now let's tune in" left={31} top={778} width={342} enabled={!!sel} />
     </Frame>
   )
 }

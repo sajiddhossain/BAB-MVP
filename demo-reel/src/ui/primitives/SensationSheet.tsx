@@ -94,7 +94,7 @@ export function SensationSheet({
 }) {
   const nav = useNav()
   const [picked, setPicked] = useField<readonly string[]>(`${field ?? 'sheet'}.chips`, selected)
-  const [side, setSide] = useField<'Yes' | 'No'>(`${field ?? 'sheet'}.side`, 'Yes')
+  const [side, setSide] = useField<'Yes' | 'No' | null>(`${field ?? 'sheet'}.side`, 'Yes')
   const [thumb, setThumb] = useField(`${field ?? 'sheet'}.intensity`, intensityThumb)
   const [note, setNote] = useField(`${field ?? 'sheet'}.note`, '')
   const [focus, setFocus] = useState(false)
@@ -108,6 +108,11 @@ export function SensationSheet({
    */
   const [help, setHelp] = useField(`${field ?? 'sheet'}.help`, true)
   const HELP_H = 176
+
+  // "Add this sensation" con nessuna sensazione nominata non aggiunge niente:
+  // finche' non scegli un chip o scrivi qualcosa, il bottone resta spento
+  const named = picked.length > 0 || note.trim().length > 0
+  const live = named && !!nav
 
   /*
    * Trascinare il pannello via.
@@ -351,17 +356,17 @@ export function SensationSheet({
           className="absolute"
           data-cta
           style={{ left: 24, top: ctaTop, width: width - 48, height: 62 }}
-          onTap={nav ? nav.next : undefined}
-          press={nav ? 0.975 : 1}
+          onTap={live ? nav.next : undefined}
+          press={live ? 0.975 : 1}
           stop={!!nav}
         >
           <div
             className="absolute left-0 top-0"
-            style={{ width: width - 48, height: 56, borderRadius: 100, background: '#d4f369', border: 'var(--bab-border-w) solid var(--bab-border)', boxSizing: 'border-box', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.05))' }}
+            style={{ width: width - 48, height: 56, borderRadius: 100, background: named ? '#d4f369' : 'var(--bab-surface)', border: 'var(--bab-border-w) solid var(--bab-border)', boxSizing: 'border-box', filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.05))', transition: 'background 220ms ease-out' }}
           >
             <p
               className="bab-font-body absolute whitespace-nowrap font-bold"
-              style={{ left: ctaLabelLeft, top: 16.5, fontSize: 16, color: 'var(--bab-ink-max)', lineHeight: 'normal', margin: 0 }}
+              style={{ left: ctaLabelLeft, top: 16.5, fontSize: 16, color: named ? 'var(--bab-ink-max)' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0, transition: 'color 220ms ease-out' }}
             >
               {ctaLabel}
             </p>

@@ -38,7 +38,7 @@ const PILLS = [
 
 /** node 3568:4 — checkout-3-satisfaction */
 export function Checkout3Satisfaction() {
-  const [face, setFace] = useField('checkout.face', DEFAULT_FACE)
+  const [face, setFace] = useField<string | null>('checkout.face', DEFAULT_FACE)
   const [pills, setPills] = useField<readonly string[]>('checkout.takeHome', DEFAULT_PILLS)
   return (
     <Frame>
@@ -237,7 +237,7 @@ export function Checkout3Satisfaction() {
         </div>
       </div>
 
-      <CtaButton label="Now let’s tune in" left={24} top={778} width={354} shadowTop={4} labelColor="var(--bab-ink)" labelCenter={175.5} />
+      <CtaButton label="Now let’s tune in" left={24} top={778} width={354} shadowTop={4} labelColor="var(--bab-ink)" labelCenter={175.5} enabled={!!face} />
     </Frame>
   )
 }

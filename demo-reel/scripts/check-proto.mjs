@@ -36,6 +36,7 @@ const touch = (type, x, y) =>
     touchPoints: type === 'touchEnd' ? [] : [{ x, y, radiusX: 8, radiusY: 8, force: 1 }],
   })
 const step = () => page.evaluate(() => window.__step)
+const state = () => page.evaluate(() => window.__babState())
 const scrollTop = () =>
   page.evaluate(() => Math.round(document.querySelector('.overflow-y-auto')?.scrollTop ?? -1))
 
@@ -94,10 +95,18 @@ const expect = (name, got, want) => checks.push({ name, got, want, ok: got === w
 
 expect('parte dal primo schermo', await step(), 0)
 
+// Foglio bianco: il prototipo NON deve aprirsi con le risposte del frame Figma
+// gia' dentro. I default dei componenti restano quelli del frame (li confronta
+// il diff); il vuoto lo mette proto/blank.ts.
+expect('parte senza risposte', (await state())['checkin.tempo'], null)
+
 // la regola: si va avanti solo confermando. Un dito appoggiato a vuoto per
 // leggere non deve portarti due schermi piu' in la'.
 await tap(196, 700)
 expect('un tocco a vuoto non avanza', await step(), 0)
+await tapCta()
+expect('...e nemmeno il bottone, se la domanda non ha risposta', await step(), 0)
+await tapLabel('Upbeat')
 await tapCta()
 expect('il bottone principale avanza', await step(), 1)
 
@@ -109,8 +118,10 @@ expect('...ma scorre', (await scrollTop()) > 100, true)
 await swipe(120, 450, 340, 450)
 expect('lo swipe destro torna indietro', await step(), 0)
 
+await tapLabel('Upbeat')
 await tapCta()
-await tapCta() // il CTA di tune-in sta a y=1193: tapCta lo porta in vista da solo
+await tapLabel('7–8h') // anche tune-in aspetta una risposta
+await tapCta() // il suo CTA sta a y=1193: tapCta lo porta in vista da solo
 expect('e lo fa anche da uno schermo che scorre', await step(), 2)
 await tap(30, 60)
 expect('il tasto indietro torna indietro', await step(), 1)
@@ -118,7 +129,6 @@ expect('il tasto indietro torna indietro', await step(), 1)
 // --- interazioni vere ---------------------------------------------------
 // Il rischio grosso: toccare un comando seleziona MA cambia anche pagina,
 // perche' il tocco arriva anche allo stage. Qui si vede subito.
-const state = () => page.evaluate(() => window.__babState())
 const K = 852 / 874 // lo stage e' scalato per riempire il telefono
 const at = (x, y) => [x * K + 1, y * K]
 
@@ -132,6 +142,7 @@ expect('...senza cambiare schermo', await step(), 0)
 
 await tapCta()
 expect('il CTA porta avanti', await step(), 1)
+await tapLabel('7–8h')
 
 // slider Sleep su tune-in: trascinare deve spostare il pallino
 const before = (await state())['checkin.sleep'] ?? 139
@@ -157,9 +168,18 @@ expect('...senza cambiare schermo', await step(), 1)
 await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
 await page.evaluate(() => document.fonts.ready)
 await page.waitForTimeout(300)
+await tapLabel('Upbeat')
 await tapCta()
+await tapLabel('7–8h')
 await tapCta()
 expect('siamo sulla body map', await step(), 2)
+expect(
+  'il contatore parte da zero',
+  await page.evaluate(() =>
+    [...document.querySelectorAll('p')].find((e) => /spots added/.test(e.textContent))?.textContent,
+  ),
+  '0 spots added',
+)
 
 /** baricentro di una zona -> punto sullo schermo del telefono */
 const onBody = async (zoneId) =>
@@ -206,10 +226,14 @@ await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
 await page.evaluate(() => document.fonts.ready)
 await page.waitForTimeout(300)
 await tap(...at(202, 806))
+await tapLabel('Upbeat')
 await tapCta()
+await tapLabel('7–8h')
 await tapCta()
 await tap(...(await onBody('quad-r')))
 expect('siamo sul sensation sheet', await step(), 3)
+await tapCta()
+expect('il pannello non aggiunge una sensazione senza nome', await step(), 3)
 // il sheet parte a y=175, i chip a 205.5 al suo interno -> 380.5 assoluti
 await tap(...at(58, 394)) // chip "strong"
 const chips = (await state())['checkin.sheet.chips']

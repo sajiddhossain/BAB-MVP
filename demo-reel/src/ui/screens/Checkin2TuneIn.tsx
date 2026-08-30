@@ -71,7 +71,7 @@ export function Checkin2TuneIn() {
   const [energy, setEnergy] = useField('checkin.energy', 240)
   const [mood, setMood] = useField('checkin.mood', 190)
   const [school, setSchool] = useField('checkin.school', 90)
-  const [dur, setDur] = useField('checkin.sleepDuration', '7–8h')
+  const [dur, setDur] = useField<string | null>('checkin.sleepDuration', '7–8h')
   return (
     <Frame width={404} height={1262} textureTops={[0, 868]}>
       <NavBar progress={84 / 277} left={31} top={56} trackWidth={282} />
@@ -168,7 +168,7 @@ export function Checkin2TuneIn() {
         <ContextCard question="Taken pain relief?" field="checkin.painRelief" fallback="No" toggleTop={44.5} />
       </div>
 
-      <CtaButton label="Pinpoint how it feels" left={29} top={1165} width={342} shadowTop={1} labelTop={15.5} />
+      <CtaButton label="Pinpoint how it feels" left={29} top={1165} width={342} shadowTop={1} labelTop={15.5} enabled={!!dur} />
     </Frame>
   )
 }

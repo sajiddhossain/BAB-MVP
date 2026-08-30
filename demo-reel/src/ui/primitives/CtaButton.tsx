@@ -18,6 +18,7 @@ export function CtaButton({
   shadowOnTop = false,
   labelWidth,
   labelCenter,
+  enabled = true,
 }: {
   label: string
   left: number
@@ -40,10 +41,18 @@ export function CtaButton({
    */
   labelWidth?: number
   labelCenter?: number
+  /**
+   * false = la domanda non ha ancora risposta. Il bottone si spegne e non porta
+   * avanti. Va usato solo dove il frame Figma MOSTRA una risposta data: dove il
+   * frame e' gia' senza risposta e col bottone acceso (checkout-1a) spegnerlo
+   * vorrebbe dire allontanarsi dal disegno, non avvicinarsi.
+   */
+  enabled?: boolean
 }) {
   const lw = labelWidth ?? width
   const lc = labelCenter ?? width / 2
   const nav = useNav()
+  const live = enabled && !!nav
   const shadow = (
     <div
       className="absolute"
@@ -62,8 +71,8 @@ export function CtaButton({
       className="absolute"
       data-cta
       style={{ left, top, width, height: height + shadowTop }}
-      onTap={nav ? nav.next : undefined}
-      press={nav ? 0.975 : 1}
+      onTap={live ? nav.next : undefined}
+      press={live ? 0.975 : 1}
       stop={!!nav}
     >
       {!shadowOnTop && shadow}
@@ -73,9 +82,12 @@ export function CtaButton({
           width,
           height,
           borderRadius: 100,
-          background: 'linear-gradient(to right, var(--bab-lime-from), var(--bab-lime-to))',
+          background: enabled
+            ? 'linear-gradient(to right, var(--bab-lime-from), var(--bab-lime-to))'
+            : 'var(--bab-surface)',
           border: 'var(--bab-border-w) solid var(--bab-border)',
           boxSizing: 'border-box',
+          transition: 'background 220ms ease-out',
         }}
       >
         <p
@@ -85,7 +97,8 @@ export function CtaButton({
             top: labelTop,
             width: lw,
             fontSize: 16,
-            color: labelColor,
+            color: enabled ? labelColor : 'var(--bab-ink-mute)',
+            transition: 'color 220ms ease-out',
             lineHeight: 'normal',
             margin: 0,
           }}

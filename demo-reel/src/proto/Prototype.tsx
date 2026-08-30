@@ -3,12 +3,17 @@ import { FLOWS, STAGE } from './flows'
 import type { Flow } from './flows'
 import { useFit } from './useFit'
 import { NavContext } from './nav'
+import { startBlank } from './blank'
 
 const TRANSITION_MS = 460
 
 type Move = { dir: 1 | -1; from: number } | null
 
 export function Prototype({ flow }: { flow: Flow }) {
+  // dentro useState e non in un effetto: deve succedere PRIMA che i figli
+  // leggano lo store, altrimenti il primo fotogramma mostra lo stato del frame
+  // e poi si svuota sotto gli occhi
+  useState(startBlank)
   const scale = useFit()
   const [index, setIndex] = useState(0)
   const [move, setMove] = useState<Move>(null)

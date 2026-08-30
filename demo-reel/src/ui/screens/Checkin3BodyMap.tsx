@@ -18,6 +18,9 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
   const [side, setSide] = useField<Side>('checkin.bodySide', 'Front')
   const [picked, setPicked] = useField<readonly string[]>('checkin.zones', NO_ZONES)
   const [, setLast] = useField<string | null>('checkin.lastZone', null)
+  // il frame dice "2 spots added": e' lo stato di chi ha gia' segnato
+  // qualcosa. Nel prototipo si parte da zero (vedi proto/blank.ts).
+  const [base] = useField('checkin.spotsBase', spots)
   return (
     <Frame>
       <NavBar progress={162 / 285} left={20} top={55} trackWidth={290} />
@@ -110,7 +113,7 @@ export function Checkin3BodyMap({ spots = 2 }: { spots?: number }) {
         className="absolute whitespace-nowrap font-bold"
         style={{ left: 153, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
-        {spots + picked.length} spots added
+        {base + picked.length} spots added
       </p>
     </Frame>
   )

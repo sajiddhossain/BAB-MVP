@@ -230,6 +230,34 @@ del tocco, quindi i bottoni smettevano di affondare quando li premevi.
 `prefers-reduced-motion` spegne tutto, e in cattura le animazioni non partono:
 altrimenti il diff fotograferebbe gli schermi a meta' ingresso.
 
+### Si parte da foglio bianco
+
+I componenti hanno come default lo stato del **frame Figma**: il chip gia'
+scelto, gli slider dove li ha messi il designer, "2 spots added". E' giusto che
+sia cosi' — e' quello che il diff confronta, e senza sarebbe impossibile
+verificare la fedelta'. Ma aprire l'app e trovare le risposte gia' date non e'
+un'app: e' una fotografia.
+
+Quindi il vuoto vive nel **prototipo**, non nei componenti: `proto/blank.ts`
+riempie lo store prima del primo render. Chi apre il prototipo trova il foglio
+bianco; il probe del diff, che lo store non lo tocca, continua a cadere sui
+default del frame. Nessuno dei due si accorge dell'altro.
+
+Gli slider fanno eccezione, perche' un cursore non ha uno stato vuoto: ha una
+posizione. Partono dal mezzo — su una scala 1–7 e' il 4, su una 0–10 e' il 5 —
+che e' la risposta neutra, non una risposta gia' data. (Sono tutti larghi 302 col
+pallino da 24, quindi il mezzo cade a 139 per tutti.)
+
+**Il bottone principale resta spento finche' la domanda non ha risposta**, e si
+accende quando rispondi. Vale dove il frame Figma mostra una risposta data:
+checkin-1, tune-in, checkout-3, e i due sensation sheet ("Add this sensation"
+senza nessuna sensazione nominata non aggiunge niente).
+
+L'eccezione e' **checkout-1a**: il suo frame ha il bottone acceso e nessuna
+andatura scelta. Spegnerlo vorrebbe dire allontanarsi dal disegno invece che
+avvicinarsi, quindi li' si passa anche senza rispondere. E' un'incoerenza del
+file di partenza, non una scorciatoia.
+
 ### I campi fanno quello che dicono
 
 | comando | prima | ora |

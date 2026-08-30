@@ -22,7 +22,7 @@ const ACHES = [
 
 /** node 3594:4 — checkout-7-close-loop */
 export function Checkout7CloseLoop() {
-  const [answer, setAnswer] = useField<'Yes' | 'No'>('checkout.protective', 'No')
+  const [answer, setAnswer] = useField<'Yes' | 'No' | null>('checkout.protective', 'No')
   return (
     <Frame>
       {/* qui la track e' beige traslucida con raggio 8, non bianca con raggio 99 */}
