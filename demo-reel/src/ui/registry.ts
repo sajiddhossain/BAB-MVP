@@ -10,6 +10,8 @@ import { Checkout3Satisfaction } from './screens/Checkout3Satisfaction'
 import { Checkin4SensationSheet } from './screens/Checkin4SensationSheet'
 import { Checkout7CloseLoop } from './screens/Checkout7CloseLoop'
 import { Checkout6SensationSheet } from './screens/Checkout6SensationSheet'
+import { Checkin5MakeSense } from './screens/Checkin5MakeSense'
+import { Checkin2TuneIn } from './screens/Checkin2TuneIn'
 
 export type UiScreen = {
   /** componente nello stato "finale" che l'export Figma mostra */
@@ -107,5 +109,20 @@ export const UI_SCREENS: Record<string, UiScreen> = {
     // il bleed dell'ombra e' solo orizzontale: i 3px verticali sono design
     // (il sheet parte a 175 invece che a 172), non vanno tolti anche qui
     refClip: { x: 20, y: 0 },
+  },
+  'checkin-5-make-sense': {
+    Component: Checkin5MakeSense,
+    width: 404,
+    height: 874,
+    // in locale avevamo solo un PNG: l'SVG e' l'export del nodo, scaricato da Figma
+    reference: 'src/assets/checkin/checkin-5-make-sense.svg',
+    node: '3554:4',
+  },
+  'checkin-2-tune-in': {
+    Component: Checkin2TuneIn,
+    width: 404,
+    height: 1262,
+    reference: 'src/assets/checkin/checkin-2-tune-in.svg',
+    node: '3532:4',
   },
 }

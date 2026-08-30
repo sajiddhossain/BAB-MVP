@@ -10,22 +10,32 @@ export function Frame({
   children,
   width = 402,
   height = 874,
+  textureTops = [0],
 }: {
   children: ReactNode
   width?: number
   height?: number
+  /**
+   * La texture e' un'immagine da 404x874: su uno schermo che scorre va ripetuta,
+   * non stirata. tune-in ne mette una seconda a 868 (leggera sovrapposizione).
+   */
+  textureTops?: number[]
 }) {
   return (
     <div
       className="bab-font-body relative overflow-hidden"
       style={{ width, height, background: 'var(--bab-bg)' }}
     >
-      <img
-        src={texture}
-        alt=""
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-        draggable={false}
-      />
+      {textureTops.map((t) => (
+        <img
+          key={t}
+          src={texture}
+          alt=""
+          className="pointer-events-none absolute left-0"
+          style={{ top: t, width, height: 874 }}
+          draggable={false}
+        />
+      ))}
       {children}
     </div>
   )

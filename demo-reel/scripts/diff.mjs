@@ -32,20 +32,40 @@ const THRESHOLD_PCT = 2.5
 const argv = process.argv.slice(2)
 const ids = argv.filter((a) => !a.startsWith('--'))
 
-/* Il registry e' TypeScript: ne leggiamo i campi senza compilarlo. */
+/*
+ * Il registry e' TypeScript: ne leggiamo i campi senza compilarlo.
+ * Parsiamo blocco per blocco e poi ogni chiave da sola: cosi' un commento
+ * fra due campi non rompe tutto (e' successo).
+ */
 function readRegistry() {
   const src = readFileSync(pres(ROOT, 'src/ui/registry.ts'), 'utf8')
+  const body = src.slice(src.indexOf('export const UI_SCREENS'))
   const out = {}
-  const re =
-    /'([^']+)':\s*\{[^}]*?width:\s*(\d+),\s*height:\s*(\d+),\s*reference:\s*'([^']+)'([^}]*)/gs
+  const entry = /'([a-z0-9-]+)':\s*\{/g
   let m
-  while ((m = re.exec(src))) {
-    const clip = /refClip:\s*\{\s*x:\s*(-?[\d.]+),\s*y:\s*(-?[\d.]+)/.exec(m[5] ?? '')
+  while ((m = entry.exec(body))) {
+    // ritaglia il blocco bilanciando le graffe
+    let depth = 1
+    let i = entry.lastIndex
+    while (i < body.length && depth > 0) {
+      if (body[i] === '{') depth++
+      else if (body[i] === '}') depth--
+      i++
+    }
+    const block = body.slice(entry.lastIndex, i - 1)
+    const num = (k) => {
+      const r = new RegExp(`\\b${k}:\\s*(-?[\\d.]+)`).exec(block)
+      return r ? +r[1] : null
+    }
+    const ref = /\breference:\s*'([^']+)'/.exec(block)
+    if (!ref) continue
+    const cx = /refClip:\s*\{[^}]*?\bx:\s*(-?[\d.]+)/.exec(block)
+    const cy = /refClip:\s*\{[^}]*?\by:\s*(-?[\d.]+)/.exec(block)
     out[m[1]] = {
-      width: +m[2],
-      height: +m[3],
-      reference: m[4],
-      clip: clip ? { x: +clip[1], y: +clip[2] } : null,
+      width: num('width'),
+      height: num('height'),
+      reference: ref[1],
+      clip: cx && cy ? { x: +cx[1], y: +cy[1] } : null,
     }
   }
   return out

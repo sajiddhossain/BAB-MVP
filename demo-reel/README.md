@@ -36,9 +36,26 @@ giallo = antialiasing).
 i blocchi di testo nel riferimento e per ognuno confronta larghezza, altezza e posizione.
 Un Δ di 1px e' arrotondamento del line box; un Δ di 5px e' il font sbagliato.
 
-Stato: `checkin-1-predict` a **0.88%**, tutti i blocchi entro 2px.
-Il residuo e' antialiasing dei glifi — confrontiamo font vivo contro testo in outline,
-sotto quella soglia non si scende.
+### Stato: 13 schermi su 13
+
+| schermo | diff | | schermo | diff |
+|---|---|---|---|---|
+| checkout-1a-pick-tempo | 0.22% | | checkin-5-make-sense | 1.06% |
+| checkout-2-rpe | 0.42% | | checkout-5-body-map | 1.31% |
+| checkout-1b-reveal | 0.54% | | checkin-3-body-map | 1.44% |
+| checkin-1-predict | 0.90% | | checkin-2-tune-in | 1.55% |
+| checkout-4-energy | 0.94% | | checkin-4-sensation-sheet | 1.71% |
+| checkout-7-close-loop | 0.97% | | checkout-6-sensation-sheet | 1.95% |
+| | | | checkout-3-satisfaction | 2.08% |
+
+Il residuo e' antialiasing dei glifi — confrontiamo font vivo contro testo gia' in
+outline, sotto quella soglia non si scende. La percentuale cresce con la QUANTITA'
+di testo: checkout-3 ha 40+ blocchi ed e' visivamente identico pur stando a 2.08%.
+Il cancello vero e' `measure.mjs`: scostamento massimo <= 2px.
+
+Due punti non convergono e non e' un difetto del codice: i glifi `ⓘ` e `✨` non
+esistono in Space Grotesk, e Figma e Chrome ripiegano su fallback diversi (nell'export
+Figma `✨` e' addirittura un quadrato vuoto).
 
 ## Cosa ha insegnato il primo schermo
 
@@ -52,6 +69,37 @@ sotto quella soglia non si scende.
   dietro l'elemento (4px sulle card, 6px solo in basso sui bottoni). Vedi `Raised.tsx`.
 - Le coordinate assolute di Figma sono corrette: lo sweep degli offset conferma che
   `(0,0)` e' gia' l'ottimo, non serve "aggiustare a occhio".
+
+## Cosa hanno insegnato gli altri dodici
+
+- **Lo stroke di Figma non consuma spazio di layout.** In CSS il `border` lo consuma:
+  le pill di checkout-3 perdevano 3px di contenuto e il testo andava a capo su due
+  righe. Ovunque il layout dipenda da padding usiamo `outline` + `outline-offset`
+  negativo, che disegna dentro senza togliere spazio.
+- **I figli di un contenitore con bordo sono relativi al contenuto.** Su checkout-5
+  il corpo umano sta a `129/330`, non a `127.5/328.5` come dice la somma delle
+  coordinate annidate: e' il bordo da 1.5px. Da solo valeva 3.52% -> 1.31%.
+- **Il tracking dichiarato non e' sempre quello renderizzato.** Il titolo di
+  checkin-3 dichiara `-0.5px` e renderizza `-0.3px`. Verificare per blocco con
+  `sweep.mjs`, non fidarsi dell'hint.
+- **Le stesse icone hanno colori diversi fra schermi.** La nota musicale e' `#4AB5A0`
+  su tune-in e `#10B981` su checkout-4: riusare l'asset sbagliato non si vede a occhio
+  ma il diff lo prende.
+- **Figma non centra sempre le etichette dei bottoni.** Su checkout-4 l'etichetta del
+  CTA e' centrata in una scatola da 354 dentro un bottone da 342: centrarla sul
+  bottone la sposta di 5px.
+- **La figura umana e' uno sprite** con fronte e retro affiancati: il toggle Front/Back
+  sposta il ritaglio, non cambia immagine. Le macchie rosse sono dipinte dentro il
+  raster, quindi non sono accendibili una a una.
+
+## Strumenti
+
+| comando | a cosa risponde |
+|---|---|
+| `node scripts/diff.mjs [id...]` | quanto sbaglio |
+| `node scripts/measure.mjs <id>` | dove e di quanto, blocco per blocco |
+| `node scripts/align.mjs <id>` | e' spostato o e' sbagliato? |
+| `node scripts/sweep.mjs "<testo>" --prop letterSpacing --target N` | quale valore fa combaciare |
 
 ## Comandi
 
