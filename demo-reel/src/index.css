@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./ui/tokens.css";
 
 html, body, #root { height: 100%; }
 body {
@@ -11,3 +12,8 @@ body {
 /* In modalita cattura vogliamo un fondale piatto e nessuna UI di controllo */
 body[data-capture="1"] { background: #0E0E11; }
 body[data-capture="1"] .no-capture { display: none !important; }
+
+/* La probe del diff deve essere nuda: nessun fondale, nessun margine. */
+body:has(#probe) { background: transparent; }
+body:has(#probe) > #root { display: block; }
+#probe { position: absolute; left: 0; top: 0; }

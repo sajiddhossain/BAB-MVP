@@ -1,4 +1,5 @@
 import { CLIPS } from './reel/clips'
+import { UiProbe } from './dev/UiProbe'
 import { Player, useTimeline } from './reel/Player'
 import { useClock } from './reel/useClock'
 
@@ -7,9 +8,16 @@ const capture = params.get('capture') === '1'
 const clipId = params.get('clip') ?? location.hash.replace('#', '') ?? 'checkin'
 const clip = CLIPS[clipId] ?? CLIPS.checkin
 
-if (capture) document.body.dataset.capture = '1'
+const probe = params.get('probe')
+
+if (capture || probe) document.body.dataset.capture = '1'
 
 export default function App() {
+  if (probe) return <UiProbe id={probe} />
+  return <Reel />
+}
+
+function Reel() {
   const tl = useTimeline(clip)
   const { t, setT, playing, setPlaying } = useClock(tl.duration, capture)
 

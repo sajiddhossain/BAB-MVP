@@ -3,14 +3,55 @@
 Riproduzione animata dei frame Figma per girare uno **screen record simulato** dell'app.
 Due clip separate: `checkin` (32.6s) e `checkout` (43.6s).
 
-## L'idea
+## Due modi di produrre gli schermi
 
-Gli SVG esportati da Figma **non vengono ricostruiti in Tailwind**: entrano intatti
-(`?raw` + inline) e sono la verita' visiva. React fa solo il **regista**: cornice del
-device, transizioni fra schermi, scroll, dito finto che tocca i bersagli giusti.
+**v1 — SVG intatti** (`src/reel/screens.ts`): gli export Figma entrano cosi' come sono.
+Fedelta' immediata, ma ogni schermo e' uno stato finale: un tap non puo' cambiare nulla
+dentro lo schermo, e il video ha poco il feel di un'app.
 
-Risultato: fedelta' 1:1 con Figma senza spendere ore a rifare 13 schermi a mano —
-e senza il rischio che la copia diverga dal design.
+**v2 — UI ricostruita** (`src/ui/`): gli schermi sono componenti React veri, con stato.
+Costa piu' tempo ma permette selezioni, slider, progress che si riempie — cioe' il feel
+di app che serve al video.
+
+La v2 non si fa a occhio: si fa con il loop di verifica qui sotto.
+
+## Il loop di verifica
+
+```bash
+npm run diff                      # tutti gli schermi del registry
+node scripts/diff.mjs checkin-1-predict
+node scripts/measure.mjs checkin-1-predict
+```
+
+`diff.mjs` renderizza il componente React alle dimensioni native, renderizza **nello
+stesso Chrome** l'export Figma, e li confronta pixel per pixel. Esce una percentuale e
+tre immagini in `out/diff/`: `.mine`, `.ref`, `.diff` (rosso = differenza vera,
+giallo = antialiasing).
+
+> Perche' lo stesso Chrome: all'inizio rasterizzavo il riferimento con Inkscape e il
+> diff misurava anche la differenza fra due rasterizzatori — ogni bordo di ogni glifo
+> risultava sbagliato. Con lo stesso motore su entrambi i lati, cio' che resta e' reale.
+
+`measure.mjs` risponde alla domanda successiva: **dove** e **di quanto**. Trova da solo
+i blocchi di testo nel riferimento e per ognuno confronta larghezza, altezza e posizione.
+Un Δ di 1px e' arrotondamento del line box; un Δ di 5px e' il font sbagliato.
+
+Stato: `checkin-1-predict` a **0.88%**, tutti i blocchi entro 2px.
+Il residuo e' antialiasing dei glifi — confrontiamo font vivo contro testo in outline,
+sotto quella soglia non si scende.
+
+## Cosa ha insegnato il primo schermo
+
+- **Il codice generato da Figma non e' sempre cio' che Figma renderizza.** Dichiarava
+  `font-variation-settings: 'opsz' 14` sul titolo. Misurato: con `opsz 14` il titolo esce
+  266px, l'export ne misura 260. Quello vero e' l'optical sizing automatico. Seguire
+  l'hint alla lettera peggiorava il diff — la misura ha corretto la documentazione.
+- **`@fontsource-variable/bricolage-grotesque/index.css` carica solo l'asse `wght`.**
+  Serve `opsz.css`, altrimenti gli assi che Figma usa non esistono nel font caricato.
+- **Le ombre non sono `box-shadow`**: sono rettangoli pieni `rgba(0,0,0,0.04)` sfalsati
+  dietro l'elemento (4px sulle card, 6px solo in basso sui bottoni). Vedi `Raised.tsx`.
+- Le coordinate assolute di Figma sono corrette: lo sweep degli offset conferma che
+  `(0,0)` e' gia' l'ottimo, non serve "aggiustare a occhio".
 
 ## Comandi
 
