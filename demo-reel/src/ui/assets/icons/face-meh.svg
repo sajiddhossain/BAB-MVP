@@ -1,0 +1,9 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="meh">
+<path id="Vector" d="M13.4988 22.4988C13.9988 21.4988 15.9988 20.9988 17.9988 20.9988C19.9988 20.9988 21.9988 21.4988 22.4988 22.4988M32.9988 17.9988C32.9988 26.2828 26.2828 32.9988 17.9988 32.9988C9.7148 32.9988 2.9988 26.2828 2.9988 17.9988C2.9988 9.7148 9.7148 2.9988 17.9988 2.9988C26.2828 2.9988 32.9988 9.7148 32.9988 17.9988Z" stroke="#5C5C6E" stroke-width="2.2"/>
+<circle id="eye-left" cx="13.5" cy="14" r="1.8" fill="#5C5C6E"/>
+<circle id="eye-right" cx="22.5" cy="14" r="1.8" fill="#5C5C6E"/>
+<path id="brow-left" d="M10.5 13L15.5 10" stroke="#5C5C6E" stroke-width="1.8" stroke-linecap="round"/>
+<path id="brow-right" d="M20.5 10L25.5 13" stroke="#5C5C6E" stroke-width="1.8" stroke-linecap="round"/>
+</g>
+</svg>

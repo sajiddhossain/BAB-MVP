@@ -1,4 +1,7 @@
-import sprite from '../assets/bodymap/body-sprite.png'
+import spriteFront from '../assets/bodymap/body-sprite.png'
+import spriteBack from '../assets/bodymap/body-back.png'
+
+const SOURCES = { sprite: spriteFront, back: spriteBack }
 
 /**
  * La figura umana e' uno sprite unico 1546x1546 con fronte e retro affiancati:
@@ -17,6 +20,7 @@ export function BodySprite({
   imgHeightPct,
   imgLeftPct,
   imgTopPct,
+  src = 'sprite',
 }: {
   left: number
   top: number
@@ -26,11 +30,13 @@ export function BodySprite({
   imgHeightPct: number
   imgLeftPct: number
   imgTopPct: number
+  /** checkout-5 non usa lo sprite fronte/retro ma una figura sua */
+  src?: keyof typeof SOURCES
 }) {
   return (
     <div className="absolute overflow-hidden" style={{ left, top, width, height }}>
       <img
-        src={sprite}
+        src={SOURCES[src]}
         alt=""
         draggable={false}
         className="absolute max-w-none"

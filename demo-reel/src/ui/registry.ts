@@ -5,6 +5,8 @@ import { Checkout1aPickTempo } from './screens/Checkout1aPickTempo'
 import { Checkout1bReveal } from './screens/Checkout1bReveal'
 import { Checkout2Rpe } from './screens/Checkout2Rpe'
 import { Checkout4Energy } from './screens/Checkout4Energy'
+import { Checkout5BodyMap } from './screens/Checkout5BodyMap'
+import { Checkout3Satisfaction } from './screens/Checkout3Satisfaction'
 
 export type UiScreen = {
   /** componente nello stato "finale" che l'export Figma mostra */
@@ -59,5 +61,19 @@ export const UI_SCREENS: Record<string, UiScreen> = {
     height: 874,
     reference: 'src/assets/checkout/checkout-4-energy.svg',
     node: '3590:4',
+  },
+  'checkout-5-body-map': {
+    Component: Checkout5BodyMap,
+    width: 402,
+    height: 874,
+    reference: 'src/assets/checkout/checkout-5-body-map.svg',
+    node: '3588:167',
+  },
+  'checkout-3-satisfaction': {
+    Component: Checkout3Satisfaction,
+    width: 402,
+    height: 874,
+    reference: 'src/assets/checkout/checkout-3-satisfaction.svg',
+    node: '3568:4',
   },
 }
