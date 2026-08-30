@@ -15,7 +15,7 @@ export const CHECKIN: Clip = {
       dur: 5200,
       caption: 'Step 1 · Predict',
       taps: [
-        { at: 1500, x: 202, y: 415 }, // chip "Steady"
+        { at: 1500, x: 80, y: 415 }, // chip "Upbeat": e' quello acceso nel frame
         { at: 3500, x: 202, y: 806 }, // CTA "Now let's tune in"
       ],
     },
@@ -105,7 +105,7 @@ export const CHECKOUT: Clip = {
       caption: 'Step 3 · Satisfaction',
       taps: [
         { at: 1400, x: 201, y: 345 },
-        { at: 2900, x: 135, y: 636 }, // uno dei chip
+        { at: 2900, x: 145, y: 636 }, // chip selezionato (#E5F5F2)
         { at: 4200, x: 201, y: 806 },
       ],
     },
@@ -125,8 +125,8 @@ export const CHECKOUT: Clip = {
       enter: 'push',
       caption: 'Step 5 · Pinpoint',
       taps: [
-        { at: 1400, x: 178, y: 470, r: 34 },
-        { at: 3000, x: 214, y: 560, r: 34 },
+        { at: 1300, x: 150, y: 271 }, // toggle "Back": il frame mostra la vista posteriore
+        { at: 3000, x: 214, y: 558, r: 34 }, // unica zona rossa -> "1 spots added"
         { at: 4800, x: 202, y: 806 },
       ],
     },
@@ -148,9 +148,8 @@ export const CHECKOUT: Clip = {
       enter: 'push',
       caption: 'Step 6 · Close the loop',
       taps: [
-        { at: 1500, x: 89, y: 254 },
-        { at: 3000, x: 313, y: 254 },
-        { at: 4800, x: 207, y: 812 },
+        { at: 1600, x: 274, y: 618 }, // "No" a "Feeling any of the protective kind?"
+        { at: 4200, x: 207, y: 812 },
       ],
     },
   ],
