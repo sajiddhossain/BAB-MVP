@@ -37,9 +37,17 @@ function readRegistry() {
   const src = readFileSync(pres(ROOT, 'src/ui/registry.ts'), 'utf8')
   const out = {}
   const re =
-    /'([^']+)':\s*\{[^}]*?width:\s*(\d+),\s*height:\s*(\d+),\s*reference:\s*'([^']+)'/gs
+    /'([^']+)':\s*\{[^}]*?width:\s*(\d+),\s*height:\s*(\d+),\s*reference:\s*'([^']+)'([^}]*)/gs
   let m
-  while ((m = re.exec(src))) out[m[1]] = { width: +m[2], height: +m[3], reference: m[4] }
+  while ((m = re.exec(src))) {
+    const clip = /refClip:\s*\{\s*x:\s*(-?[\d.]+),\s*y:\s*(-?[\d.]+)/.exec(m[5] ?? '')
+    out[m[1]] = {
+      width: +m[2],
+      height: +m[3],
+      reference: m[4],
+      clip: clip ? { x: +clip[1], y: +clip[2] } : null,
+    }
+  }
   return out
 }
 
@@ -75,15 +83,18 @@ function startServer() {
  * rasterizzatori diversi, e ogni bordo di ogni glifo risultava "sbagliato".
  * Con lo stesso motore su entrambi i lati, cio' che resta e' differenza vera.
  */
-async function renderReference(browser, svgRelPath, width, height) {
+async function renderReference(browser, svgRelPath, width, height, clip) {
   const page = await browser.newPage({
-    viewport: { width, height },
+    viewport: { width: width + (clip?.x ?? 0), height: height + (clip?.y ?? 0) },
     deviceScaleFactor: 1,
   })
   await page.goto(`${BASE}/${svgRelPath.replace(/^src\//, 'src/')}`, {
     waitUntil: 'networkidle',
   })
-  const buf = await page.screenshot({ type: 'png' })
+  const buf = await page.screenshot({
+    type: 'png',
+    ...(clip ? { clip: { x: clip.x, y: clip.y, width, height } } : {}),
+  })
   await page.close()
   return buf
 }
@@ -111,7 +122,7 @@ async function diffOne(browser, id, meta) {
   const mineBuf = await page.screenshot({ type: 'png' })
   await page.close()
 
-  const refBuf = await renderReference(browser, meta.reference, meta.width, meta.height)
+  const refBuf = await renderReference(browser, meta.reference, meta.width, meta.height, meta.clip)
   writeFileSync(pres(OUT, `${id}.ref.png`), refBuf)
 
   const mine = flatten(PNG.sync.read(mineBuf))

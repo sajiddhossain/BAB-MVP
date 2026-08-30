@@ -7,6 +7,9 @@ import { Checkout2Rpe } from './screens/Checkout2Rpe'
 import { Checkout4Energy } from './screens/Checkout4Energy'
 import { Checkout5BodyMap } from './screens/Checkout5BodyMap'
 import { Checkout3Satisfaction } from './screens/Checkout3Satisfaction'
+import { Checkin4SensationSheet } from './screens/Checkin4SensationSheet'
+import { Checkout7CloseLoop } from './screens/Checkout7CloseLoop'
+import { Checkout6SensationSheet } from './screens/Checkout6SensationSheet'
 
 export type UiScreen = {
   /** componente nello stato "finale" che l'export Figma mostra */
@@ -17,6 +20,11 @@ export type UiScreen = {
   reference: string
   /** node id Figma, per risalire alla fonte */
   node: string
+  /**
+   * Alcuni export includono il bleed dell'ombra e sono piu' grandi del frame:
+   * qui diciamo al diff quale porzione del riferimento confrontare.
+   */
+  refClip?: { x: number; y: number }
 }
 
 export const UI_SCREENS: Record<string, UiScreen> = {
@@ -75,5 +83,29 @@ export const UI_SCREENS: Record<string, UiScreen> = {
     height: 874,
     reference: 'src/assets/checkout/checkout-3-satisfaction.svg',
     node: '3568:4',
+  },
+  'checkin-4-sensation-sheet': {
+    Component: Checkin4SensationSheet,
+    width: 402,
+    height: 874,
+    reference: 'src/assets/checkin/checkin-4-sensation-sheet.svg',
+    node: '3547:34',
+  },
+  'checkout-7-close-loop': {
+    Component: Checkout7CloseLoop,
+    width: 402,
+    height: 874,
+    reference: 'src/assets/checkout/checkout-7-close-loop.svg',
+    node: '3594:4',
+  },
+  'checkout-6-sensation-sheet': {
+    Component: Checkout6SensationSheet,
+    width: 402,
+    height: 874,
+    reference: 'src/assets/checkout/checkout-6-sensation-sheet.svg',
+    node: '3588:213',
+    // il bleed dell'ombra e' solo orizzontale: i 3px verticali sono design
+    // (il sheet parte a 175 invece che a 172), non vanno tolti anche qui
+    refClip: { x: 20, y: 0 },
   },
 }
