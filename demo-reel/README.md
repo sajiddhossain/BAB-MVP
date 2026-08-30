@@ -174,7 +174,19 @@ quelle che ho tolto di mezzo, e cosa dicevano:
 | tocco | solo visto | e anche sentito, dove il dispositivo lo permette (`navigator.vibrate`; iOS Safari non ce l'ha, e li' non fingiamo) |
 | pannello che sale | lo schermo dietro si scuriva e basta | arretra, si arrotonda e rientra se trascini giu' — e' il gesto che dice "questo sta SOPRA a quello" |
 
-Sull'ultima: vale solo dentro al prototipo. E' la presentazione di uno schermo
+Due note sulle ultime tre.
+
+La barra appiccicata **alza il suo z-index solo mentre e' appiccicata**. Metterlo
+fisso sembrava innocuo e invece rompeva i due sensation sheet: li' la body map fa
+da sfondo, e la sua barra finiva sopra i veli e sopra il pannello.
+
+Il segno di spunta e' **disegnato, non un carattere**: `✓` non c'e' in Space
+Grotesk, e sarebbe stato l'ennesimo glifo che Figma e Chrome rendono diversi
+(come `ⓘ` e `✨`). E vale solo dove confermi qualcosa di tuo — sugli altri
+bottoni sarebbe mezzo secondo in piu' per dire che sei andato avanti, che si
+vede gia'.
+
+Sul pannello che spinge indietro lo schermo: vale solo dentro al prototipo. E' la presentazione di uno schermo
 sopra un altro, e senza navigazione non c'e' niente da presentare — nel probe
 del diff lo sfondo del pannello e' un fondale, non uno schermo arretrato.
 
@@ -248,6 +260,8 @@ del tocco, quindi i bottoni smettevano di affondare quando li premevi.
 | pallino degli slider | cresce mentre lo tieni | dice "l'ho preso io" senza scriverlo |
 | zone del corpo | pulsano quando si accendono | conferma che il dito ha preso quella e non la vicina |
 | bottom sheet | si trascina via dalla maniglia, e i veli si alzano insieme | il gesto e' collegato a quello che c'e' sotto |
+| barra in alto su tune-in | resta appiccicata, col contenuto che sfuma sotto un velo | lo schermo e' alto 1262: scorrendo perdevi di vista sia il tasto indietro sia a che punto eri |
+| "Add / Update this sensation" | diventa un segno di spunta prima di chiudere | li' stai salvando un dato tuo, e vedere che e' stato preso vale la mezza pausa |
 
 `prefers-reduced-motion` spegne tutto, e in cattura le animazioni non partono:
 altrimenti il diff fotograferebbe gli schermi a meta' ingresso.
@@ -361,7 +375,8 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
 - Non c'e' un tasto indietro DENTRO al bottom sheet: da li' si esce con la ✕,
   trascinando, o con lo swipe. Il tasto indietro appartiene allo schermo dietro,
   ed e' coperto dai veli.
-- I campi di testo non si scrivono.
+- "Add your own..." su checkout-3 e' l'unico campo che non si scrive: e' una
+  pillola, non un campo, e trasformarla vorrebbe dire disegnarla.
 - Il copione del reel e' scritto a mano: se cambia un'etichetta, va aggiornato
   (`scripts/reel-script.mjs` avvisa a video quando non trova un bersaglio).
 

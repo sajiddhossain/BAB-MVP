@@ -147,6 +147,24 @@ export function SensationSheet({
   const live = named && !!nav && !!onSave
 
   /*
+   * Prima di chiudere, il bottone diventa un segno di spunta.
+   *
+   * Qui stai salvando un dato tuo: vedere che e' stato preso vale la mezza
+   * pausa. Sugli altri bottoni no — sono solo un passo avanti, e ritardarli
+   * allungherebbe tutto il giro senza dire niente.
+   *
+   * Il segno e' disegnato, non un carattere: ✓ non c'e' in Space Grotesk, e
+   * sarebbe l'ennesimo glifo che Figma e Chrome rendono diversi.
+   */
+  const [okay, setOkay] = useState(false)
+  const confirm = () => {
+    if (okay) return
+    setOkay(true)
+    // niente reset: da qui il pannello si chiude e il componente se ne va
+    window.setTimeout(() => onSave?.(), 460)
+  }
+
+  /*
    * Trascinare il pannello via.
    *
    * Il gesto parte solo dalla fascia in alto (maniglia + titolo): sotto ci sono
@@ -408,7 +426,7 @@ export function SensationSheet({
           className="absolute"
           data-cta
           style={{ left: 24, top: ctaTop, width: width - 48, height: 62 }}
-          onTap={live ? onSave : undefined}
+          onTap={live ? confirm : undefined}
           press={live ? 0.975 : 1}
           stop={!!nav}
         >
@@ -424,14 +442,46 @@ export function SensationSheet({
             */}
             <p
               className="bab-font-body absolute whitespace-nowrap font-bold"
-              style={
-                saved
-                  ? { left: 0, top: 16.5, width: width - 48, textAlign: 'center', fontSize: 16, color: named ? 'var(--bab-ink-max)' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0, transition: 'color 220ms ease-out' }
-                  : { left: ctaLabelLeft, top: 16.5, fontSize: 16, color: named ? 'var(--bab-ink-max)' : 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0, transition: 'color 220ms ease-out' }
-              }
+              style={{
+                ...(saved
+                  ? { left: 0, top: 16.5, width: width - 48, textAlign: 'center' as const }
+                  : { left: ctaLabelLeft, top: 16.5 }),
+                fontSize: 16,
+                color: named ? 'var(--bab-ink-max)' : 'var(--bab-ink-mute)',
+                lineHeight: 'normal',
+                margin: 0,
+                opacity: okay ? 0 : 1,
+                transform: okay ? 'scale(0.9)' : undefined,
+                transition: 'color 220ms ease-out, opacity 160ms ease-out, transform 160ms ease-out',
+              }}
             >
               {saved ? 'Update this sensation' : ctaLabel}
             </p>
+            <svg
+              className="absolute"
+              width={26}
+              height={26}
+              viewBox="0 0 26 26"
+              fill="none"
+              style={{
+                left: (width - 48) / 2 - 13,
+                top: 15,
+                opacity: okay ? 1 : 0,
+                transform: okay ? 'scale(1)' : 'scale(0.5)',
+                transformOrigin: 'center',
+                transition: okay
+                  ? 'opacity 140ms ease-out 60ms, transform 320ms cubic-bezier(0.34,1.56,0.64,1) 60ms'
+                  : 'none',
+              }}
+            >
+              <path
+                d="M5 13.6 10.4 19 21 7.6"
+                stroke="var(--bab-ink-max)"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </div>
           <div className="absolute" style={{ left: 0, top: 6, width: width - 48, height: 56, borderRadius: 100, background: 'var(--bab-shadow)' }} />
         </Touchable>

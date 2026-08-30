@@ -55,10 +55,19 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
     [index, flow],
   )
 
-  // sonda per i test: leggere lo stato dal DOM era fragile
+  // sonde per i test: leggere lo stato dal DOM era fragile
   useEffect(() => {
     ;(window as unknown as { __step?: number }).__step = index
   }, [index])
+  /*
+   * `__moving` dice se una transizione e' in corso. Serve ai test per aspettare
+   * il FATTO invece di un numero di millisecondi: da quando il bottone del
+   * pannello conferma prima di chiudere, le attese a tempo fisso non tornavano
+   * piu' e sarebbero andate ritoccate a ogni cambio di animazione.
+   */
+  useEffect(() => {
+    ;(window as unknown as { __moving?: boolean }).__moving = !!move
+  }, [move])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

@@ -43,7 +43,10 @@ const scrollTop = () =>
 async function tap(x, y) {
   await touch('touchStart', x, y)
   await touch('touchEnd', x, y)
-  await page.waitForTimeout(650)
+  // 700ms coprono anche il bottone che conferma prima di chiudere (460ms),
+  // poi si aspetta che la transizione sia finita davvero invece di indovinare
+  await page.waitForTimeout(700)
+  await page.waitForFunction(() => !window.__moving, null, { timeout: 4000 })
 }
 /**
  * Tocca il bottone principale dello schermo corrente.
@@ -118,6 +121,27 @@ expect('il bottone principale avanza', await step(), 1)
 await swipe(196, 650, 196, 330)
 expect('lo swipe verticale non avanza', await step(), 1)
 expect('...ma scorre', (await scrollTop()) > 100, true)
+
+/*
+ * tune-in e' alto 1262: scorrendo si perdevano di vista sia il tasto indietro
+ * sia a che punto sei. La barra resta appiccicata, e sotto compare un velo o il
+ * contenuto le passa sopra.
+ */
+const barTop = await page.evaluate(() => {
+  const img = document.querySelector('img[alt=""][src*="arrow-left"]')
+  return Math.round(img.getBoundingClientRect().top)
+})
+expect('la barra in alto resta in vista', barTop > 0 && barTop < 160, true)
+expect(
+  '...col velo sotto',
+  await page.evaluate(() => {
+    const v = [...document.querySelectorAll('div')].find((d) =>
+      getComputedStyle(d).backdropFilter.includes('blur(6px)'),
+    )
+    return Number(getComputedStyle(v).opacity) > 0.5
+  }),
+  true,
+)
 
 await swipe(120, 450, 340, 450)
 expect('lo swipe destro torna indietro', await step(), 0)
@@ -284,8 +308,34 @@ await page.waitForTimeout(400)
 expect('e si riapre', (await state())['checkin.spot.quad-r.help'], true)
 
 // --- salvare, riaprire, togliere -----------------------------------------
-await tapCta()
-expect('il bottone salva il punto e riporta alla mappa', await step(), 2)
+/*
+ * Il bottone diventa un segno di spunta PRIMA di chiudere: qui stai salvando un
+ * dato tuo, e vedere che e' stato preso vale la mezza pausa. Si guarda subito
+ * dopo il tocco, prima che il pannello se ne vada.
+ */
+{
+  const box = await page.evaluate(() => {
+    const el = [...document.querySelectorAll('[data-cta]')].pop()
+    const r = el.getBoundingClientRect()
+    return { x: r.x + r.width / 2, y: r.y + 28 }
+  })
+  await touch('touchStart', box.x, box.y)
+  await touch('touchEnd', box.x, box.y)
+  await page.waitForTimeout(260)
+  expect(
+    'il bottone conferma prima di chiudere',
+    await page.evaluate(() => {
+      const cta = [...document.querySelectorAll('[data-cta]')].pop()
+      const svg = cta.querySelector('svg')
+      return Number(getComputedStyle(svg).opacity) > 0.8 &&
+        Number(getComputedStyle(cta.querySelector('p')).opacity) < 0.2
+    }),
+    true,
+  )
+  await page.waitForTimeout(700)
+  await page.waitForFunction(() => !window.__moving, null, { timeout: 4000 })
+}
+expect('...poi salva il punto e riporta alla mappa', await step(), 2)
 expect('...e ora il contatore conta', await spots(), '1 spots added')
 
 await tap(...(await onBody('quad-r')))

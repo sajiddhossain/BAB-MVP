@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import arrowLeft from '../assets/icons/arrow-left.svg'
 import { Touchable } from './Touchable'
 import { useNav } from '../../proto/nav'
@@ -33,6 +33,41 @@ export function NavBar({
   const trackW = trackWidth
   const innerW = trackW - inset * 2
   const nav = useNav()
+
+  /*
+   * Su uno schermo che scorre la barra resta appiccicata in cima.
+   *
+   * tune-in e' alto 1262: scorrendo perdevi di vista sia il tasto indietro sia
+   * a che punto eri. Sotto compare un velo, altrimenti il contenuto passa sopra
+   * la barra e sembra rotto.
+   *
+   * Si scrive direttamente sul DOM invece di passare da uno stato React: e' uno
+   * scroll, e un render per fotogramma si vede.
+   */
+  const bar = useRef<HTMLDivElement>(null)
+  const veil = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const box = bar.current?.closest('.overflow-y-auto') as HTMLElement | null
+    if (!box) return
+    const onScroll = () => {
+      const y = box.scrollTop
+      if (bar.current) {
+        bar.current.style.transform = y > 0 ? `translateY(${y}px)` : ''
+        /*
+         * Lo z-index sale SOLO mentre e' appiccicata, perche' le card vengono
+         * dopo nel DOM e altrimenti le passa sotto. Metterlo fisso sembrava
+         * innocuo e invece rompeva i due sensation sheet: li' la body map fa da
+         * sfondo, e la sua barra finiva sopra i veli e sopra il pannello.
+         */
+        bar.current.style.zIndex = y > 0 ? '3' : ''
+      }
+      if (veil.current) veil.current.style.opacity = String(Math.min(1, y / 40))
+    }
+    onScroll()
+    box.addEventListener('scroll', onScroll, { passive: true })
+    return () => box.removeEventListener('scroll', onScroll)
+  }, [])
+
   // in cattura serve il valore finale al primo fotogramma, o il diff fotografa
   // la barra a meta' corsa
   const still = typeof document !== 'undefined' && document.body.dataset.capture === '1'
@@ -44,7 +79,28 @@ export function NavBar({
     return () => cancelAnimationFrame(r)
   }, [progress, still])
   return (
-    <div className="absolute" style={{ left, top, width: 60 + trackW, height: 44 }}>
+    <div
+      ref={bar}
+      className="absolute"
+      style={{ left, top, width: 60 + trackW, height: 44 }}
+    >
+      {/* il velo copre da sopra il bordo dello schermo fino a sotto la barra;
+          e' largo piu' del contenitore apposta, e il Frame lo ritaglia */}
+      <div
+        ref={veil}
+        className="pointer-events-none absolute"
+        style={{
+          left: -left,
+          top: -top,
+          width: 440,
+          height: top + 44 + 14,
+          opacity: 0,
+          background: 'linear-gradient(var(--bab-bg) 68%, rgba(240,235,230,0))',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          transition: 'opacity 120ms linear',
+        }}
+      />
       <Touchable
         className="absolute left-0 top-0"
         onTap={nav ? nav.back : undefined}
