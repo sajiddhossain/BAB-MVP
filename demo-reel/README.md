@@ -1,19 +1,21 @@
 # BAB · Demo Reel
 
 Riproduzione animata dei frame Figma per girare uno **screen record simulato** dell'app.
-Due clip separate: `checkin` (32.6s) e `checkout` (43.6s).
+Due clip separate: `checkin` (~25s) e `checkout` (~26s).
 
-## Due modi di produrre gli schermi
+## Come ci siamo arrivati
 
-**v1 — SVG intatti** (`src/reel/screens.ts`): gli export Figma entrano cosi' come sono.
-Fedelta' immediata, ma ogni schermo e' uno stato finale: un tap non puo' cambiare nulla
-dentro lo schermo, e il video ha poco il feel di un'app.
+**v1 — SVG intatti**: gli export Figma entravano cosi' come sono, e un cursore
+finto ci passava sopra. Fedelta' immediata, ma ogni schermo era uno stato
+finale: un tocco non poteva cambiare niente, e il video aveva poco il feel di
+un'app. E' l'approccio che abbiamo buttato.
 
-**v2 — UI ricostruita** (`src/ui/`): gli schermi sono componenti React veri, con stato.
-Costa piu' tempo ma permette selezioni, slider, progress che si riempie — cioe' il feel
-di app che serve al video.
+**v2 — UI ricostruita** (`src/ui/`): gli schermi sono componenti React veri, con
+stato. Costa piu' tempo ma permette selezioni, slider, la barra che si riempie —
+e soprattutto il video si registra USANDO l'app, non riproducendola (vedi "Il
+video e' l'app").
 
-La v2 non si fa a occhio: si fa con il loop di verifica qui sotto.
+La v2 non si fa a occhio: si fa col loop di verifica qui sotto.
 
 ## Il loop di verifica
 
@@ -212,8 +214,9 @@ cambia l'altezza utile mentre scrolli).
 `npm run dev` stampa anche un indirizzo `Network:`: aprilo dal telefono sulla
 stessa wifi. Per un link stabile, `npm run build` e pubblica `dist/`.
 
-Le altre viste restano dove erano: `?clip=checkin` il reel da registrare,
-`?probe=<id>` un singolo schermo nudo per il diff.
+Le altre viste: `?reel=1` lo stesso prototipo dentro la cornice del telefono
+(e' quello che registra `record.mjs`), `?probe=<id>` un singolo schermo nudo per
+il diff, `?dev=1` la barretta per saltare fra i flussi.
 
 ## Come si muove
 
@@ -359,8 +362,8 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
   trascinando, o con lo swipe. Il tasto indietro appartiene allo schermo dietro,
   ed e' coperto dai veli.
 - I campi di testo non si scrivono.
-- Il reel (`?clip=`) usa ancora gli export SVG di Figma, non i componenti: i due
-  video escono da li'. Rifarlo sui componenti e' il passo successivo.
+- Il copione del reel e' scritto a mano: se cambia un'etichetta, va aggiornato
+  (`scripts/reel-script.mjs` avvisa a video quando non trova un bersaglio).
 
 - `npm run record:checkin` / `npm run record:checkout` per una sola clip
 - `node scripts/record.mjs all --fps 60 --scale 3` per alzare qualita'
@@ -368,34 +371,71 @@ propagazione, altrimenti il tocco arriverebbe anche allo stage.
 
 Output in `out/`: `bab-checkin.mp4`, `bab-checkin.gif`, `bab-checkout.mp4`, `bab-checkout.gif`.
 
-## Perche' la cattura e' deterministica
+## Il video e' l'app, non un suo disegno
 
-`scripts/record.mjs` non registra a tempo reale. Per ogni fotogramma chiama
-`window.__seek(ms)`, aspetta il paint e scatta, poi manda i PNG in pipe dentro ffmpeg.
-Il video non dipende dalla velocita' della macchina e non ha jitter.
+Prima il reel si montava dagli **export SVG di Figma**, con un cursore finto che
+ci passava sopra: mostrava il disegno, non il prodotto. Ora un copione
+(`scripts/reel-script.mjs`) tocca il prototipo vero via CDP — gli stessi eventi
+touch di un dito — e Chrome ci manda i fotogrammi che compone davvero. Nel video
+ci sono quindi le animazioni, le transizioni, gli stati e gli errori veri.
 
-Per questo il "premuto" del dito e' calcolato (`cursor.press`, 0..1) e non affidato a
-una `transition` CSS: una transition andrebbe fuori sincrono con il tempo dettato dallo script.
+Il copione dice gesti, non fotogrammi:
+
+```js
+{ tap: 'Steady', hold: 900 },
+{ slide: { near: 'Barely slept', to: 0.78 } },
+{ zone: 'quad-r', hold: 1200 },
+{ cta: true },
+```
+
+I bersagli si cercano nel DOM, non a coordinate: `?reel=1` e' lo stesso
+prototipo dentro una cornice di telefono, quindi se un bottone si sposta il
+copione lo trova lo stesso. Quando NON lo trova lo dice, invece di registrare in
+silenzio un video sbagliato — ed e' cosi' che sono venute fuori due cose:
+
+- l'etichetta delle faccine di checkout-3 e' **sorella** del bottone, non figlia:
+  mirare alla scritta voleva dire toccare nove pixel di testo invece del
+  bersaglio;
+- lo screencast di Chrome **ignora il deviceScaleFactor** e manda i fotogrammi
+  alla risoluzione CSS, quindi a 2x veniva fuori un video grande la meta'. Si
+  risolve ingrandendo la pagina (`?zoom=`), che essendo vettori e testo viene
+  rasterizzata piu' grande invece che stirata.
+
+Il pallino del dito lo inietta il registratore, non vive nell'app: un indicatore
+di tocco e' roba da video, e non ha senso spedirlo a chi apre il prototipo.
+
+## Perche' la cattura non e' piu' "deterministica" (e va bene)
+
+Prima, per ogni fotogramma, si chiamava `window.__seek(ms)`: il video non
+dipendeva dalla macchina e non aveva jitter. Non si puo' piu' fare, perche' le
+animazioni CSS e lo stato di React non tornano indietro a comando.
+
+Si registra quindi quello che succede e lo si **ricampiona** a passo fisso: per
+ogni istante si prende l'ultimo fotogramma gia' composto. Se l'app e' rimasta
+ferma il fotogramma si ripete, ed e' giusto cosi'. Il video esce senza jitter
+anche se la macchina va a scatti; quello che cambia fra due registrazioni sono i
+millisecondi, non quello che si vede.
+
+Il tempo virtuale di Chrome (`Emulation.setVirtualTimePolicy`) darebbe la
+determinismo piena, ma con l'HMR aperto `Page.captureScreenshot` resta appeso.
+Provato, non vale il prezzo.
 
 ## Dove si mettono le mani
 
 | Cosa | File |
 |---|---|
-| Sequenza, durate, coordinate dei tap | `src/reel/clips.ts` |
-| Motore del tempo: transizioni, scroll, cursore | `src/reel/timeline.ts` |
-| Registro schermi, offset, namespacing id | `src/reel/screens.ts` |
-| Cornice del telefono e status bar | `src/reel/PhoneShell.tsx` |
-| Cattura video | `scripts/record.mjs` |
-
-Le coordinate dei tap in `clips.ts` sono nello spazio del **contenuto** (lo scroll viene
-sottratto a runtime) e sono state estratte dai `<rect>` degli SVG, non stimate a occhio.
+| Gesti e pause delle due clip | `scripts/reel-script.mjs` |
+| Cattura video: copione, screencast, ricampionamento | `scripts/record.mjs` |
+| Cornice del telefono e status bar | `src/proto/PhoneShell.tsx` |
+| Ordine degli schermi nei due flussi | `src/proto/flows.ts` |
+| Foglio bianco all'avvio | `src/proto/blank.ts` |
+| Zone del corpo (generate) | `tools/extract-zones.py` -> `src/ui/bodyZones.ts` |
 
 ## Due dettagli non ovvi negli export
 
 - **`checkout-6-sensation-sheet.svg` e' 442x890**, non 402x874: Figma ha incluso il bleed
-  dell'ombra del bottom sheet. Compensato con `offsetX: -20, offsetY: -3` in `screens.ts`.
-- **`checkin-2-tune-in.svg` e' alto 1262**: e' uno schermo che scorre davvero, animato
-  con `scroll: [0, 388]`.
+  dell'ombra del bottom sheet. Il diff lo compensa con `refClip` nel registry.
+- **`checkin-2-tune-in.svg` e' alto 1262**: e' uno schermo che scorre davvero.
 - Figma riusa gli stessi id (`filter0_d_`, `paint0_linear_`) dentro ogni file. Inlinando
   piu SVG nello stesso DOM gli id collidono; `namespaceIds()` li prefissa per file.
 - `checkin-5-make-sense` e' un PNG, non un SVG: renderizzato come `<img>`, quindi non

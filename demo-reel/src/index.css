@@ -9,10 +9,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* In modalita cattura vogliamo un fondale piatto e nessuna UI di controllo */
-body[data-capture="1"] { background: #0E0E11; }
-body[data-capture="1"] .no-capture { display: none !important; }
-
 /* La probe del diff deve essere nuda: nessun fondale, nessun margine. */
 body:has(#probe) { background: transparent; }
 body:has(#probe) > #root { display: block; }
@@ -86,8 +82,9 @@ html, body, #root { height: 100dvh; }
   .bab-enter > *:nth-child(14) { animation-delay: 288ms; }
   .bab-enter > *:nth-child(n+15) { animation-delay: 300ms; }
 
-/* In cattura vogliamo lo stato finale al primo fotogramma, o il diff contro
-   Figma fotografa gli schermi a meta' ingresso. */
+/* Il probe del diff deve mostrare lo stato finale al primo fotogramma, o il
+   confronto con Figma fotografa gli schermi a meta' ingresso. Il reel invece le
+   animazioni le vuole: e' tutto il punto. */
 body[data-capture="1"] .bab-enter > * { animation: none; }
 
 @media (prefers-reduced-motion: reduce) {

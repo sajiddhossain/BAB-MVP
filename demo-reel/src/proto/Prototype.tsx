@@ -9,12 +9,18 @@ const TRANSITION_MS = 460
 
 type Move = { dir: 1 | -1; from: number } | null
 
-export function Prototype({ flow }: { flow: Flow }) {
+export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean }) {
   // dentro useState e non in un effetto: deve succedere PRIMA che i figli
   // leggano lo store, altrimenti il primo fotogramma mostra lo stato del frame
   // e poi si svuota sotto gli occhi
   useState(startBlank)
-  const scale = useFit()
+  /*
+   * `boxed` = siamo dentro la cornice del telefono (il reel), che e' gia'
+   * esattamente 402x874: niente da adattare, scala 1. Fuori invece lo stage si
+   * ridimensiona per riempire lo schermo vero.
+   */
+  const fitted = useFit()
+  const scale = boxed ? 1 : fitted
   const [index, setIndex] = useState(0)
   const [move, setMove] = useState<Move>(null)
   const [animating, setAnimating] = useState(false)
@@ -106,7 +112,7 @@ export function Prototype({ flow }: { flow: Flow }) {
      * sembrare la stessa superficie, non la cornice di un video.
      */
     <div
-      className="fixed inset-0 flex items-center justify-center overflow-hidden"
+      className={`${boxed ? 'absolute' : 'fixed'} inset-0 flex items-center justify-center overflow-hidden`}
       style={{ background: 'var(--bab-bg)' }}
     >
       <div

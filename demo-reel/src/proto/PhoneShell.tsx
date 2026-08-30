@@ -1,21 +1,17 @@
 import type { ReactNode } from 'react'
-import { VIEWPORT } from './screens'
+import { STAGE } from '../proto/flows'
 
-/** Cornice del device. Il contenuto e' esattamente 402x874, come l'export Figma. */
-export function PhoneShell({
-  children,
-  topScroll = 0,
-}: {
-  children: ReactNode
-  /** scroll dello schermo in cima: serve a far comparire il velo sotto la status bar */
-  topScroll?: number
-}) {
+/**
+ * Cornice del telefono per il video. Il contenuto e' esattamente 402x874, come
+ * l'export Figma, quindi qui dentro il prototipo gira a scala 1.
+ */
+export function PhoneShell({ children }: { children: ReactNode }) {
   return (
     <div
       className="relative"
       style={{
-        width: VIEWPORT.w + 24,
-        height: VIEWPORT.h + 24,
+        width: STAGE.w + 24,
+        height: STAGE.h + 24,
         padding: 12,
         borderRadius: 58,
         background: 'linear-gradient(160deg,#2a2a30,#141418 60%,#25252b)',
@@ -25,10 +21,10 @@ export function PhoneShell({
     >
       <div
         className="relative overflow-hidden bg-[#FAF9F7]"
-        style={{ width: VIEWPORT.w, height: VIEWPORT.h, borderRadius: 46 }}
+        style={{ width: STAGE.w, height: STAGE.h, borderRadius: 46 }}
       >
         {children}
-        <StatusBar scrolled={Math.max(0, Math.min(1, topScroll / 28))} />
+        <StatusBar />
       </div>
     </div>
   )
@@ -37,8 +33,10 @@ export function PhoneShell({
 /**
  * Gli export Figma non includono la status bar (partono dal contenuto a y=56).
  * La disegniamo noi: senza, il video non sembra un telefono.
+ * Il velo sotto e' sempre acceso, cosi' il contenuto che scorre non passa
+ * sopra l'ora.
  */
-function StatusBar({ scrolled }: { scrolled: number }) {
+function StatusBar() {
   return (
     <>
       {/* Senza questo velo il contenuto che scorre passa sopra l'ora: sembra rotto. */}
@@ -46,11 +44,9 @@ function StatusBar({ scrolled }: { scrolled: number }) {
         className="pointer-events-none absolute inset-x-0 top-0"
         style={{
           height: 46,
-          opacity: scrolled,
-          background: 'rgba(250,249,247,0.92)',
+          background: 'rgba(240,235,230,0.82)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
-          boxShadow: `0 1px 0 rgba(28,28,38,${0.06 * scrolled})`,
         }}
       />
     <div
