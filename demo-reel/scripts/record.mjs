@@ -133,29 +133,87 @@ async function toGif(mp4, gif) {
  * da video, e non ha senso spedirlo a chi apre il prototipo sul telefono.
  */
 const GHOST = `
-  window.__ghost = (x, y) => {
-    let g = document.getElementById('__ghost')
-    if (!g) {
-      g = document.createElement('div')
-      g.id = '__ghost'
-      g.style.cssText =
-        'position:fixed;z-index:99999;width:46px;height:46px;margin:-23px 0 0 -23px;' +
-        'border-radius:50%;pointer-events:none;opacity:0;' +
-        'background:radial-gradient(circle,rgba(44,44,58,0.28) 0%,rgba(44,44,58,0.14) 62%,rgba(44,44,58,0) 72%);' +
-        'border:2px solid rgba(44,44,58,0.32);' +
-        'transition:opacity 130ms ease-out,transform 130ms ease-out'
-      document.body.appendChild(g)
+  window.__ghost = (() => {
+    /*
+     * Due elementi, non uno: fuori la posizione, dentro il cerchio.
+     * Se la pressione e la posizione stessero sullo stesso transform, la
+     * transizione della pressione rallenterebbe anche gli spostamenti, e
+     * durante un trascinamento il dito resterebbe indietro rispetto al tocco.
+     */
+    let box, dot, x = 0, y = 0
+    const build = () => {
+      box = document.createElement('div')
+      box.id = '__ghost'
+      box.style.cssText =
+        'position:fixed;left:0;top:0;z-index:99999;pointer-events:none;opacity:0;' +
+        'will-change:transform;transition:opacity 200ms ease-out'
+      dot = document.createElement('div')
+      dot.style.cssText =
+        'width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;' +
+        'background:radial-gradient(circle,rgba(44,44,58,0.30) 0%,rgba(44,44,58,0.15) 62%,rgba(44,44,58,0) 72%);' +
+        'border:2px solid rgba(44,44,58,0.34);' +
+        'transition:transform 110ms cubic-bezier(0.4,0,0.2,1),background 110ms,border-color 110ms'
+      box.appendChild(dot)
+      document.body.appendChild(box)
     }
-    if (x === null) {
-      g.style.opacity = '0'
-      g.style.transform = 'scale(1.55)'
-      return
+    const paint = () => { box.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)' }
+    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+    return {
+      at(nx, ny) { if (!box) build(); x = nx; y = ny; paint() },
+      show(on) { if (!box) build(); box.style.opacity = on ? '1' : '0' },
+      pos() { return { x, y } },
+      /*
+       * Il viaggio non e' una retta: una mano descrive un arco. Il punto di
+       * mezzo viene spostato di lato, perpendicolarmente, e il percorso e' la
+       * bezier che ne esce.
+       */
+      travel(tx, ty, ms, bow) {
+        if (!box) build()
+        const x0 = x, y0 = y
+        const dx = tx - x0, dy = ty - y0
+        const len = Math.hypot(dx, dy) || 1
+        const cx = (x0 + tx) / 2 - (dy / len) * bow
+        const cy = (y0 + ty) / 2 + (dx / len) * bow
+        const t0 = performance.now()
+        return new Promise((done) => {
+          const step = () => {
+            const t = Math.min(1, (performance.now() - t0) / ms)
+            const e = ease(t)
+            const u = 1 - e
+            x = u * u * x0 + 2 * u * e * cx + e * e * tx
+            y = u * u * y0 + 2 * u * e * cy + e * e * ty
+            paint()
+            if (t < 1) requestAnimationFrame(step)
+            else { x = tx; y = ty; paint(); done() }
+          }
+          requestAnimationFrame(step)
+        })
+      },
+      /* appoggiato: piu' piccolo e piu' scuro. Lasciato: si allarga e rientra. */
+      press(on) {
+        if (!box) build()
+        if (on) {
+          dot.style.transform = 'scale(0.78)'
+          dot.style.background =
+            'radial-gradient(circle,rgba(44,44,58,0.44) 0%,rgba(44,44,58,0.24) 62%,rgba(44,44,58,0) 72%)'
+          dot.style.borderColor = 'rgba(44,44,58,0.5)'
+          return
+        }
+        dot.style.transform = 'scale(1.2)'
+        dot.style.background =
+          'radial-gradient(circle,rgba(44,44,58,0.30) 0%,rgba(44,44,58,0.15) 62%,rgba(44,44,58,0) 72%)'
+        dot.style.borderColor = 'rgba(44,44,58,0.34)'
+        setTimeout(() => {
+          dot.style.transition = 'transform 260ms cubic-bezier(0.22,1,0.36,1),background 110ms,border-color 110ms'
+          dot.style.transform = 'scale(1)'
+          setTimeout(() => {
+            dot.style.transition =
+              'transform 110ms cubic-bezier(0.4,0,0.2,1),background 110ms,border-color 110ms'
+          }, 280)
+        }, 90)
+      },
     }
-    g.style.left = x + 'px'
-    g.style.top = y + 'px'
-    g.style.opacity = '1'
-    g.style.transform = 'scale(1)'
-  }
+  })()
 `
 
 /* ----------------------------------------------------------------- copione */
@@ -179,8 +237,15 @@ const findByText = (page, text) =>
       else if (near.length > 1) break
     }
     el = el ?? p
-    el.scrollIntoView({ block: 'center' })
-    const r = el.getBoundingClientRect()
+    /*
+     * Portarlo in vista SOLO se non si vede: scrollIntoView fa saltare lo
+     * scorrimento di netto, e nel video quel salto e' identico a un bot.
+     */
+    let r = el.getBoundingClientRect()
+    if (r.top < 8 || r.bottom > window.innerHeight - 8) {
+      el.scrollIntoView({ block: 'center', behavior: 'instant' })
+      r = el.getBoundingClientRect()
+    }
     return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
   }, text)
 
@@ -189,8 +254,11 @@ const findCta = (page) =>
     // l'ultimo: col pannello aperto ce ne sono due, e vale quello sopra
     const el = [...document.querySelectorAll('[data-cta]')].pop()
     if (!el) return null
-    el.scrollIntoView({ block: 'center' })
-    const r = el.getBoundingClientRect()
+    let r = el.getBoundingClientRect()
+    if (r.top < 8 || r.bottom > window.innerHeight - 8) {
+      el.scrollIntoView({ block: 'center', behavior: 'instant' })
+      r = el.getBoundingClientRect()
+    }
     return { x: r.x + r.width / 2, y: r.y + Math.min(28, r.height / 2) }
   })
 
@@ -216,8 +284,11 @@ const findSlide = (page, near) =>
   page.evaluate((label) => {
     const p = [...document.querySelectorAll('p')].find((e) => e.textContent.trim() === label)
     if (!p) return null
-    p.scrollIntoView({ block: 'center' })
-    const anchor = p.getBoundingClientRect()
+    let anchor = p.getBoundingClientRect()
+    if (anchor.top < 8 || anchor.bottom > window.innerHeight - 8) {
+      p.scrollIntoView({ block: 'center', behavior: 'instant' })
+      anchor = p.getBoundingClientRect()
+    }
     let best = null
     for (const el of document.querySelectorAll('div')) {
       if (el.style.touchAction !== 'none') continue
@@ -228,31 +299,89 @@ const findSlide = (page, near) =>
     return best?.r ?? null
   }, near)
 
+/**
+ * Numeri casuali sempre uguali.
+ *
+ * Il movimento ha bisogno di irregolarita' — se ogni pausa e ogni atterraggio
+ * sono identici si vede subito che e' una macchina — ma due registrazioni
+ * dello stesso copione devono venire uguali, altrimenti non si puo' piu'
+ * confrontare niente.
+ */
+function rng(seed) {
+  let a = seed >>> 0
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
 async function playScript(page, cdp, steps, log) {
   const touch = (type, x, y) =>
     cdp.send('Input.dispatchTouchEvent', {
       type,
       touchPoints: type === 'touchEnd' ? [] : [{ x, y, radiusX: 12, radiusY: 12, force: 1 }],
     })
-  const ghost = (x, y) => page.evaluate(([a, b]) => window.__ghost(a, b), [x, y])
+  const rand = rng(20260831)
   const wait = (ms) => new Promise((r) => setTimeout(r, ms))
+  /** nessuna pausa umana e' un numero tondo */
+  const about = (ms, amount = 0.12) => Math.round(ms * (1 - amount + rand() * amount * 2))
+  const pause = (ms) => wait(about(ms))
 
-  const tapAt = async (pt) => {
-    await ghost(pt.x, pt.y)
-    await wait(150)
-    await touch('touchStart', pt.x, pt.y)
-    await wait(90)
-    await touch('touchEnd', pt.x, pt.y)
-    await ghost(null, null)
+  const g = {
+    at: (x, y) => page.evaluate(([a, b]) => window.__ghost.at(a, b), [x, y]),
+    travel: (x, y, ms, bow) =>
+      page.evaluate(([a, b, c, d]) => window.__ghost.travel(a, b, c, d), [x, y, ms, bow]),
+    press: (on) => page.evaluate((o) => window.__ghost.press(o), on),
+    show: (on) => page.evaluate((o) => window.__ghost.show(o), on),
   }
 
-  /* il campo di testo del pannello, e i tasti della nostra tastiera */
+  /* la mano entra da sotto lo schermo, come quando prendi il telefono in mano */
+  let hand = { x: (STAGE.w / 2) * SCALE, y: (STAGE.h + 90) * SCALE }
+  await g.at(hand.x, hand.y)
+  await g.show(true)
+
+  /**
+   * Quanto ci mette ad arrivare: piu' lontano, piu' tempo, ma non in
+   * proporzione — una mano copre in fretta le grandi distanze e rallenta
+   * sull'ultimo pezzo. `fast` e' per i tasti, dove le dita saltano vicino.
+   */
+  const travelMs = (to, fast) => {
+    const d = Math.hypot(to.x - hand.x, to.y - hand.y) / SCALE
+    return fast ? Math.min(88, 36 + d * 0.22) : Math.max(185, Math.min(460, 150 + d * 0.36))
+  }
+  const goTo = async (pt, fast = false) => {
+    const d = Math.hypot(pt.x - hand.x, pt.y - hand.y) / SCALE
+    const bow = fast ? 0 : Math.min(26, d * 0.13) * SCALE
+    await g.travel(pt.x, pt.y, about(travelMs(pt, fast)), bow)
+    hand = pt
+  }
+  /** il dito non atterra mai al centro esatto */
+  const near = (pt) => ({
+    x: pt.x + (rand() - 0.5) * 7 * SCALE,
+    y: pt.y + (rand() - 0.5) * 7 * SCALE,
+  })
+  const pressHere = async (pt, fast = false) => {
+    await g.press(true)
+    await touch('touchStart', pt.x, pt.y)
+    await wait(about(fast ? 32 : 70))
+    await touch('touchEnd', pt.x, pt.y)
+    await g.press(false)
+  }
+  const tapAt = async (pt, { hover = 0, fast = false } = {}) => {
+    const t = near(pt)
+    await goTo(t, fast)
+    await pause(hover || (fast ? 14 : 55))
+    await pressHere(t, fast)
+  }
+
   const findField = () =>
     page.evaluate(() => {
-      const t = document.querySelector('textarea')
+      const t = document.querySelector('textarea, input.bab-field')
       if (!t) return null
       const r = t.getBoundingClientRect()
-      return { x: r.x + 40, y: r.y + r.height / 2 }
+      return { x: r.x + 40, y: r.y + r.height / 2, gia: document.activeElement === t }
     })
   const findKey = (id) =>
     page.evaluate((k) => {
@@ -262,14 +391,7 @@ async function playScript(page, cdp, steps, log) {
       return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
     }, id)
 
-  /* un tasto si tocca piu' in fretta di un comando: chi scrive non esita */
-  const tapKey = async (pt) => {
-    await ghost(pt.x, pt.y)
-    await touch('touchStart', pt.x, pt.y)
-    await wait(45)
-    await touch('touchEnd', pt.x, pt.y)
-    await wait(55)
-  }
+  const dove = async () => `schermo ${await page.evaluate(() => window.__step)}`
 
   for (const s of steps) {
     if (s.tap || s.cta || s.close || s.zone) {
@@ -280,54 +402,106 @@ async function playScript(page, cdp, steps, log) {
           : s.close
             ? await findByText(page, '✕')
             : await findZone(page, s.zone)
-      if (!pt) log(`  ⚠ non trovato: ${JSON.stringify(s)} (schermo ${await page.evaluate(() => window.__step)})`)
-      else await tapAt(pt)
+      if (!pt) log(`  ⚠ non trovato: ${JSON.stringify(s)} (${await dove()})`)
+      else await tapAt(pt, { hover: s.hover })
+    } else if (s.hesitate) {
+      /*
+       * Il dito va verso la risposta che si aspettava, si ferma, e sceglie
+       * l'altra. E' l'unica esitazione del video, e sta dove significa
+       * qualcosa: la schermata dopo dice "avevi indovinato X, era Y".
+       */
+      const a = await findByText(page, s.hesitate.from)
+      const b = await findByText(page, s.hesitate.to)
+      if (!a || !b) log(`  ⚠ esitazione non montabile: ${JSON.stringify(s)} (${await dove()})`)
+      else {
+        await goTo(near(a))
+        await pause(560)
+        const t = near(b)
+        await goTo(t)
+        await pause(200)
+        await pressHere(t)
+      }
     } else if (s.slide) {
       const box = await findSlide(page, s.slide.near)
-      if (!box)
-        log(`  ⚠ slider non trovato vicino a "${s.slide.near}" (schermo ${await page.evaluate(() => window.__step)})`)
+      if (!box) log(`  ⚠ slider non trovato vicino a "${s.slide.near}" (${await dove()})`)
       else {
         const y = box.y + box.h / 2
         const x0 = box.x + 12
         const x1 = box.x + 12 + (box.w - 24) * s.slide.to
-        await ghost(x0, y)
+        await goTo({ x: x0, y })
+        await pause(120)
+        await g.press(true)
         await touch('touchStart', x0, y)
-        for (let i = 1; i <= 14; i++) {
-          const x = x0 + ((x1 - x0) * i) / 14
+        const N = 18
+        for (let i = 1; i <= N; i++) {
+          const t = i / N
+          /* frena verso la fine e sfonda di un soffio: poi si assesta */
+          const e = 1 - Math.pow(1 - t, 2.4)
+          const over = Math.sin(Math.PI * t) * 0.035
+          const x = x0 + (x1 - x0) * (e + over)
           await touch('touchMove', x, y)
-          await ghost(x, y)
-          await wait(22)
+          await g.at(x, y)
+          await wait(about(20))
         }
+        await touch('touchMove', x1, y)
+        await g.at(x1, y)
+        await wait(60)
         await touch('touchEnd', x1, y)
-        await ghost(null, null)
+        await g.press(false)
+        hand = { x: x1, y }
       }
     } else if (s.write) {
       const f = await findField()
-      if (!f) log(`  ⚠ campo di testo non trovato (schermo ${await page.evaluate(() => window.__step)})`)
+      if (!f) log(`  ⚠ campo di testo non trovato (${await dove()})`)
       else {
-        await tapAt(f)
-        await wait(460) // la tastiera sale
-        for (const ch of s.write) {
-          const pt = await findKey(ch === ' ' ? 'space' : ch.toLowerCase())
-          if (pt) await tapKey(pt)
+        if (!f.gia) {
+          await tapAt(f)
+          await pause(460) // la tastiera sale
         }
-        await ghost(null, null)
-        await wait(500)
+        let prima = null
+        for (const ch of s.write) {
+          const id = ch === ' ' ? 'space' : ch.toLowerCase()
+          const pt = await findKey(id)
+          if (!pt) continue
+          await tapAt(pt, { fast: true })
+          /* dentro una parola si corre, fra una parola e l'altra si respira */
+          await pause(ch === ' ' ? 24 : prima === ' ' ? 100 : 26)
+          prima = ch
+        }
+        await pause(520)
         const done = await findKey('Done')
         if (done) await tapAt(done)
       }
-    } else if (s.scroll) {
-      const x = (STAGE.w / 2) * SCALE
-      const y0 = (STAGE.h - 260) * SCALE
-      const y1 = y0 - s.scroll.by * SCALE
+    } else if (s.flick) {
+      /*
+       * Un lancio, non una trascinata: parte deciso, rallenta appena, e il
+       * dito si stacca mentre e' ancora in movimento. Prima lo schermo
+       * scorreva da solo, senza nessun dito in vista.
+       */
+      const x = (STAGE.w / 2 + (rand() - 0.5) * 46) * SCALE
+      const y0 = (STAGE.h - 250) * SCALE
+      const y1 = y0 - s.flick.by * SCALE
+      await goTo({ x, y: y0 })
+      await pause(90)
+      await g.press(true)
       await touch('touchStart', x, y0)
-      for (let i = 1; i <= 18; i++) {
-        await touch('touchMove', x, y0 + ((y1 - y0) * i) / 18)
-        await wait(16)
+      const N = 20
+      for (let i = 1; i <= N; i++) {
+        const t = i / N
+        const y = y0 + (y1 - y0) * (1 - Math.pow(1 - t, 1.7))
+        await touch('touchMove', x, y)
+        await g.at(x, y)
+        await wait(about(14))
       }
       await touch('touchEnd', x, y1)
+      await g.press(false)
+      hand = { x, y: y1 }
+    } else if (s.lift) {
+      /* la mano esce di scena: gli ultimi fotogrammi restano puliti */
+      await goTo({ x: hand.x, y: (STAGE.h + 110) * SCALE })
+      await g.show(false)
     }
-    if (s.hold) await wait(s.hold)
+    if (s.hold) await pause(s.hold)
   }
 }
 
