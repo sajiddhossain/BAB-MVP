@@ -293,7 +293,9 @@ export function Checkout3Satisfaction() {
 
       <CtaButton label="Now let’s tune in" left={24} top={778} width={354} shadowTop={4} labelColor="var(--bab-ink)" labelCenter={175.5} enabled={!!face} />
 
-      {kb && <Keyboard open={editing} value={own} onChange={setOwn} onDone={() => ownBox.current?.blur()} />}
+      {kb && (
+        <Keyboard open={editing} value={own} onChange={setOwn} onDone={() => ownBox.current?.blur()} multiline={false} />
+      )}
     </Frame>
   )
 }

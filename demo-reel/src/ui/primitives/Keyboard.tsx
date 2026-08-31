@@ -119,11 +119,16 @@ export function Keyboard({
   value,
   onChange,
   onDone,
+  multiline = true,
 }: {
   open: boolean
   value: string
   onChange: (v: string) => void
   onDone: () => void
+  /* false su un campo a riga singola: li' "return" chiude invece di andare
+     a capo. Andando a capo l'a-capo finiva nello stato ma il campo lo
+     buttava via, e restava una differenza invisibile fra i due. */
+  multiline?: boolean
 }) {
   /*
    * iOS accende il maiuscolo da solo a inizio frase e lo spegne dopo la
@@ -202,7 +207,7 @@ export function Keyboard({
           id="space"
           onTap={() => onChange(value + ' ')}
         />
-        <Key x={W - PAD - RETURN_W} y={rowTop(3)} w={RETURN_W} bg={GREY} label="return" font={16} onTap={() => onChange(value + '\n')} />
+        <Key x={W - PAD - RETURN_W} y={rowTop(3)} w={RETURN_W} bg={GREY} label="return" font={16} onTap={() => (multiline ? onChange(value + '\n') : onDone())} />
       </div>
     </div>
   )
