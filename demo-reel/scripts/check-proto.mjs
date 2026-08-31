@@ -212,8 +212,9 @@ expect(
 /** baricentro di una zona -> punto sullo schermo del telefono */
 const onBody = async (zoneId) =>
   at(...(await page.evaluate((id) => {
-    const svg = document.querySelector('svg[viewBox]')
-    const path = svg.querySelector(`path[data-zone="${id}"]`)
+    // data-zone ce l'ha solo la figura che si vede: le due sono sovrapposte
+    const path = document.querySelector(`path[data-zone="${id}"]`)
+    const svg = path.ownerSVGElement
     const b = path.getBBox()
     const stage = document.querySelector('.bab-proto > div > div').getBoundingClientRect()
     const k = svg.getScreenCTM()

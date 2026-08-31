@@ -69,9 +69,7 @@ export function BodyMap({
   const paths = useRef(new Map<string, SVGPathElement>())
   const down = useRef<{ x: number; y: number } | null>(null)
   const zones = zonesFor(side)
-  const ink = side === 'Back' ? BACK_INK : FRONT_INK
   const k = height / FRONT_INK[3]
-  const box = { width: ink[2] * k, height: ink[3] * k }
 
   /** Tocco -> zona, nello spazio del viewBox. */
   const hit = (e: React.PointerEvent): BodyZone | null => {
@@ -96,11 +94,33 @@ export function BodyMap({
     return best
   }
 
+  /*
+   * Tutte e due le figure stanno sempre in pagina, una sopra l'altra: girandosi
+   * si dissolvono l'una nell'altra invece di scattare. Quella nascosta non
+   * prende tocchi e non porta `data-zone`, cosi' chi cerca una zona (i
+   * controlli, il copione del video) ne trova sempre una sola: quella che si
+   * vede.
+   */
   return (
+    <>
+      {(['Front', 'Back'] as Side[]).map((s) => {
+        const live = s === side
+        const ink = s === 'Back' ? BACK_INK : FRONT_INK
+        const box = { width: ink[2] * k, height: ink[3] * k }
+        return (
     <svg
-      ref={svg}
+      key={s}
+      ref={live ? svg : undefined}
       className="absolute"
-      style={{ left: centerX - box.width / 2, top, ...box, touchAction: 'pan-y' }}
+      style={{
+        left: centerX - box.width / 2,
+        top,
+        ...box,
+        touchAction: 'pan-y',
+        opacity: live ? 1 : 0,
+        pointerEvents: live ? undefined : 'none',
+        transition: 'opacity 280ms ease-out',
+      }}
       // il viewBox e' l'ingombro esatto del tratto: la figura tocca i bordi del
       // riquadro, quindi le misure qui sopra sono quelle che si vedono davvero
       viewBox={ink.join(' ')}
@@ -117,17 +137,18 @@ export function BodyMap({
         if (z) onPick(z)
       }}
     >
-      {zones.map((z) => {
-        const on = selected.includes(zoneKey(side, z.id))
+      {zonesFor(s).map((z) => {
+        const on = selected.includes(zoneKey(s, z.id))
         return (
           <path
             key={z.id}
             ref={(el) => {
+              if (!live) return
               if (el) paths.current.set(z.id, el)
               else paths.current.delete(z.id)
             }}
             d={z.d}
-            data-zone={z.id}
+            data-zone={live ? z.id : undefined}
             fill={MARK}
             stroke={MARK}
             strokeWidth={on ? 6 : 0}
@@ -146,5 +167,8 @@ export function BodyMap({
       {/* il tratto per ultimo, cosi' le campiture non lo coprono */}
       <path d={OUTLINE} fill="#000" style={{ pointerEvents: 'none' }} />
     </svg>
+        )
+      })}
+    </>
   )
 }

@@ -196,9 +196,10 @@ const findCta = (page) =>
 
 const findZone = (page, id) =>
   page.evaluate((z) => {
-    const svg = document.querySelector('svg[viewBox]')
-    const path = svg?.querySelector(`path[data-zone="${z}"]`)
+    // data-zone ce l'ha solo la figura che si vede: le due sono sovrapposte
+    const path = document.querySelector(`path[data-zone="${z}"]`)
     if (!path) return null
+    const svg = path.ownerSVGElement
     const b = path.getBBox()
     const p = new DOMPoint(b.x + b.width / 2, b.y + b.height / 2).matrixTransform(svg.getScreenCTM())
     return { x: p.x, y: p.y }
