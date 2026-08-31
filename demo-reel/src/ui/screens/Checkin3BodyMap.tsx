@@ -2,7 +2,7 @@ import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { SegmentedToggle } from '../primitives/SegmentedToggle'
-import { BodyMap, ELSEWHERE } from '../primitives/BodyMap'
+import { BodyMap, ELSEWHERE, zoneKey } from '../primitives/BodyMap'
 import type { Side } from '../primitives/BodyMap'
 import { useField } from '../state'
 import { useNav } from '../../proto/nav'
@@ -89,7 +89,7 @@ export function Checkin3BodyMap({ spots = 2, pending = null }: { spots?: number;
         // sulla mappa da sola non c'e' niente in sospeso.
         selected={pending && !picked.includes(pending) ? [...picked, pending] : picked}
         onPick={(z) => {
-          setLast(z.id)
+          setLast(zoneKey(side, z.id))
           nav?.next()
         }}
       />

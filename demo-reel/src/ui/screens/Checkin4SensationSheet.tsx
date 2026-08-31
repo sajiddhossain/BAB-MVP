@@ -1,6 +1,5 @@
 import { SensationSheet } from '../primitives/SensationSheet'
 import { labelOf } from '../primitives/BodyMap'
-import type { Side } from '../primitives/BodyMap'
 import { useField } from '../state'
 import { useNav } from '../../proto/nav'
 import { Checkin3BodyMap } from './Checkin3BodyMap'
@@ -24,14 +23,13 @@ const NO_ZONES: string[] = []
  */
 export function Checkin4SensationSheet({ backdrop = true, entered = true }: { backdrop?: boolean; entered?: boolean }) {
   const nav = useNav()
-  const [side] = useField<Side>('checkin.bodySide', 'Front')
   const [last] = useField<string | null>('checkin.lastZone', null)
   const [zones, setZones] = useField<readonly string[]>('checkin.zones', NO_ZONES)
   const saved = !!last && zones.includes(last)
   return (
     <div className="relative overflow-hidden" style={{ width: 402, height: 874 }}>
       <SensationSheet
-        title={labelOf(side, last) ?? 'Right quad'}
+        title={labelOf(last) ?? 'Right quad'}
         selected={DEFAULT_CHIPS}
         field={last ? `checkin.spot.${last}` : 'checkin.sheet'}
         saved={saved}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { forwardRef, useState } from 'react'
 import type { CSSProperties, ReactNode } from 'react'
 import { buzz } from '../haptics'
 
@@ -12,15 +12,7 @@ import { buzz } from '../haptics'
  * `press` da il feedback tattile (leggero affondamento): senza, il tocco
  * funziona ma non sembra che stia succedendo niente.
  */
-export function Touchable({
-  children,
-  onTap,
-  style,
-  className = '',
-  press = 0.97,
-  stop = true,
-  ...rest
-}: {
+export const Touchable = forwardRef<HTMLDivElement, {
   children?: ReactNode
   onTap?: () => void
   style?: CSSProperties
@@ -31,11 +23,15 @@ export function Touchable({
   stop?: boolean
   /** attributi passanti: serve a data-cta, il gancio dei test */
   'data-cta'?: boolean
-}) {
+}>(function Touchable(
+  { children, onTap, style, className = '', press = 0.97, stop = true, ...rest },
+  ref,
+) {
   const [down, setDown] = useState(false)
 
   return (
     <div
+      ref={ref}
       {...rest}
       className={`bab-touch ${className}`.trim()}
       style={{
@@ -74,4 +70,4 @@ export function Touchable({
       {children}
     </div>
   )
-}
+})

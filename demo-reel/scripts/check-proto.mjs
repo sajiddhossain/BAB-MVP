@@ -228,7 +228,8 @@ const spots = () =>
   )
 
 await tap(...(await onBody('quad-r')))
-expect('la zona si accende', (await state())['checkin.lastZone'], 'quad-r')
+// la chiave porta il lato: diciannove zone si chiamano uguale davanti e dietro
+expect('la zona si accende', (await state())['checkin.lastZone'], 'Front:quad-r')
 expect('...e fa salire il sheet', await step(), 3)
 expect(
   '...col nome della zona',
@@ -259,7 +260,7 @@ await tap(...at(151, 271)) // linguetta "Back"
 expect('il toggle gira il corpo', (await state())['checkin.bodySide'], 'Back')
 // il gomito e' una zona da 191px: senza tolleranza sul tocco sarebbe intoccabile
 await tap(...(await onBody('elbow-l')))
-expect('anche una zona minuscola si prende', (await state())['checkin.lastZone'], 'elbow-l')
+expect('anche una zona minuscola si prende', (await state())['checkin.lastZone'], 'Back:elbow-l')
 await tapLabel('✕')
 
 // --- sensation sheet ----------------------------------------------------
@@ -277,7 +278,7 @@ await tapCta()
 expect('il pannello non aggiunge una sensazione senza nome', await step(), 3)
 // il sheet parte a y=175, i chip a 205.5 al suo interno -> 380.5 assoluti
 await tap(...at(58, 394)) // chip "strong"
-const chips = (await state())['checkin.spot.quad-r.chips']
+const chips = (await state())['checkin.spot.Front:quad-r.chips']
 expect('il chip del sheet si aggiunge', Array.isArray(chips) && chips.includes('strong'), true)
 expect('...senza cambiare schermo', await step(), 3)
 
@@ -286,7 +287,7 @@ await page.fill('textarea', 'tira quando salgo le scale')
 await page.waitForTimeout(200)
 expect(
   'il campo di testo scrive davvero',
-  (await state())['checkin.spot.quad-r.note'],
+  (await state())['checkin.spot.Front:quad-r.note'],
   'tira quando salgo le scale',
 )
 
@@ -301,11 +302,11 @@ const sheetTop = () =>
   })
 const topOpen = await sheetTop()
 await tapLabel('A little help ✨')
-expect('la tendina si chiude', (await state())['checkin.spot.quad-r.help'], false)
+expect('la tendina si chiude', (await state())['checkin.spot.Front:quad-r.help'], false)
 expect('...e il pannello si accorcia', (await sheetTop()) > topOpen + 100, true)
 await tapLabel('A little help ✨')
 await page.waitForTimeout(400)
-expect('e si riapre', (await state())['checkin.spot.quad-r.help'], true)
+expect('e si riapre', (await state())['checkin.spot.Front:quad-r.help'], true)
 
 // --- salvare, riaprire, togliere -----------------------------------------
 /*
@@ -536,6 +537,33 @@ expect(
   await page.evaluate(() => (window.__babState() || {})['checkout.ownTakeHome']),
   'Kept',
 )
+
+/* --------------------------------------- un punto sta sul suo lato, non su entrambi */
+/*
+ * Diciannove zone su trentatre portano lo stesso nome davanti e dietro
+ * (head, knee-l, ankle-r...). Segnando solo il nome, un ginocchio segnato
+ * davanti si accendeva anche dietro.
+ */
+await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(400)
+await tapLabel('Steady')
+await tapCta()
+await tapLabel('6–7h')
+await tapCta()
+await tap(...(await onBody('knee-l')))
+await tapLabel('sore')
+await tapCta()
+const accese = () =>
+  page.evaluate(() =>
+    [...document.querySelectorAll('path[data-zone]')]
+      .filter((p) => +getComputedStyle(p).fillOpacity > 0.1)
+      .map((p) => p.dataset.zone),
+  )
+expect('il ginocchio segnato davanti si accende', (await accese()).join(), 'knee-l')
+await tapLabel('Back')
+await page.waitForTimeout(500)
+expect('...e girandosi non si accende anche dietro', (await accese()).join(), '')
 
 /* ------------------------------------------------------- il rimbalzo ai bordi */
 /*

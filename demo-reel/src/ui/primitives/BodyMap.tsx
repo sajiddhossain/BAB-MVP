@@ -16,8 +16,23 @@ export function zonesFor(side: Side) {
 /** Zona finta per "Somewhere else": non sta sul disegno, ma e' una scelta vera. */
 export const ELSEWHERE = 'elsewhere'
 
-export function labelOf(side: Side, id: string | null) {
-  if (id === ELSEWHERE) return 'Somewhere else'
+/**
+ * Il nome con cui un punto viene messo via: il lato piu' la zona.
+ *
+ * Il lato serve: diciannove zone su trentatre si chiamano uguale davanti e
+ * dietro (head, knee-l, ankle-r...). Mettendo via solo "knee-l", un ginocchio
+ * segnato davanti si accendeva anche dietro, e il pannello lo intestava col
+ * nome del lato che stavi guardando in quel momento.
+ */
+export const zoneKey = (side: Side, id: string) => (id === ELSEWHERE ? id : `${side}:${id}`)
+
+export function labelOf(key: string | null) {
+  if (!key) return null
+  if (key === ELSEWHERE) return 'Somewhere else'
+  const cut = key.indexOf(':')
+  if (cut === -1) return null
+  const side = key.slice(0, cut) as Side
+  const id = key.slice(cut + 1)
   return zonesFor(side).find((z) => z.id === id)?.label ?? null
 }
 
@@ -103,7 +118,7 @@ export function BodyMap({
       }}
     >
       {zones.map((z) => {
-        const on = selected.includes(z.id)
+        const on = selected.includes(zoneKey(side, z.id))
         return (
           <path
             key={z.id}

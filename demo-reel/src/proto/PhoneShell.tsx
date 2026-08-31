@@ -25,8 +25,34 @@ export function PhoneShell({ children }: { children: ReactNode }) {
       >
         {children}
         <StatusBar />
+        <HomeBar />
       </div>
     </div>
+  )
+}
+
+/**
+ * La barra home dell'iPhone.
+ *
+ * I frame Figma lasciano liberi gli ultimi 34px proprio perche' li' ci passa —
+ * il posto c'era, il segno no. Su iOS la disegna il sistema e sta sopra a
+ * tutto, tastiera compresa: per questo sta qui e non dentro al prototipo.
+ */
+function HomeBar() {
+  return (
+    <div
+      className="pointer-events-none absolute"
+      style={{
+        left: '50%',
+        bottom: 8,
+        width: 140,
+        height: 5,
+        marginLeft: -70,
+        borderRadius: 2.5,
+        background: 'rgba(11,11,13,0.85)',
+        zIndex: 60,
+      }}
+    />
   )
 }
 

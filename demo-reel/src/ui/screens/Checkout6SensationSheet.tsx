@@ -1,6 +1,5 @@
 import { SensationSheet } from '../primitives/SensationSheet'
 import { labelOf } from '../primitives/BodyMap'
-import type { Side } from '../primitives/BodyMap'
 import { useField } from '../state'
 import { useNav } from '../../proto/nav'
 import { Checkout5BodyMap } from './Checkout5BodyMap'
@@ -24,14 +23,13 @@ const NO_ZONES: string[] = []
  */
 export function Checkout6SensationSheet({ backdrop = true, entered = true }: { backdrop?: boolean; entered?: boolean }) {
   const nav = useNav()
-  const [side] = useField<Side>('checkout.bodySide', 'Front')
   const [last] = useField<string | null>('checkout.lastZone', null)
   const [zones, setZones] = useField<readonly string[]>('checkout.zones', NO_ZONES)
   const saved = !!last && zones.includes(last)
   return (
     <div className="relative overflow-hidden" style={{ width: 402, height: 874 }}>
       <SensationSheet
-        title={labelOf(side, last) ?? 'Left hamstring'}
+        title={labelOf(last) ?? 'Left hamstring'}
         selected={DEFAULT_CHIPS}
         field={last ? `checkout.spot.${last}` : 'checkout.sheet'}
         saved={saved}

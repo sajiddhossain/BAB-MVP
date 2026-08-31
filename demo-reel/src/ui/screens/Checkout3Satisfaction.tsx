@@ -129,8 +129,14 @@ export function Checkout3Satisfaction() {
                     height: on ? 48 : 44,
                     borderRadius: on ? 24 : 22,
                     background: on ? '#e5f5f2' : '#f6f5f1',
-                    border: on ? '2px solid #10b981' : undefined,
+                    // il bordo c'e' sempre: da undefined a 2px il cerchio
+                    // scattava di due pixel invece di ingrossarsi
+                    border: `2px solid ${on ? '#10b981' : 'transparent'}`,
                     boxSizing: 'border-box',
+                    /* la scelta si ingrossa, non salta: la faccia scelta
+                       passa da 44 a 48 e prima ci arrivava di colpo */
+                    transition:
+                      'width 260ms cubic-bezier(0.34,1.56,0.64,1), height 260ms cubic-bezier(0.34,1.56,0.64,1), border-radius 260ms ease-out',
                   }}
                 >
                   <img src={f.icon} alt="" style={{ width: 36, height: 36 }} />
