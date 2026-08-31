@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { FLOWS, STAGE } from './flows'
 import type { Flow } from './flows'
 import { useFit } from './useFit'
 import { NavContext } from './nav'
+import { useRubberBand } from './rubberBand'
 import { startBlank } from './blank'
 
 /*
@@ -191,7 +193,7 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
           const Comp = s.Component
           const scrolls = s.h > STAGE.h
           return (
-            <div
+            <Layer
               /*
                * La chiave e' l'indice dello schermo, NON indice+ruolo.
                * Con `${i}-${role}` lo schermo che esce cambiava chiave nel
@@ -201,9 +203,8 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
                * perdeva anche la sua posizione di scorrimento.
                */
               key={i}
-              className={`absolute inset-0 ${scrolls ? 'overflow-y-auto' : 'overflow-hidden'}${
-                slid.current.has(i) ? ' bab-arrived' : ''
-              }`}
+              scrolls={scrolls}
+              arrived={slid.current.has(i)}
               style={{
                 transform: `translate3d(${tx}px,0,0)`,
                 opacity,
@@ -227,7 +228,7 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
                   <Comp entered={role === 'in' && isSheet ? entered : true} />
                 </NavContext.Provider>
               </div>
-            </div>
+            </Layer>
           )
         })}
 
@@ -239,6 +240,38 @@ export function Prototype({ flow, boxed = false }: { flow: Flow; boxed?: boolean
         Si accende con ?dev=1.
       */}
       {new URLSearchParams(location.search).has('dev') && <FlowSwitcher flow={flow} index={index} />}
+    </div>
+  )
+}
+
+/**
+ * Uno schermo dentro la pila.
+ *
+ * E' un componente suo, e non un div nel mezzo del map, solo perche' il
+ * rimbalzo ai bordi ha bisogno di un riferimento all'elemento che scorre — e
+ * un hook non si puo' chiamare dentro un ciclo.
+ */
+function Layer({
+  scrolls,
+  arrived,
+  style,
+  children,
+}: {
+  scrolls: boolean
+  /** e' arrivato scorrendo: niente ingresso a scaglioni del contenuto */
+  arrived: boolean
+  style: CSSProperties
+  children: ReactNode
+}) {
+  const el = useRef<HTMLDivElement>(null)
+  useRubberBand(el, scrolls)
+  return (
+    <div
+      ref={el}
+      className={`absolute inset-0 ${scrolls ? 'overflow-y-auto' : 'overflow-hidden'}${arrived ? ' bab-arrived' : ''}`}
+      style={style}
+    >
+      {children}
     </div>
   )
 }
