@@ -537,6 +537,46 @@ expect(
   'Kept',
 )
 
+/* ------------------------------------------------------- il rimbalzo ai bordi */
+/*
+ * Questo controllo esiste perche' il rimbalzo era gia' passato una volta per
+ * funzionante senza esserlo: ascoltava gli eventi del puntatore, che il
+ * browser annulla appena decide che il gesto e' uno scorrimento. Serve il
+ * tocco vero via CDP, non eventi finti costruiti a mano.
+ */
+await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(400)
+await tapLabel('Steady')
+await tapCta()
+expect('si arriva a tune-in', await step(), 1)
+
+const pull = () =>
+  page.evaluate(() => {
+    const l = document.querySelector('.overflow-y-auto')
+    const c = l && l.firstElementChild
+    return c ? Math.round(new DOMMatrixReadOnly(getComputedStyle(c).transform).m42) : 0
+  })
+// portati in fondo e da li' tira ancora: e' li' che deve tendersi
+await page.evaluate(() => {
+  const l = document.querySelector('.overflow-y-auto')
+  l.scrollTop = l.scrollHeight
+})
+await page.waitForTimeout(200)
+const cx = 196
+let peak = 0
+await touch('touchStart', cx, 600)
+for (let i = 1; i <= 10; i++) {
+  await touch('touchMove', cx, 600 - i * 14)
+  await page.waitForTimeout(16)
+  const y = await pull()
+  if (Math.abs(y) > Math.abs(peak)) peak = y
+}
+await touch('touchEnd', cx, 460)
+expect('arrivati in fondo il contenuto si tende', peak < -30, true)
+await page.waitForTimeout(600)
+expect('...e al rilascio torna al suo posto', await pull(), 0)
+
 await browser.close()
 
 let bad = 0
