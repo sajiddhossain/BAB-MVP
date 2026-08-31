@@ -11,17 +11,19 @@ const ENERGY_GRADIENT =
 
 /**
  * Testo della pillola di lettura.
- * Figma mostra solo il caso 3: quello lo teniamo identico parola per parola,
- * gli altri sono segnaposto miei — copy da far validare.
+ * Figma mostra solo il caso 3, e quello e' identico parola per parola. Gli
+ * altri sei erano segnaposto a due parti, e si vedeva: il 3 ne aveva tre.
+ * Ora hanno tutti la stessa forma — numero, parola, frase.
  */
 const READOUT: Record<number, string> = {
-  1: '1 · Drained',
-  2: '2 · Running low',
+  1: '1 · Drained · Nothing left in the tank',
+  // accorciata: 'not much more' sforava la pillola di 22px (302 di larghezza)
+  2: '2 · Running low · Enough to finish, no more',
   3: '3 · A bit low · Something in between',
-  4: '4 · Steady',
-  5: '5 · Good',
-  6: '6 · Strong',
-  7: '7 · Still buzzing',
+  4: '4 · Steady · Held it together fine',
+  5: '5 · Good · More left than I expected',
+  6: '6 · Strong · Could go again',
+  7: '7 · Buzzing · Hard to switch off',
 }
 
 /** node 3590:4 — checkout-4-energy */

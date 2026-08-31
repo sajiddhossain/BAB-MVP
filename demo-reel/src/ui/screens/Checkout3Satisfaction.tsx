@@ -1,8 +1,11 @@
+import { useRef, useState } from 'react'
 import { Frame } from '../primitives/Frame'
 import { NavBar } from '../primitives/NavBar'
 import { CtaButton } from '../primitives/CtaButton'
 import { Touchable } from '../primitives/Touchable'
 import { useField, toggle } from '../state'
+import { Keyboard } from '../primitives/Keyboard'
+import { fakeKeyboard } from '../keyboard'
 import rotate from '../assets/icons/rotate-ccw.svg'
 import sad from '../assets/icons/face-sad.svg'
 import meh from '../assets/icons/face-meh.svg'
@@ -27,19 +30,33 @@ const FACES = [
 const DEFAULT_FACE = 'Satisfied'
 const DEFAULT_PILLS = ['Listened to my body', 'Showed kindness to myself']
 
+/** la pillola tratteggiata non e' una scelta dall'elenco: e' un campo */
+const OWN = 'Add your own...'
+
 const PILLS = [
   { w: 175, text: 'Learned something new' },
   { w: 156, text: 'Listened to my body' },
   { w: 149, text: 'Helped a teammate' },
   { w: 194, text: 'Showed kindness to myself' },
   { w: 142, text: 'Nailed an exercise' },
-  { w: 127, text: 'Add your own...', dashed: true },
+  { w: 127, text: OWN },
 ]
 
 /** node 3568:4 — checkout-3-satisfaction */
 export function Checkout3Satisfaction() {
   const [face, setFace] = useField<string | null>('checkout.face', DEFAULT_FACE)
   const [pills, setPills] = useField<readonly string[]>('checkout.takeHome', DEFAULT_PILLS)
+  /*
+   * "Add your own..." era un finto campo: sembrava scrivibile e non lo era.
+   * Ora lo e'. Il campo vero pero' compare solo quando lo tocchi: a riposo
+   * resta il testo di prima, identico al frame, e il confronto con Figma non
+   * si muove di un pixel.
+   */
+  const [own, setOwn] = useField('checkout.ownTakeHome', '')
+  const [editing, setEditing] = useState(false)
+  const kb = fakeKeyboard()
+  const ownBox = useRef<HTMLInputElement>(null)
+  const hasOwn = own.trim().length > 0
   return (
     <Frame>
       <NavBar progress={89 / 288} left={24} top={56} trackWidth={294} borderWidth="1px" inset={3} />
@@ -188,25 +205,38 @@ export function Checkout3Satisfaction() {
             style={{ left: 16.5, top: 60.5, width: 306 }}
           >
             {PILLS.map((p) => {
-              const on = !p.dashed && pills.includes(p.text)
+              const mine = p.text === OWN
+              const on = mine ? hasOwn && !editing : pills.includes(p.text)
               return (
               <Touchable
                 key={p.text}
                 className="flex shrink-0 items-center gap-[6px]"
-                onTap={p.dashed ? undefined : () => setPills(toggle(pills, p.text))}
-                press={p.dashed ? 1 : 0.96}
+                onTap={
+                  mine
+                    ? () => {
+                        setEditing(true)
+                        // il campo nasce ora: aspetta che ci sia prima di puntarlo
+                        requestAnimationFrame(() => ownBox.current?.focus({ preventScroll: true }))
+                      }
+                    : () => setPills(toggle(pills, p.text))
+                }
+                press={mine ? 0.98 : 0.96}
                 style={{
-                  width: p.w,
+                  // largo quanto il frame finche' e' vuoto e fermo; poi cresce
+                  width: mine ? (editing ? 306 : hasOwn ? 'auto' : p.w) : p.w,
+                  maxWidth: 306,
                   padding: '7px 10px 7px 9px',
                   borderRadius: 999,
                   boxSizing: 'border-box',
                   background: on ? '#e5f5f2' : '#f7f5f1',
-                  outline: `1.5px ${p.dashed ? 'dashed' : 'solid'} ${on ? '#10b981' : 'var(--bab-border)'}`,
+                  outline: `1.5px ${mine && !hasOwn && !editing ? 'dashed' : 'solid'} ${
+                    on ? '#10b981' : editing && mine ? '#10b981' : 'var(--bab-border)'
+                  }`,
                   outlineOffset: -1.5,
                 }}
               >
                 <div className="relative shrink-0" style={{ width: 16, height: 16 }}>
-                  {p.dashed ? (
+                  {mine && !on ? (
                     <img src={pencil} alt="" className="absolute" style={{ left: 1, top: 1, width: 14, height: 14 }} />
                   ) : on ? (
                     <>
@@ -217,19 +247,43 @@ export function Checkout3Satisfaction() {
                     <img src={checkEmpty} alt="" className="absolute inset-0" style={{ width: 16, height: 16 }} />
                   )}
                 </div>
-                <p
-                  style={{
-                    flex: '1 0 0',
-                    minWidth: 0,
-                    fontSize: 11.5,
-                    lineHeight: '14px',
-                    margin: 0,
-                    fontWeight: on ? 700 : 400,
-                    color: on ? '#0b7a5a' : p.dashed ? 'var(--bab-ink-soft)' : 'var(--bab-ink)',
-                  }}
-                >
-                  {p.text}
-                </p>
+                {mine && editing ? (
+                  <input
+                    ref={ownBox}
+                    className="bab-field"
+                    value={own}
+                    placeholder={OWN}
+                    onChange={(e) => setOwn(e.target.value)}
+                    onBlur={() => setEditing(false)}
+                    onPointerDown={(e) => e.stopPropagation()}
+                    /* con la nostra tastiera accesa non deve salire quella di iOS */
+                    inputMode={kb ? 'none' : undefined}
+                    style={{
+                      flex: '1 0 0',
+                      minWidth: 0,
+                      fontSize: 11.5,
+                      lineHeight: '14px',
+                      margin: 0,
+                      fontFamily: 'inherit',
+                      color: 'var(--bab-ink)',
+                    }}
+                  />
+                ) : (
+                  <p
+                    style={{
+                      flex: '1 0 0',
+                      minWidth: 0,
+                      fontSize: 11.5,
+                      lineHeight: '14px',
+                      margin: 0,
+                      whiteSpace: mine && on ? 'nowrap' : undefined,
+                      fontWeight: on ? 700 : 400,
+                      color: on ? '#0b7a5a' : mine ? 'var(--bab-ink-soft)' : 'var(--bab-ink)',
+                    }}
+                  >
+                    {mine ? (hasOwn ? own : OWN) : p.text}
+                  </p>
+                )}
               </Touchable>
               )
             })}
@@ -238,6 +292,8 @@ export function Checkout3Satisfaction() {
       </div>
 
       <CtaButton label="Now let’s tune in" left={24} top={778} width={354} shadowTop={4} labelColor="var(--bab-ink)" labelCenter={175.5} enabled={!!face} />
+
+      {kb && <Keyboard open={editing} value={own} onChange={setOwn} onDone={() => ownBox.current?.blur()} />}
     </Frame>
   )
 }

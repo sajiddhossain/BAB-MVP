@@ -7,6 +7,7 @@ import type { Side } from '../primitives/BodyMap'
 import { useField } from '../state'
 import { useNav } from '../../proto/nav'
 import { SomewhereElse } from '../primitives/SomewhereElse'
+import { ElsewhereSpot } from '../primitives/ElsewhereSpot'
 import gps from '../assets/icons/gps.svg'
 
 /** costante di modulo: un array nuovo a ogni render manderebbe lo store in loop */
@@ -93,6 +94,21 @@ export function Checkin3BodyMap({ spots = 2, pending = null }: { spots?: number;
         }}
       />
 
+      {/*
+        Il punto fuori dal disegno. La card finisce a 705: 12 di margine e
+        un'altezza di 26 lo mettono a 667, nell'angolo che la figura non usa.
+      */}
+      {picked.includes(ELSEWHERE) && (
+        <ElsewhereSpot
+          left={32}
+          top={667}
+          onTap={() => {
+            setLast(ELSEWHERE)
+            nav?.next()
+          }}
+        />
+      )}
+
       <p
         className="absolute"
         style={{ left: 20, top: 726, width: 362, fontSize: 13, lineHeight: '18px', color: 'var(--bab-ink)', margin: 0 }}
@@ -115,7 +131,7 @@ export function Checkin3BodyMap({ spots = 2, pending = null }: { spots?: number;
         className="absolute whitespace-nowrap font-bold"
         style={{ left: 153, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
-        {base + picked.length} spots added
+        {base + picked.length} spot{base + picked.length === 1 ? '' : 's'} added
       </p>
     </Frame>
   )

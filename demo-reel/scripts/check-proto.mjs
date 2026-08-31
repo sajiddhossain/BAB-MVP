@@ -204,7 +204,7 @@ expect('siamo sulla body map', await step(), 2)
 expect(
   'il contatore parte da zero',
   await page.evaluate(() =>
-    [...document.querySelectorAll('p')].find((e) => /spots added/.test(e.textContent))?.textContent,
+    [...document.querySelectorAll('p')].find((e) => /spots? added/.test(e.textContent))?.textContent,
   ),
   '0 spots added',
 )
@@ -224,7 +224,7 @@ const onBody = async (zoneId) =>
 
 const spots = () =>
   page.evaluate(() =>
-    [...document.querySelectorAll('p')].find((e) => /spots added/.test(e.textContent))?.textContent,
+    [...document.querySelectorAll('p')].find((e) => /spots? added/.test(e.textContent))?.textContent,
   )
 
 await tap(...(await onBody('quad-r')))
@@ -336,7 +336,7 @@ expect('e si riapre', (await state())['checkin.spot.quad-r.help'], true)
   await page.waitForFunction(() => !window.__moving, null, { timeout: 4000 })
 }
 expect('...poi salva il punto e riporta alla mappa', await step(), 2)
-expect('...e ora il contatore conta', await spots(), '1 spots added')
+expect('...e ora il contatore conta', await spots(), '1 spot added')
 
 await tap(...(await onBody('quad-r')))
 expect('ritoccando un punto salvato si riapre', await step(), 3)
@@ -416,6 +416,125 @@ expect(
     return p.parentElement.getBoundingClientRect().bottom < cta.getBoundingClientRect().top
   }),
   true,
+)
+
+/* ------------------------------------------------ la tastiera e i campi veri */
+/*
+ * ?kb=1 accende la tastiera disegnata da noi anche qui: senza, il controllo
+ * dipenderebbe dal fatto che il browser di prova finga di essere un telefono.
+ */
+await page.goto(`${BASE}/?flow=checkin&kb=1`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(400)
+await tapLabel('Steady')
+await tapCta()
+await tapLabel('6–7h')
+await tapCta()
+expect('si arriva alla mappa', await step(), 2)
+
+const somewhere = () =>
+  page.evaluate(
+    () =>
+      !![...document.querySelectorAll('p')].find(
+        (e) => e.textContent.trim() === 'Somewhere else' && e.style.fontSize === '11.5px',
+      ),
+  )
+const counter = () =>
+  page.evaluate(
+    () => [...document.querySelectorAll('p')].find((e) => /spots? added/.test(e.textContent))?.textContent,
+  )
+
+expect('un punto fuori dal disegno non si vede ancora', await somewhere(), false)
+await tapLabel('Somewhere else')
+expect('...ma il pannello si apre lo stesso', await step(), 3)
+
+const kbTop = () =>
+  page.evaluate(() => {
+    const k = document.querySelector('[data-key="q"]')
+    return k ? Math.round(k.getBoundingClientRect().top) : null
+  })
+/* la tastiera sta sempre nel DOM: da chiusa e' spinta sotto il bordo */
+const kbChiusa = async () => (await kbTop()) > 852
+expect('a riposo la tastiera sta fuori schermo', await kbChiusa(), true)
+await page.evaluate(() => {
+  const t = document.querySelector('textarea')
+  const r = t.getBoundingClientRect()
+  const f = (ty) =>
+    t.dispatchEvent(
+      new PointerEvent(ty, {
+        bubbles: true,
+        cancelable: true,
+        clientX: r.x + 20,
+        clientY: r.y + 10,
+        pointerId: 1,
+        pointerType: 'touch',
+        isPrimary: true,
+      }),
+    )
+  f('pointerdown')
+  f('pointerup')
+})
+await page.waitForTimeout(500)
+expect('toccando il campo la tastiera sale', (await kbTop()) < 852, true)
+
+const pressKey = async (id) => {
+  await page.evaluate((k) => {
+    const el = [...document.querySelectorAll('[data-key]')].find((e) => e.dataset.key === k)
+    const f = (ty) =>
+      el.dispatchEvent(
+        new PointerEvent(ty, { bubbles: true, cancelable: true, pointerId: 1, pointerType: 'touch', isPrimary: true }),
+      )
+    f('pointerdown')
+    f('pointerup')
+  }, id)
+  await page.waitForTimeout(60)
+}
+for (const c of ['s', 'o', 'r', 'e']) await pressKey(c)
+const written = () => page.evaluate(() => document.querySelector('textarea').value)
+expect('i tasti scrivono, col maiuscolo a inizio frase', await written(), 'Sore')
+await pressKey('backspace')
+expect('...e si cancella', await written(), 'Sor')
+await pressKey('Done')
+await page.waitForTimeout(500)
+expect('"Done" fa scendere la tastiera', await kbChiusa(), true)
+
+await tapLabel('tight')
+await tapCta()
+expect('confermando si torna alla mappa', await step(), 2)
+expect('...e ora il punto fuori dal disegno si vede', await somewhere(), true)
+expect('...e il contatore sta al singolare', await counter(), '1 spot added')
+await tapLabel('Somewhere else')
+expect('...e toccandolo si riapre il pannello', await step(), 3)
+
+/* ---------------------------------------- "Add your own" e' un campo, non un finto */
+await page.goto(`${BASE}/?flow=checkout&kb=1`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(400)
+await tapLabel('Gentle')
+for (let i = 0; i < 6; i++) {
+  const trovato = await page.evaluate(
+    () => !![...document.querySelectorAll('p')].find((p) => p.textContent.trim() === 'Add your own...'),
+  )
+  if (trovato) break
+  await tapCta()
+}
+expect(
+  'si arriva a "What did you bring home?"',
+  await page.evaluate(
+    () => !![...document.querySelectorAll('p')].find((p) => p.textContent.trim() === 'Add your own...'),
+  ),
+  true,
+)
+expect('a riposo non e un campo', await page.evaluate(() => !!document.querySelector('input.bab-field')), false)
+await tapLabel('Add your own...')
+expect('toccandolo diventa un campo vero', await page.evaluate(() => !!document.querySelector('input.bab-field')), true)
+for (const c of ['k', 'e', 'p', 't']) await pressKey(c)
+await pressKey('Done')
+await page.waitForTimeout(400)
+expect(
+  'le tue parole diventano una pillola tua',
+  await page.evaluate(() => (window.__babState() || {})['checkout.ownTakeHome']),
+  'Kept',
 )
 
 await browser.close()

@@ -17,6 +17,7 @@ export function fakeKeyboard(): boolean {
   const q = new URLSearchParams(window.location.search)
   // il probe del diff fotografa schermi a riposo: nessuna tastiera, mai
   if (q.has('probe')) return (cached = false)
-  if (q.has('reel')) return (cached = true)
+  // ?kb=1: la accende comunque, serve ai controlli automatici
+  if (q.has('reel') || q.get('kb') === '1') return (cached = true)
   return (cached = navigator.maxTouchPoints === 0)
 }
