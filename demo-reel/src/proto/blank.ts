@@ -36,6 +36,8 @@ const BLANK: Record<string, unknown> = {
   'checkin.school': MID_302,
   'checkin.sleepDuration': null,
   'checkin.spotsBase': 0,
+  'checkin.period': null,
+  'checkin.painRelief': null,
 
   // check-out
   'checkout.tempo': null,

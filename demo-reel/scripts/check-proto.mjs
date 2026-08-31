@@ -79,9 +79,21 @@ async function tapCta() {
  */
 async function tapLabel(text) {
   const box = await page.evaluate((t) => {
-    const el = [...document.querySelectorAll('p')].find((e) => e.textContent.trim() === t)
-    if (!el) return null
-    const r = (el.closest('.bab-touch') ?? el).getBoundingClientRect()
+    const p = [...document.querySelectorAll('p')].find((e) => e.textContent.trim() === t)
+    if (!p) return null
+    /*
+     * La scritta non sta sempre DENTRO al comando: le faccine di checkout-3
+     * hanno il nome come sorella del bottone, e mirare alla scritta voleva
+     * dire toccare nove pixel di testo invece del bersaglio. Se non e'
+     * dentro, si sale finche' non si trova un antenato con un comando solo.
+     */
+    let el = p.closest('.bab-touch')
+    for (let n = p.parentElement; n && !el; n = n.parentElement) {
+      const vicini = n.querySelectorAll('.bab-touch')
+      if (vicini.length === 1) el = vicini[0]
+      else if (vicini.length > 1) break
+    }
+    const r = (el ?? p).getBoundingClientRect()
     return { x: r.x + r.width / 2, y: r.y + r.height / 2 }
   }, text)
   if (!box) throw new Error('nessun comando con la scritta: ' + text)
@@ -538,6 +550,34 @@ expect(
   await page.evaluate(() => (window.__babState() || {})['checkout.ownTakeHome']),
   'Kept',
 )
+
+/* ------------------------- l'ultima domanda del check-out si vede quando scegli */
+/*
+ * Era l'unico comando dell'app in cui "scelto" cambiava solo il colore di un
+ * testo da 12px: si toccava e sembrava non fosse successo niente.
+ */
+await page.goto(`${BASE}/?flow=checkout`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(400)
+await tapLabel('Gentle')
+await tapCta() // -> il confronto
+await tapCta() // -> effort
+await tapCta() // -> satisfaction
+await tapLabel('Proud') // il bottone li' e' chiuso finche' non scegli una faccia
+await tapCta() // -> energy
+await tapCta() // -> la mappa
+await tapCta() // -> la lettura finale
+expect('si arriva alla lettura finale', await step(), 7)
+const sfondoNo = () =>
+  page.evaluate(() => {
+    const el = [...document.querySelectorAll('.bab-touch')].find((e) => e.textContent.trim() === 'No')
+    return el ? getComputedStyle(el).backgroundColor : null
+  })
+const primaDelTocco = await sfondoNo()
+await tapLabel('No')
+const dopoIlTocco = await sfondoNo()
+expect('scegliendo, il bottone cambia davvero aspetto', primaDelTocco !== dopoIlTocco, true)
+expect('...e prende il verde delle altre scelte', dopoIlTocco, 'rgb(229, 245, 242)')
 
 /* ------------------ la lettura finale parla del punto che hai segnato davvero */
 await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })

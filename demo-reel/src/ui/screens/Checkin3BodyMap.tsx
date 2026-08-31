@@ -128,8 +128,13 @@ export function Checkin3BodyMap({ spots = 2, pending = null }: { spots?: number;
       <CtaButton label="Almost done" left={31} top={778} width={342} labelTop={15.5} onTap={() => nav?.go(2)} />
 
       <p
-        className="absolute whitespace-nowrap font-bold"
-        style={{ left: 153, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
+        /*
+         * Centrato, non ancorato a 153: quel numero e' la posizione di
+         * "2 spots added", ma con "1 spot added" — due caratteri in meno —
+         * la scritta restava storta di qualche pixel verso destra.
+         */
+        className="absolute w-full whitespace-nowrap text-center font-bold"
+        style={{ left: 0, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
         {base + picked.length} spot{base + picked.length === 1 ? '' : 's'} added
       </p>

@@ -193,14 +193,12 @@ function ContextCard({
   toggleTop: number
 }) {
   /*
-   * Erano le uniche due domande del prototipo che partivano gia' risposte:
-   * "On your period?" su Yes e "Taken pain relief?" su No, perche' e' cosi'
-   * che stanno nel frame. Ma il prototipo parte da foglio bianco, e vederle
-   * gia' spuntate diceva che quelle caselle non contano. Il valore del frame
-   * resta per il confronto con Figma, che non passa da qui.
+   * Erano le uniche due domande del prototipo che partivano gia' risposte,
+   * perche' e' cosi' che stanno nel frame. Il vuoto ora lo mette blank.ts,
+   * come tutti gli altri; qui resta il valore del frame, che serve al
+   * confronto con Figma.
    */
-  const [blank] = useField('proto.blank', false)
-  const [value, setValue] = useField<'Yes' | 'No' | null>(field, blank ? null : fallback)
+  const [value, setValue] = useField<'Yes' | 'No' | null>(field, fallback)
 
   const tab = (label: 'Yes' | 'No', left: number, labelLeft: number) => {
     const on = value === label

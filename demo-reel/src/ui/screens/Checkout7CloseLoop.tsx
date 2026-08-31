@@ -192,8 +192,8 @@ export function Checkout7CloseLoop() {
                   width: 146,
                   height: 28,
                   borderRadius: 100,
-                  background: 'var(--bab-surface)',
-                  border: 'var(--bab-border-w) solid var(--bab-border)',
+                  background: on ? '#e5f5f2' : 'var(--bab-surface)',
+                  border: `var(--bab-border-w) solid ${on ? '#4ab5a0' : 'var(--bab-border)'}`,
                   boxSizing: 'border-box',
                 }}
               >

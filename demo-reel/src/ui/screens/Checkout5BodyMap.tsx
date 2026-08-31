@@ -122,8 +122,13 @@ export function Checkout5BodyMap({ spots = 1, pending = null }: { spots?: number
       <CtaButton label="Next" left={31} top={778} width={342} labelTop={15.5} onTap={() => nav?.go(2)} />
 
       <p
-        className="absolute whitespace-nowrap font-bold"
-        style={{ left: 154, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
+        /*
+         * Centrato, non ancorato a 154: quel numero e' la posizione di
+         * "1 spots added" del frame, ma appena il conto cambia — o si toglie
+         * la esse di troppo — la scritta resta storta.
+         */
+        className="absolute w-full whitespace-nowrap text-center font-bold"
+        style={{ left: 0, top: 841, fontSize: 14, lineHeight: 'normal', margin: 0, color: '#866bf2' }}
       >
         {base + picked.length} spot{base + picked.length === 1 ? '' : 's'} added
       </p>
