@@ -1,7 +1,1 @@
-node_modules
-dist
-out/*.mp4
-out/*.gif
-out/*.png
-.DS_Store
-out/diff
+out/
