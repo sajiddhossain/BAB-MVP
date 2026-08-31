@@ -8,6 +8,8 @@ import bulletCoral from '../assets/icons/bullet-coral.svg'
 import chevron from '../assets/icons/chevron-down-18.svg'
 import { Touchable } from '../primitives/Touchable'
 import { useField } from '../state'
+import { labelOf, ELSEWHERE } from '../primitives/BodyMap'
+import { valueFromThumb } from '../primitives/Slider'
 
 /*
  * Il contenuto di "Try this today".
@@ -43,8 +45,41 @@ const ACHES = [
 ]
 
 /** node 3554:4 — checkin-5-make-sense */
+/** costante di modulo: un array nuovo a ogni render manda lo store in loop */
+const NO_CHIPS: string[] = []
+/** lo slider dell'intensita' nel pannello e' largo 370 e va da 1 a 10 */
+const INTENSITY_W = 370
+
 export function Checkin5MakeSense() {
   const [open, setOpen] = useField('checkin.tryToday', false)
+  /*
+   * Il titolo e il riepilogo erano due stringhe fisse copiate dal frame:
+   * dicevano "About that right quad." e "tight · sore · burning | one side |
+   * 4/10" qualunque cosa avessi segnato e scritto. Ed e' la schermata su cui
+   * il giro si chiude, cioe' l'ultimo posto dove puoi permetterti di mentire.
+   *
+   * Senza un punto segnato — il caso del confronto con Figma, che non passa
+   * dallo store — restano le parole del frame.
+   */
+  const [last] = useField<string | null>('checkin.lastZone', null)
+  const key = last ? `checkin.spot.${last}` : 'checkin.spot.nessuno'
+  const [chips] = useField<readonly string[]>(`${key}.chips`, NO_CHIPS)
+  const [side] = useField<'Yes' | 'No' | null>(`${key}.side`, null)
+  /* lo stesso valore di partenza del pannello: lo slider una posizione ce
+     l'ha sempre, anche se non l'hai spostato, quindi va riportata */
+  const [thumb] = useField(`${key}.intensity`, 173)
+
+  const zona = last === ELSEWHERE ? 'Somewhere else' : (labelOf(last) ?? 'Right quad')
+  const titolo = last
+    ? last === ELSEWHERE
+      ? 'About that spot.'
+      : `About that ${zona.toLowerCase()}.`
+    : 'About that right quad.'
+  const pezzi: string[] = []
+  if (chips.length) pezzi.push(chips.join(' · '))
+  if (side) pezzi.push(side === 'No' ? 'both sides' : 'one side')
+  if (last) pezzi.push(`${valueFromThumb(thumb, INTENSITY_W, 1, 10)}/10`)
+  const riepilogo = last && pezzi.length ? pezzi.join('  |  ') : 'tight · sore · burning  |  one side  |  4/10'
   return (
     <Frame width={404}>
       <NavBar progress={289 / 293} left={25} top={54} trackWidth={298} />
@@ -61,7 +96,7 @@ export function Checkin5MakeSense() {
         className="bab-font-display absolute font-bold"
         style={{ left: 25, top: 154, width: 354, fontSize: 30, lineHeight: '36px', letterSpacing: '-0.6px', color: 'var(--bab-ink)', margin: 0 }}
       >
-        About that right quad.
+        {titolo}
       </p>
 
       {/* riepilogo del punto scelto */}
@@ -73,13 +108,13 @@ export function Checkin5MakeSense() {
           <img src={pin} alt="" className="absolute" style={{ left: 9, top: 9, width: 24, height: 24 }} />
         </div>
         <p className="absolute whitespace-nowrap font-bold" style={{ left: 66.5, top: 13.5, fontSize: 16, color: 'var(--bab-ink)', lineHeight: 'normal', margin: 0 }}>
-          Right quad
+          {zona}
         </p>
         <p
           className="absolute"
           style={{ left: 66.5, top: 34.5, fontSize: 12, color: 'var(--bab-ink-mute)', lineHeight: 'normal', margin: 0, whiteSpace: 'pre' }}
         >
-          {'tight · sore · burning  |  one side  |  4/10'}
+          {riepilogo}
         </p>
       </div>
 

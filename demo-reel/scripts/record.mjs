@@ -262,6 +262,30 @@ const findCta = (page) =>
     return { x: r.x + r.width / 2, y: r.y + Math.min(28, r.height / 2) }
   })
 
+/**
+ * Il "Sì" o il "No" di UNA domanda precisa.
+ *
+ * Su tune-in ci sono due coppie affiancate — "On your period?" e "Taken pain
+ * relief?" — e cercare il comando che dice "No" prendeva sempre quello della
+ * prima. Qui si parte dalla domanda e si prende la risposta piu' vicina fra
+ * quelle che le stanno sotto o accanto.
+ */
+const findAnswer = (page, question, pick) =>
+  page.evaluate(([q, want]) => {
+    const dom = [...document.querySelectorAll('p')].find((p) => p.textContent.trim() === q)
+    if (!dom) return null
+    const a = dom.getBoundingClientRect()
+    let best = null
+    for (const el of document.querySelectorAll('.bab-touch')) {
+      if (el.textContent.trim() !== want) continue
+      const r = el.getBoundingClientRect()
+      if (r.top < a.top - 4) continue
+      const d = Math.abs(r.left - a.left) + (r.top - a.top) * 2
+      if (!best || d < best.d) best = { d, x: r.x + r.width / 2, y: r.y + r.height / 2 }
+    }
+    return best ? { x: best.x, y: best.y } : null
+  }, [question, pick])
+
 const findZone = (page, id) =>
   page.evaluate((z) => {
     // data-zone ce l'ha solo la figura che si vede: le due sono sovrapposte
@@ -349,7 +373,7 @@ async function playScript(page, cdp, steps, log) {
    */
   const travelMs = (to, fast) => {
     const d = Math.hypot(to.x - hand.x, to.y - hand.y) / SCALE
-    return fast ? Math.min(88, 36 + d * 0.22) : Math.max(185, Math.min(460, 150 + d * 0.36))
+    return fast ? Math.min(105, 44 + d * 0.26) : Math.max(230, Math.min(620, 190 + d * 0.46))
   }
   const goTo = async (pt, fast = false) => {
     const d = Math.hypot(pt.x - hand.x, pt.y - hand.y) / SCALE
@@ -365,14 +389,14 @@ async function playScript(page, cdp, steps, log) {
   const pressHere = async (pt, fast = false) => {
     await g.press(true)
     await touch('touchStart', pt.x, pt.y)
-    await wait(about(fast ? 32 : 70))
+    await wait(about(fast ? 40 : 90))
     await touch('touchEnd', pt.x, pt.y)
     await g.press(false)
   }
   const tapAt = async (pt, { hover = 0, fast = false } = {}) => {
     const t = near(pt)
     await goTo(t, fast)
-    await pause(hover || (fast ? 14 : 55))
+    await pause(hover || (fast ? 20 : 80))
     await pressHere(t, fast)
   }
 
@@ -404,6 +428,10 @@ async function playScript(page, cdp, steps, log) {
             : await findZone(page, s.zone)
       if (!pt) log(`  ⚠ non trovato: ${JSON.stringify(s)} (${await dove()})`)
       else await tapAt(pt, { hover: s.hover })
+    } else if (s.answer) {
+      const pt = await findAnswer(page, s.answer.q, s.answer.pick)
+      if (!pt) log(`  ⚠ risposta non trovata: ${JSON.stringify(s.answer)} (${await dove()})`)
+      else await tapAt(pt, { hover: s.hover })
     } else if (s.hesitate) {
       /*
        * Il dito va verso la risposta che si aspettava, si ferma, e sceglie
@@ -432,7 +460,7 @@ async function playScript(page, cdp, steps, log) {
         await pause(120)
         await g.press(true)
         await touch('touchStart', x0, y)
-        const N = 18
+        const N = 22
         for (let i = 1; i <= N; i++) {
           const t = i / N
           /* frena verso la fine e sfonda di un soffio: poi si assesta */
@@ -441,11 +469,11 @@ async function playScript(page, cdp, steps, log) {
           const x = x0 + (x1 - x0) * (e + over)
           await touch('touchMove', x, y)
           await g.at(x, y)
-          await wait(about(20))
+          await wait(about(26))
         }
         await touch('touchMove', x1, y)
         await g.at(x1, y)
-        await wait(60)
+        await wait(110)
         await touch('touchEnd', x1, y)
         await g.press(false)
         hand = { x: x1, y }
@@ -456,7 +484,7 @@ async function playScript(page, cdp, steps, log) {
       else {
         if (!f.gia) {
           await tapAt(f)
-          await pause(460) // la tastiera sale
+          await pause(600) // la tastiera sale
         }
         let prima = null
         for (const ch of s.write) {
@@ -465,10 +493,10 @@ async function playScript(page, cdp, steps, log) {
           if (!pt) continue
           await tapAt(pt, { fast: true })
           /* dentro una parola si corre, fra una parola e l'altra si respira */
-          await pause(ch === ' ' ? 24 : prima === ' ' ? 100 : 26)
+          await pause(ch === ' ' ? 34 : prima === ' ' ? 130 : 34)
           prima = ch
         }
-        await pause(520)
+        await pause(700)
         const done = await findKey('Done')
         if (done) await tapAt(done)
       }
@@ -485,14 +513,17 @@ async function playScript(page, cdp, steps, log) {
       await pause(90)
       await g.press(true)
       await touch('touchStart', x, y0)
-      const N = 20
+      const N = 26
       for (let i = 1; i <= N; i++) {
         const t = i / N
-        const y = y0 + (y1 - y0) * (1 - Math.pow(1 - t, 1.7))
+        const y = y0 + (y1 - y0) * (1 - Math.pow(1 - t, 2.1))
         await touch('touchMove', x, y)
         await g.at(x, y)
-        await wait(about(14))
+        await wait(about(26))
       }
+      /* un attimo fermo prima di staccare: cosi' si legge dove sei arrivato,
+         invece di lanciare e vedere lo schermo sfilare via */
+      await wait(140)
       await touch('touchEnd', x, y1)
       await g.press(false)
       hand = { x, y: y1 }
@@ -557,8 +588,28 @@ async function recordClip(browser, clipId) {
 
   process.stdout.write(`\n▶ ${clipId}\n`)
   await playScript(page, cdp, SCRIPTS[clipId], (m) => process.stdout.write(`${m}\n`))
+  /*
+   * Chrome manda un fotogramma solo quando la pagina cambia, e non ne manda
+   * un altro finche' non hai confermato il precedente. Alla fine del copione
+   * la pagina si ferma di colpo: l'ultimo stato — la mano gia' uscita di
+   * scena — non partiva mai, e il video finiva tre secondi prima, con il dito
+   * ancora a mezz'aria. Qui si muove un quadratino invisibile per un po', cosi'
+   * Chrome ha di che mandare e l'ultima inquadratura arriva davvero.
+   */
+  await page.evaluate(async () => {
+    const nudge = document.createElement('div')
+    nudge.style.cssText =
+      'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0.01;background:#000;pointer-events:none;z-index:0'
+    document.body.appendChild(nudge)
+    for (let i = 0; i < 48; i++) {
+      nudge.style.transform = `translateX(${i % 2}px)`
+      await new Promise((r) => requestAnimationFrame(r))
+    }
+    nudge.remove()
+  })
+  await page.waitForTimeout(300)
   await cdp.send('Page.stopScreencast')
-  await page.waitForTimeout(200)
+  await page.waitForTimeout(300)
 
   if (frames.length < 2) throw new Error('Chrome non ha mandato fotogrammi')
   const shots = resample(frames, FPS)

@@ -539,6 +539,61 @@ expect(
   'Kept',
 )
 
+/* ------------------ la lettura finale parla del punto che hai segnato davvero */
+await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(400)
+await tapLabel('Steady')
+await tapCta()
+await tapLabel('6–7h')
+await tapCta()
+await tap(...(await onBody('chest-l')))
+await tapLabel('strong')
+await tapCta() // salva il punto
+await tapCta() // -> la lettura
+const testo = (px) =>
+  page.evaluate(
+    (s) =>
+      [...document.querySelectorAll('p')]
+        .find((e) => Math.round(parseFloat(getComputedStyle(e).fontSize)) === s)
+        ?.textContent.trim(),
+    px,
+  )
+expect('il titolo nomina la zona che hai segnato', await testo(30), 'About that left chest.')
+expect(
+  '...e il riepilogo porta quello che hai scelto',
+  await page.evaluate(
+    () => [...document.querySelectorAll('p')].map((e) => e.textContent.trim()).find((t) => t.includes('|')),
+  ),
+  'strong  |  6/10',
+)
+
+/* ------------------------------- anche le due domande in fondo partono in bianco */
+await page.goto(`${BASE}/?flow=checkin`, { waitUntil: 'networkidle' })
+await page.evaluate(() => document.fonts.ready)
+await page.waitForTimeout(400)
+await tapLabel('Steady')
+await tapCta()
+const sceltePresenti = () =>
+  page.evaluate(
+    () =>
+      [...document.querySelectorAll('.bab-touch')].filter((el) => {
+        const t = el.textContent.trim()
+        if (t !== 'Yes' && t !== 'No') return false
+        const p = el.querySelector('p')
+        return p && getComputedStyle(p).color === 'rgb(134, 107, 242)'
+      }).length,
+  )
+expect('nessuna delle due domande parte gia risposta', await sceltePresenti(), 0)
+// stanno in fondo a uno schermo lungo 1262: senza scorrere il tocco cade altrove
+await page.evaluate(() => {
+  const l = document.querySelector('.overflow-y-auto')
+  l.scrollTop = l.scrollHeight
+})
+await page.waitForTimeout(300)
+await tapLabel('No')
+expect('...e rispondendo se ne accende una', await sceltePresenti(), 1)
+
 /* --------------------------------------- un punto sta sul suo lato, non su entrambi */
 /*
  * Diciannove zone su trentatre portano lo stesso nome davanti e dietro
