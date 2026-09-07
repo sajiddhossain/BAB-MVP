@@ -1,0 +1,3726 @@
+{
+  "fileKey": "TA3cGQAArcaxt4tnCSQWJw",
+  "frame": 372,
+  "frames": [
+    {
+      "nome": "01 · Entra in BAB",
+      "famiglia": "altro",
+      "nodeId": "3321:6",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-6&m=dev",
+      "x": -2964,
+      "y": 49091,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "02 · Oggi",
+      "famiglia": "altro",
+      "nodeId": "3321:7",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-7&m=dev",
+      "x": -2524,
+      "y": 49091,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "03 · Check-in · una domanda per schermata",
+      "famiglia": "altro",
+      "nodeId": "3321:8",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-8&m=dev",
+      "x": -2084,
+      "y": 49091,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "04 · La mappa corporea",
+      "famiglia": "altro",
+      "nodeId": "3321:9",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-9&m=dev",
+      "x": -1644,
+      "y": 49091,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "05 · Il foglio della zona",
+      "famiglia": "altro",
+      "nodeId": "3321:10",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-10&m=dev",
+      "x": -1178,
+      "y": 49086,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "06 · Il mio corpo",
+      "famiglia": "altro",
+      "nodeId": "3321:11",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-11&m=dev",
+      "x": -2964,
+      "y": 50051,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "07 · Me",
+      "famiglia": "altro",
+      "nodeId": "3321:12",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-12&m=dev",
+      "x": -2524,
+      "y": 50051,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "08 · Tu e i tuoi dati",
+      "famiglia": "altro",
+      "nodeId": "3321:13",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-13&m=dev",
+      "x": -2084,
+      "y": 50051,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "09 · Console admin · Battito",
+      "famiglia": "altro",
+      "nodeId": "3321:14",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-14&m=dev",
+      "x": -1644,
+      "y": 50040,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "10 · Come sta l'app",
+      "famiglia": "altro",
+      "nodeId": "3321:15",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3321-15&m=dev",
+      "x": -1178,
+      "y": 50040,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "iPhone 16 & 17 Pro - 1",
+      "famiglia": "altro",
+      "nodeId": "3427:140",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3427-140&m=dev",
+      "x": 4972,
+      "y": 48793,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "welcome-bab",
+      "famiglia": "altro",
+      "nodeId": "3958:182",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-182&m=dev",
+      "x": -17416,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "welcome-bab",
+      "famiglia": "altro",
+      "nodeId": "3472:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3472-4&m=dev",
+      "x": 359,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "welcome-to-bab",
+      "famiglia": "altro",
+      "nodeId": "3461:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3461-4&m=dev",
+      "x": 14172,
+      "y": 47234,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "bl-call",
+      "famiglia": "body-language",
+      "nodeId": "3941:400",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-400&m=dev",
+      "x": -15763,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:2391",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2391&m=dev",
+      "x": -9966,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-done",
+      "famiglia": "body-language",
+      "nodeId": "3941:469",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-469&m=dev",
+      "x": -15321,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:2477",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2477&m=dev",
+      "x": -9524,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3941:330",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-330&m=dev",
+      "x": -14879,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:2307",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2307&m=dev",
+      "x": -9082,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-call",
+      "famiglia": "body-language",
+      "nodeId": "3941:737",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-737&m=dev",
+      "x": -14879,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:479",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-479&m=dev",
+      "x": -9082,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-done",
+      "famiglia": "body-language",
+      "nodeId": "3941:811",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-811&m=dev",
+      "x": -14437,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:552",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-552&m=dev",
+      "x": -8640,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3941:675",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-675&m=dev",
+      "x": -13995,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:392",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-392&m=dev",
+      "x": -8198,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-match",
+      "famiglia": "body-language",
+      "nodeId": "3941:630",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-630&m=dev",
+      "x": -13553,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:339",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-339&m=dev",
+      "x": -7756,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-meet-achy",
+      "famiglia": "body-language",
+      "nodeId": "3941:603",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-603&m=dev",
+      "x": -13111,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-meet-achy",
+      "famiglia": "body-language",
+      "nodeId": "4049:310",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-310&m=dev",
+      "x": -7314,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-meet-sore",
+      "famiglia": "body-language",
+      "nodeId": "3941:576",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-576&m=dev",
+      "x": -12669,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-meet-sore",
+      "famiglia": "body-language",
+      "nodeId": "4049:282",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-282&m=dev",
+      "x": -6872,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3941:771",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-771&m=dev",
+      "x": -12227,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:520",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-520&m=dev",
+      "x": -6430,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-story",
+      "famiglia": "body-language",
+      "nodeId": "3941:703",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-703&m=dev",
+      "x": -16205,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l2-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:435",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-435&m=dev",
+      "x": -10408,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-call",
+      "famiglia": "body-language",
+      "nodeId": "3941:1051",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-1051&m=dev",
+      "x": -15763,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:775",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-775&m=dev",
+      "x": -9966,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-done",
+      "famiglia": "body-language",
+      "nodeId": "3941:1125",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-1125&m=dev",
+      "x": -15321,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:845",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-845&m=dev",
+      "x": -9524,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3941:981",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-981&m=dev",
+      "x": -14879,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:695",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-695&m=dev",
+      "x": -9082,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-match",
+      "famiglia": "body-language",
+      "nodeId": "3941:931",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-931&m=dev",
+      "x": -14437,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:646",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-646&m=dev",
+      "x": -8640,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-meet-stiff",
+      "famiglia": "body-language",
+      "nodeId": "3941:893",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-893&m=dev",
+      "x": -13995,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-meet-stiff",
+      "famiglia": "body-language",
+      "nodeId": "4049:612",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-612&m=dev",
+      "x": -8198,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-meet-tight",
+      "famiglia": "body-language",
+      "nodeId": "3941:857",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-857&m=dev",
+      "x": -13553,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-meet-tight",
+      "famiglia": "body-language",
+      "nodeId": "4049:582",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-582&m=dev",
+      "x": -7756,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3941:1090",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-1090&m=dev",
+      "x": -13111,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:814",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-814&m=dev",
+      "x": -7314,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-story",
+      "famiglia": "body-language",
+      "nodeId": "3941:1015",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-1015&m=dev",
+      "x": -12669,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l3-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:734",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-734&m=dev",
+      "x": -6872,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-call",
+      "famiglia": "body-language",
+      "nodeId": "3942:160",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-160&m=dev",
+      "x": -12227,
+      "y": -5415,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:1082",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1082&m=dev",
+      "x": -6430,
+      "y": -5452,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-done",
+      "famiglia": "body-language",
+      "nodeId": "3942:215",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-215&m=dev",
+      "x": -16205,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:1165",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1165&m=dev",
+      "x": -10408,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3942:104",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-104&m=dev",
+      "x": -15763,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:1011",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1011&m=dev",
+      "x": -9966,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-match",
+      "famiglia": "body-language",
+      "nodeId": "3942:69",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-69&m=dev",
+      "x": -15321,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:958",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-958&m=dev",
+      "x": -9524,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-meet-crampy",
+      "famiglia": "body-language",
+      "nodeId": "3942:11",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-11&m=dev",
+      "x": -14879,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-meet-crampy",
+      "famiglia": "body-language",
+      "nodeId": "4049:899",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-899&m=dev",
+      "x": -9082,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-meet-gripping",
+      "famiglia": "body-language",
+      "nodeId": "3942:41",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-41&m=dev",
+      "x": -14437,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-meet-gripping",
+      "famiglia": "body-language",
+      "nodeId": "4049:929",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-929&m=dev",
+      "x": -8640,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3942:186",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-186&m=dev",
+      "x": -13995,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:1126",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1126&m=dev",
+      "x": -8198,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-story",
+      "famiglia": "body-language",
+      "nodeId": "3942:133",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-133&m=dev",
+      "x": -13553,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l4-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:1050",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1050&m=dev",
+      "x": -7756,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-call",
+      "famiglia": "body-language",
+      "nodeId": "3942:446",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-446&m=dev",
+      "x": -13111,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:2740",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2740&m=dev",
+      "x": -7314,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-done",
+      "famiglia": "body-language",
+      "nodeId": "3942:498",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-498&m=dev",
+      "x": -12669,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:2808",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2808&m=dev",
+      "x": -6872,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3942:359",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-359&m=dev",
+      "x": -12227,
+      "y": -4501,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:2626",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2626&m=dev",
+      "x": -6430,
+      "y": -4538,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-match",
+      "famiglia": "body-language",
+      "nodeId": "3942:314",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-314&m=dev",
+      "x": -16205,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:2577",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2577&m=dev",
+      "x": -10408,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-meet-sharp",
+      "famiglia": "body-language",
+      "nodeId": "3942:259",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-259&m=dev",
+      "x": -15763,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-meet-sharp",
+      "famiglia": "body-language",
+      "nodeId": "4049:2517",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2517&m=dev",
+      "x": -9966,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-meet-stabbing",
+      "famiglia": "body-language",
+      "nodeId": "3942:286",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-286&m=dev",
+      "x": -15321,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-meet-stabbing",
+      "famiglia": "body-language",
+      "nodeId": "4049:2546",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2546&m=dev",
+      "x": -9524,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-redflag",
+      "famiglia": "body-language",
+      "nodeId": "3942:391",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-391&m=dev",
+      "x": -14879,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-redflag",
+      "famiglia": "body-language",
+      "nodeId": "4049:2670",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2670&m=dev",
+      "x": -9082,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3942:476",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-476&m=dev",
+      "x": -14437,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:2784",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2784&m=dev",
+      "x": -8640,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-story",
+      "famiglia": "body-language",
+      "nodeId": "3942:416",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-416&m=dev",
+      "x": -13995,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l5-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:2698",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2698&m=dev",
+      "x": -8198,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-call",
+      "famiglia": "body-language",
+      "nodeId": "3942:735",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-735&m=dev",
+      "x": -13553,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:1423",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1423&m=dev",
+      "x": -7756,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-done",
+      "famiglia": "body-language",
+      "nodeId": "3942:800",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-800&m=dev",
+      "x": -13111,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:1509",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1509&m=dev",
+      "x": -7314,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3942:669",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-669&m=dev",
+      "x": -12669,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:1334",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1334&m=dev",
+      "x": -6872,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-match",
+      "famiglia": "body-language",
+      "nodeId": "3942:619",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-619&m=dev",
+      "x": -12227,
+      "y": -3587,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:1273",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1273&m=dev",
+      "x": -6430,
+      "y": -3624,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-meet-burning",
+      "famiglia": "body-language",
+      "nodeId": "3942:553",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-553&m=dev",
+      "x": -16205,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-meet-burning",
+      "famiglia": "body-language",
+      "nodeId": "4049:1205",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1205&m=dev",
+      "x": -10408,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-meet-tingling",
+      "famiglia": "body-language",
+      "nodeId": "3942:586",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-586&m=dev",
+      "x": -15763,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-meet-tingling",
+      "famiglia": "body-language",
+      "nodeId": "4049:1239",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1239&m=dev",
+      "x": -9966,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3942:764",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-764&m=dev",
+      "x": -15321,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:1466",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1466&m=dev",
+      "x": -9524,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-story",
+      "famiglia": "body-language",
+      "nodeId": "3942:702",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-702&m=dev",
+      "x": -14879,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l6-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:1376",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1376&m=dev",
+      "x": -9082,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-call",
+      "famiglia": "body-language",
+      "nodeId": "3942:1078",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1078&m=dev",
+      "x": -14437,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:1753",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1753&m=dev",
+      "x": -8640,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-done",
+      "famiglia": "body-language",
+      "nodeId": "3942:1125",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1125&m=dev",
+      "x": -13995,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:1825",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1825&m=dev",
+      "x": -8198,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3942:1006",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1006&m=dev",
+      "x": -13553,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:1651",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1651&m=dev",
+      "x": -7756,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-match",
+      "famiglia": "body-language",
+      "nodeId": "3942:964",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-964&m=dev",
+      "x": -13111,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:1604",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1604&m=dev",
+      "x": -7314,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-meet-numb",
+      "famiglia": "body-language",
+      "nodeId": "3942:907",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-907&m=dev",
+      "x": -12669,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-meet-numb",
+      "famiglia": "body-language",
+      "nodeId": "4049:1546",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1546&m=dev",
+      "x": -6872,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-meet-unstable",
+      "famiglia": "body-language",
+      "nodeId": "3942:935",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-935&m=dev",
+      "x": -12227,
+      "y": -2673,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-meet-unstable",
+      "famiglia": "body-language",
+      "nodeId": "4049:1574",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1574&m=dev",
+      "x": -6430,
+      "y": -2710,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-redflag",
+      "famiglia": "body-language",
+      "nodeId": "3942:1031",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1031&m=dev",
+      "x": -16205,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-redflag",
+      "famiglia": "body-language",
+      "nodeId": "4049:1688",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1688&m=dev",
+      "x": -10408,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3942:1101",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1101&m=dev",
+      "x": -15763,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:1789",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1789&m=dev",
+      "x": -9966,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-story",
+      "famiglia": "body-language",
+      "nodeId": "3942:1051",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1051&m=dev",
+      "x": -15321,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l7-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:1711",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1711&m=dev",
+      "x": -9524,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-call",
+      "famiglia": "body-language",
+      "nodeId": "3942:1342",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1342&m=dev",
+      "x": -14879,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-call",
+      "famiglia": "body-language",
+      "nodeId": "4049:2058",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2058&m=dev",
+      "x": -9082,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-done",
+      "famiglia": "body-language",
+      "nodeId": "3942:1408",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1408&m=dev",
+      "x": -14437,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-done",
+      "famiglia": "body-language",
+      "nodeId": "4049:2132",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2132&m=dev",
+      "x": -8640,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "3942:1276",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1276&m=dev",
+      "x": -13995,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-false-friends",
+      "famiglia": "body-language",
+      "nodeId": "4049:1977",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1977&m=dev",
+      "x": -8198,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-match",
+      "famiglia": "body-language",
+      "nodeId": "3942:1237",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1237&m=dev",
+      "x": -13553,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:1929",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1929&m=dev",
+      "x": -7756,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-meet-hot",
+      "famiglia": "body-language",
+      "nodeId": "3942:1207",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1207&m=dev",
+      "x": -13111,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-meet-hot",
+      "famiglia": "body-language",
+      "nodeId": "4049:1899",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1899&m=dev",
+      "x": -7314,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-meet-swollen",
+      "famiglia": "body-language",
+      "nodeId": "3942:1177",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1177&m=dev",
+      "x": -12669,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-meet-swollen",
+      "famiglia": "body-language",
+      "nodeId": "4049:1868",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-1868&m=dev",
+      "x": -6872,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3942:1375",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1375&m=dev",
+      "x": -12227,
+      "y": -1759,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:2099",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2099&m=dev",
+      "x": -6430,
+      "y": -1796,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-story",
+      "famiglia": "body-language",
+      "nodeId": "3942:1308",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3942-1308&m=dev",
+      "x": -16205,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-l8-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:2020",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2020&m=dev",
+      "x": -10408,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-match",
+      "famiglia": "body-language",
+      "nodeId": "3941:279",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-279&m=dev",
+      "x": -14437,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-match",
+      "famiglia": "body-language",
+      "nodeId": "4049:2247",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2247&m=dev",
+      "x": -8640,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-meet-light",
+      "famiglia": "body-language",
+      "nodeId": "3941:247",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-247&m=dev",
+      "x": -13995,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-meet-light",
+      "famiglia": "body-language",
+      "nodeId": "4049:2213",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2213&m=dev",
+      "x": -8198,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-meet-strong",
+      "famiglia": "body-language",
+      "nodeId": "3941:213",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-213&m=dev",
+      "x": -13553,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-meet-strong",
+      "famiglia": "body-language",
+      "nodeId": "4049:2175",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2175&m=dev",
+      "x": -7756,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-path",
+      "famiglia": "body-language",
+      "nodeId": "3941:6",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-6&m=dev",
+      "x": -16205,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-path",
+      "famiglia": "body-language",
+      "nodeId": "4049:82",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-82&m=dev",
+      "x": -10408,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-rule",
+      "famiglia": "body-language",
+      "nodeId": "3941:137",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-137&m=dev",
+      "x": -15321,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-rule",
+      "famiglia": "body-language",
+      "nodeId": "4049:245",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-245&m=dev",
+      "x": -9524,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-sentence",
+      "famiglia": "body-language",
+      "nodeId": "3941:436",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-436&m=dev",
+      "x": -13111,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-sentence",
+      "famiglia": "body-language",
+      "nodeId": "4049:2441",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2441&m=dev",
+      "x": -7314,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-story",
+      "famiglia": "body-language",
+      "nodeId": "3941:363",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-363&m=dev",
+      "x": -12668,
+      "y": -845,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-story",
+      "famiglia": "body-language",
+      "nodeId": "4049:2344",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-2344&m=dev",
+      "x": -6872,
+      "y": -882,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-words",
+      "famiglia": "body-language",
+      "nodeId": "3941:72",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3941-72&m=dev",
+      "x": -15763,
+      "y": -6329,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bl-words",
+      "famiglia": "body-language",
+      "nodeId": "4049:173",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4049-173&m=dev",
+      "x": -9966,
+      "y": -6366,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-1",
+      "famiglia": "body-sense",
+      "nodeId": "4067:159",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-159&m=dev",
+      "x": -27438,
+      "y": -17483,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-1",
+      "famiglia": "body-sense",
+      "nodeId": "4067:913",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-913&m=dev",
+      "x": -23789,
+      "y": -12203,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-2",
+      "famiglia": "body-sense",
+      "nodeId": "4067:180",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-180&m=dev",
+      "x": -27913,
+      "y": -17497,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-2",
+      "famiglia": "body-sense",
+      "nodeId": "4067:706",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-706&m=dev",
+      "x": -24231,
+      "y": -12203,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-3",
+      "famiglia": "body-sense",
+      "nodeId": "4067:213",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-213&m=dev",
+      "x": -26954,
+      "y": -17483,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-3",
+      "famiglia": "body-sense",
+      "nodeId": "4067:739",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-739&m=dev",
+      "x": -23331,
+      "y": -12203,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-4",
+      "famiglia": "body-sense",
+      "nodeId": "4067:236",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-236&m=dev",
+      "x": -26502,
+      "y": -17483,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-4",
+      "famiglia": "body-sense",
+      "nodeId": "4067:762",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-762&m=dev",
+      "x": -22829,
+      "y": -12203,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-5",
+      "famiglia": "body-sense",
+      "nodeId": "4067:264",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-264&m=dev",
+      "x": -26050,
+      "y": -17483,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-5",
+      "famiglia": "body-sense",
+      "nodeId": "4067:790",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-790&m=dev",
+      "x": -22377,
+      "y": -12203,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-6",
+      "famiglia": "body-sense",
+      "nodeId": "4067:288",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-288&m=dev",
+      "x": -25598,
+      "y": -17483,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-breath-6",
+      "famiglia": "body-sense",
+      "nodeId": "4067:815",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-815&m=dev",
+      "x": -21925,
+      "y": -12203,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-feeling-1-tune",
+      "famiglia": "body-sense",
+      "nodeId": "4081:771",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-771&m=dev",
+      "x": -23457,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-feeling-2-locate",
+      "famiglia": "body-sense",
+      "nodeId": "4081:799",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-799&m=dev",
+      "x": -23004,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-feeling-3-name",
+      "famiglia": "body-sense",
+      "nodeId": "4081:843",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-843&m=dev",
+      "x": -22551,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-feeling-4-nice",
+      "famiglia": "body-sense",
+      "nodeId": "4081:887",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-887&m=dev",
+      "x": -22098,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-1",
+      "famiglia": "body-sense",
+      "nodeId": "3914:531",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-531&m=dev",
+      "x": -23457,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-1-tune",
+      "famiglia": "body-sense",
+      "nodeId": "4081:261",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-261&m=dev",
+      "x": -25722,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-2",
+      "famiglia": "body-sense",
+      "nodeId": "3914:557",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-557&m=dev",
+      "x": -23004,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-2-guess",
+      "famiglia": "body-sense",
+      "nodeId": "4081:289",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-289&m=dev",
+      "x": -25269,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-3",
+      "famiglia": "body-sense",
+      "nodeId": "3914:596",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-596&m=dev",
+      "x": -22551,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-3-check",
+      "famiglia": "body-sense",
+      "nodeId": "4081:333",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-333&m=dev",
+      "x": -24816,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-4",
+      "famiglia": "body-sense",
+      "nodeId": "3914:622",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-622&m=dev",
+      "x": -22098,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-4-after",
+      "famiglia": "body-sense",
+      "nodeId": "4081:361",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-361&m=dev",
+      "x": -24363,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-5",
+      "famiglia": "body-sense",
+      "nodeId": "3914:653",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-653&m=dev",
+      "x": -26175,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-hunger-5-nice",
+      "famiglia": "body-sense",
+      "nodeId": "4081:402",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-402&m=dev",
+      "x": -23910,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-library",
+      "famiglia": "body-sense",
+      "nodeId": "4081:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-2&m=dev",
+      "x": -23910,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-nervous-1-tune",
+      "famiglia": "body-sense",
+      "nodeId": "4081:432",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-432&m=dev",
+      "x": -23457,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-nervous-2-name",
+      "famiglia": "body-sense",
+      "nodeId": "4081:460",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-460&m=dev",
+      "x": -23004,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-nervous-3-secret",
+      "famiglia": "body-sense",
+      "nodeId": "4081:501",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-501&m=dev",
+      "x": -22551,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-nervous-4-try",
+      "famiglia": "body-sense",
+      "nodeId": "4081:529",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-529&m=dev",
+      "x": -22098,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-nervous-5-done",
+      "famiglia": "body-sense",
+      "nodeId": "4081:573",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-573&m=dev",
+      "x": -26175,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-twosides-1-tune",
+      "famiglia": "body-sense",
+      "nodeId": "4081:93",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-93&m=dev",
+      "x": -23457,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-twosides-2-guess",
+      "famiglia": "body-sense",
+      "nodeId": "4081:121",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-121&m=dev",
+      "x": -23004,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-twosides-3-check",
+      "famiglia": "body-sense",
+      "nodeId": "4081:162",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-162&m=dev",
+      "x": -22551,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-twosides-4-actual",
+      "famiglia": "body-sense",
+      "nodeId": "4081:190",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-190&m=dev",
+      "x": -22098,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-twosides-5-reveal",
+      "famiglia": "body-sense",
+      "nodeId": "4081:231",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-231&m=dev",
+      "x": -26175,
+      "y": -4240,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-zone-1-scale",
+      "famiglia": "body-sense",
+      "nodeId": "4081:603",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-603&m=dev",
+      "x": -25722,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-zone-2-steer",
+      "famiglia": "body-sense",
+      "nodeId": "4081:644",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-644&m=dev",
+      "x": -25269,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-zone-3-breathe",
+      "famiglia": "body-sense",
+      "nodeId": "4081:672",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-672&m=dev",
+      "x": -24816,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-zone-4-rescale",
+      "famiglia": "body-sense",
+      "nodeId": "4081:700",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-700&m=dev",
+      "x": -24363,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bs-zone-5-reveal",
+      "famiglia": "body-sense",
+      "nodeId": "4081:741",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4081-741&m=dev",
+      "x": -23910,
+      "y": -3316,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-3-body-map",
+      "famiglia": "check-in",
+      "nodeId": "3523:251",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3523-251&m=dev",
+      "x": -5077,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-3-body-map",
+      "famiglia": "check-in",
+      "nodeId": "3967:1639",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-1639&m=dev",
+      "x": -4634,
+      "y": -19000,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-4-sensation-sheet",
+      "famiglia": "check-in",
+      "nodeId": "3547:34",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3547-34&m=dev",
+      "x": -4636,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-4-sensation-sheet",
+      "famiglia": "check-in",
+      "nodeId": "3967:1677",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-1677&m=dev",
+      "x": -4193,
+      "y": -19000,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-4-sensation-sheet",
+      "famiglia": "check-in",
+      "nodeId": "4095:2940",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4095-2940&m=dev",
+      "x": -3182,
+      "y": -13530,
+      "w": 402,
+      "h": 993
+    },
+    {
+      "nome": "checkin-4-sensation-sheet",
+      "famiglia": "check-in",
+      "nodeId": "3972:2366",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3972-2366&m=dev",
+      "x": -2868,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-7-the-16-words",
+      "famiglia": "check-in",
+      "nodeId": "4108:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4108-2&m=dev",
+      "x": 4157,
+      "y": -13530,
+      "w": 402,
+      "h": 1268
+    },
+    {
+      "nome": "checkin-8-what-to-do",
+      "famiglia": "check-in",
+      "nodeId": "4110:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4110-2&m=dev",
+      "x": 4641,
+      "y": -13530,
+      "w": 402,
+      "h": 1376
+    },
+    {
+      "nome": "checkout-1a-pick-tempo",
+      "famiglia": "check-out",
+      "nodeId": "3673:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3673-2&m=dev",
+      "x": -5963,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-1a-pick-tempo",
+      "famiglia": "check-out",
+      "nodeId": "3967:2238",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-2238&m=dev",
+      "x": -5520,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-1b-reveal-comparison",
+      "famiglia": "check-out",
+      "nodeId": "3562:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3562-4&m=dev",
+      "x": -5521,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-1b-reveal-comparison",
+      "famiglia": "check-out",
+      "nodeId": "3967:1821",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-1821&m=dev",
+      "x": -5078,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-2-rpe",
+      "famiglia": "check-out",
+      "nodeId": "3565:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3565-4&m=dev",
+      "x": -5079,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-2-rpe",
+      "famiglia": "check-out",
+      "nodeId": "3967:1864",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-1864&m=dev",
+      "x": -4636,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-3-satisfaction",
+      "famiglia": "check-out",
+      "nodeId": "3568:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3568-4&m=dev",
+      "x": -4637,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-3-satisfaction",
+      "famiglia": "check-out",
+      "nodeId": "3967:1903",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-1903&m=dev",
+      "x": -4194,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-4-energy",
+      "famiglia": "check-out",
+      "nodeId": "3590:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3590-4&m=dev",
+      "x": -4195,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-4-energy",
+      "famiglia": "check-out",
+      "nodeId": "3967:2005",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-2005&m=dev",
+      "x": -3752,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-5-body-map",
+      "famiglia": "check-out",
+      "nodeId": "3588:167",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3588-167&m=dev",
+      "x": -3753,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-5-body-map",
+      "famiglia": "check-out",
+      "nodeId": "3967:2041",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-2041&m=dev",
+      "x": -3310,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-6-sensation-sheet",
+      "famiglia": "check-out",
+      "nodeId": "3588:213",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3588-213&m=dev",
+      "x": -3311,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-6-sensation-sheet-v2",
+      "famiglia": "check-out",
+      "nodeId": "4115:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4115-2&m=dev",
+      "x": -2229,
+      "y": -12084,
+      "w": 402,
+      "h": 1106
+    },
+    {
+      "nome": "checkout-7-close-loop",
+      "famiglia": "check-out",
+      "nodeId": "3594:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3594-4&m=dev",
+      "x": -2869,
+      "y": -12057,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-7-close-loop",
+      "famiglia": "check-out",
+      "nodeId": "3967:2184",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-2184&m=dev",
+      "x": -2115,
+      "y": -17527,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkout-7-close-loop",
+      "famiglia": "check-out",
+      "nodeId": "4113:3743",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3743&m=dev",
+      "x": 4994,
+      "y": -12084,
+      "w": 402,
+      "h": 1235
+    },
+    {
+      "nome": "body-check-in",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "3447:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3447-4&m=dev",
+      "x": 5016,
+      "y": 49751,
+      "w": 390,
+      "h": 905
+    },
+    {
+      "nome": "body-part-detail",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "3451:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3451-4&m=dev",
+      "x": 8091,
+      "y": 48793,
+      "w": 390,
+      "h": 844
+    },
+    {
+      "nome": "bodymap-selected",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "3462:21",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3462-21&m=dev",
+      "x": 3399,
+      "y": -5215,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "bodymap-selection",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "3446:26",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3446-26&m=dev",
+      "x": 2940,
+      "y": -5215,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "training-overview",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "4067:404",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-404&m=dev",
+      "x": -25645,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "training-overview",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "3950:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3950-2&m=dev",
+      "x": -8652,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "training-overview",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "3958:242",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-242&m=dev",
+      "x": -8394,
+      "y": -13142,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "training-overview",
+      "famiglia": "corpo/allenamento",
+      "nodeId": "3477:4",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3477-4&m=dev",
+      "x": 1267,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-1-checkin-due",
+      "famiglia": "home",
+      "nodeId": "4126:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4126-2&m=dev",
+      "x": -219,
+      "y": -19713,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-1-checkin-due-IT",
+      "famiglia": "home",
+      "nodeId": "4141:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4141-2&m=dev",
+      "x": -219,
+      "y": -18793,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-2-checkout-due",
+      "famiglia": "home",
+      "nodeId": "4126:40",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4126-40&m=dev",
+      "x": 268,
+      "y": -19713,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-2-checkout-due-IT",
+      "famiglia": "home",
+      "nodeId": "4141:67",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4141-67&m=dev",
+      "x": 268,
+      "y": -18793,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-3-done-flagged",
+      "famiglia": "home",
+      "nodeId": "4126:78",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4126-78&m=dev",
+      "x": 755,
+      "y": -19713,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-3-done-flagged-IT",
+      "famiglia": "home",
+      "nodeId": "4141:116",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4141-116&m=dev",
+      "x": 755,
+      "y": -18793,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-4-rest-day",
+      "famiglia": "home",
+      "nodeId": "4126:116",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4126-116&m=dev",
+      "x": 1242,
+      "y": -19713,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "home-4-rest-day-IT",
+      "famiglia": "home",
+      "nodeId": "4141:170",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4141-170&m=dev",
+      "x": 1242,
+      "y": -18793,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "01-auth-login",
+      "famiglia": "onboarding",
+      "nodeId": "3771:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-2&m=dev",
+      "x": -18497,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "01-auth-login",
+      "famiglia": "onboarding",
+      "nodeId": "3958:461",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-461&m=dev",
+      "x": -18460,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "01-bs-feeling-1",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1132",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1132&m=dev",
+      "x": -25722,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "01-bs-library",
+      "famiglia": "onboarding",
+      "nodeId": "3914:9",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-9&m=dev",
+      "x": -26175,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "01-bs-nervous-1",
+      "famiglia": "onboarding",
+      "nodeId": "3914:753",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-753&m=dev",
+      "x": -25722,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "01-bs-zone-1",
+      "famiglia": "onboarding",
+      "nodeId": "3914:989",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-989&m=dev",
+      "x": -23457,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "01-twosides-1",
+      "famiglia": "onboarding",
+      "nodeId": "3914:374",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-374&m=dev",
+      "x": -25722,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "02-auth-link-sent",
+      "famiglia": "onboarding",
+      "nodeId": "3771:14",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-14&m=dev",
+      "x": -17975,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "02-auth-link-sent",
+      "famiglia": "onboarding",
+      "nodeId": "3958:486",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-486&m=dev",
+      "x": -17938,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "02-bs-feeling-2",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1154",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1154&m=dev",
+      "x": -25269,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "02-bs-nervous-2",
+      "famiglia": "onboarding",
+      "nodeId": "3914:781",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-781&m=dev",
+      "x": -25269,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "02-bs-zone-2",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1021",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1021&m=dev",
+      "x": -23004,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "02-twosides-2",
+      "famiglia": "onboarding",
+      "nodeId": "3914:395",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-395&m=dev",
+      "x": -25269,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "03-bs-feeling-3",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1198",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1198&m=dev",
+      "x": -24816,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "03-bs-nervous-3",
+      "famiglia": "onboarding",
+      "nodeId": "3914:816",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-816&m=dev",
+      "x": -24816,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "03-bs-zone-3",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1042",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1042&m=dev",
+      "x": -22551,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "03-twosides-3",
+      "famiglia": "onboarding",
+      "nodeId": "3914:425",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-425&m=dev",
+      "x": -24816,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "03-what-is-bab",
+      "famiglia": "onboarding",
+      "nodeId": "3771:39",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-39&m=dev",
+      "x": -17453,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "03-what-is-bab",
+      "famiglia": "onboarding",
+      "nodeId": "3975:2524",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3975-2524&m=dev",
+      "x": -6466,
+      "y": -19025,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "04-bs-feeling-4",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1234",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1234&m=dev",
+      "x": -24363,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "04-bs-nervous-4",
+      "famiglia": "onboarding",
+      "nodeId": "3914:843",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-843&m=dev",
+      "x": -24363,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "04-bs-zone-4",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1066",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1066&m=dev",
+      "x": -22098,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "04-twosides-4",
+      "famiglia": "onboarding",
+      "nodeId": "3914:446",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-446&m=dev",
+      "x": -24363,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "05-bs-nervous-5",
+      "famiglia": "onboarding",
+      "nodeId": "3914:882",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-882&m=dev",
+      "x": -23910,
+      "y": -6088,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "05-bs-zone-5",
+      "famiglia": "onboarding",
+      "nodeId": "3914:1098",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-1098&m=dev",
+      "x": -26175,
+      "y": -5164,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "05-name",
+      "famiglia": "onboarding",
+      "nodeId": "3771:104",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-104&m=dev",
+      "x": -16814,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "05-name",
+      "famiglia": "onboarding",
+      "nodeId": "3958:567",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-567&m=dev",
+      "x": -16777,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "05-twosides-5",
+      "famiglia": "onboarding",
+      "nodeId": "3914:475",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3914-475&m=dev",
+      "x": -23910,
+      "y": -7012,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "05b-consent-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:941",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-941&m=dev",
+      "x": -16777,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "05b-consent-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-2&m=dev",
+      "x": -15930,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "06-birthday",
+      "famiglia": "onboarding",
+      "nodeId": "3771:122",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-122&m=dev",
+      "x": -16372,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "06-birthday",
+      "famiglia": "onboarding",
+      "nodeId": "3958:592",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-592&m=dev",
+      "x": -16335,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "06b-name-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:27",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-27&m=dev",
+      "x": -16814,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "06b-name-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:972",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-972&m=dev",
+      "x": -16335,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "07-sport",
+      "famiglia": "onboarding",
+      "nodeId": "3771:140",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-140&m=dev",
+      "x": -15930,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "07-sport",
+      "famiglia": "onboarding",
+      "nodeId": "3958:616",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-616&m=dev",
+      "x": -15893,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "07b-birthday-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:45",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-45&m=dev",
+      "x": -16372,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "07b-birthday-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:996",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-996&m=dev",
+      "x": -15893,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "08-training",
+      "famiglia": "onboarding",
+      "nodeId": "3771:160",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-160&m=dev",
+      "x": -15488,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "08-training",
+      "famiglia": "onboarding",
+      "nodeId": "3958:641",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-641&m=dev",
+      "x": -15451,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "08b-sport-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:63",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-63&m=dev",
+      "x": -15488,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "08b-sport-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1020",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1020&m=dev",
+      "x": -15451,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "09-pe",
+      "famiglia": "onboarding",
+      "nodeId": "3772:193",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-193&m=dev",
+      "x": -15046,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "09-pe",
+      "famiglia": "onboarding",
+      "nodeId": "3958:709",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-709&m=dev",
+      "x": -15009,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "09b-training-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:83",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-83&m=dev",
+      "x": -15046,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "09b-training-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1058",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1058&m=dev",
+      "x": -15009,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "10-competitions",
+      "famiglia": "onboarding",
+      "nodeId": "3772:223",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-223&m=dev",
+      "x": -14604,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "10-competitions",
+      "famiglia": "onboarding",
+      "nodeId": "3958:745",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-745&m=dev",
+      "x": -14567,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "10b-pe-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:116",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-116&m=dev",
+      "x": -14604,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "10b-pe-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1129",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1129&m=dev",
+      "x": -14567,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "11-cycle-question",
+      "famiglia": "onboarding",
+      "nodeId": "3772:241",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-241&m=dev",
+      "x": -14162,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "11-cycle-question",
+      "famiglia": "onboarding",
+      "nodeId": "3958:769",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-769&m=dev",
+      "x": -14125,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "11b-competitions-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:146",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-146&m=dev",
+      "x": -14162,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "11b-competitions-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1168",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1168&m=dev",
+      "x": -14125,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "12-cycle-dates",
+      "famiglia": "onboarding",
+      "nodeId": "3772:261",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-261&m=dev",
+      "x": -13720,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "12-cycle-dates",
+      "famiglia": "onboarding",
+      "nodeId": "3958:797",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-797&m=dev",
+      "x": -13683,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "13-cycle-age",
+      "famiglia": "onboarding",
+      "nodeId": "3871:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3871-2&m=dev",
+      "x": -13278,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "13-cycle-age",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1248",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1248&m=dev",
+      "x": -13241,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "13b-cycle-dates-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:164",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-164&m=dev",
+      "x": -13720,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "13b-cycle-dates-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1192",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1192&m=dev",
+      "x": -13683,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "13b-first-period-date",
+      "famiglia": "onboarding",
+      "nodeId": "3907:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3907-2&m=dev",
+      "x": -14162,
+      "y": -18802,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "13b-first-period-date",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1308",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1308&m=dev",
+      "x": -14125,
+      "y": -14099,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "14-contraceptive",
+      "famiglia": "onboarding",
+      "nodeId": "3772:287",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-287&m=dev",
+      "x": -12836,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "14-summary",
+      "famiglia": "onboarding",
+      "nodeId": "3772:308",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-308&m=dev",
+      "x": -12394,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "14-summary",
+      "famiglia": "onboarding",
+      "nodeId": "3958:853",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-853&m=dev",
+      "x": -12357,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "14b-contraceptive-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3775:190",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3775-190&m=dev",
+      "x": -13278,
+      "y": -16856,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "14b-contraceptive-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1221",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1221&m=dev",
+      "x": -13241,
+      "y": -12153,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "14b-contraceptive-filled",
+      "famiglia": "onboarding",
+      "nodeId": "3958:1437",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-1437&m=dev",
+      "x": -12799,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "15-consent",
+      "famiglia": "onboarding",
+      "nodeId": "3771:81",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3771-81&m=dev",
+      "x": -11952,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "15-consent",
+      "famiglia": "onboarding",
+      "nodeId": "3958:538",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-538&m=dev",
+      "x": -11915,
+      "y": -13157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "16-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "4067:445",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-445&m=dev",
+      "x": -28757,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "16-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "4067:630",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-630&m=dev",
+      "x": -28315,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "16-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "4067:834",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-834&m=dev",
+      "x": -25653,
+      "y": -13423,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "16-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "4067:864",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-864&m=dev",
+      "x": -25211,
+      "y": -13423,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "16-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "3772:338",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-338&m=dev",
+      "x": -11510,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "16-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "3967:2325",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3967-2325&m=dev",
+      "x": -5993,
+      "y": -19000,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "17-first-rep",
+      "famiglia": "onboarding",
+      "nodeId": "4067:475",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-475&m=dev",
+      "x": -27858,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "17-first-rep",
+      "famiglia": "onboarding",
+      "nodeId": "4067:888",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-888&m=dev",
+      "x": -24754,
+      "y": -13423,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "17-first-rep",
+      "famiglia": "onboarding",
+      "nodeId": "3772:361",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3772-361&m=dev",
+      "x": -11068,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "18-guess",
+      "famiglia": "onboarding",
+      "nodeId": "3958:95",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-95&m=dev",
+      "x": -23779,
+      "y": -13423,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "18-guess",
+      "famiglia": "onboarding",
+      "nodeId": "3958:381",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-381&m=dev",
+      "x": -10165,
+      "y": -13142,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "18-guess-it",
+      "famiglia": "onboarding",
+      "nodeId": "4067:531",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-531&m=dev",
+      "x": -27416,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "18-guess-it",
+      "famiglia": "onboarding",
+      "nodeId": "3908:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3908-2&m=dev",
+      "x": -10423,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "19-count",
+      "famiglia": "onboarding",
+      "nodeId": "3958:126",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-126&m=dev",
+      "x": -23336,
+      "y": -13423,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "19-count",
+      "famiglia": "onboarding",
+      "nodeId": "3958:412",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-412&m=dev",
+      "x": -9722,
+      "y": -13142,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "19-count-it",
+      "famiglia": "onboarding",
+      "nodeId": "4067:562",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-562&m=dev",
+      "x": -26974,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "19-count-it",
+      "famiglia": "onboarding",
+      "nodeId": "3908:33",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3908-33&m=dev",
+      "x": -9981,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "20-reveal",
+      "famiglia": "onboarding",
+      "nodeId": "4067:496",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-496&m=dev",
+      "x": -26532,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "20-reveal",
+      "famiglia": "onboarding",
+      "nodeId": "3958:146",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-146&m=dev",
+      "x": -22893,
+      "y": -13423,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "20-reveal",
+      "famiglia": "onboarding",
+      "nodeId": "3889:363",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3889-363&m=dev",
+      "x": -9539,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "20-reveal",
+      "famiglia": "onboarding",
+      "nodeId": "3958:432",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-432&m=dev",
+      "x": -9279,
+      "y": -13142,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "20-reveal-it",
+      "famiglia": "onboarding",
+      "nodeId": "3909:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3909-2&m=dev",
+      "x": 4114,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "21-wrap",
+      "famiglia": "onboarding",
+      "nodeId": "3958:206",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-206&m=dev",
+      "x": -8836,
+      "y": -13142,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "21-wrap-it",
+      "famiglia": "onboarding",
+      "nodeId": "4067:582",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4067-582&m=dev",
+      "x": -26090,
+      "y": -18577,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "21-wrap-it",
+      "famiglia": "onboarding",
+      "nodeId": "3909:31",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3909-31&m=dev",
+      "x": -9097,
+      "y": -17860,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-count",
+      "famiglia": "onboarding",
+      "nodeId": "3815:138",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3815-138&m=dev",
+      "x": 3164,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-first-rep",
+      "famiglia": "onboarding",
+      "nodeId": "3958:78",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-78&m=dev",
+      "x": -24231,
+      "y": -13423,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-first-rep",
+      "famiglia": "onboarding",
+      "nodeId": "3958:364",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-364&m=dev",
+      "x": -10810,
+      "y": -13142,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-first-rep",
+      "famiglia": "onboarding",
+      "nodeId": "3815:90",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3815-90&m=dev",
+      "x": 1799,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-first-rep",
+      "famiglia": "onboarding",
+      "nodeId": "3718:6",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3718-6&m=dev",
+      "x": 2250,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-guess",
+      "famiglia": "onboarding",
+      "nodeId": "3815:107",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3815-107&m=dev",
+      "x": 2707,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "3958:323",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3958-323&m=dev",
+      "x": -11252,
+      "y": -13142,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-how-it-works",
+      "famiglia": "onboarding",
+      "nodeId": "3681:41",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3681-41&m=dev",
+      "x": 816,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "onboard-reveal",
+      "famiglia": "onboarding",
+      "nodeId": "3815:159",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=3815-159&m=dev",
+      "x": 3621,
+      "y": -4080,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card",
+      "famiglia": "word-cards",
+      "nodeId": "4097:37",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4097-37&m=dev",
+      "x": -2728,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card",
+      "famiglia": "word-cards",
+      "nodeId": "4159:69",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4159-69&m=dev",
+      "x": -2326,
+      "y": -9157,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card",
+      "famiglia": "word-cards",
+      "nodeId": "4161:104",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4161-104&m=dev",
+      "x": -1795,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-achy",
+      "famiglia": "word-cards",
+      "nodeId": "4107:98",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-98&m=dev",
+      "x": -1040,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-achy",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3359",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3359&m=dev",
+      "x": -94,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-crampy",
+      "famiglia": "word-cards",
+      "nodeId": "4107:194",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-194&m=dev",
+      "x": 226,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-crampy",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3455",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3455&m=dev",
+      "x": 1172,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-gripping",
+      "famiglia": "word-cards",
+      "nodeId": "4107:226",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-226&m=dev",
+      "x": 648,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-gripping",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3487",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3487&m=dev",
+      "x": 1594,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-hot",
+      "famiglia": "word-cards",
+      "nodeId": "4107:450",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-450&m=dev",
+      "x": 3602,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-hot",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3711",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3711&m=dev",
+      "x": 4548,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-light",
+      "famiglia": "word-cards",
+      "nodeId": "4107:34",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-34&m=dev",
+      "x": -1884,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-light",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3295",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3295&m=dev",
+      "x": -938,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-numb",
+      "famiglia": "word-cards",
+      "nodeId": "4107:354",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-354&m=dev",
+      "x": 2336,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-numb",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3615",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3615&m=dev",
+      "x": 3282,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-sharp",
+      "famiglia": "word-cards",
+      "nodeId": "4107:258",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-258&m=dev",
+      "x": 1070,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-sharp",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3519",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3519&m=dev",
+      "x": 2016,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-sore",
+      "famiglia": "word-cards",
+      "nodeId": "4107:66",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-66&m=dev",
+      "x": -1462,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-sore",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3327",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3327&m=dev",
+      "x": -516,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-stabbing",
+      "famiglia": "word-cards",
+      "nodeId": "4107:290",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-290&m=dev",
+      "x": 1492,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-stabbing",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3551",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3551&m=dev",
+      "x": 2438,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-stiff",
+      "famiglia": "word-cards",
+      "nodeId": "4107:162",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-162&m=dev",
+      "x": -196,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-stiff",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3423",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3423&m=dev",
+      "x": 750,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-strong",
+      "famiglia": "word-cards",
+      "nodeId": "4107:2",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-2&m=dev",
+      "x": -2306,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-strong",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3263",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3263&m=dev",
+      "x": -1360,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-swollen",
+      "famiglia": "word-cards",
+      "nodeId": "4107:418",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-418&m=dev",
+      "x": 3180,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-swollen",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3679",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3679&m=dev",
+      "x": 4126,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-tight",
+      "famiglia": "word-cards",
+      "nodeId": "4107:130",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-130&m=dev",
+      "x": -618,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-tight",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3391",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3391&m=dev",
+      "x": 328,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-tingling",
+      "famiglia": "word-cards",
+      "nodeId": "4107:322",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-322&m=dev",
+      "x": 1914,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-tingling",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3583",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3583&m=dev",
+      "x": 2860,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-unstable",
+      "famiglia": "word-cards",
+      "nodeId": "4107:386",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4107-386&m=dev",
+      "x": 2758,
+      "y": -13530,
+      "w": 402,
+      "h": 874
+    },
+    {
+      "nome": "checkin-5-word-card-unstable",
+      "famiglia": "word-cards",
+      "nodeId": "4113:3647",
+      "url": "https://www.figma.com/design/TA3cGQAArcaxt4tnCSQWJw/BAB-MVP?node-id=4113-3647&m=dev",
+      "x": 3704,
+      "y": -12084,
+      "w": 402,
+      "h": 874
+    }
+  ]
+}

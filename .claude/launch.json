@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "bab-app",
+      "name": "bab",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
         "run",
@@ -10,22 +10,8 @@
         "--prefix",
         "app"
       ],
-      "port": 5180
-    },
-    {
-      "name": "bab-demo-reel",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "dev",
-        "--prefix",
-        "demo-reel",
-        "--",
-        "--port",
-        "5199",
-        "--strictPort"
-      ],
-      "port": 5199
+      "port": 5173,
+      "autoPort": true
     }
   ]
 }
