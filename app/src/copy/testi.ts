@@ -19,7 +19,6 @@
 export const DA_RIVEDERE = [
   '11-cycle-question',
   '12-cycle-dates',
-  '13-cycle-age',
   '13b-first-period-date',
   // e i nomi dei giorni, che restano "Lun Mar Mer..." anche nel frame inglese
   '08-training/giorni',
@@ -43,6 +42,8 @@ const it = {
     etichetta: 'LA TUA EMAIL',
     segnaposto: 'nome@esempio.it',
     azione: 'Mandami il link',
+    invio: 'Sto mandando…',
+    nonRiuscito: 'Non siamo riusciti a mandare la mail. Riprova fra un momento.',
   },
 
   linkMandato: {
@@ -54,6 +55,7 @@ const it = {
     spiegaCodice:
       'Il link non si apre dove vuoi tu? Puoi usare il codice a 6 cifre che trovi nella mail.',
     etichettaCodice: 'CODICE',
+    codiceSbagliato: 'Questo codice non va. Controlla la mail.',
   },
 
   cosaEBab: {
@@ -94,6 +96,7 @@ const it = {
       'BAB lo usa per capire la tua fase di crescita. Il corpo cambia un sacco in questi anni, e le stesse sensazioni possono significare cose diverse.',
     etichetta: 'DATA DI NASCITA',
     segnaposto: 'gg/mm/aaaa',
+    troppoPiccola: 'BAB parte dai 12 anni.',
   },
 
   sport: {
@@ -152,14 +155,6 @@ const it = {
     segnaposto: 'gg/mm/aaaa',
   },
 
-  cicloEta: {
-    occhiello: 'IL TUO CICLO',
-    titolo: 'Se ti ricordi, quanti anni avevi quando ti è venuto la prima volta?',
-    occhio: 'Solo se lo sai — non è un problema se non te lo ricordi.',
-    etichetta: 'LA TUA ETÀ',
-    nonRicordo: 'Non me lo ricordo',
-  },
-
   primoCiclo: {
     occhiello: 'IL TUO CICLO',
     titolo: 'Quando hai avuto il primo ciclo?',
@@ -188,6 +183,8 @@ const it = {
       ciclo: 'ULTIMO CICLO',
     },
     vuoto: '—',
+    salvataggio: 'Sto salvando…',
+    nonSalvato: 'Non siamo riusciti a salvare. Riprova.',
   },
 
   consenso: {
@@ -301,6 +298,8 @@ const en: typeof it = {
     etichetta: 'YOUR EMAIL',
     segnaposto: 'name@example.com',
     azione: 'Send me the link',
+    invio: 'Sending…',
+    nonRiuscito: 'We could not send the email. Try again in a moment.',
   },
 
   linkMandato: {
@@ -312,6 +311,7 @@ const en: typeof it = {
     spiegaCodice:
       'Is the link not opening where you want it to? You can use the 6-digit code found in the email.',
     etichettaCodice: 'CODE',
+    codiceSbagliato: 'That code does not work. Check the email.',
   },
 
   cosaEBab: {
@@ -352,6 +352,7 @@ const en: typeof it = {
       'BAB uses this to understand your growth phase. Your body changes a lot during these years, and the same feelings can mean different things.',
     etichetta: 'DATE OF BIRTH',
     segnaposto: 'dd/mm/yyyy',
+    troppoPiccola: 'BAB starts at 12.',
   },
 
   sport: {
@@ -412,14 +413,6 @@ const en: typeof it = {
     segnaposto: 'dd/mm/yyyy',
   },
 
-  cicloEta: {
-    occhiello: 'YOUR CYCLE',
-    titolo: 'If you remember, how old were you the first time?',
-    occhio: "Only if you know — it is not a problem if you don't remember.",
-    etichetta: 'YOUR AGE',
-    nonRicordo: "I don't remember",
-  },
-
   primoCiclo: {
     occhiello: 'YOUR CYCLE',
     titolo: 'When did you have your first period?',
@@ -449,6 +442,8 @@ const en: typeof it = {
       ciclo: 'LAST CYCLE',
     },
     vuoto: '—',
+    salvataggio: 'Saving…',
+    nonSalvato: 'We could not save. Try again.',
   },
 
   consenso: {

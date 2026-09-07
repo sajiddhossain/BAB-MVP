@@ -50,3 +50,15 @@ export function Gruppo({ etichetta, children }: { etichetta: ReactNode; children
     </div>
   )
 }
+
+/** Il messaggio quando qualcosa non e' andato. Rosso ma non urlato. */
+export function Errore({ children }: { children: ReactNode }) {
+  return (
+    <p
+      role="alert"
+      className="m-0 mt-[6px] text-[13px] leading-[1.4] font-bold text-[#ef545e]"
+    >
+      {children}
+    </p>
+  )
+}

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Schermo } from '../../ui/Schermo'
-import { Occhiello, Titolo, Occhio, Gruppo } from '../../ui/Testo'
+import { Occhiello, Titolo, Occhio, Gruppo, Errore } from '../../ui/Testo'
 import { Campo, CampoData, dataValida } from '../../ui/Campo'
 import { Bottone } from '../../ui/Bottone'
 import { Giorni } from '../../ui/Giorni'
@@ -8,6 +8,7 @@ import { Pillole } from '../../ui/Scelte'
 import { useLingua } from '../../lib/lingua'
 import { scrivi, useRisposte } from '../../lib/risposte'
 import { SPORT, normalizza } from '../../data/sport'
+import { abbastanzaGrande } from '../../data/onboarding'
 import type { PropsSchermo } from '../tipi'
 
 /** Lo stacco fra il blocco del titolo e il primo campo. */
@@ -49,13 +50,15 @@ export function CorpoNome({ nodo, avanzamento, avanti, indietro }: PropsSchermo)
 export function CorpoCompleanno({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { nascita } = useRisposte()
+  const completa = dataValida(nascita)
+  const grande = abbastanzaGrande(nascita)
   return (
     <Schermo
       nodo={nodo}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={
-        <Bottone attivo={dataValida(nascita)} onClick={avanti}>
+        <Bottone attivo={completa && grande} onClick={avanti}>
           {t.comune.continua}
         </Bottone>
       }
@@ -70,6 +73,7 @@ export function CorpoCompleanno({ nodo, avanzamento, avanti, indietro }: PropsSc
             onChange={(v) => scrivi({ nascita: v })}
             segnaposto={t.compleanno.segnaposto}
           />
+          {completa && !grande && <Errore>{t.compleanno.troppoPiccola}</Errore>}
         </Gruppo>
       </div>
     </Schermo>

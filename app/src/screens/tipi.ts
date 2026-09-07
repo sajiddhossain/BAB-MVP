@@ -11,6 +11,10 @@ export type PropsSchermo = {
   nodo: string
   avanzamento?: number
   avanti: () => void
+  /** vero mentre l'ultimo schermo sta scrivendo nel database */
+  salvando?: boolean
+  /** il salvataggio finale non e' riuscito */
+  erroreSalvataggio?: boolean
   indietro?: () => void
   /** salta questo schermo e vai avanti — usato dai rimandi tipo "non me lo ricordo" */
   saltaA?: (id: string) => void

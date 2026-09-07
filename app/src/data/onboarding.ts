@@ -24,7 +24,6 @@ export type Corpo =
   | 'gare'
   | 'cicloSiNo'
   | 'cicloDate'
-  | 'cicloEta'
   | 'primoCiclo'
   | 'contraccettivo'
   | 'riepilogo'
@@ -50,6 +49,19 @@ export function minorenne(nascita: string): boolean {
   return diciotto > new Date()
 }
 
+/**
+ * BAB parte dai 12 anni: il limite sta anche nel database, quindi se lo
+ * lasciassimo solo alla UI l'inserimento fallirebbe con un errore che non
+ * vuol dire niente per chi lo legge.
+ */
+export function abbastanzaGrande(nascita: string): boolean {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(nascita.trim())
+  if (!m) return false
+  const [, g, me, a] = m
+  const dodici = new Date(Number(a) + 12, Number(me) - 1, Number(g))
+  return dodici <= new Date()
+}
+
 const haCiclo = (r: Risposte) => r.ciclo !== 'si'
 
 export const PERCORSO: Passo[] = [
@@ -71,14 +83,12 @@ export const PERCORSO: Passo[] = [
 
   { id: 'ciclo', corpo: 'cicloSiNo', nodo: { it: '3772:241', en: '3958:769' } },
   { id: 'ciclo-date', corpo: 'cicloDate', nodo: { it: '3772:261', en: '3958:797' }, salta: haCiclo },
-  { id: 'ciclo-eta', corpo: 'cicloEta', nodo: { it: '3871:2', en: '3958:1248' }, salta: haCiclo },
-  {
-    id: 'primo-ciclo',
-    corpo: 'primoCiclo',
-    nodo: { it: '3907:2', en: '3958:1308' },
-    // ci si arriva solo da "non me lo ricordo" sullo schermo dell'eta'
-    salta: (r) => r.ciclo !== 'si' || r.etaPrimoCiclo !== 'non-ricordo',
-  },
+  /*
+   * 13-cycle-age (3871:2) chiedeva la stessa cosa come numero di anni. Resta
+   * in Figma ma non nel percorso: mese e anno sono piu' facili da rispondere
+   * di un'eta' che va ricordata a mente.
+   */
+  { id: 'primo-ciclo', corpo: 'primoCiclo', nodo: { it: '3907:2', en: '3958:1308' }, salta: haCiclo },
   {
     id: 'contraccettivo',
     corpo: 'contraccettivo',

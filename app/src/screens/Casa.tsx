@@ -3,6 +3,7 @@ import { Titolo, Occhiello } from '../ui/Testo'
 import { Bottone } from '../ui/Bottone'
 import { useLingua } from '../lib/lingua'
 import { azzera, useRisposte } from '../lib/risposte'
+import { acceso, esci, useSessione } from '../lib/conto'
 import { useNavigate } from 'react-router-dom'
 
 /**
@@ -16,13 +17,34 @@ export function Casa() {
   const { t, lingua, cambia } = useLingua()
   const r = useRisposte()
   const vai = useNavigate()
+  const { sessione } = useSessione()
 
   return (
-    <Schermo nodo="casa" azione={<Bottone onClick={() => { azzera(); vai('/onboarding/accesso') }}>{lingua === 'it' ? 'Ricomincia' : 'Start over'}</Bottone>}>
+    <Schermo
+      nodo="casa"
+      azione={
+        <Bottone
+          onClick={() => {
+            azzera()
+            void esci().then(() => vai('/onboarding/accesso'))
+          }}
+        >
+          {lingua === 'it' ? 'Ricomincia' : 'Start over'}
+        </Bottone>
+      }
+    >
       <Occhiello>BAB</Occhiello>
       <Titolo>
         {r.nome ? (lingua === 'it' ? `Ciao ${r.nome}` : `Hi ${r.nome}`) : t.riepilogo.titolo}
       </Titolo>
+
+      <p className="m-0 mt-2 text-[13px] text-ink-soft">
+        {acceso
+          ? (sessione?.user.email ?? (lingua === 'it' ? 'nessuna sessione' : 'no session'))
+          : lingua === 'it'
+            ? 'Supabase spento: le risposte restano nel telefono'
+            : 'Supabase off: answers stay on this phone'}
+      </p>
 
       <div className="mt-6 flex gap-2">
         {(['it', 'en'] as const).map((l) => (

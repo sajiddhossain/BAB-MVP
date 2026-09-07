@@ -1,9 +1,9 @@
 import { Schermo } from '../../ui/Schermo'
 import { Occhiello, Titolo, Occhio, Gruppo } from '../../ui/Testo'
-import { Campo, CampoData } from '../../ui/Campo'
+import { CampoData } from '../../ui/Campo'
 import { Bottone } from '../../ui/Bottone'
 import { Carta, Carte } from '../../ui/Carta'
-import { Pillole, Selettore, Rimando } from '../../ui/Scelte'
+import { Pillole, Selettore } from '../../ui/Scelte'
 import { useLingua } from '../../lib/lingua'
 import { scrivi, useRisposte } from '../../lib/risposte'
 import type { Risposte } from '../../lib/risposte'
@@ -78,60 +78,6 @@ export function CorpoCicloDate({ nodo, avanzamento, avanti, indietro }: PropsSch
             />
           </Gruppo>
         ))}
-      </div>
-    </Schermo>
-  )
-}
-
-/*
- * 13-cycle-age — 3871:2 / 3958:1248
- *
- * "Non me lo ricordo" non salta la domanda: apre 13b, che la stessa cosa la
- * chiede come mese e anno. E' una lettura nostra dei due frame — in Figma non
- * c'e' il collegamento fra i due, vanno confermati l'ordine e il rimando.
- */
-export function CorpoCicloEta({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
-  const { t } = useLingua()
-  const { etaPrimoCiclo } = useRisposte()
-  const numero = /^\d{1,2}$/.test(etaPrimoCiclo) ? Number(etaPrimoCiclo) : null
-  const valida = numero !== null && numero >= 6 && numero <= 25
-
-  return (
-    <Schermo
-      nodo={nodo}
-      avanzamento={avanzamento}
-      indietro={indietro}
-      azione={
-        <div>
-          <Bottone attivo={valida} onClick={avanti}>
-            {t.comune.continua}
-          </Bottone>
-          <div className="mt-4">
-            <Rimando
-              onClick={() => {
-                scrivi({ etaPrimoCiclo: 'non-ricordo' })
-                avanti()
-              }}
-            >
-              {t.cicloEta.nonRicordo}
-            </Rimando>
-          </div>
-        </div>
-      }
-    >
-      <Occhiello>{t.cicloEta.occhiello}</Occhiello>
-      <Titolo>{t.cicloEta.titolo}</Titolo>
-      <Occhio>{t.cicloEta.occhio}</Occhio>
-      <div className={STACCO}>
-        <Gruppo etichetta={t.cicloEta.etichetta}>
-          <Campo
-            inputMode="numeric"
-            maxLength={2}
-            placeholder="13"
-            value={etaPrimoCiclo === 'non-ricordo' ? '' : etaPrimoCiclo}
-            onChange={(e) => scrivi({ etaPrimoCiclo: e.target.value.replace(/\D/g, '').slice(0, 2) })}
-          />
-        </Gruppo>
       </div>
     </Schermo>
   )

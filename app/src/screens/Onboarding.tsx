@@ -1,8 +1,10 @@
+import { useState } from 'react'
 import type { ComponentType } from 'react'
 import { useNavigate, useParams, Navigate } from 'react-router-dom'
 import { percorsoVisibile } from '../data/onboarding'
 import type { Corpo } from '../data/onboarding'
 import { useLingua } from '../lib/lingua'
+import { salvaOnboarding } from '../lib/conto'
 import { tutte, useRisposte } from '../lib/risposte'
 import type { PropsSchermo } from './tipi'
 import {
@@ -16,7 +18,6 @@ import {
 import {
   CorpoCicloSiNo,
   CorpoCicloDate,
-  CorpoCicloEta,
   CorpoPrimoCiclo,
   CorpoContraccettivo,
 } from './corpi/Ciclo'
@@ -40,7 +41,6 @@ const CORPI: Record<Corpo, ComponentType<PropsSchermo>> = {
   gare: CorpoGare,
   cicloSiNo: CorpoCicloSiNo,
   cicloDate: CorpoCicloDate,
-  cicloEta: CorpoCicloEta,
   primoCiclo: CorpoPrimoCiclo,
   contraccettivo: CorpoContraccettivo,
   riepilogo: CorpoRiepilogo,
@@ -63,6 +63,8 @@ export function Onboarding() {
   const vai = useNavigate()
   const { lingua } = useLingua()
   const risposte = useRisposte()
+  const [salvando, setSalvando] = useState(false)
+  const [nonSalvato, setNonSalvato] = useState(false)
 
   const percorso = percorsoVisibile(risposte)
   const i = percorso.findIndex((p) => p.id === id)
@@ -75,7 +77,7 @@ export function Onboarding() {
   const nelPercorso = percorso.filter((p) => !p.fuoriPercorso)
   const posizione = nelPercorso.indexOf(passo)
 
-  function avanti() {
+  async function avanti() {
     // `tutte()` e non `risposte`: chi risponde toccando una carta scrive e
     // chiama avanti nello stesso gesto, quindi qui il valore del render e'
     // ancora quello di prima — e sono proprio quelle risposte a decidere
@@ -83,7 +85,25 @@ export function Onboarding() {
     const aggiornato = percorsoVisibile(tutte())
     const qui = aggiornato.findIndex((p) => p.id === passo.id)
     const prossimo = aggiornato[qui + 1]
-    vai(prossimo ? `/onboarding/${prossimo.id}` : '/casa')
+
+    if (prossimo) {
+      vai(`/onboarding/${prossimo.id}`)
+      return
+    }
+
+    // fine del percorso: e' qui che tutto quello che ha risposto va nel
+    // database, in un colpo solo. Non a ogni schermo: a meta' onboarding non
+    // c'e' ancora una riga `athletes` valida da aggiornare.
+    setSalvando(true)
+    setNonSalvato(false)
+    const esito = await salvaOnboarding(tutte(), lingua)
+    setSalvando(false)
+    if (!esito.ok) {
+      console.error('[onboarding]', esito.errore)
+      setNonSalvato(true)
+      return
+    }
+    vai('/casa')
   }
 
   const Corpo = CORPI[passo.corpo]
@@ -95,7 +115,9 @@ export function Onboarding() {
       avanzamento={
         posizione === -1 ? undefined : (posizione + 1) / nelPercorso.length
       }
-      avanti={avanti}
+      avanti={() => void avanti()}
+      salvando={salvando}
+      erroreSalvataggio={nonSalvato}
       indietro={i > 0 ? () => vai(-1) : undefined}
     />
   )

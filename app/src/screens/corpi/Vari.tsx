@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Schermo } from '../../ui/Schermo'
-import { Occhiello, Titolo, Occhio, Gruppo, Etichetta } from '../../ui/Testo'
+import { Occhiello, Titolo, Occhio, Gruppo, Etichetta, Errore } from '../../ui/Testo'
 import { Campo } from '../../ui/Campo'
 import { Bottone } from '../../ui/Bottone'
 import { Nota } from '../../ui/Nota'
 import { Casella, Rimando } from '../../ui/Scelte'
 import { useLingua } from '../../lib/lingua'
 import { scrivi, useRisposte } from '../../lib/risposte'
+import { mandaLink, verificaCodice } from '../../lib/conto'
 import type { Risposte } from '../../lib/risposte'
 import { SPORT } from '../../data/sport'
 import type { PropsSchermo } from '../tipi'
@@ -17,14 +18,31 @@ import sparkles from '../../assets/icon-sparkles.svg'
 export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
   const { t } = useLingua()
   const { email } = useRisposte()
+  const [inCorso, setInCorso] = useState(false)
+  const [errore, setErrore] = useState('')
   const valida = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email.trim())
+
+  async function manda() {
+    setInCorso(true)
+    setErrore('')
+    const esito = await mandaLink(email)
+    setInCorso(false)
+    // il messaggio vero di Supabase finisce nella console, non a schermo:
+    // a chi legge non dice niente, a noi serve per capire cosa e' successo
+    if (!esito.ok) {
+      console.error('[accesso]', esito.errore)
+      setErrore(t.accesso.nonRiuscito)
+      return
+    }
+    avanti()
+  }
 
   return (
     <Schermo
       nodo={nodo}
       azione={
-        <Bottone attivo={valida} onClick={avanti}>
-          {t.accesso.azione}
+        <Bottone attivo={valida && !inCorso} onClick={manda}>
+          {inCorso ? t.accesso.invio : t.accesso.azione}
         </Bottone>
       }
     >
@@ -50,8 +68,12 @@ export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
             autoComplete="email"
             placeholder={t.accesso.segnaposto}
             value={email}
-            onChange={(e) => scrivi({ email: e.target.value })}
+            onChange={(e) => {
+              scrivi({ email: e.target.value })
+              setErrore('')
+            }}
           />
+          {errore && <Errore>{errore}</Errore>}
         </Gruppo>
       </div>
     </Schermo>
@@ -69,14 +91,29 @@ export function CorpoLink({ nodo, avanti }: PropsSchermo) {
   const { t } = useLingua()
   const { email } = useRisposte()
   const [cifre, setCifre] = useState<string[]>(['', '', '', '', '', ''])
+  const [errore, setErrore] = useState('')
 
   function scriviCifra(i: number, v: string) {
     const c = v.replace(/\D/g, '').slice(-1)
     const copia = [...cifre]
     copia[i] = c
     setCifre(copia)
+    setErrore('')
     if (c && i < 5) fuoco(i + 1)
-    if (copia.every((x) => x !== '')) avanti()
+    // sei cifre sono una risposta completa: non serve un bottone di conferma
+    if (copia.every((x) => x !== '')) void controlla(copia.join(''))
+  }
+
+  async function controlla(codice: string) {
+    const esito = await verificaCodice(email, codice)
+    if (!esito.ok) {
+      console.error('[codice]', esito.errore)
+      setErrore(t.linkMandato.codiceSbagliato)
+      setCifre(['', '', '', '', '', ''])
+      fuoco(0)
+      return
+    }
+    avanti()
   }
 
   function fuoco(i: number) {
@@ -117,10 +154,13 @@ export function CorpoLink({ nodo, avanti }: PropsSchermo) {
               onKeyDown={(e) => {
                 if (e.key === 'Backspace' && cifre[i] === '' && i > 0) fuoco(i - 1)
               }}
-              className="h-14 min-w-0 flex-1 rounded-field border-[1.5px] border-line bg-surface text-center text-[20px] font-bold text-ink outline-none focus:border-violet"
+              className={`h-14 min-w-0 flex-1 rounded-field border-[1.5px] bg-surface text-center text-[20px] font-bold text-ink outline-none focus:border-violet ${
+                errore ? 'border-[#ef545e]' : 'border-line'
+              }`}
             />
           ))}
         </div>
+        {errore && <Errore>{errore}</Errore>}
       </div>
     </Schermo>
   )
@@ -163,7 +203,14 @@ export function CorpoIntro({ nodo, avanti }: PropsSchermo) {
 }
 
 /* 14-summary — 3772:308 / 3958:853 */
-export function CorpoRiepilogo({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoRiepilogo({
+  nodo,
+  avanzamento,
+  avanti,
+  indietro,
+  salvando,
+  erroreSalvataggio,
+}: PropsSchermo) {
   const { t, lingua } = useLingua()
   const r = useRisposte()
 
@@ -188,7 +235,14 @@ export function CorpoRiepilogo({ nodo, avanzamento, avanti, indietro }: PropsSch
       nodo={nodo}
       avanzamento={avanzamento}
       indietro={indietro}
-      azione={<Bottone onClick={avanti}>{t.comune.continua}</Bottone>}
+      azione={
+        <div>
+          <Bottone attivo={!salvando} onClick={avanti}>
+            {salvando ? t.riepilogo.salvataggio : t.comune.continua}
+          </Bottone>
+          {erroreSalvataggio && <Errore>{t.riepilogo.nonSalvato}</Errore>}
+        </div>
+      }
     >
       <Occhiello>{t.riepilogo.occhiello}</Occhiello>
       <Titolo>{t.riepilogo.titolo}</Titolo>
@@ -210,7 +264,14 @@ export function CorpoRiepilogo({ nodo, avanzamento, avanti, indietro }: PropsSch
 }
 
 /* 15-consent — 3771:81 / 3958:538 */
-export function CorpoConsenso({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoConsenso({
+  nodo,
+  avanzamento,
+  avanti,
+  indietro,
+  salvando,
+  erroreSalvataggio,
+}: PropsSchermo) {
   const { t } = useLingua()
   const { consensi } = useRisposte()
 
@@ -228,9 +289,12 @@ export function CorpoConsenso({ nodo, avanzamento, avanti, indietro }: PropsSche
       avanzamento={avanzamento}
       indietro={indietro}
       azione={
-        <Bottone attivo={consensi[0] && consensi[1]} onClick={avanti}>
-          {t.comune.continua}
-        </Bottone>
+        <div>
+          <Bottone attivo={consensi[0] && consensi[1] && !salvando} onClick={avanti}>
+            {salvando ? t.riepilogo.salvataggio : t.comune.continua}
+          </Bottone>
+          {erroreSalvataggio && <Errore>{t.riepilogo.nonSalvato}</Errore>}
+        </div>
       }
     >
       <Occhiello>{t.consenso.occhiello}</Occhiello>

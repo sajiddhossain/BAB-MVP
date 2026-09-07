@@ -13,7 +13,6 @@ export type Risposte = {
   prossimaGara: string
   ciclo: '' | 'si' | 'non-ancora' | 'preferisco-non-dirlo'
   cicliUltimi: [string, string, string]
-  etaPrimoCiclo: string
   primoCicloMese: number | null
   primoCicloAnno: number | null
   contraccettivo: '' | 'si' | 'no'
@@ -33,7 +32,6 @@ export const VUOTE: Risposte = {
   prossimaGara: '',
   ciclo: '',
   cicliUltimi: ['', '', ''],
-  etaPrimoCiclo: '',
   primoCicloMese: null,
   primoCicloAnno: null,
   contraccettivo: '',
