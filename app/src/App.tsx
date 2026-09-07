@@ -1,11 +1,13 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { AuthLogin } from './screens/AuthLogin'
+import { Onboarding } from './screens/Onboarding'
+import { Casa } from './screens/Casa'
 
 export function App() {
   return (
     <Routes>
-      <Route path="/" element={<AuthLogin />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/onboarding/:id" element={<Onboarding />} />
+      <Route path="/casa" element={<Casa />} />
+      <Route path="*" element={<Navigate to="/onboarding/accesso" replace />} />
     </Routes>
   )
 }

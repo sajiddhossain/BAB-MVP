@@ -12,3 +12,50 @@ export function Campo(props: InputHTMLAttributes<HTMLInputElement>) {
     />
   )
 }
+
+/**
+ * Il campo data.
+ *
+ * Le barre le mette lui mentre si scrive: sul telefono si tiene la tastiera
+ * numerica, che e' quello che serve, e non si deve azzeccare il tasto della
+ * barra. Cancellando, la barra sparisce da sola perche' non la tratteniamo
+ * mai — si ricalcola ogni volta dalle sole cifre.
+ */
+export function CampoData({
+  valore,
+  onChange,
+  segnaposto,
+}: {
+  valore: string
+  onChange: (v: string) => void
+  segnaposto: string
+}) {
+  return (
+    <Campo
+      inputMode="numeric"
+      autoComplete="off"
+      placeholder={segnaposto}
+      value={valore}
+      maxLength={10}
+      onChange={(e) => onChange(formattaData(e.target.value))}
+    />
+  )
+}
+
+/** "1234" -> "12/34", "12345678" -> "12/34/5678". Solo cifre, massimo otto. */
+export function formattaData(grezzo: string): string {
+  const c = grezzo.replace(/\D/g, '').slice(0, 8)
+  if (c.length <= 2) return c
+  if (c.length <= 4) return `${c.slice(0, 2)}/${c.slice(2)}`
+  return `${c.slice(0, 2)}/${c.slice(2, 4)}/${c.slice(4)}`
+}
+
+/** Vero se e' una data gg/mm/aaaa che esiste davvero. */
+export function dataValida(v: string): boolean {
+  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v)
+  if (!m) return false
+  const [, g, me, a] = m.map(Number)
+  if (me < 1 || me > 12 || g < 1) return false
+  const d = new Date(a, me - 1, g)
+  return d.getFullYear() === a && d.getMonth() === me - 1 && d.getDate() === g
+}

@@ -1,0 +1,539 @@
+/**
+ * Tutti i testi dell'onboarding, in italiano e in inglese.
+ *
+ * Vengono dai nomi dei livelli di testo del file Figma: in questo file i
+ * livelli si chiamano come il testo che contengono, quindi la copia si legge
+ * dai metadati senza aprire schermo per schermo.
+ *
+ * Due cose da sapere prima di fidarsi di quello che c'e' scritto qui:
+ *
+ * 1. Alcuni frame inglesi contengono ancora l'italiano (vedi DA_RIVEDERE).
+ *    Li' l'inglese qui sotto l'abbiamo scritto noi: funziona, ma non e' ancora
+ *    passato da chi scrive i testi.
+ * 2. Su alcuni schermi i livelli si chiamano `headline`, `body-text`,
+ *    `button-text`: sono segnaposto, il testo vero non sta nel nome. Quelli
+ *    vanno riletti con get_design_context schermo per schermo.
+ */
+
+/** Gli schermi in cui il frame inglese di Figma contiene ancora l'italiano. */
+export const DA_RIVEDERE = [
+  '11-cycle-question',
+  '12-cycle-dates',
+  '13-cycle-age',
+  '13b-first-period-date',
+  // e i nomi dei giorni, che restano "Lun Mar Mer..." anche nel frame inglese
+  '08-training/giorni',
+  '09-pe/giorni',
+] as const
+
+const it = {
+  comune: {
+    continua: 'Continua',
+    indietro: 'Indietro',
+    si: 'Sì',
+    no: 'No',
+    salta: 'Salta',
+  },
+
+  accesso: {
+    occhiello: 'ACCESSO',
+    titolo: 'Entra in BAB',
+    occhio: 'Inserisci la tua mail e riceverai subito un link per attivare BAB.',
+    nota: 'Siamo felici che tu sia qui 🎉',
+    etichetta: 'LA TUA EMAIL',
+    segnaposto: 'nome@esempio.it',
+    azione: 'Mandami il link',
+  },
+
+  linkMandato: {
+    occhiello: 'ACCESSO',
+    titolo: 'Guarda la posta',
+    occhio: (mail: string) =>
+      `Abbiamo mandato un link a ${mail}. Aprilo da questo telefono ed è fatta.`,
+    rimanda: 'Non è arrivato? Rimandalo',
+    spiegaCodice:
+      'Il link non si apre dove vuoi tu? Puoi usare il codice a 6 cifre che trovi nella mail.',
+    etichettaCodice: 'CODICE',
+  },
+
+  cosaEBab: {
+    occhiello: 'BENVENUTA!',
+    titolo: 'Impariamo i segnali del corpo',
+    occhio:
+      'Ogni giorno, il corpo ci manda dei messaggi — stanco, teso, riposato, carico. Ma coglierne e capirne il significato può essere complicato a volte. BAB ti insegna questo superpotere, un passo alla volta.',
+    azione: 'Mostrami come',
+    passi: [
+      {
+        titolo: 'Prima indovina',
+        testo: 'Prova a indovinare come sta il tuo corpo oggi e quanto ha da dare.',
+      },
+      {
+        titolo: 'Sintonizzati',
+        testo: 'Soffermati ad ascoltare cosa ti sta dicendo il tuo corpo, un passo alla volta.',
+      },
+      {
+        titolo: 'Impara dal confronto',
+        testo:
+          'Confronta come pensavi di stare con ciò che ti ha detto il corpo: è così che impari a leggere sempre meglio i suoi segnali.',
+      },
+    ],
+  },
+
+  nome: {
+    occhiello: 'IL TUO PROFILO',
+    titolo: 'Come ti chiamiamo?',
+    occhio: "Il nome che vuoi leggere quando apri l'app. Puoi cambiarlo quando vuoi.",
+    etichetta: 'IL TUO NOME',
+    segnaposto: 'Il tuo nome',
+  },
+
+  compleanno: {
+    occhiello: 'IL TUO PROFILO',
+    titolo: 'Quando compi gli anni?',
+    occhio:
+      'BAB lo usa per capire la tua fase di crescita. Il corpo cambia un sacco in questi anni, e le stesse sensazioni possono significare cose diverse.',
+    etichetta: 'DATA DI NASCITA',
+    segnaposto: 'gg/mm/aaaa',
+  },
+
+  sport: {
+    occhiello: 'IL TUO PROFILO',
+    titolo: 'Quali sport fai?',
+    occhio: 'Aggiungili tutti e poi seleziona quello principale',
+    etichetta: 'CERCA UNO SPORT',
+    segnaposto: 'Cerca uno sport',
+    principale: 'PRINCIPALE',
+    nessuno: 'Nessun risultato',
+  },
+
+  allenamenti: {
+    occhiello: 'IL TUO PROFILO',
+    titolo: 'Quando ti alleni?',
+    occhio: "Imposta i giorni e l'orario per ogni sport. Puoi sempre cambiarli dopo.",
+    giorni: 'I TUOI GIORNI',
+    orario: 'A CHE ORA DI SOLITO?',
+    fasce: ['Mattina', 'Pomeriggio', 'Sera'],
+  },
+
+  edFisica: {
+    occhiello: 'IL TUO PROFILO',
+    titolo: 'Educazione fisica',
+    occhio: 'Ogni giorno che fai attività fisica conta, pure la ricreazione, se corri.',
+    etichetta: 'GIORNI DI ED. FISICA',
+  },
+
+  gare: {
+    occhiello: 'IL TUO PROFILO',
+    titolo: 'Gare e partite',
+    occhio: "Se non sai ancora l'orario va benissimo: lo aggiungi dopo.",
+    etichetta: 'LA PROSSIMA GARA, SE LA SAI GIÀ',
+    segnaposto: 'gg/mm/aaaa',
+  },
+
+  cicloSiNo: {
+    occhiello: 'IL TUO CICLO',
+    titolo: 'Hai già il ciclo?',
+    scelte: [
+      { id: 'si', titolo: "Sì, ce l'ho", sotto: 'BAB ti supporta a gestirlo.' },
+      { id: 'non-ancora', titolo: 'Non ancora', sotto: 'Ogni corpo ha il suo tempo.' },
+      {
+        id: 'preferisco-non-dirlo',
+        titolo: 'Preferisco non dirlo',
+        sotto: 'Va bene anche così. Questo spazio è tuo.',
+      },
+    ],
+  },
+
+  cicloDate: {
+    occhiello: 'IL TUO CICLO',
+    titolo: 'Quando sono iniziati i tuoi ultimi tre cicli?',
+    occhio: 'Anche una sola data basta a BAB per partire.',
+    etichette: ['IL PIÙ RECENTE', 'QUELLO PRIMA', 'E ANCORA PRIMA'],
+    segnaposto: 'gg/mm/aaaa',
+  },
+
+  cicloEta: {
+    occhiello: 'IL TUO CICLO',
+    titolo: 'Se ti ricordi, quanti anni avevi quando ti è venuto la prima volta?',
+    occhio: 'Solo se lo sai — non è un problema se non te lo ricordi.',
+    etichetta: 'LA TUA ETÀ',
+    nonRicordo: 'Non me lo ricordo',
+  },
+
+  primoCiclo: {
+    occhiello: 'IL TUO CICLO',
+    titolo: 'Quando hai avuto il primo ciclo?',
+    occhio: "Anche solo l'anno va benissimo, se non ricordi il mese.",
+    mese: 'MESE',
+    scegliMese: 'Seleziona mese',
+    anno: 'ANNO',
+    scegliAnno: 'Seleziona anno',
+  },
+
+  contraccettivo: {
+    occhiello: 'IL TUO CICLO',
+    titolo: 'Prendi un contraccettivo ormonale?',
+    nota: 'Condividerlo aiuta BAB a darti insight più precisi, perché la contraccezione ormonale può influenzare alcuni dei parametri che monitorerai.',
+  },
+
+  riepilogo: {
+    occhiello: 'RIEPILOGO',
+    titolo: 'Ecco fatto',
+    occhio: 'Questo è quello che BAB sa di te. Puoi cambiare tutto dalle impostazioni.',
+    voci: {
+      nome: 'COME TI CHIAMIAMO?',
+      sport: 'IL TUO SPORT',
+      allenamenti: 'ALLENAMENTI',
+      edFisica: 'ED. FISICA A SCUOLA',
+      ciclo: 'ULTIMO CICLO',
+    },
+    vuoto: '—',
+  },
+
+  consenso: {
+    occhiello: 'CONSENSO',
+    titolo: 'Prima di tutto il resto',
+    occhio:
+      'Hai meno di 18 anni, quindi servono due sì: il tuo e quello di un genitore o di chi si prende cura di te.',
+    segnaposto:
+      'Questo testo è un segnaposto: quello definitivo arriva prima che la app venga usata davvero.',
+    caselle: ['Ho letto e ci sto', 'Un genitore o chi si prende cura di me ha letto e ci sta'],
+  },
+
+  primaRep: {
+    occhiello: 'COME FUNZIONA',
+    titolo: 'Indovina. Sintonizzati. Confronta',
+    occhio: 'Tre step da fare ogni giorno:',
+    chiusura:
+      'Più ti alleni a farlo, più accurata sarà la tua lettura dei segnali del corpo.',
+    passi: [
+      {
+        titolo: 'Prima indovina',
+        testo: 'Prova a indovinare come sta il tuo corpo oggi e quanto ha da dare.',
+      },
+      {
+        titolo: 'Sintonizzati',
+        testo: 'Soffermati ad ascoltare cosa ti sta dicendo il tuo corpo, un passo alla volta.',
+      },
+      {
+        titolo: 'Impara dal confronto',
+        testo:
+          'Confronta come pensavi di stare con ciò che ti ha detto il corpo: è così che impari a leggere sempre meglio i suoi segnali.',
+      },
+    ],
+  },
+
+  indovina: {
+    occhiello: 'INDOVINA',
+    titolo: 'Come ti senti adesso?',
+    occhio: 'Non pensarci troppo: la prima sensazione è quella buona.',
+    fasce: [
+      { id: 'lento', emoji: '🐢', titolo: 'Lento', sotto: 'calmo' },
+      { id: 'medio', emoji: '🚶‍♀️', titolo: 'Medio', sotto: 'tiene il ritmo' },
+      { id: 'veloce', emoji: '🐇', titolo: 'Veloce', sotto: 'su di giri' },
+    ],
+  },
+
+  conta: {
+    occhiello: 'CONTA',
+    titolo: 'Conta i battiti',
+    occhio: 'Trova il polso e tocca a ogni battito per quindici secondi.',
+    tocca: 'TAP',
+    battiti: 'BATTITI',
+    secondi: 'SECONDI',
+  },
+
+  confronto: {
+    occhiello: 'CONFRONTATI',
+    titolo: 'Hai appena letto il tuo corpo.',
+    unita: 'BATTITI AL MINUTO',
+    ipotesi: 'LA TUA IPOTESI',
+    contato: 'HAI CONTATO',
+    vicino:
+      'La tua sensazione e il tuo conteggio sono vicini — bel fatto! Con la pratica diventerai ancora più brava a leggere il tuo corpo.',
+    lontano:
+      'La tua sensazione e il tuo conteggio sono finiti in fasce diverse. È del tutto normale il primo giorno, ed è proprio la distanza che imparerai a chiudere. Hai appena trovato il tuo punto di partenza.',
+    chiusura:
+      'Imparare a leggere rapidamente i segnali del corpo è come allenare un muscolo: hai appena fatto la tua prima rep.',
+  },
+
+  ritmi: {
+    scattante: 'Scattante',
+    stabile: 'Stabile',
+    tranquillo: 'Tranquillo',
+  },
+
+  giorni: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+  mesi: [
+    'Gennaio',
+    'Febbraio',
+    'Marzo',
+    'Aprile',
+    'Maggio',
+    'Giugno',
+    'Luglio',
+    'Agosto',
+    'Settembre',
+    'Ottobre',
+    'Novembre',
+    'Dicembre',
+  ],
+}
+
+/**
+ * Deve avere esattamente la stessa forma dell'italiano: se manca una chiave o
+ * ne avanza una, il typecheck si ferma qui invece che a schermo acceso.
+ */
+const en: typeof it = {
+  comune: {
+    continua: 'Continue',
+    indietro: 'Back',
+    si: 'Yes',
+    no: 'No',
+    salta: 'Skip',
+  },
+
+  accesso: {
+    occhiello: 'ACCESS',
+    titolo: 'Enter BAB',
+    occhio: 'Enter your email and you will immediately receive a link to activate BAB.',
+    nota: 'We are happy to have you here 🎉',
+    etichetta: 'YOUR EMAIL',
+    segnaposto: 'name@example.com',
+    azione: 'Send me the link',
+  },
+
+  linkMandato: {
+    occhiello: 'ACCESS',
+    titolo: 'Check your inbox',
+    occhio: (mail: string) =>
+      `We have sent a link to ${mail}. Open it from this phone and you're all set.`,
+    rimanda: 'Did it not arrive? Resend it.',
+    spiegaCodice:
+      'Is the link not opening where you want it to? You can use the 6-digit code found in the email.',
+    etichettaCodice: 'CODE',
+  },
+
+  cosaEBab: {
+    occhiello: 'WELCOME!',
+    titolo: "Let's learn your body's signals",
+    occhio:
+      "Every day, your body sends you messages — tired, tense, rested, charged. But catching them and working out what they mean can be tricky. BAB teaches you that superpower, one step at a time.",
+    azione: 'Show me how',
+    passi: [
+      {
+        titolo: 'Predict first',
+        testo: "Take a quick guess about how much your body's got to give today.",
+      },
+      {
+        titolo: 'Tune in',
+        testo: "Slow down and actually sense what's going on, bit by bit.",
+      },
+      {
+        titolo: 'Learn the gap',
+        testo:
+          'The space between your guess and your body’s tempo is where you get sharper at decoding its signals. Being "off" isn’t a fail.',
+      },
+    ],
+  },
+
+  nome: {
+    occhiello: 'YOUR PROFILE',
+    titolo: 'What shall we call you?',
+    occhio: 'The name you want to see when you open the app. You can change it whenever you like.',
+    etichetta: 'YOUR NAME',
+    segnaposto: 'Your name',
+  },
+
+  compleanno: {
+    occhiello: 'YOUR PROFILE',
+    titolo: 'When is your birthday?',
+    occhio:
+      'BAB uses this to understand your growth phase. Your body changes a lot during these years, and the same feelings can mean different things.',
+    etichetta: 'DATE OF BIRTH',
+    segnaposto: 'dd/mm/yyyy',
+  },
+
+  sport: {
+    occhiello: 'YOUR PROFILE',
+    titolo: 'What sports do you play?',
+    occhio: 'Add them all and then select the main one',
+    etichetta: 'SEARCH FOR A SPORT',
+    segnaposto: 'Search for a sport',
+    principale: 'MAIN',
+    nessuno: 'No results',
+  },
+
+  allenamenti: {
+    occhiello: 'YOUR PROFILE',
+    titolo: 'When do you train?',
+    occhio: 'Set the days and times for each sport. You can always change them later.',
+    giorni: 'YOUR DAYS',
+    orario: 'AT WHAT TIME USUALLY?',
+    fasce: ['Morning', 'Afternoon', 'Evening'],
+  },
+
+  edFisica: {
+    occhiello: 'YOUR PROFILE',
+    titolo: 'Physical education',
+    occhio: 'Every day you do physical activity counts, even playtime, if you run.',
+    etichetta: 'PE DAYS',
+  },
+
+  gare: {
+    occhiello: 'YOUR PROFILE',
+    titolo: 'Matches and games',
+    occhio: "If you don't know the time yet, that's perfectly fine: you can add it later.",
+    etichetta: 'THE NEXT MATCH, IF YOU ALREADY KNOW IT',
+    segnaposto: 'dd/mm/yyyy',
+  },
+
+  // --- da qui in giu' il frame inglese di Figma contiene ancora l'italiano:
+  //     questo inglese l'abbiamo scritto noi. Vedi DA_RIVEDERE.
+  cicloSiNo: {
+    occhiello: 'YOUR CYCLE',
+    titolo: 'Have you started your period?',
+    scelte: [
+      { id: 'si', titolo: 'Yes, I have', sotto: 'BAB helps you keep track of it.' },
+      { id: 'non-ancora', titolo: 'Not yet', sotto: 'Every body has its own timing.' },
+      {
+        id: 'preferisco-non-dirlo',
+        titolo: "I'd rather not say",
+        sotto: 'That is fine too. This space is yours.',
+      },
+    ],
+  },
+
+  cicloDate: {
+    occhiello: 'YOUR CYCLE',
+    titolo: 'When did your last three periods start?',
+    occhio: 'Even one date is enough for BAB to get going.',
+    etichette: ['THE MOST RECENT', 'THE ONE BEFORE', 'AND THE ONE BEFORE THAT'],
+    segnaposto: 'dd/mm/yyyy',
+  },
+
+  cicloEta: {
+    occhiello: 'YOUR CYCLE',
+    titolo: 'If you remember, how old were you the first time?',
+    occhio: "Only if you know — it is not a problem if you don't remember.",
+    etichetta: 'YOUR AGE',
+    nonRicordo: "I don't remember",
+  },
+
+  primoCiclo: {
+    occhiello: 'YOUR CYCLE',
+    titolo: 'When did you have your first period?',
+    occhio: "Even just the year is fine, if you don't remember the month.",
+    mese: 'MONTH',
+    scegliMese: 'Select month',
+    anno: 'YEAR',
+    scegliAnno: 'Select year',
+  },
+  // --- fine della parte tradotta da noi
+
+  contraccettivo: {
+    occhiello: 'YOUR CYCLE',
+    titolo: 'Taking any hormonal contraception?',
+    nota: "Sharing it helps BAB give you more accurate insights, as hormonal contraception can affect some of the metrics you'll track.",
+  },
+
+  riepilogo: {
+    occhiello: 'SUMMARY',
+    titolo: 'Done',
+    occhio: 'This is what BAB knows about you. You can change everything in the settings.',
+    voci: {
+      nome: 'WHAT SHALL WE CALL YOU?',
+      sport: 'YOUR SPORT',
+      allenamenti: 'TRAINING SESSIONS',
+      edFisica: 'PE AT SCHOOL',
+      ciclo: 'LAST CYCLE',
+    },
+    vuoto: '—',
+  },
+
+  consenso: {
+    occhiello: 'CONSENT',
+    titolo: 'Before we proceed',
+    occhio: 'You are under 18, so we need two yeses: yours and one from a parent or guardian.',
+    segnaposto:
+      'This text is a placeholder: the final version will arrive before the app is actually used.',
+    caselle: ['I have read and agree.', 'A parent or guardian has read and agrees.'],
+  },
+
+  primaRep: {
+    occhiello: 'HOW IT WORKS',
+    titolo: 'Guess. Tune in. Compare',
+    occhio: 'Three steps to do every day:',
+    chiusura: 'The more you practise, the sharper your reading of your body will get.',
+    passi: [
+      {
+        titolo: 'Predict first',
+        testo: "Take a quick guess about how much your body's got to give today.",
+      },
+      { titolo: 'Tune in', testo: "Slow down and actually sense what's going on, bit by bit." },
+      {
+        titolo: 'Learn the gap',
+        testo:
+          'Compare how you thought you felt with what your body told you: that is how you get better at reading its signals.',
+      },
+    ],
+  },
+
+  indovina: {
+    occhiello: 'GUESS',
+    titolo: 'How do you feel right now?',
+    occhio: "Don't overthink it: the first feeling is the right one.",
+    fasce: [
+      { id: 'lento', emoji: '🐢', titolo: 'Slow', sotto: 'Calm & settled' },
+      { id: 'medio', emoji: '🚶‍♀️', titolo: 'Medium', sotto: 'Ticking along' },
+      { id: 'veloce', emoji: '🐇', titolo: 'Fast', sotto: 'Up & going' },
+    ],
+  },
+
+  conta: {
+    occhiello: 'COUNT',
+    titolo: 'Count your beats',
+    occhio: 'Find your pulse and tap on every beat for fifteen seconds.',
+    tocca: 'START',
+    battiti: 'BEATS',
+    secondi: 'SECONDS',
+  },
+
+  confronto: {
+    occhiello: 'COMPARE',
+    titolo: 'You have just read your body.',
+    unita: 'BEATS PER MINUTE (YOU COUNTED)',
+    ipotesi: 'Your prediction',
+    contato: 'You counted',
+    vicino:
+      'Your feeling and your count landed close together — nice one! With practice you will get even better at reading your body.',
+    lontano:
+      'Your guess and your count landed in different bands. That is completely normal on day one, and it is exactly the gap you will get better at closing. You just found your starting point.',
+    chiusura:
+      'Learning to read your body’s signals quickly is like training a muscle: you have just done your first rep.',
+  },
+
+  ritmi: {
+    scattante: 'Upbeat',
+    stabile: 'Steady',
+    tranquillo: 'Gentle',
+  },
+
+  giorni: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  mesi: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
+}
+
+export const TESTI = { it, en }
