@@ -95,3 +95,32 @@ L'età minima (12 anni) è nel vincolo di `athletes.birth_date` **e** nello
 schermo del compleanno: se stesse solo nella UI basterebbe una chiamata
 diretta all'API per aggirarla, e se stesse solo nel database l'inserimento
 fallirebbe alla fine con un errore che a chi legge non dice niente.
+
+### Provare l'accesso senza mandare mail
+
+Il codice a sei cifre si puo' farsi dare da Supabase senza spedirlo. Serve la
+chiave `service_role`, che **non va nel repo e non va in nessuna chat**:
+
+```bash
+echo 'SERVICE_ROLE=…' > ~/.bab-service-key && chmod 600 ~/.bab-service-key
+```
+
+Poi, ogni volta che serve un codice:
+
+```bash
+source ~/.bab-service-key && curl -s -X POST \
+  "https://<progetto>.supabase.co/auth/v1/admin/generate_link" \
+  -H "apikey: $SERVICE_ROLE" -H "Authorization: Bearer $SERVICE_ROLE" \
+  -H "Content-Type: application/json" \
+  -d '{"type":"magiclink","email":"…"}' \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['email_otp'])"
+```
+
+Le sei cifre si scrivono nella app come se fossero arrivate per posta: la
+sessione che si apre e' vera, il percorso e' quello vero. **Non e' una
+scorciatoia dentro al codice** — la app non sa niente di tutto questo, e non
+c'e' niente da togliere prima di andare online.
+
+Serve anche a capire dove sta un guasto: se `generate_link` risponde subito e
+`signInWithOtp` no, allora generare il codice funziona e a essere rotto e' solo
+lo spedirlo — cioe' la SMTP o il modello di mail, non l'autenticazione.
