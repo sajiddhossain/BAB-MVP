@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Sfondo } from '../ui/Sfondo'
 import { Barra } from '../ui/Barra'
@@ -7,7 +8,7 @@ import { BarraSotto } from '../ui/casa/BarraSotto'
 import { riempi } from '../copy/riempi'
 import { useLingua } from '../lib/lingua'
 import { caricaProgresso, lezioneAperta, useProgresso } from '../lib/percorso'
-import { LEZIONI, TINTE_LEZIONE, UNITA } from '../data/percorso'
+import { LEZIONI, TINTE_LEZIONE, UNITA, lezionePronta } from '../data/percorso'
 import type { Unita } from '../data/percorso'
 
 import cervello from '../assets/percorso/cervello.svg'
@@ -170,11 +171,25 @@ export function Percorso() {
  */
 function RigaUnita({ unita, parole }: { unita: Unita; parole: Record<string, string> }) {
   const { tpe } = useLingua()
+  const vai = useNavigate()
   const progresso = useProgresso()
 
   const aperta = lezioneAperta(unita.lezioni[0], progresso)
   const finita = unita.lezioni.every((n) => progresso.fatte.includes(n))
   const nome = tpe.unita[unita.numero as 1 | 2 | 3 | 4]
+
+  /*
+   * Dove si va toccando: la prima lezione dell'unita' che non e' ancora
+   * finita, fra quelle che esistono. Se sono finite tutte — o se quella dopo
+   * non l'abbiamo ancora scritta — si rientra nell'ultima che c'e': rifare
+   * una lezione non toglie niente a nessuno, e "riguardo com'era" e'
+   * esattamente il motivo per cui uno torna qui.
+   */
+  const scritte = unita.lezioni.filter(lezionePronta)
+  const prossima =
+    unita.lezioni.find((n) => !progresso.fatte.includes(n) && lezionePronta(n)) ??
+    scritte[scritte.length - 1]
+  const apribile = aperta && prossima !== undefined
 
   // "forte • leggero / indolenzito • affaticato": le due lezioni, due parole
   // ciascuna, prese da dove stanno gia'
@@ -185,18 +200,8 @@ function RigaUnita({ unita, parole }: { unita: Unita; parole: Record<string, str
     })
     .join(' / ')
 
-  return (
-    /*
-      TODO(percorso): qui ci va l'apertura della lezione, quando ci sara' il
-      riproduttore. Finche' non c'e', la riga non e' un bottone: un bottone
-      che porta a un indirizzo che non esiste manda l'atleta alla schermata
-      d'accesso, che e' il modo peggiore di dire "non e' ancora pronto".
-    */
-    <div
-      className={`relative flex h-11 w-full items-center gap-3 overflow-hidden rounded-[20px] border-[1.5px] border-line bg-surface px-3 text-left shadow-[0px_6px_20px_0px_rgba(0,0,0,0.04)] ${
-        aperta ? '' : 'opacity-70'
-      }`}
-    >
+  const dentro = (
+    <>
       <span
         aria-hidden
         className="absolute inset-y-0 left-0 w-[6px]"
@@ -225,6 +230,54 @@ function RigaUnita({ unita, parole }: { unita: Unita; parole: Record<string, str
           {elenco}
         </span>
       </span>
-    </div>
+      {/*
+        L'unita' aperta ma non ancora scritta lo dice. Senza, sarebbe una riga
+        che si puo' toccare e non fa niente — che e' il modo peggiore di dire
+        "non c'e' ancora".
+      */}
+      {aperta && scritte.length === 0 && (
+        <span className="shrink-0 rounded-pill bg-chip px-2 py-1 text-[10px] font-bold tracking-[0.5px] text-ink-mute">
+          {tpe.comune.inArrivo}
+        </span>
+      )}
+    </>
+  )
+
+  return (
+    <Riga apribile={apribile} spenta={!aperta} onClick={() => vai(`/percorso/${prossima}`)}>
+      {dentro}
+    </Riga>
+  )
+}
+
+/**
+ * La riga dell'unita': un bottone quando c'e' dove andare, un riquadro
+ * quando no.
+ *
+ * Non e' un bottone disattivato: un bottone che non fa niente resta
+ * raggiungibile con la tastiera e col lettore di schermo si annuncia come una
+ * cosa da premere. Una riga che non si puo' aprire non e' un comando rotto,
+ * e' un pezzo di elenco.
+ */
+function Riga({
+  apribile,
+  spenta,
+  onClick,
+  children,
+}: {
+  apribile: boolean
+  spenta: boolean
+  onClick: () => void
+  children: ReactNode
+}) {
+  const vestito = `relative flex h-11 w-full items-center gap-3 overflow-hidden rounded-[20px] border-[1.5px] border-line bg-surface px-3 text-left shadow-[0px_6px_20px_0px_rgba(0,0,0,0.04)] ${
+    spenta ? 'opacity-70' : ''
+  }`
+
+  if (!apribile) return <div className={vestito}>{children}</div>
+  return (
+    <button type="button" onClick={onClick} className={vestito}>
+      {children}
+    </button>
   )
 }

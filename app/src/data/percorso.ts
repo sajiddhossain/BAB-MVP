@@ -1,13 +1,18 @@
-import type { Parola } from './sessione'
+import type { Livello, Parola } from './sessione'
 
 /**
  * Il percorso: sedici parole, otto lezioni, quattro unita'.
  *
  * ── COSA C'E' QUI E COSA NO ────────────────────────────────────────────────
  * Qui c'e' solo la FORMA: quali parole stanno in quale lezione, quali lezioni
- * in quale unita', quali esercizi in quale ordine. Le parole che si leggono a
- * schermo stanno in `copy/percorso.ts`, come per tutto il resto dell'app,
- * cosi' si cambiano dal pannello senza toccare codice.
+ * in quale unita', quali esercizi in quale ordine, e — dentro a ogni
+ * esercizio — qual e' la risposta giusta. Le parole che si leggono a schermo
+ * stanno in `copy/percorso.ts`, come per tutto il resto dell'app, cosi' si
+ * cambiano dal pannello senza toccare codice.
+ *
+ * La riga di confine e' questa: se cambiandolo cambia quello che l'app
+ * CONSIDERA giusto, sta qui; se cambia solo quello che si legge, sta nei
+ * testi. Un indice non e' una scritta, e nel pannello non deve comparire.
  *
  * ── PERCHE' NON SONO SESSANTANOVE SCHERMI ──────────────────────────────────
  * In Figma il percorso e' disegnato come 69 frame (138 contando l'inglese).
@@ -22,42 +27,53 @@ import type { Parola } from './sessione'
  * scritta nel README, ed e' la ragione per cui questa app sta in piedi.
  */
 
-/** I sei esercizi di una lezione, nell'ordine in cui si incontrano. */
-export type Esercizio =
-  /** conosci la parola: una per volta, e sono due per lezione */
-  | 'incontra'
-  /** abbina ogni parola alla sua descrizione, trascinandola */
-  | 'abbina'
-  /** uno scenario di vita vera: quale parola lo dice? */
-  | 'storia'
-  /** completa la frase con la parola giusta */
-  | 'frase'
-  /** cosa fai adesso: e' il segnale che decide, non la parola */
-  | 'mossa'
-  /** due parole che si somigliano e non sono la stessa cosa */
-  | 'gemelle'
-  /** la lezione e' finita */
-  | 'fatto'
-  /** la bandiera rossa: certe parole vanno dette a un adulto */
-  | 'allarme'
+/** Le icone che compaiono dentro alle lezioni, da `assets/percorso/`. */
+export type IconaLezione = 'manubrio' | 'piuma' | 'fulmine' | 'battito'
 
 /**
- * Gli esercizi di ogni lezione.
+ * Un esercizio, con quello che serve per correggerlo.
  *
- * `incontra` sta due volte perche' le parole sono due, e viene per primo: si
- * conoscono, e poi ci si gioca. `allarme` c'e' solo dove il disegno lo mette,
- * cioe' dopo le parole che possono voler dire che serve un adulto.
+ * `giusta` e' sempre un indice o un identificativo, mai un testo: cosi' chi
+ * riscrive una risposta dal pannello non puo' spostare per sbaglio qual e'
+ * quella giusta.
  */
-export const ESERCIZI: Esercizio[] = [
-  'incontra',
-  'incontra',
-  'abbina',
-  'storia',
-  'frase',
-  'mossa',
-  'gemelle',
-  'fatto',
-]
+export type Passo =
+  /** conosci la parola: la scheda grande, una per volta */
+  | { tipo: 'incontra'; parola: Parola; icona: IconaLezione }
+  /**
+   * abbina ogni parola alla sua immagine.
+   *
+   * `giusta` e' l'indice nel cesto, oppure `null` per le righe che nella
+   * lezione non hanno nessuna parola giusta — sono la meta' dell'esercizio:
+   * imparare a NON usare una parola che non c'entra.
+   *
+   * Il cesto e' `parole` (che prendono il nome da quello dell'app) piu'
+   * `esche` pastiglie che esistono solo nei testi, e quindi non vanno da
+   * nessuna parte.
+   */
+  | {
+      tipo: 'abbina'
+      righe: { icona: IconaLezione; giusta: number | null }[]
+      parole: Parola[]
+      esche: number
+    }
+  /** due parole che si somigliano e non sono la stessa cosa */
+  | { tipo: 'gemelle'; risposte: Parola[]; giusta: number }
+  /** uno scenario di vita vera: quale parola lo dice? */
+  | { tipo: 'storia'; risposte: Parola[]; giusta: number }
+  /** cosa fai adesso: e' il segnale che decide, non la parola */
+  | { tipo: 'mossa'; giusta: Livello }
+  /**
+   * completa la frase.
+   *
+   * Quanti buchi ci sono e cosa ci va NON sta qui: sta nel modello, dove i
+   * buchi si scrivono `{forte}` col nome della parola giusta dentro. E'
+   * l'unico modo in cui l'italiano puo' avere due buchi e l'inglese uno —
+   * come succede, perche' le due frasi vengono da due disegni diversi.
+   */
+  | { tipo: 'frase'; parole: Parola[]; esche: number }
+  /** la lezione e' finita */
+  | { tipo: 'fatto' }
 
 export type Lezione = {
   /** da 1 a 8 */
@@ -86,6 +102,54 @@ export const LEZIONI: Lezione[] = [
   { numero: 7, parole: ['intorpidito', 'instabile'], allarme: true },
   { numero: 8, parole: ['gonfio', 'caldo'] },
 ]
+
+/**
+ * Gli esercizi di ogni lezione, nell'ordine del disegno.
+ *
+ * L'ordine viene dalla barra di avanzamento dei frame: si conoscono le due
+ * parole, si abbinano, si distinguono l'una dall'altra, si riconoscono in uno
+ * scenario, si decide cosa fare, si scrive la frase, e si e' finito.
+ *
+ * ── PERCHE' SOLO LA PRIMA ──────────────────────────────────────────────────
+ * Una lezione senza questa tabella non si apre: nel percorso resta segnata
+ * "in arrivo" e non si tocca. E' meglio di una lezione vuota che si apre e
+ * non ha niente dentro — e vuol dire che le prossime sette si aggiungono qui,
+ * senza toccare una riga di codice del riproduttore.
+ */
+export const PASSI: Record<number, Passo[]> = {
+  1: [
+    { tipo: 'incontra', parola: 'forte', icona: 'manubrio' },
+    { tipo: 'incontra', parola: 'leggero', icona: 'piuma' },
+    {
+      tipo: 'abbina',
+      righe: [
+        { icona: 'manubrio', giusta: 0 },
+        { icona: 'piuma', giusta: 1 },
+        /* la scarica elettrica e il battito calmo sono di lezioni che non ha
+           ancora fatto: qui non ci va niente, ed e' il punto */
+        { icona: 'fulmine', giusta: null },
+        { icona: 'battito', giusta: null },
+      ],
+      parole: ['forte', 'leggero'],
+      esche: 1,
+    },
+    { tipo: 'gemelle', risposte: ['forte', 'leggero'], giusta: 0 },
+    { tipo: 'storia', risposte: ['leggero', 'forte', 'indolenzito', 'sordo'], giusta: 0 },
+    { tipo: 'mossa', giusta: 'calibra' },
+    { tipo: 'frase', parole: ['forte', 'leggero'], esche: 2 },
+    { tipo: 'fatto' },
+  ],
+}
+
+/** Gli esercizi di una lezione, o niente se non e' ancora stata scritta. */
+export function passiDi(numero: number): Passo[] | null {
+  return PASSI[numero] ?? null
+}
+
+/** Vero se la lezione ha un contenuto e quindi si puo' aprire. */
+export function lezionePronta(numero: number): boolean {
+  return passiDi(numero) !== null
+}
 
 export type Unita = {
   numero: number
@@ -123,6 +187,16 @@ export const TINTE_LEZIONE = [
   '#ffd1c1',
   '#e9d5ff',
 ]
+
+/**
+ * Le tinte delle carte-risposta, nell'ordine in cui compaiono.
+ *
+ * Nel disegno il cerchio della lettera e il bordo della carta hanno due
+ * tinte leggermente diverse su alcune carte. Qui e' una sola: sono due
+ * sfumature dello stesso colore, e tenerle separate vorrebbe dire due
+ * tabelle da tenere allineate a mano per una differenza che non si vede.
+ */
+export const TINTE_RISPOSTA = ['#ffd1c1', '#e9d5ff', '#e9d5ff', '#d1fae5']
 
 /** Tutte le parole del percorso, nell'ordine in cui si sbloccano. */
 export function paroleInOrdine(): Parola[] {

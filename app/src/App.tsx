@@ -3,6 +3,7 @@ import { Onboarding } from './screens/Onboarding'
 import { Sessione } from './screens/Sessione'
 import { Parole } from './screens/Parole'
 import { Percorso } from './screens/Percorso'
+import { Lezione } from './screens/Lezione'
 import { Casa } from './screens/Casa'
 import { Prossimamente } from './screens/Prossimamente'
 import { Amministrazione } from './screens/Amministrazione'
@@ -24,6 +25,10 @@ export function App() {
             `platform_admins`, e a dirlo e' il database */}
         <Route path="/admin" element={<Amministrazione />} />
         <Route path="/percorso" element={<Percorso />} />
+        {/* :lezione e' il numero da 1 a 8; :passo e' l'esercizio dentro a
+            quella lezione, tipo `incontra-1` o `abbina` */}
+        <Route path="/percorso/:lezione/:passo" element={<Lezione />} />
+        <Route path="/percorso/:lezione" element={<Lezione />} />
         <Route path="/storico" element={<Prossimamente titolo="Storico" />} />
         <Route path="/profilo" element={<Prossimamente titolo="Profilo" profilo />} />
         <Route path="*" element={<Navigate to="/onboarding/accesso" replace />} />
