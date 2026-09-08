@@ -61,7 +61,6 @@ type Lingua = {
   segnali: Record<Livello, { nome: string; testo: string }>
   comeLeggere: string
   oggi: string
-  etichette: Record<Tono | 'sente', string>
   schermo: {
     occhiello: string
     titolo: string
@@ -74,6 +73,16 @@ type Lingua = {
   schede: Record<Parola, SchedaParola>
 }
 
+/*
+ * Le etichette dei riquadri.
+ *
+ * NON sono un ramo dell'albero delle scritte: ogni scheda si porta la sua
+ * copia dentro al riquadro, ed e' quella che si cambia dal pannello. Se
+ * stessero anche qui come ramo, dal pannello si vedrebbero due volte e una
+ * delle due non cambierebbe niente — nessuno la legge a schermo. Queste
+ * servono solo a scrivere le sedici schede senza ripetere quattro parole
+ * cinquanta volte.
+ */
 const ET_IT = {
     prova: "La prova",
     rosso: "Diventa rosso quando",
@@ -105,7 +114,6 @@ const it: Lingua = {
   },
   comeLeggere: "Come si legge un segnale",
   oggi: "La mossa di oggi",
-  etichette: ET_IT,
   schermo: {
     occhiello:
       "LE TUE SENSAZIONI",
@@ -330,7 +338,6 @@ const en: Lingua = {
   },
   comeLeggere: "How to read any signal",
   oggi: "Today’s call",
-  etichette: ET_EN,
   schermo: {
     occhiello:
       "YOUR SENSATIONS",
