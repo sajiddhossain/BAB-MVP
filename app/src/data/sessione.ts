@@ -164,15 +164,6 @@ export function paroleDi(livello: Livello): Parola[] {
   return PAROLE.filter((p) => LIVELLO_DI[p] === livello)
 }
 
-/**
- * Le parole che chiedono sostegno: quando ce n'e' una, lo schermo dei segnali
- * mette in evidenza il dolore protettivo invece di quello da affaticamento.
- *
- * E' un ordine di lettura, non una diagnosi — lo schermo dice tutte e due le
- * cose comunque.
- */
-export const PAROLE_DA_GUARDARE: Parola[] = paroleDi('sostegno')
-
 /** Le cinque facce della soddisfazione, dalla meno alla piu' contenta. */
 export const FACCE = [
   { id: 'disappointed', icona: 'faccia-delusa' },
@@ -293,6 +284,19 @@ const SINISTRO: Record<Genere, string> = {
   f: 'sinistra',
   mp: 'sinistri',
   fp: 'sinistre',
+}
+
+/**
+ * Il nome visibile di un codice zona: `front_quad_r` -> "Quadricipite destro".
+ *
+ * Si ricava dal codice ogni volta, e non si tiene da parte insieme alla
+ * sensazione: il nome e' l'unica cosa della sensazione che cambia con la
+ * lingua, e tenerlo scritto vorrebbe dire che chi cambia lingua a meta'
+ * giornata si ritrova il check-out che parla del "quadricipite destro" in
+ * mezzo a una pagina inglese.
+ */
+export function nomeCodice(codice: string, lingua: 'it' | 'en'): string {
+  return nomeZona(codice.split('_').slice(1).join('-'), lingua)
 }
 
 /** L'etichetta inglese generata, cercata per id fra le zone dei due lati. */

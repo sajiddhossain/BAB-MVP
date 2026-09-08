@@ -27,8 +27,6 @@ export type Sensazione = {
   id: string
   /** `front_quad_r`, oppure `altrove` */
   zona: string
-  /** il nome visibile, gia' in italiano: "Quadricipite destro" */
-  nome: string
   /** dove, quando ha scelto "Altrove" */
   zonaLibera: string
   parole: Parola[]

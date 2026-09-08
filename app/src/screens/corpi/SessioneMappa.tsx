@@ -14,11 +14,10 @@ import type { Lato } from '../../data/sessione'
 import type { PropsSessione } from '../tipi'
 
 /** Una sensazione appena nata, prima che ci scriva dentro qualcosa. */
-function nuovaSensazione(zona: string, nome: string): Sensazione {
+function nuovaSensazione(zona: string): Sensazione {
   return {
     id: crypto.randomUUID(),
     zona,
-    nome,
     zonaLibera: '',
     parole: [],
     sue: '',
@@ -48,10 +47,10 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
   const [aperta, setAperta] = useState<Sensazione | null>(null)
   const [eNuova, setENuova] = useState(true)
 
-  function tocca({ codice, nome }: { codice: string; nome: string }) {
+  function tocca(codice: string) {
     const gia = dati.sensazioni.find((s) => s.zona === codice)
     setENuova(!gia)
-    setAperta(gia ?? nuovaSensazione(codice, nome))
+    setAperta(gia ?? nuovaSensazione(codice))
   }
 
   function salva(s: Sensazione) {
@@ -116,7 +115,7 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
             type="button"
             onClick={() => {
               setENuova(true)
-              setAperta(nuovaSensazione('altrove', t.altrove))
+              setAperta(nuovaSensazione('altrove'))
             }}
             className="flex h-[41px] shrink-0 items-center gap-2 rounded-pill border-[1.5px] border-paper bg-surface px-4 text-[14px] font-bold text-spento"
             style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.05))' }}

@@ -30,6 +30,31 @@ import type { Tempo } from '../data/casa'
  *    estremi del cursore.
  */
 
+/*
+ * Due aiuti per le frasi che si compongono.
+ *
+ * L'elenco di parole va con la virgola e la congiunzione in fondo — "teso,
+ * indolenzito e bruciante" — perche' e' una frase da dire a voce a un
+ * adulto, non un riassunto. La congiunzione cambia con la lingua, il resto
+ * no.
+ */
+function elencoIt(parole: string[]): string {
+  if (parole.length === 0) return ''
+  if (parole.length === 1) return parole[0]
+  return `${parole.slice(0, -1).join(', ')} e ${parole[parole.length - 1]}`
+}
+
+function elencoEn(parole: string[]): string {
+  if (parole.length === 0) return ''
+  if (parole.length === 1) return parole[0]
+  return `${parole.slice(0, -1).join(', ')} and ${parole[parole.length - 1]}`
+}
+
+/** "Solo quando mi muovo" dentro a una frase diventa minuscolo. */
+function minuscola(s: string): string {
+  return s.charAt(0).toLowerCase() + s.slice(1)
+}
+
 const it = {
   comune: {
     si: 'Sì',
@@ -86,37 +111,55 @@ const it = {
     azione: 'Individua ciò che senti',
   },
 
+  /*
+   * L'ultimo schermo del check-in, rifatto sul frame nuovo.
+   *
+   * Il vecchio elencava i punti e spiegava due tipi di dolore. Questo prende
+   * le parole che ha scelto e le rimanda indietro: la frase che potrebbe
+   * dire a un adulto, cosa dice ogni parola, come si legge un segnale
+   * qualsiasi, e quattro cose da fare oggi. L'italiano e' nostro: il frame
+   * nuovo esiste solo in inglese.
+   */
   segnali: {
-    occhiello: 'PRIMA DI INIZIARE',
-    titolo: 'Considera questi segnali',
-    decifra: 'Decifriamo la sensazione',
-    affaticamento: {
-      titolo: 'Dolore da affaticamento',
-      corpo: 'Si allevia mentre ti riscaldi. Presente in entrambi i lati.',
+    occhiello: 'PASSO 4 · DAGLI UN SENSO',
+    titolo: (zona: string) => `Parliamo di: ${zona.toLowerCase()}.`,
+    titoloPiu: 'Parliamo di quello che hai segnato.',
+    frase: {
+      etichetta: 'La tua frase di oggi',
+      /*
+       * La frase che potrebbe dire a chi la allena. In italiano non usa il
+       * possessivo ("il mio quadricipite") perche' meta' delle zone sono
+       * femminili e le parole sono tutte al maschile: sarebbe "la mia
+       * caviglia teso". Due punti e l'elenco lo evitano.
+       */
+      testo: (zona: string, parole: string[], intensita: number, quando: string | null) => {
+        const elenco = elencoIt(parole)
+        const base = elenco
+          ? `${zona}: ${elenco}, circa ${intensita} su 10.`
+          : `${zona}: circa ${intensita} su 10.`
+        return quando ? `${base} La noto ${minuscola(quando)}.` : base
+      },
     },
-    protettivo: {
-      titolo: 'Dolore protettivo',
+    parole: {
+      titolo: 'Cosa dicono le tue parole',
+      occhio: 'Ognuna ha la sua mossa. Quella che grida più forte decide la mossa di oggi.',
+    },
+    prova: {
+      titolo: 'Prova questo oggi',
+      passi: [
+        'Scalda bene quel punto, poi ricontrollalo prima della prima serie dura.',
+        "Confrontalo con l'altro lato. Stesso punto, stesso tocco. È la cosa più utile che puoi fare, e non costa niente.",
+        'Guarda se si scioglie, resta uguale o peggiora: te lo chiediamo al check-out, non adesso.',
+        'Se una parola diventa pungente, trafittiva o formicolante, è un altro discorso: fermati con quel movimento e dillo a qualcuno.',
+      ],
+    },
+    quando: {
+      titolo: 'Il "quando" non devi ancora saperlo',
       corpo:
-        "Acuto, improvviso o profondo in un'articolazione. Solo da un lato. Peggiora muovendolo.",
+        'Se questa cosa esce durante, subito dopo, il giorno dopo o intorno al ciclo è BAB a ricavarlo, leggendo lo stesso punto una sessione dopo l\'altra. Il tuo lavoro è solo dargli un nome ogni volta.',
     },
-    prova: 'Prova questo oggi',
-    /*
-     * Quello che c'e' dentro alla scheda quando si apre. Due liste, non una:
-     * il consiglio cambia se le parole che ha scelto assomigliano a un dolore
-     * che protegge o a uno che ha solo lavorato.
-     */
-    provaOggi: {
-      affaticamento: [
-        'Allunga il riscaldamento di cinque minuti e parti piano: questo tipo di dolore di solito si scioglie mentre ti muovi.',
-        'Se a metà sessione è ancora lì uguale, dillo a chi ti allena — non aspettare la fine.',
-      ],
-      protettivo: [
-        'Oggi evita il gesto che lo fa peggiorare. Il resto dell’allenamento puoi farlo.',
-        'Dillo a chi ti allena PRIMA di cominciare, e a un genitore o al medico se stasera è ancora lì.',
-      ],
-    },
-    nota: 'BAB ti aiuta a tradurre i segnali del corpo in informazioni chiare, senza sostituire il tuo sistema di supporto. Rivolgiti sempre al tuo allenatore, medico o un genitore se qualcosa non va.',
-    azione: 'Capito! Iniziamo',
+    nota: 'Leggere il segnale è la bravura. Ignorarlo è da principianti. BAB non ti dice mai se allenarti o no, e non dà mai un nome a una malattia.',
+    azione: 'Capito, si comincia',
   },
 
   // ── CHECK-OUT ─────────────────────────────────────────────────────────────
@@ -199,33 +242,34 @@ const it = {
     azione: 'Individua come ti senti',
   },
 
+  /*
+   * L'ultimo schermo del check-out, rifatto sul frame nuovo.
+   *
+   * Il vecchio confrontava previsione ed esito e spiegava due tipi di
+   * dolore. Questo, in piu', mette accanto lo stesso punto stamattina e
+   * adesso — stesse sedici parole, ed e' quello che li rende confrontabili.
+   * L'italiano e' nostro: il frame nuovo esiste solo in inglese.
+   */
   rendiconto: {
-    occhiello: 'PASSO 4 · IL TUO RENDICONTO',
+    occhiello: 'PASSO 4 · CHIUDI IL CERCHIO',
     titolo: "Ecco cos'hai imparato oggi.",
-    previsione: 'Previsione',
-    richiesta: 'richiesta del corpo',
+    prima: 'STAMATTINA',
+    dopo: 'NE SEI USCITA',
     frase: {
-      piu: 'Ti aspettavi di più di quanto il tuo corpo potesse dare oggi e lo hai notato: ben fatto! ',
-      meno: 'Il tuo corpo aveva più da dare di quanto pensassi, e te ne sei accorta: ben fatto! ',
-      uguale: 'Avevi previsto esattamente il ritmo che il tuo corpo ha seguito. ',
-      chiusa: 'Stai allenando la tua consapevolezza corporea.',
+      piu: 'Sei entrata aspettandoti più di quanto il tuo corpo avesse oggi, e te ne sei accorta. È la lettura che si affina, non una sessione andata male.',
+      meno: 'Il tuo corpo aveva più da dare di quanto ti aspettassi entrando, e te ne sei accorta. È la lettura che si affina.',
+      uguale: "L'avevi indovinato esattamente. È la lettura che si affina.",
     },
-    decodifica: {
-      titolo: 'Decodifica il dolore',
-      occhio: 'Alcuni segnali si manifestano solo quando ti fermi.',
-      affaticamento: {
-        titolo: 'Dolore da affaticamento',
-        corpo:
-          'Bruciore o stanchezza nei muscoli che hanno lavorato, abbastanza uniforme su entrambi i lati, che diminuisce mentre ti raffreddi.',
-      },
-      protettivo: {
-        titolo: 'Dolore protettivo',
-        corpo:
-          "Acuto o improvviso, all'interno di un'articolazione, solo da un lato, che non ti fa dormire.",
-      },
-      domanda: 'Senti un dolore di tipo protettivo?',
+    confronto: {
+      titolo: (zona: string) => `${zona}, da stamattina a ora`,
+      occhio: 'Stesso punto, stesse sedici parole: è questo che li rende confrontabili.',
+      prima: 'PRIMA',
+      dopo: 'DOPO',
+      /* quando stamattina quel punto non l'aveva segnato non c'e' un prima */
+      senzaPrima: 'Stamattina questo punto non c’era.',
     },
-    nota: "Il recupero non è la parte noiosa dopo l'allenamento, ma dove l'allenamento si trasforma in progresso. Per dolore protettivo o qualsiasi cosa che sembri insolita, coinvolgi il tuo allenatore, medico o un genitore.",
+    domanda: "C'è qualcosa nella colonna rossa oggi?",
+    nota: 'Leggere il segnale è la bravura. Ignorarlo è da principianti. Sostegno non vuol mai dire una diagnosi: vuol dire dirlo a chi ti allena, a un fisioterapista, a un genitore o a un medico.',
     azione: 'Fatto per oggi',
   },
 
@@ -296,7 +340,7 @@ const it = {
     quando: {
       domanda: 'Quando la senti?',
       voci: {
-        muovo: 'Solo quando la muovo',
+        muovo: 'Solo quando mi muovo',
         premo: 'Quando ci premo sopra',
         ferma: 'Anche stando ferma',
       },
@@ -385,31 +429,39 @@ const en: typeof it = {
   },
 
   segnali: {
-    occhiello: 'BEFORE KICKING OFF',
-    titolo: 'Mind these signals',
-    decifra: 'Let’s decode it',
-    affaticamento: {
-      titolo: 'Working ache',
-      corpo: 'Muscle burn or tightness from previous sessions which eases as you warm up.',
+    occhiello: 'STEP 4 · MAKE SENSE OF IT',
+    titolo: (zona: string) => `About that ${zona.toLowerCase()}.`,
+    titoloPiu: 'About what you flagged.',
+    frase: {
+      etichetta: 'Your sentence today',
+      testo: (zona: string, parole: string[], intensita: number, quando: string | null) => {
+        const elenco = elencoEn(parole)
+        const base = elenco
+          ? `My ${zona.toLowerCase()} feels ${elenco}, about ${intensita} out of 10`
+          : `My ${zona.toLowerCase()} is about ${intensita} out of 10`
+        return quando ? `${base}, and I notice it ${minuscola(quando)}.` : `${base}.`
+      },
     },
-    protettivo: {
-      titolo: 'Protective pain',
+    parole: {
+      titolo: 'What your words are saying',
+      occhio: 'Each one has its own move. The loudest one sets today’s call.',
+    },
+    prova: {
+      titolo: 'Try this today',
+      passi: [
+        'Warm that spot up properly, then check it again before the first hard rep.',
+        'Compare it to the other side. Same spot, same touch. It’s the most useful thing you can do and it costs nothing.',
+        'Notice whether it warms out, stays, or gets worse — you’ll answer that at check-out, not now.',
+        'If any word changes to sharp, stabbing or tingling, that’s a different conversation — stop that movement and tell someone.',
+      ],
+    },
+    quando: {
+      titolo: 'You don’t have to know the "when" yet',
       corpo:
-        'Sharp, sudden or deep in a joint. One side only. Moving it makes you limp, or worsens the pain.',
+        'Whether this shows up during, right after, the next day, or around your period is something BAB works out for you — by reading the same spot across sessions. Your job is just to name it each time.',
     },
-    prova: 'Try this today',
-    provaOggi: {
-      affaticamento: [
-        'Add five minutes to your warm-up and start easy: this kind of ache usually loosens off once you get moving.',
-        'If it’s still exactly the same halfway through, tell your coach — don’t wait until the end.',
-      ],
-      protettivo: [
-        'Skip the movement that makes it worse today. You can still do the rest of the session.',
-        'Tell your coach BEFORE you start, and a parent or a doctor if it’s still there tonight.',
-      ],
-    },
-    nota: 'BAB helps you translate body signals into clear information, without replacing your support system. Always consult your coach, doctor, or a parent if something feels wrong.',
-    azione: 'Got it! Let’s start',
+    nota: 'Reading the signal is the skill. Ignoring it is the amateur move. BAB never tells you to train or not to train — and never names a condition.',
+    azione: 'Got it — start training',
   },
 
   // ── CHECK-OUT ─────────────────────────────────────────────────────────────
@@ -492,33 +544,24 @@ const en: typeof it = {
   },
 
   rendiconto: {
-    occhiello: 'STEP 4 · YOUR READ',
+    occhiello: 'STEP 4 · CLOSE THE LOOP',
     titolo: 'Here’s what today taught you.',
-    previsione: 'Prediction',
-    richiesta: 'body’s ask',
+    prima: 'THIS MORNING',
+    dopo: 'YOU CAME OUT',
     frase: {
-      piu: 'You expected more than your body could give today, and you noticed it: well done! ',
-      meno: 'Your body had more to give than you thought, and you noticed it: well done! ',
-      uguale: 'You called exactly the tempo your body followed. ',
-      chiusa: 'Your read is getting sharper.',
+      piu: 'You went in expecting more than your body had today — and you noticed it. That’s the read getting sharper, not a session gone wrong.',
+      meno: 'Your body had more to give than you went in expecting — and you noticed it. That’s the read getting sharper.',
+      uguale: 'You called it exactly. That’s the read getting sharper.',
     },
-    decodifica: {
-      titolo: 'Decode the ache',
-      occhio:
-        'Some things only show up once you stop. Naming it comes first — deciding what to do comes after.',
-      affaticamento: {
-        titolo: 'Working ache',
-        corpo:
-          'Burn or tiredness in muscles that worked, fairly even on both sides, easing as you cool down.',
-      },
-      protettivo: {
-        titolo: 'Protective pain',
-        corpo:
-          'Sharp or sudden, inside a joint or bone, one side only, makes you limp, or does not settle.',
-      },
-      domanda: 'Feeling any of the protective kind?',
+    confronto: {
+      titolo: (zona: string) => `Your ${zona.toLowerCase()}, morning to now`,
+      occhio: 'Same spot, same 16 words — that’s what makes them comparable.',
+      prima: 'BEFORE',
+      dopo: 'AFTER',
+      senzaPrima: 'This spot wasn’t there this morning.',
     },
-    nota: 'Recovery isn’t the boring bit after training — it’s where the training actually works. For protective pain or anything that feels off, loop in your coach, physio or a parent.',
+    domanda: 'Anything in the red column today?',
+    nota: 'Reading the signal is the skill. Ignoring it is the amateur move. Support never means a diagnosis — it means tell a coach, a physio, a parent or a doctor.',
     azione: 'Done for today',
   },
 

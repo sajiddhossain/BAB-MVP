@@ -39,10 +39,28 @@ export type SchedaParola = {
   riga: string
   descrizione: string
   riquadri: Riquadro[]
+  /*
+   * La riga corta e la mossa sullo schermo "cosa dicono le tue parole".
+   *
+   * Il disegno le da' per TRE parole su sedici, e sono queste: dove mancano
+   * si usa `riga` per la prima e il nome del livello per la seconda. Non le
+   * abbiamo inventate per le altre tredici — inventare tredici consigli su
+   * cosa fare con un dolore non e' una cosa da fare di sfuggita.
+   */
+  glossa?: string
+  mossa?: string
 }
 
 type Lingua = {
   livelli: Record<Livello, { nome: string; spiega: string }>
+  /*
+   * Gli stessi tre livelli visti da fuori: non "cosa fai" ma "cosa fa il
+   * segnale". Passa, insiste, segnala. Vengono dai frame nuovi del check-in
+   * e del check-out, dove stanno in cima con questi nomi.
+   */
+  segnali: Record<Livello, { nome: string; testo: string }>
+  comeLeggere: string
+  oggi: string
   etichette: Record<Tono | 'sente', string>
   schermo: {
     occhiello: string
@@ -69,6 +87,24 @@ const it: Lingua = {
     calibra: { nome: "Calibra", spiega: "Il tuo corpo chiede un aggiustamento" },
     sostegno: { nome: "Sostegno", spiega: "Il tuo corpo chiede una mano in più" },
   },
+  segnali: {
+    push: {
+      nome: "Passa",
+      testo: "Va via se ti riposi, o si scioglie mentre ti muovi. Il tuo corpo sta lavorando.",
+    },
+    calibra: {
+      nome: "Insiste",
+      testo:
+        "Resta, non cresce, e ha un motivo che sai dire. Il tuo corpo chiede un aggiustamento.",
+    },
+    sostegno: {
+      nome: "Segnala",
+      testo:
+        "Improvviso, largo come un dito, da un lato solo, che cresce, o che non sembra proprio muscolo. Il tuo corpo chiede un'altra persona.",
+    },
+  },
+  comeLeggere: "Come si legge un segnale",
+  oggi: "La mossa di oggi",
   etichette: ET_IT,
   schermo: {
     occhiello:
@@ -109,6 +145,8 @@ const it: Lingua = {
       badge: "Controlla se è dolente al tatto",
       metafora: "Il conto del giorno dopo.",
       riga: "Il conto del giorno dopo.",
+      glossa: "il conto del giorno dopo",
+      mossa: "Spingi piano",
       descrizione:
         "Il conto che i muscoli ti mandano 24-48 ore dopo un lavoro nuovo o più duro. Sparso su tutto un muscolo, di solito da tutti e due i lati, peggio al primo movimento, meglio quando ti sei scaldata.",
       riquadri: [
@@ -119,6 +157,8 @@ const it: Lingua = {
       badge: "Nota cosa succede quando ti muovi",
       metafora: "Come se un muscolo venisse tirato più corto.",
       riga: "Una corda di chitarra accordata troppo alta.",
+      glossa: "si scioglie quando ti scaldi",
+      mossa: "Spingi dopo il riscaldamento",
       descrizione:
         "Sentirsi tesa può far sembrare una parte del corpo bloccata, stirata, o come se non avesse la solita libertà di movimento.",
       riquadri: [
@@ -129,6 +169,8 @@ const it: Lingua = {
       badge: "Nota se si spegne",
       metafora: "Un fiammifero, non un incendio.",
       riga: "Un fiammifero, non un incendio.",
+      glossa: "un fiammifero, non un incendio",
+      mossa: "Spingi se si spegne",
       descrizione:
         "Una sensazione calda e pungente dentro a un muscolo, che può crescere durante uno sforzo intenso. Quando viene dal lavoro duro, di solito passa poco dopo che rallenti o ti fermi.",
       riquadri: [
@@ -270,6 +312,24 @@ const en: Lingua = {
     calibra: { nome: "Calibrate", spiega: "Your body is asking for an adjustment" },
     sostegno: { nome: "Support", spiega: "Your body is asking for additional help" },
   },
+  segnali: {
+    push: {
+      nome: "Fades",
+      testo: "Goes when you rest, or warms out as you move. Your body is working.",
+    },
+    calibra: {
+      nome: "Nags",
+      testo:
+        "Stays, doesn’t grow, has a reason you can name. Your body is asking for an adjustment.",
+    },
+    sostegno: {
+      nome: "Flags",
+      testo:
+        "Sudden, one-finger wide, one side only, growing, or it doesn’t feel like muscle at all. Your body is asking for another person.",
+    },
+  },
+  comeLeggere: "How to read any signal",
+  oggi: "Today’s call",
   etichette: ET_EN,
   schermo: {
     occhiello:
@@ -310,6 +370,8 @@ const en: Lingua = {
       badge: "Check if it feels tender",
       metafora: "The day-after receipt.",
       riga: "The day-after receipt.",
+      glossa: "the day-after receipt",
+      mossa: "Push lightly",
       descrizione:
         "The bill your muscles send 24–48 hours after new or harder work. Spread across a whole muscle, usually both sides, worse on the first move, better once you’re warm.",
       riquadri: [
@@ -320,6 +382,8 @@ const en: Lingua = {
       badge: "Notice what happens when you move",
       metafora: "Like a muscle is being pulled shorter.",
       riga: "A guitar string tuned too high.",
+      glossa: "loosens as you warm up",
+      mossa: "Push after warm-up",
       descrizione:
         "A tight feeling can make a body part feel restricted, stretched or as though it doesn’t have its usual freedom to move.",
       riquadri: [
@@ -330,6 +394,8 @@ const en: Lingua = {
       badge: "Notice if it fades",
       metafora: "A match, not a fire.",
       riga: "A match, not a fire.",
+      glossa: "a match, not a fire",
+      mossa: "Push if it fades",
       descrizione:
         "A hot, stinging feeling inside a muscle that can build during hard exercise. When it’s from working hard, it usually eases soon after you slow down or stop.",
       riquadri: [

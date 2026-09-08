@@ -44,7 +44,7 @@ export function Mappa({
   lato: Lato
   /** i codici zona gia' segnati, nella forma `front_quad_r` */
   scelte: string[]
-  onTocca: (zona: { codice: string; nome: string }) => void
+  onTocca: (codice: string) => void
 }) {
   const svg = useRef<SVGSVGElement>(null)
   const { lingua } = useLingua()
@@ -52,7 +52,7 @@ export function Mappa({
   const [x, y, w, h] = lato === 'front' ? FRONT_INK : BACK_INK
 
   function scegli(z: BodyZone) {
-    onTocca({ codice: codiceZona(lato, z.id), nome: nomeZona(z.id, lingua) })
+    onTocca(codiceZona(lato, z.id))
   }
 
   /*

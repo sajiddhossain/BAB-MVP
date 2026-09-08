@@ -1,56 +1,117 @@
-import { useState } from 'react'
-import giu from '../../assets/chevron-down.svg'
 import { Schermo } from '../../ui/Schermo'
 import { Bottone } from '../../ui/Bottone'
 import { Titolo } from '../../ui/Testo'
 import { Errore } from '../../ui/Testo'
 import { OcchielloSessione } from '../../ui/sessione/Testo'
 import { Scheda, Nota } from '../../ui/sessione/Scheda'
-import { Apri } from '../../ui/Apri'
-import { PAROLE_DA_GUARDARE } from '../../data/sessione'
+import { Scelta } from '../../ui/sessione/Comandi'
+import { TINTA_LIVELLO } from '../../ui/sessione/SchedaParola'
+import { LIVELLI, LIVELLO_DI, nomeCodice } from '../../data/sessione'
+import type { Livello, Parola } from '../../data/sessione'
 import { testiSessione } from '../../copy/sessione'
 import type { TestiSessione } from '../../copy/sessione'
+import { testiParole } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
 import { datiSessione, useDatiSessione, scriviSessione } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
 
-const ICONE = import.meta.glob<string>('../../assets/sessione/*.svg', {
-  eager: true,
-  import: 'default',
-})
-const icona = (n: string) => ICONE[`../../assets/sessione/${n}.svg`]
+/**
+ * Il livello che decide la mossa del punto: il piu' alto fra quelli delle
+ * parole scelte.
+ *
+ * "Il piu' alto" e non "il piu' frequente": una parola che chiede una mano
+ * non si annulla perche' accanto ce ne sono due che dicono di spingere. E'
+ * la stessa regola che la scheda-parola usa per il colore del badge.
+ */
+function livelloDi(parole: Parola[]): Livello | null {
+  let peggiore: Livello | null = null
+  for (const p of parole) {
+    const l = LIVELLO_DI[p]
+    if (peggiore === null || LIVELLI.indexOf(l) > LIVELLI.indexOf(peggiore)) peggiore = l
+  }
+  return peggiore
+}
+
+/** Il nome che si vede: la zona, o quello che ha scritto lei per "Altrove". */
+function nome(s: Sensazione, ts: TestiSessione, lingua: 'it' | 'en'): string {
+  if (s.zona === 'altrove') return s.zonaLibera.trim() || ts.mappa.altrove
+  return nomeCodice(s.zona, lingua)
+}
+
+/** "teso · indolenzito · bruciante", oppure le sue parole se non ne ha scelte. */
+function paroleViste(s: Sensazione, ts: TestiSessione): string {
+  const p = s.parole.map((x) => ts.foglio.parole[x])
+  if (p.length) return p.join(' · ')
+  return s.sue.trim()
+}
 
 /**
- * Se fra le parole scelte ce n'e' almeno una di quelle da guardare.
+ * La scheda "come si legge un segnale".
  *
- * Decide QUALE delle due spiegazioni mettere per prima, non se c'e' qualcosa
- * che non va: e' un ordine di lettura, non una diagnosi. Lo schermo dice
- * tutte e due le cose comunque.
+ * E' la stessa nei due schermi, e non e' un caso: e' la tabella che dice
+ * cosa fa un segnale, e cambiarla fra il prima e il dopo vorrebbe dire
+ * insegnare due cose diverse nello stesso giorno.
  */
-function daGuardare(sensazioni: Sensazione[]): boolean {
-  return sensazioni.some(
-    (s) => s.parole.some((p) => PAROLE_DA_GUARDARE.includes(p)) || s.unLato === true,
+function ComeLeggere({ lingua }: { lingua: 'it' | 'en' }) {
+  const tp = testiParole(lingua)
+  return (
+    <Scheda piatta className="px-[15px] py-[13px]">
+      <p className="m-0 text-[13px] font-bold text-ink">{tp.comeLeggere}</p>
+      <div className="mt-3 flex flex-col gap-[10px]">
+        {LIVELLI.map((l) => {
+          const tinta = TINTA_LIVELLO[l]
+          return (
+            <div key={l} className="flex gap-[10px]">
+              <span
+                className="w-[52px] shrink-0 self-start rounded-[6px] px-2 py-[3px] text-center text-[11px] font-bold"
+                style={{ background: tinta.fondo, color: tinta.testo }}
+              >
+                {tp.segnali[l].nome}
+              </span>
+              <p className="m-0 text-[12px] leading-[1.45] text-ink-medio">{tp.segnali[l].testo}</p>
+            </div>
+          )
+        })}
+      </div>
+    </Scheda>
   )
 }
 
-/** "teso · indolenzito · bruciante  |  un lato  |  4/10" */
-function riassunto(s: Sensazione, ts: TestiSessione): string {
-  const pezzi: string[] = []
-  const parole = s.parole.map((p) => ts.foglio.parole[p])
-  if (parole.length) pezzi.push(parole.join(' · '))
-  else if (s.sue.trim()) pezzi.push(s.sue.trim())
-  if (s.unLato !== null) pezzi.push(s.unLato ? ts.mappa.unLato : ts.mappa.dueLati)
-  pezzi.push(`${s.intensita}/10`)
-  return pezzi.join('  |  ')
+/** La pastiglia "La mossa di oggi · Spingi", col colore del livello. */
+function MossaDiOggi({ livello, lingua }: { livello: Livello; lingua: 'it' | 'en' }) {
+  const tp = testiParole(lingua)
+  const tinta = TINTA_LIVELLO[livello]
+  return (
+    <div className="flex flex-wrap items-center gap-x-[10px] gap-y-1">
+      <span
+        className="inline-flex items-center gap-[8px] rounded-[12px] px-3 py-[6px] text-[12px] font-bold"
+        style={{ background: tinta.fondo, color: tinta.testo }}
+      >
+        <span
+          aria-hidden
+          className="size-[6px] shrink-0 rounded-full"
+          style={{ background: tinta.testo }}
+        />
+        {tp.oggi} · {tp.livelli[livello].nome}
+      </span>
+      <span className="text-[11px] text-ink-medio">{tp.livelli[livello].spiega}</span>
+    </div>
+  )
 }
 
 /**
  * L'ultimo schermo del check-in: cosa vuol dire quello che ha appena segnato.
  *
- * Non dice cosa ha. Dice come si distinguono due cose che si somigliano, e
- * le mette nell'ordine giusto per lei — e poi rimanda a un adulto, che e' la
+ * Non dice cosa ha. Prende le parole che ha scelto e gliele rimanda
+ * indietro — la frase che potrebbe dire a un adulto, cosa dice ogni parola,
+ * come si legge un segnale qualsiasi — e poi rimanda a un adulto, che e' la
  * riga piu' importante di tutto lo schermo.
+ *
+ * Il blocco si ripete per ogni punto segnato. Il frame ne mostra uno solo
+ * ("About that right quad") perche' il caso disegnato e' quello, ma tre
+ * punti sono tre punti: mostrarne uno e nascondere gli altri due vorrebbe
+ * dire far sparire proprio la cosa che le abbiamo chiesto di segnare.
  */
 export function CorpoSegnali({
   passo,
@@ -64,10 +125,9 @@ export function CorpoSegnali({
   const dati = useDatiSessione('checkin')
   const { lingua } = useLingua()
   const ts = testiSessione(lingua)
+  const tp = testiParole(lingua)
   const t = ts.segnali
-  const [aperto, setAperto] = useState(false)
-  const guardare = daGuardare(dati.sensazioni)
-  const consigli = guardare ? t.provaOggi.protettivo : t.provaOggi.affaticamento
+  const sensazioni = dati.sensazioni
 
   return (
     <Schermo
@@ -87,68 +147,102 @@ export function CorpoSegnali({
       }
     >
       <OcchielloSessione icona="scintilla">{t.occhiello}</OcchielloSessione>
-      <Titolo>{t.titolo}</Titolo>
+      <Titolo>
+        {sensazioni.length === 1 ? t.titolo(nome(sensazioni[0], ts, lingua)) : t.titoloPiu}
+      </Titolo>
 
-      <div className="mt-[18px] flex flex-col gap-[10px]">
-        {dati.sensazioni.map((s) => (
-          <Scheda key={s.id} piatta className="flex items-center gap-3 p-[12px]">
-            <span className="flex size-[42px] shrink-0 items-center justify-center rounded-[14px] bg-allarme-fondo">
-              <img src={icona('spillo')} alt="" aria-hidden className="size-6" />
-            </span>
-            <span className="min-w-0">
-              <span className="block truncate text-[16px] font-bold text-ink">
-                {s.zona === 'altrove' ? s.zonaLibera : s.nome}
-              </span>
-              <span className="block truncate text-[12px] text-ink-mute">{riassunto(s, ts)}</span>
-            </span>
-          </Scheda>
-        ))}
+      {sensazioni.map((s) => {
+        const livello = livelloDi(s.parole)
+        return (
+          <div key={s.id} className="mt-[18px] flex flex-col gap-[10px]">
+            <Scheda piatta className="px-[15px] py-[13px]">
+              <p className="m-0 text-[12px] font-bold tracking-[0.5px] text-ink-medio">
+                {t.frase.etichetta}
+              </p>
+              <p className="m-0 mt-[10px] text-[15px] leading-[1.5] font-bold text-ink">
+                {t.frase.testo(
+                  nome(s, ts, lingua),
+                  s.parole.map((p) => ts.foglio.parole[p]),
+                  s.intensita,
+                  s.quando ? ts.foglio.quando.voci[s.quando] : null,
+                )}
+              </p>
+            </Scheda>
+
+            {s.parole.length > 0 && (
+              <Scheda piatta className="px-[15px] py-[13px]">
+                <p className="m-0 text-[13px] font-bold text-ink">{t.parole.titolo}</p>
+                <p className="m-0 mt-1 text-[12px] leading-[1.4] text-ink-medio">
+                  {t.parole.occhio}
+                </p>
+                <ul className="m-0 mt-3 flex list-none flex-col gap-[10px] p-0">
+                  {s.parole.map((p) => {
+                    const scheda = tp.schede[p]
+                    const l = LIVELLO_DI[p]
+                    const tinta = TINTA_LIVELLO[l]
+                    return (
+                      <li key={p} className="flex items-start justify-between gap-3">
+                        <span className="min-w-0">
+                          <span className="block text-[13px] font-bold text-ink">
+                            {ts.foglio.parole[p]}
+                          </span>
+                          <span className="block text-[11px] text-ink-medio">
+                            {scheda.glossa ?? scheda.riga}
+                          </span>
+                        </span>
+                        <span
+                          className="inline-flex shrink-0 items-center gap-[6px] rounded-[10px] px-2 py-[3px] text-[10px] font-bold"
+                          style={{ background: tinta.fondo, color: tinta.testo }}
+                        >
+                          <span
+                            aria-hidden
+                            className="size-[5px] shrink-0 rounded-full"
+                            style={{ background: tinta.testo }}
+                          />
+                          {scheda.mossa ?? tp.livelli[l].nome}
+                        </span>
+                      </li>
+                    )
+                  })}
+                </ul>
+                {livello && (
+                  <>
+                    <div className="mt-3 h-px bg-riga" />
+                    <div className="mt-[10px]">
+                      <MossaDiOggi livello={livello} lingua={lingua} />
+                    </div>
+                  </>
+                )}
+              </Scheda>
+            )}
+          </div>
+        )
+      })}
+
+      <div className="mt-[18px]">
+        <ComeLeggere lingua={lingua} />
       </div>
 
-      <div className="mt-[10px]">
-        <Scheda piatta className="px-[14px] pt-[12px] pb-[16px]">
-          <p className="m-0 text-[14px] font-bold text-ink">{t.decifra}</p>
-          <div className="mt-[14px] flex flex-col gap-[14px]">
-            <Riga
-              pallino="pallino-verde"
-              titolo={t.affaticamento.titolo}
-              corpo={t.affaticamento.corpo}
-            />
-            <Riga
-              pallino="pallino-corallo"
-              titolo={t.protettivo.titolo}
-              corpo={t.protettivo.corpo}
-            />
-          </div>
+      <div className="mt-[18px]">
+        <Scheda piatta className="px-[15px] py-[13px]">
+          <p className="m-0 text-[13px] font-bold text-ink">{t.prova.titolo}</p>
+          <ol className="m-0 mt-3 flex list-none flex-col gap-[10px] p-0">
+            {t.prova.passi.map((passoTesto, i) => (
+              <li key={passoTesto} className="flex gap-[8px]">
+                <span className="mt-[1px] flex size-[22px] shrink-0 items-center justify-center rounded-full bg-chip text-[11px] font-bold text-ink">
+                  {i + 1}
+                </span>
+                <p className="m-0 text-[12px] leading-[1.5] text-ink">{passoTesto}</p>
+              </li>
+            ))}
+          </ol>
         </Scheda>
       </div>
 
       <div className="mt-[18px]">
-        <Scheda piatta>
-          <button
-            type="button"
-            onClick={() => setAperto((a) => !a)}
-            aria-expanded={aperto}
-            className="flex h-12 w-full items-center justify-between px-4 text-[14px] font-bold text-ink"
-          >
-            {t.prova}
-            <img
-              src={giu}
-              alt=""
-              aria-hidden
-              className="size-[18px] transition-transform duration-200 motion-reduce:transition-none"
-              style={{ transform: aperto ? 'rotate(180deg)' : 'none' }}
-            />
-          </button>
-          <Apri aperto={aperto}>
-            <ul className="m-0 flex list-none flex-col gap-2 px-4 pb-4">
-              {consigli.map((c) => (
-                <li key={c} className="text-[12.5px] leading-[1.45] text-ink-soft">
-                  {c}
-                </li>
-              ))}
-            </ul>
-          </Apri>
+        <Scheda piatta className="px-[15px] py-[13px]">
+          <p className="m-0 text-[13px] font-bold text-ink">{t.quando.titolo}</p>
+          <p className="m-0 mt-2 text-[12px] leading-[1.5] text-ink-medio">{t.quando.corpo}</p>
         </Scheda>
       </div>
 
@@ -159,24 +253,16 @@ export function CorpoSegnali({
   )
 }
 
-function Riga({ pallino, titolo, corpo }: { pallino: string; titolo: string; corpo: string }) {
-  return (
-    <div className="flex gap-[10px]">
-      <img src={icona(pallino)} alt="" aria-hidden className="mt-[5px] size-2 shrink-0" />
-      <div className="min-w-0">
-        <p className="m-0 text-[13px] font-bold text-ink">{titolo}</p>
-        <p className="m-0 mt-[2px] text-[11.5px] leading-[15px] text-ink-soft">{corpo}</p>
-      </div>
-    </div>
-  )
-}
-
 /**
  * L'ultimo schermo del check-out: il confronto fra la previsione e l'esito.
  *
  * E' lo schermo per cui esiste tutto il resto. Le due caselle in cima sono
  * l'unica cosa che il check-in di stamattina e il check-out di adesso hanno
  * da dirsi, e sono affiancate apposta.
+ *
+ * Sotto, lo stesso confronto punto per punto: prima e dopo, con le stesse
+ * sedici parole. E' quello che le rende confrontabili, ed e' anche il motivo
+ * per cui le parole sono sedici e non "descrivilo come vuoi".
  */
 export function CorpoRendiconto({
   passo,
@@ -192,12 +278,14 @@ export function CorpoRendiconto({
   const ts = testiSessione(lingua)
   const t = ts.rendiconto
   const nomi = ts.comune.ritmi
-  const previsto = datiSessione('checkin').ritmo
+  const mattina = datiSessione('checkin')
+  const previsto = mattina.ritmo
   const sentito = dati.ritmo
 
   const ordine = ['carica', 'costante', 'leggero']
   const scarto = previsto && sentito ? ordine.indexOf(sentito) - ordine.indexOf(previsto) : null
-  const frase = scarto === null ? null : scarto > 0 ? t.frase.piu : scarto < 0 ? t.frase.meno : t.frase.uguale
+  const frase =
+    scarto === null ? null : scarto > 0 ? t.frase.piu : scarto < 0 ? t.frase.meno : t.frase.uguale
 
   return (
     <Schermo
@@ -221,80 +309,131 @@ export function CorpoRendiconto({
 
       {/*
         Il confronto c'e' solo se stamattina ha fatto il check-in. Senza,
-        mostrare una casella "Previsione" vuota direbbe che ha sbagliato
+        mostrare una casella "Stamattina" vuota direbbe che ha sbagliato
         qualcosa, quando invece semplicemente non c'era.
       */}
       {previsto && sentito && (
         <div className="mt-[22px]">
-          <div className="flex items-center gap-2">
-            <div className="flex min-w-0 flex-1 flex-col gap-[2px] rounded-[14px] border-[1.5px] border-[#e8d6bd] bg-ritmo-fondo px-[10px] py-2">
-              <span className="text-[9px] font-bold tracking-[1px] text-[#e8a33d] uppercase">
-                {t.previsione}
+          <div className="flex items-center gap-2 rounded-[16px] border border-riga bg-surface p-[7px]">
+            <div className="flex min-w-0 flex-1 flex-col gap-[2px] rounded-[12px] border-[1.5px] border-ambra-testo bg-ritmo-fondo px-[10px] py-[5px]">
+              <span className="text-[9px] font-bold tracking-[1px] text-ambra-testo uppercase">
+                {t.prima}
               </span>
-              <span className="text-[16px] font-bold text-[#e8a33d]">{nomi[previsto]}</span>
+              <span className="text-[16px] font-bold text-ink">{nomi[previsto]}</span>
             </div>
-            <img src={icona('freccia-destra')} alt="→" className="size-4 shrink-0" />
-            <div className="flex min-w-0 flex-1 flex-col gap-[2px] rounded-[14px] border-[1.5px] border-lilla-bordo bg-lilla-fondo px-[10px] py-2">
-              <span className="text-[9px] font-bold tracking-[1px] text-lilla-vivo uppercase">
-                {t.richiesta}
+            <span aria-hidden className="shrink-0 text-[16px] font-bold text-ink-tenue">
+              →
+            </span>
+            <div className="flex min-w-0 flex-1 flex-col gap-[2px] rounded-[12px] border-[1.5px] border-lilla-cupo bg-lilla-fondo px-[10px] py-[5px]">
+              <span className="text-[9px] font-bold tracking-[1px] text-lilla-cupo uppercase">
+                {t.dopo}
               </span>
-              <span className="text-[16px] font-bold text-lilla-vivo">{nomi[sentito]}</span>
+              <span className="text-[16px] font-bold text-ink">{nomi[sentito]}</span>
             </div>
           </div>
-          <p className="m-0 mt-5 text-[13px] leading-[1.5] tracking-[-0.13px] text-ink-soft">
-            {frase}
-            <strong className="font-bold">{t.frase.chiusa}</strong>
-          </p>
+          <p className="m-0 mt-4 text-[13px] leading-[1.5] text-ink-medio">{frase}</p>
         </div>
       )}
 
-      <div className="mt-[22px]">
-        <Scheda className="p-[12px]">
-          <p className="m-0 text-[15px] font-bold text-ink">{t.decodifica.titolo}</p>
-          <p className="m-0 mt-2 text-[11.5px] leading-[16px] text-ink-medio">
-            {t.decodifica.occhio}
-          </p>
-          <div className="mt-2 flex flex-col gap-2">
-            <Riga
-              pallino="pallino-verde"
-              titolo={t.decodifica.affaticamento.titolo}
-              corpo={t.decodifica.affaticamento.corpo}
-            />
-            <Riga
-              pallino="pallino-corallo"
-              titolo={t.decodifica.protettivo.titolo}
-              corpo={t.decodifica.protettivo.corpo}
-            />
+      {dati.sensazioni.map((s) => {
+        const prima = mattina.sensazioni.find((x) => x.zona === s.zona)
+        const livello = livelloDi(s.parole)
+        return (
+          <div key={s.id} className="mt-[18px]">
+            <Scheda piatta className="px-[15px] py-[13px]">
+              <p className="m-0 text-[13px] font-bold text-ink">{t.confronto.titolo(nome(s, ts, lingua))}</p>
+              <p className="m-0 mt-2 text-[12px] leading-[1.4] text-ink-medio">
+                {t.confronto.occhio}
+              </p>
+
+              <div className="mt-3 flex flex-col gap-2">
+                {prima ? (
+                  <RigaConfronto
+                    etichetta={t.confronto.prima}
+                    parole={paroleViste(prima, ts)}
+                    intensita={prima.intensita}
+                  />
+                ) : (
+                  <p className="m-0 text-[11px] text-ink-medio">{t.confronto.senzaPrima}</p>
+                )}
+                <RigaConfronto
+                  etichetta={t.confronto.dopo}
+                  parole={paroleViste(s, ts)}
+                  intensita={s.intensita}
+                />
+              </div>
+
+              {livello && (
+                <>
+                  <div className="mt-3 h-px bg-riga" />
+                  <div className="mt-[10px]">
+                    <MossaDiOggi livello={livello} lingua={lingua} />
+                  </div>
+                </>
+              )}
+
+              {/*
+                Cosa le ha fatto la sessione lo ha detto lei nel foglio: qui
+                si rimette la sua risposta, non una frase nostra su cosa
+                quella risposta vorrebbe dire.
+              */}
+              {s.effetto && (
+                <p className="m-0 mt-[10px] text-[11px] leading-[1.45] text-ink-medio">
+                  {ts.foglio.effetto.voci[s.effetto]}
+                </p>
+              )}
+            </Scheda>
           </div>
-          <div className="mt-2 h-px bg-line" />
-          <p className="mt-2 mb-2 text-[12.5px] font-bold text-ink">{t.decodifica.domanda}</p>
-          <div className="flex gap-2" role="radiogroup" aria-label={t.decodifica.domanda}>
-            {[true, false].map((v) => {
-              const acceso = dati.protettivo === v
-              return (
-                <button
-                  key={String(v)}
-                  type="button"
-                  role="radio"
-                  aria-checked={acceso}
-                  onClick={() => scriviSessione('checkout', { protettivo: v })}
-                  className={`h-7 min-w-0 flex-1 rounded-pill border-[1.5px] text-[12px] font-bold transition-colors duration-150 ${
-                    acceso
-                      ? 'border-verde-vivo bg-verde-fondo text-verde-scuro'
-                      : 'border-line bg-surface text-ink-soft'
-                  }`}
-                >
+        )
+      })}
+
+      <div className="mt-[18px]">
+        <ComeLeggere lingua={lingua} />
+      </div>
+
+      <div className="mt-[18px]">
+        <Scheda piatta className="px-[15px] py-[13px]">
+          <p className="m-0 text-[14px] font-bold text-ink">{t.domanda}</p>
+          <div className="mt-[10px] flex gap-2" role="radiogroup" aria-label={t.domanda}>
+            {[true, false].map((v) => (
+              <Scelta
+                key={String(v)}
+                accesa={dati.protettivo === v}
+                onClick={() => scriviSessione('checkout', { protettivo: v })}
+              >
+                <span className="block w-[130px] text-center">
                   {v ? ts.comune.si : ts.comune.no}
-                </button>
-              )
-            })}
+                </span>
+              </Scelta>
+            ))}
           </div>
         </Scheda>
       </div>
 
-      <div className="mt-[14px]">
+      <div className="mt-[18px]">
         <Nota>{t.nota}</Nota>
       </div>
     </Schermo>
+  )
+}
+
+/** "PRIMA   teso · indolenzito · bruciante        4/10" */
+function RigaConfronto({
+  etichetta,
+  parole,
+  intensita,
+}: {
+  etichetta: string
+  parole: string
+  intensita: number
+}) {
+  return (
+    <div className="flex items-baseline gap-3">
+      <span className="w-[60px] shrink-0 text-[10px] font-bold tracking-[1px] text-ink-medio">
+        {etichetta}
+      </span>
+      <span className="min-w-0 flex-1 text-[13px] font-bold text-ink">{parole}</span>
+      <span className="shrink-0 text-[11px] font-bold text-ink-medio">{intensita}/10</span>
+    </div>
   )
 }

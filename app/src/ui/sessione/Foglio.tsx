@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { COMPARSA, EFFETTO, PAROLE, QUANDO } from '../../data/sessione'
+import { COMPARSA, EFFETTO, PAROLE, QUANDO, nomeCodice } from '../../data/sessione'
 import type { Parola, Tipo } from '../../data/sessione'
 import { testiSessione } from '../../copy/sessione'
 import type { Sensazione } from '../../lib/sessione'
@@ -96,7 +96,7 @@ export function Foglio({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={altrove ? ts.mappa.altrove : bozza.nome}
+          aria-label={altrove ? ts.mappa.altrove : nomeCodice(bozza.zona, lingua)}
           className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[20px] bg-surface"
           style={{ boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)' }}
         >
@@ -106,7 +106,7 @@ export function Foglio({
 
           <div className="flex shrink-0 items-start justify-between gap-3 px-4 pt-[18px]">
             <h2 className="bab-display m-0 text-[26px] leading-[1.12] font-bold text-ink">
-              {altrove ? bozza.zonaLibera.trim() || ts.mappa.altrove : bozza.nome}
+              {altrove ? bozza.zonaLibera.trim() || ts.mappa.altrove : nomeCodice(bozza.zona, lingua)}
             </h2>
             <button
               type="button"
