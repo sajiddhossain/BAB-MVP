@@ -246,6 +246,13 @@ function Scrivania() {
     inFila(async () => {
       const riga = righe[lingua][k]
       if (!riga) return
+      /*
+       * Aprire una scritta e chiuderla senza toccarla non deve lasciare una
+       * riga: il campo si chiude anche solo cliccando altrove, e senza questo
+       * la tabella si riempirebbe di righe che dicono quello che il codice
+       * dice gia'.
+       */
+      if (riga.vivo === null && testo(riga.bozza) === testo(partenza[lingua][k])) return
       setStato('salvo…')
       const { error } = await supabase!.from('copy_overrides').upsert(
         {

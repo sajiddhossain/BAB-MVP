@@ -47,7 +47,7 @@ export function Foglio({
   /* la parola di cui sta leggendo la scheda, se ne sta leggendo una */
   const [spiega, setSpiega] = useState<Parola | null>(null)
   const [elenco, setElenco] = useState(false)
-  const { lingua, ts, tp } = useLingua()
+  const { ts, tp } = useLingua()
   const t = ts.foglio
 
   // Esc chiude, come ogni cosa che sta sopra a un'altra
@@ -92,7 +92,7 @@ export function Foglio({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={altrove ? ts.mappa.altrove : nomeCodice(bozza.zona, lingua)}
+          aria-label={altrove ? ts.mappa.altrove : nomeCodice(bozza.zona, ts.zone)}
           className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[20px] bg-surface"
           style={{ boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)' }}
         >
@@ -102,7 +102,7 @@ export function Foglio({
 
           <div className="flex shrink-0 items-start justify-between gap-3 px-4 pt-[18px]">
             <h2 className="bab-display m-0 text-[26px] leading-[1.12] font-bold text-ink">
-              {altrove ? bozza.zonaLibera.trim() || ts.mappa.altrove : nomeCodice(bozza.zona, lingua)}
+              {altrove ? bozza.zonaLibera.trim() || ts.mappa.altrove : nomeCodice(bozza.zona, ts.zone)}
             </h2>
             <button
               type="button"

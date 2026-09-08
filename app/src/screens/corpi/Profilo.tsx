@@ -7,7 +7,7 @@ import { Giorni } from '../../ui/Giorni'
 import { Pillole } from '../../ui/Scelte'
 import { useLingua } from '../../lib/lingua'
 import { scrivi, useRisposte } from '../../lib/risposte'
-import { SPORT, normalizza } from '../../data/sport'
+import { SPORT, nomeSport, normalizza } from '../../data/sport'
 import { abbastanzaGrande } from '../../data/onboarding'
 import type { PropsSchermo } from '../tipi'
 
@@ -88,13 +88,15 @@ export function CorpoCompleanno({ nodo, verso, avanzamento, avanti, indietro }: 
 
 /* 07-sport — 3771:140 / 3958:616 */
 export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
-  const { t, lingua } = useLingua()
+  const { t } = useLingua()
   const { sport, sportPrincipale } = useRisposte()
   const [cerca, setCerca] = useState('')
 
   const q = normalizza(cerca)
   const trovati = q
-    ? SPORT.filter((s) => normalizza(s[lingua]).includes(q) && !sport.includes(s.id)).slice(0, 6)
+    ? SPORT.filter(
+        (id) => normalizza(nomeSport(t.sport.nomi, id)).includes(q) && !sport.includes(id),
+      ).slice(0, 6)
     : []
 
   function aggiungi(id: string) {
@@ -146,14 +148,14 @@ export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: Props
           {trovati.length === 0 ? (
             <p className="m-0 px-[14.5px] py-3 text-[15px] text-ink-mute">{t.sport.nessuno}</p>
           ) : (
-            trovati.map((s) => (
+            trovati.map((id) => (
               <button
-                key={s.id}
+                key={id}
                 type="button"
-                onClick={() => aggiungi(s.id)}
+                onClick={() => aggiungi(id)}
                 className="block w-full border-b border-line/50 px-[14.5px] py-3 text-left text-[15px] text-ink last:border-b-0"
               >
-                {s[lingua]}
+                {nomeSport(t.sport.nomi, id)}
               </button>
             ))
           )}
@@ -164,7 +166,6 @@ export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: Props
       {sport.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {sport.map((id) => {
-            const s = SPORT.find((x) => x.id === id)
             const principale = id === sportPrincipale
             return (
               <span
@@ -174,7 +175,7 @@ export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: Props
                 }`}
               >
                 <button type="button" onClick={() => scrivi({ sportPrincipale: id })}>
-                  {s ? s[lingua] : id}
+                  {nomeSport(t.sport.nomi, id)}
                 </button>
                 {principale && (
                   <span className="text-[10px] tracking-[1px] text-ink-soft">
@@ -183,7 +184,7 @@ export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: Props
                 )}
                 <button
                   type="button"
-                  aria-label={`${s ? s[lingua] : id} ✕`}
+                  aria-label={`${nomeSport(t.sport.nomi, id)} ✕`}
                   onClick={() => togli(id)}
                   className="flex size-5 items-center justify-center rounded-full text-ink-soft"
                 >
@@ -200,7 +201,7 @@ export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: Props
 
 /* 08-training — 3771:160 / 3958:641 */
 export function CorpoAllenamenti({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
-  const { t, lingua } = useLingua()
+  const { t } = useLingua()
   const { sport, allenamenti } = useRisposte()
 
   function cambia(id: string, campi: Partial<{ giorni: number[]; fascia: number }>) {
@@ -225,11 +226,10 @@ export function CorpoAllenamenti({ nodo, verso, avanzamento, avanti, indietro }:
       {/* un blocco per sport: nel disegno sono due, qui sono quanti ne ha scelti */}
       <div className="mt-9 flex flex-col gap-7">
         {sport.map((id) => {
-          const s = SPORT.find((x) => x.id === id)
           const val = allenamenti[id] ?? { giorni: [], fascia: 1 }
           return (
             <div key={id}>
-              <p className="m-0 mb-3 text-[17px] font-bold text-ink">{s ? s[lingua] : id}</p>
+              <p className="m-0 mb-3 text-[17px] font-bold text-ink">{nomeSport(t.sport.nomi, id)}</p>
               <Gruppo etichetta={t.allenamenti.giorni}>
                 <Giorni scelti={val.giorni} onChange={(g) => cambia(id, { giorni: g })} />
               </Gruppo>

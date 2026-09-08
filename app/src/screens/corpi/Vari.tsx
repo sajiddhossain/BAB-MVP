@@ -11,7 +11,7 @@ import { useLingua } from '../../lib/lingua'
 import { scrivi, useRisposte } from '../../lib/risposte'
 import { mandaCodice, verificaCodice } from '../../lib/conto'
 import type { Risposte } from '../../lib/risposte'
-import { SPORT } from '../../data/sport'
+import { nomeSport } from '../../data/sport'
 import { useLocation } from 'react-router-dom'
 import type { PropsSchermo } from '../tipi'
 import logo from '../../assets/logo-bab.svg'
@@ -259,10 +259,9 @@ export function CorpoRiepilogo({
   salvando,
   erroreSalvataggio,
 }: PropsSchermo) {
-  const { t, lingua } = useLingua()
+  const { t } = useLingua()
   const r = useRisposte()
 
-  const nomeSport = (id: string) => SPORT.find((s) => s.id === id)?.[lingua] ?? id
   const listaGiorni = (g: number[]) =>
     g.length ? g.map((i) => t.giorni[i]).join(' · ') : t.riepilogo.vuoto
 
@@ -272,7 +271,7 @@ export function CorpoRiepilogo({
 
   const voci: [string, string][] = [
     [t.riepilogo.voci.nome, r.nome || t.riepilogo.vuoto],
-    [t.riepilogo.voci.sport, r.sportPrincipale ? nomeSport(r.sportPrincipale) : t.riepilogo.vuoto],
+    [t.riepilogo.voci.sport, r.sportPrincipale ? nomeSport(t.sport.nomi, r.sportPrincipale) : t.riepilogo.vuoto],
     [t.riepilogo.voci.allenamenti, listaGiorni(giorniAllenamento)],
     [t.riepilogo.voci.edFisica, listaGiorni(r.edFisica)],
     [t.riepilogo.voci.ciclo, r.cicliUltimi[0] || t.riepilogo.vuoto],

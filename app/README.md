@@ -182,6 +182,19 @@ all'originale togliendo la sua riga, e c'e' un bottone che lo fa.
 buco cancellato per sbaglio non rompe niente, semplicemente quel pezzo non
 compare piu'.
 
+**Cosa NON si cambia da li'.** Una sola scritta in tutta l'app: "Qualcosa si
+e' rotto", la schermata che compare quando il resto e' caduto. E' l'ultima
+cosa che si vede, e non puo' dipendere da niente — nemmeno dai testi. Tutto il
+resto passa di qui, compresi i nomi dei diciotto sport e i quarantasette nomi
+delle zone del corpo, che prima stavano nel codice.
+
+I nomi delle zone sono scritti per intero, uno per zona. Prima si
+costruivano da una radice piu' il lato ("Quadricipite" + "destro"), col genere
+della parola scritto accanto: elegante, ma dal pannello si sarebbe potuto
+cambiare solo mezzo nome, e in inglese la regola non vale nemmeno — "Right
+quad" mette il lato davanti e accorcia la parola. Scritti per intero, chi
+tocca "Petto destro" si ritrova "Petto destro".
+
 **Le liste.** Qualche scritta e' un elenco — i quattro passi di "Prova questo
 oggi", i nomi dei giorni. Li' il campo vuole una riga per voce: togliendo una
 riga si toglie una voce.

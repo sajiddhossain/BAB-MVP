@@ -47,7 +47,7 @@ export function Mappa({
   onTocca: (codice: string) => void
 }) {
   const svg = useRef<SVGSVGElement>(null)
-  const { lingua } = useLingua()
+  const { ts } = useLingua()
   const zone = ZONE[lato]
   const [x, y, w, h] = lato === 'front' ? FRONT_INK : BACK_INK
 
@@ -119,7 +119,7 @@ export function Mappa({
             className="cursor-pointer outline-none transition-[fill] duration-200 focus-visible:stroke-lilla focus-visible:[stroke-width:10] motion-reduce:transition-none"
             role="button"
             tabIndex={0}
-            aria-label={nomeZona(z.id, lingua)}
+            aria-label={nomeZona(z.id, ts.zone)}
             aria-pressed={segnata}
             onClick={() => scegli(z)}
             onKeyDown={(e) => {

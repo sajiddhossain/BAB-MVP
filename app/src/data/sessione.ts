@@ -240,80 +240,36 @@ export function codiceZona(lato: Lato, id: string): string {
 export const ZONE = { front: FRONT_ZONES, back: BACK_ZONES } as const
 
 /*
- * I nomi italiani delle zone.
+ * Il nome visibile di una zona.
  *
- * `bodyZones.ts` e' generato e ha gia' le etichette inglesi, quelle che si
- * vedono nei frame ("Right quad", "Left hamstring"): per l'inglese si legge
- * di li'. L'italiano qui si ricostruisce dalla radice dell'id piu' il lato,
- * invece di elencare 66 stringhe a mano. Il genere serve perche' in italiano
- * "destro" cambia con il nome: il quadricipite destro, la coscia posteriore
- * destra.
- */
-type Genere = 'm' | 'f' | 'mp' | 'fp'
-
-const NOMI: Record<string, [string, Genere]> = {
-  head: ['Collo e testa', 'f'],
-  trap: ['Trapezio', 'm'],
-  shoulder: ['Spalla', 'f'],
-  chest: ['Petto', 'm'],
-  upperarm: ['Braccio', 'm'],
-  ribs: ['Costole', 'fp'],
-  elbow: ['Gomito', 'm'],
-  abs: ['Addominali', 'mp'],
-  forearm: ['Avambraccio', 'm'],
-  hip: ['Anca', 'f'],
-  wrist: ['Polso', 'm'],
-  hand: ['Mano', 'f'],
-  quad: ['Quadricipite', 'm'],
-  knee: ['Ginocchio', 'm'],
-  shin: ['Tibia', 'f'],
-  ankle: ['Caviglia', 'f'],
-  foot: ['Piede', 'm'],
-  upperback: ['Schiena alta', 'f'],
-  midback: ['Schiena media', 'f'],
-  lowback: ['Zona lombare', 'f'],
-  glute: ['Gluteo', 'm'],
-  ham: ['Coscia posteriore', 'f'],
-  calf: ['Polpaccio', 'm'],
-  heel: ['Tallone', 'm'],
-}
-
-const DESTRO: Record<Genere, string> = { m: 'destro', f: 'destra', mp: 'destri', fp: 'destre' }
-const SINISTRO: Record<Genere, string> = {
-  m: 'sinistro',
-  f: 'sinistra',
-  mp: 'sinistri',
-  fp: 'sinistre',
-}
-
-/**
- * Il nome visibile di un codice zona: `front_quad_r` -> "Quadricipite destro".
+ * I nomi stanno in `copy/sessione.ts` sotto `zone`, come tutte le altre
+ * scritte: qui c'e' solo il modo di cercarli. Si passa la mappa invece di
+ * leggerla da soli perche' e' la mappa gia' corretta dal pannello, e una
+ * lettura diretta dal file compilato salterebbe le correzioni.
  *
- * Si ricava dal codice ogni volta, e non si tiene da parte insieme alla
- * sensazione: il nome e' l'unica cosa della sensazione che cambia con la
- * lingua, e tenerlo scritto vorrebbe dire che chi cambia lingua a meta'
- * giornata si ritrova il check-out che parla del "quadricipite destro" in
- * mezzo a una pagina inglese.
+ * Se una zona non ha nome — `bodyZones.ts` e' generato, e un giorno potrebbe
+ * portarne una nuova — si ripiega sull'etichetta inglese generata. Meglio
+ * "Right quad" in mezzo all'italiano che `front_quad_r`.
  */
-export function nomeCodice(codice: string, lingua: 'it' | 'en'): string {
-  return nomeZona(codice.split('_').slice(1).join('-'), lingua)
-}
-
-/** L'etichetta inglese generata, cercata per id fra le zone dei due lati. */
 const ETICHETTE: Record<string, string> = Object.fromEntries(
   [...FRONT_ZONES, ...BACK_ZONES].map((z) => [z.id, z.label]),
 )
 
-/** "Quadricipite destro". Senza lato per la testa, che di lati non ne ha. */
-export function nomeZona(id: string, lingua: 'it' | 'en' = 'it'): string {
-  if (lingua === 'en') return ETICHETTE[id] ?? id
-  const [radice, lato] = id.split('-')
-  const voce = NOMI[radice]
-  if (!voce) return id
-  const [nome, genere] = voce
-  if (lato === 'r') return `${nome} ${DESTRO[genere]}`
-  if (lato === 'l') return `${nome} ${SINISTRO[genere]}`
-  return nome
+/** "Quadricipite destro", dal codice zona: `front_quad_r`. */
+export function nomeCodice(codice: string, zone: Record<string, string>): string {
+  return nomeZona(codice.split('_').slice(1).join('-'), zone)
+}
+
+/**
+ * "Quadricipite destro", dall'id della zona: `quad-r`.
+ *
+ * Il nome non si tiene da parte insieme alla sensazione: e' l'unica cosa
+ * della sensazione che cambia con la lingua, e tenerlo scritto vorrebbe dire
+ * che chi cambia lingua a meta' giornata si ritrova il check-out che parla
+ * del "quadricipite destro" in mezzo a una pagina inglese.
+ */
+export function nomeZona(id: string, zone: Record<string, string>): string {
+  return zone[id] ?? ETICHETTE[id] ?? id
 }
 
 /** I passi che si vedono davvero, viste le risposte date finora. */

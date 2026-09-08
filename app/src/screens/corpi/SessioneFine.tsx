@@ -33,9 +33,9 @@ function livelloDi(parole: Parola[]): Livello | null {
 }
 
 /** Il nome che si vede: la zona, o quello che ha scritto lei per "Altrove". */
-function nome(s: Sensazione, ts: TestiSessione, lingua: 'it' | 'en'): string {
+function nome(s: Sensazione, ts: TestiSessione): string {
   if (s.zona === 'altrove') return s.zonaLibera.trim() || ts.mappa.altrove
-  return nomeCodice(s.zona, lingua)
+  return nomeCodice(s.zona, ts.zone)
 }
 
 /**
@@ -47,14 +47,14 @@ function nome(s: Sensazione, ts: TestiSessione, lingua: 'it' | 'en'): string {
  * finale ("e", "and") e' un modello anche lei — in un'altra lingua l'elenco
  * potrebbe non funzionare cosi'.
  */
-function fraseDelGiorno(s: Sensazione, ts: TestiSessione, lingua: 'it' | 'en'): string {
+function fraseDelGiorno(s: Sensazione, ts: TestiSessione): string {
   const t = ts.segnali.frase
   const parole = s.parole.map((p) => ts.foglio.parole[p])
   const elenco =
     parole.length > 1
       ? `${parole.slice(0, -1).join(', ')} ${t.e} ${parole[parole.length - 1]}`
       : parole.join('')
-  const zona = nome(s, ts, lingua)
+  const zona = nome(s, ts)
   const dove = { zona, zonaMinuscola: zona.toLowerCase() }
   const base = elenco
     ? riempi(t.testo, { ...dove, parole: elenco, intensita: s.intensita })
@@ -166,7 +166,7 @@ export function CorpoSegnali({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkin')
-  const { lingua, ts, tp } = useLingua()
+  const { ts, tp } = useLingua()
   const t = ts.segnali
   const sensazioni = dati.sensazioni
 
@@ -190,7 +190,7 @@ export function CorpoSegnali({
       <OcchielloSessione icona="scintilla">{t.occhiello}</OcchielloSessione>
       <Titolo>
         {sensazioni.length === 1
-          ? riempi(t.titolo, zone(nome(sensazioni[0], ts, lingua)))
+          ? riempi(t.titolo, zone(nome(sensazioni[0], ts)))
           : t.titoloPiu}
       </Titolo>
 
@@ -203,7 +203,7 @@ export function CorpoSegnali({
                 {t.frase.etichetta}
               </p>
               <p className="m-0 mt-[10px] text-[15px] leading-[1.5] font-bold text-ink">
-{fraseDelGiorno(s, ts, lingua)}
+{fraseDelGiorno(s, ts)}
               </p>
             </Scheda>
 
@@ -312,7 +312,7 @@ export function CorpoRendiconto({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkout')
-  const { lingua, ts } = useLingua()
+  const { ts } = useLingua()
   const t = ts.rendiconto
   const nomi = ts.comune.ritmi
   const mattina = datiSessione('checkin')
@@ -378,7 +378,7 @@ export function CorpoRendiconto({
         return (
           <div key={s.id} className="mt-[18px]">
             <Scheda piatta className="px-[15px] py-[13px]">
-              <p className="m-0 text-[13px] font-bold text-ink">{riempi(t.confronto.titolo, zone(nome(s, ts, lingua)))}</p>
+              <p className="m-0 text-[13px] font-bold text-ink">{riempi(t.confronto.titolo, zone(nome(s, ts)))}</p>
               <p className="m-0 mt-2 text-[12px] leading-[1.4] text-ink-medio">
                 {t.confronto.occhio}
               </p>

@@ -133,7 +133,7 @@ export const SCHERMI: GruppoScritte[] = [
         id: 'ci-foglio',
         nome: '3b · Il foglio',
         rotta: '/sessione/checkin/mappa',
-        rami: ['sessione.foglio'],
+        rami: ['sessione.foglio', 'sessione.zone'],
         come: 'Tocca un punto del corpo per far salire il foglio.',
       },
       {
@@ -181,7 +181,7 @@ export const SCHERMI: GruppoScritte[] = [
         id: 'co-foglio',
         nome: '5b · Il foglio',
         rotta: '/sessione/checkout/mappa',
-        rami: ['sessione.foglio'],
+        rami: ['sessione.foglio', 'sessione.zone'],
         come: 'Tocca un punto del corpo per far salire il foglio.',
       },
       {
