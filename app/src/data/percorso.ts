@@ -28,7 +28,45 @@ import type { Livello, Parola } from './sessione'
  */
 
 /** Le icone che compaiono dentro alle lezioni, da `assets/percorso/`. */
-export type IconaLezione = 'manubrio' | 'piuma' | 'fulmine' | 'battito'
+export type IconaLezione =
+  | 'manubrio'
+  | 'piuma'
+  | 'fulmine'
+  | 'battito'
+  | 'bicipite'
+  | 'onde'
+
+/**
+ * I due impaginati.
+ *
+ * In Figma la lezione 1 (i frame senza prefisso) e le lezioni 2-8 (`bl-l2-*`
+ * e seguenti) sono disegnate in due modi diversi: schede centrate contro
+ * schede orizzontali, l'abbinamento con le icone contro l'abbinamento a
+ * righe, uno schermo finale con la scheda del progresso contro uno con la
+ * barra. Non e' una differenza di contenuto, e' proprio un altro impaginato
+ * per gli stessi sei esercizi.
+ *
+ * Li teniamo tutti e due, come sta nel file. `veste` dice quale.
+ */
+export type Veste = 'uno' | 'classico'
+
+/**
+ * I riquadri sotto alla scheda-parola, nella veste classica.
+ *
+ * Cambiano da schermo a schermo: la prima parola della lezione 2 ha una nota
+ * sciolta e un riquadro con la pastiglia, la seconda ha un riquadro titolato
+ * ("QUAL E' LA DIFFERENZA?") e uno con la riga di colore. Il tipo sta qui
+ * perche' e' forma; cosa c'e' scritto dentro sta nei testi.
+ */
+export type Blocco =
+  /** un paragrafo sciolto, senza riquadro */
+  | 'nota'
+  /** un riquadro con la pastiglia del livello e il testo sotto */
+  | 'pastiglia'
+  /** un riquadro con un'etichetta in maiuscolo e il testo sotto */
+  | 'titolato'
+  /** un riquadro con la riga di colore a sinistra */
+  | 'accento'
 
 /**
  * Un esercizio, con quello che serve per correggerlo.
@@ -39,7 +77,7 @@ export type IconaLezione = 'manubrio' | 'piuma' | 'fulmine' | 'battito'
  */
 export type Passo =
   /** conosci la parola: la scheda grande, una per volta */
-  | { tipo: 'incontra'; parola: Parola; icona: IconaLezione }
+  | { tipo: 'incontra'; parola: Parola; icona: IconaLezione; blocchi: Blocco[] }
   /**
    * abbina ogni parola alla sua immagine.
    *
@@ -53,7 +91,8 @@ export type Passo =
    */
   | {
       tipo: 'abbina'
-      righe: { icona: IconaLezione; giusta: number | null }[]
+      /** l'icona c'e' solo nella veste della lezione 1: la classica non ne ha */
+      righe: { icona?: IconaLezione; giusta: number | null }[]
       parole: Parola[]
       esche: number
     }
@@ -63,6 +102,15 @@ export type Passo =
   | { tipo: 'storia'; risposte: Parola[]; giusta: number }
   /** cosa fai adesso: e' il segnale che decide, non la parola */
   | { tipo: 'mossa'; giusta: Livello }
+  /**
+   * La bandiera rossa: certe parole vanno dette a un adulto, subito.
+   *
+   * Non e' un esercizio — non c'e' niente da rispondere. E' l'unico schermo
+   * del percorso che esiste per essere letto e basta, e sta solo dove il
+   * disegno lo mette: dopo le parole che possono voler dire che serve
+   * qualcuno.
+   */
+  | { tipo: 'allarme'; parola: Parola }
   /**
    * completa la frase.
    *
@@ -80,8 +128,8 @@ export type Lezione = {
   numero: number
   /** le due parole, con l'identificativo che hanno gia' nel check-in */
   parole: [Parola, Parola]
-  /** vero dove il disegno mette lo schermo della bandiera rossa */
-  allarme?: boolean
+  /** quale dei due impaginati usa */
+  veste: Veste
 }
 
 /**
@@ -93,15 +141,20 @@ export type Lezione = {
  * vorrebbe dire non ritrovare piu' i segnali gia' salvati.
  */
 export const LEZIONI: Lezione[] = [
-  { numero: 1, parole: ['forte', 'leggero'] },
-  { numero: 2, parole: ['indolenzito', 'sordo'] },
-  { numero: 3, parole: ['teso', 'rigido'] },
-  { numero: 4, parole: ['crampo', 'morsa'] },
-  { numero: 5, parole: ['pungente', 'trafittivo'], allarme: true },
-  { numero: 6, parole: ['bruciante', 'formicolante'] },
-  { numero: 7, parole: ['intorpidito', 'instabile'], allarme: true },
-  { numero: 8, parole: ['gonfio', 'caldo'] },
+  { numero: 1, parole: ['forte', 'leggero'], veste: 'uno' },
+  { numero: 2, parole: ['indolenzito', 'sordo'], veste: 'classico' },
+  { numero: 3, parole: ['teso', 'rigido'], veste: 'classico' },
+  { numero: 4, parole: ['crampo', 'morsa'], veste: 'classico' },
+  { numero: 5, parole: ['pungente', 'trafittivo'], veste: 'classico' },
+  { numero: 6, parole: ['bruciante', 'formicolante'], veste: 'classico' },
+  { numero: 7, parole: ['intorpidito', 'instabile'], veste: 'classico' },
+  { numero: 8, parole: ['gonfio', 'caldo'], veste: 'classico' },
 ]
+
+/** L'impaginato di una lezione. */
+export function vesteDi(numero: number): Veste {
+  return LEZIONI.find((l) => l.numero === numero)?.veste ?? 'classico'
+}
 
 /**
  * Gli esercizi di ogni lezione, nell'ordine del disegno.
@@ -118,8 +171,8 @@ export const LEZIONI: Lezione[] = [
  */
 export const PASSI: Record<number, Passo[]> = {
   1: [
-    { tipo: 'incontra', parola: 'forte', icona: 'manubrio' },
-    { tipo: 'incontra', parola: 'leggero', icona: 'piuma' },
+    { tipo: 'incontra', parola: 'forte', icona: 'manubrio', blocchi: ['pastiglia'] },
+    { tipo: 'incontra', parola: 'leggero', icona: 'piuma', blocchi: ['titolato'] },
     {
       tipo: 'abbina',
       righe: [
@@ -137,6 +190,27 @@ export const PASSI: Record<number, Passo[]> = {
     { tipo: 'storia', risposte: ['leggero', 'forte', 'indolenzito', 'sordo'], giusta: 0 },
     { tipo: 'mossa', giusta: 'calibra' },
     { tipo: 'frase', parole: ['forte', 'leggero'], esche: 2 },
+    { tipo: 'fatto' },
+  ],
+
+  2: [
+    { tipo: 'incontra', parola: 'indolenzito', icona: 'bicipite', blocchi: ['nota', 'pastiglia'] },
+    { tipo: 'incontra', parola: 'sordo', icona: 'onde', blocchi: ['titolato', 'accento'] },
+    {
+      /*
+       * Qui non ci sono esche e nessuna riga resta vuota: le quattro parole
+       * sono le due di oggi piu' le due della lezione 1. E' il primo ripasso
+       * che il percorso fa, ed e' il disegno a chiederlo.
+       */
+      tipo: 'abbina',
+      righe: [{ giusta: 0 }, { giusta: 1 }, { giusta: 2 }, { giusta: 3 }],
+      parole: ['indolenzito', 'sordo', 'forte', 'leggero'],
+      esche: 0,
+    },
+    { tipo: 'gemelle', risposte: ['indolenzito', 'sordo'], giusta: 0 },
+    { tipo: 'storia', risposte: ['indolenzito', 'sordo', 'forte'], giusta: 1 },
+    { tipo: 'mossa', giusta: 'calibra' },
+    { tipo: 'frase', parole: ['indolenzito', 'sordo'], esche: 2 },
     { tipo: 'fatto' },
   ],
 }

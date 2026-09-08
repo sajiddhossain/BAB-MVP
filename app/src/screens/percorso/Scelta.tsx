@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Guscio } from '../../ui/percorso/Guscio'
-import { Badge, CartaRisposta, Esito, Occhiello, Scheda, Titolo } from '../../ui/percorso/pezzi'
+import { Badge, CartaRisposta, Esito, Occhiello, Scheda, Testa, Titolo } from '../../ui/percorso/pezzi'
+import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
-import { TINTE_RISPOSTA } from '../../data/percorso'
+import { TINTE_RISPOSTA, vesteDi } from '../../data/percorso'
 import type { Passo } from '../../data/percorso'
 import type { StatoCarta } from '../../ui/percorso/pezzi'
 import type { PropsEsercizio } from './tipi'
@@ -14,17 +15,22 @@ const LETTERE = ['A', 'B', 'C', 'D', 'E']
  *
  * Sono due schermi del disegno — `bl-false-friends` e `bl-story` — e qui sono
  * uno solo, perche' la differenza fra loro e' quanto e' lungo lo scenario e
- * quante risposte ci sono. I falsi amici mettono lo scenario grande, come un
- * titolo, e danno due parole che si somigliano; la storia lo mette in una
- * scheda e ne da' quattro, tre delle quali di altre lezioni.
+ * quante risposte ci sono. I falsi amici danno due parole che si somigliano;
+ * la storia ne da' tre o quattro, quasi tutte di altre lezioni.
  *
- * Le glosse sotto alle risposte dei falsi amici ("Potenza muscolare al
- * massimo") stanno nei testi e non sono le metafore delle schede-parola: qui
- * servono a separare due parole vicine, non a spiegarle da zero.
+ * ── LE RIGHE SOTTO ALLE RISPOSTE ───────────────────────────────────────────
+ * Nella veste della lezione 1 sono descrizioni ("Leggera, senza attrito") e
+ * si vedono da subito. Nella veste classica sono spiegazioni del perche' una
+ * risposta e' quella giusta ("C'e' uno sforzo chiaro fatto 48 ore fa") e si
+ * vedono solo dopo aver verificato: nei frame sono disegnate insieme alla
+ * spunta, cioe' fanno parte dello stato "gia' risposto". Mostrarle prima
+ * vorrebbe dire scrivere la risposta accanto alla domanda.
  */
 export function Scelta({
   passo,
   testi,
+  lezione,
+  parole,
   avanzamento,
   indietro,
   avanti,
@@ -33,6 +39,8 @@ export function Scelta({
   const gemelle = passo.tipo === 'gemelle'
   const t = gemelle ? testi.gemelle : testi.storia
   const glosse = gemelle ? testi.gemelle.glosse : []
+  const classico = vesteDi(lezione) === 'classico'
+  const buchi = { uno: parole[0], due: parole[1] }
 
   const [scelta, setScelta] = useState<number | null>(null)
   const [esito, setEsito] = useState<boolean | null>(null)
@@ -48,7 +56,7 @@ export function Scelta({
       avanzamento={avanzamento}
       indietro={indietro}
       attivo={scelta !== null}
-      azione={esito === true ? tpe.comune.continua : tpe.comune.verifica}
+      azione={esito === true ? tpe.comune.continua : t.azione}
       onAzione={() => {
         if (esito === true) {
           avanti()
@@ -62,17 +70,23 @@ export function Scelta({
           giusto={esito === true}
           titolo={esito ? tpe.comune.giusto : tpe.comune.sbagliato}
         >
-          {esito ? null : tpe.comune.riprova}
+          {esito ? (t.esito ? riempi(t.esito, buchi) : null) : tpe.comune.riprova}
         </Esito>
       }
     >
-      <Occhiello nome={gemelle ? 'domanda' : 'libro-aperto'}>{t.occhiello}</Occhiello>
+      {classico ? (
+        <Testa occhiello={t.occhiello} titolo={t.titolo ?? ''} />
+      ) : (
+        <Occhiello nome={gemelle ? 'domanda' : 'libro-aperto'}>{t.occhiello}</Occhiello>
+      )}
 
-      <div className="mt-[10px]">
+      <div className={classico ? 'mt-[30px]' : 'mt-[10px]'}>
         <Badge>{t.badge}</Badge>
       </div>
 
-      {gemelle ? (
+      {classico ? (
+        <p className="m-0 mt-[14px] text-[15px] leading-[1.5] text-ink-soft">{t.scenario}</p>
+      ) : gemelle ? (
         <div className="mt-[14px]">
           <Titolo>{t.scenario}</Titolo>
         </div>
@@ -87,7 +101,11 @@ export function Scelta({
       )}
 
       <p
-        className={`m-0 ${gemelle ? 'mt-[10px] text-[13px] text-ink-soft' : 'mt-[27px] text-center text-[10px] font-bold tracking-[1px] uppercase text-lilla'}`}
+        className={`m-0 ${
+          classico || gemelle
+            ? 'mt-[18px] text-[13px] font-bold text-ink-soft'
+            : 'mt-[27px] text-center text-[10px] font-bold tracking-[1px] uppercase text-lilla'
+        }`}
       >
         {t.domanda}
       </p>
@@ -100,7 +118,7 @@ export function Scelta({
             tinta={TINTE_RISPOSTA[i % TINTE_RISPOSTA.length]}
             stato={stato(i)}
             titolo={ts.foglio.parole[parola] ?? parola}
-            glossa={glosse[i]}
+            glossa={classico && esito === null ? undefined : glosse[i]}
             onClick={() => {
               setScelta(i)
               setEsito(null)

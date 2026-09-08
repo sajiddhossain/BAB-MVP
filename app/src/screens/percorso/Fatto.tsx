@@ -88,7 +88,7 @@ export function Fatto({
               {ts.foglio.parole[p.parola] ?? p.parola}
             </p>
             <p className="m-0 mt-2 text-center text-[12px] leading-[1.4] text-ink-soft">
-              {t.righe[i]}
+              {t.righe?.[i]}
             </p>
           </div>
         ))}

@@ -1,5 +1,9 @@
 import type { ReactNode } from 'react'
 import { Apri } from '../Apri'
+import { riempi } from '../../copy/riempi'
+import type { Blocco as BloccoTipo } from '../../data/percorso'
+import type { BloccoTesto } from '../../copy/percorso'
+import type { Presa } from '../../lib/trascina'
 import spuntaTonda from '../../assets/percorso/spunta-tonda.svg'
 import spunta from '../../assets/percorso/spunta.svg'
 
@@ -281,3 +285,157 @@ export function Cesto({ etichetta, children }: { etichetta: string; children: Re
 
 /** Le tinte delle pastiglie, nell'ordine del disegno. */
 export const TINTE_PASTIGLIA = ['#ffd1c1', '#e9d5ff', '#d1fae5', '#fef3c7']
+
+/**
+ * La testa di uno schermo nella veste delle lezioni 2-8: occhiello e titolo.
+ *
+ * Nella veste della lezione 1 l'occhiello ha un'icona accanto e il titolo a
+ * volte non c'e' proprio; qui l'occhiello e' solo testo e il titolo c'e'
+ * sempre. Sono due gruppi di frame disegnati in momenti diversi, e la
+ * differenza si vede.
+ */
+export function Testa({ occhiello, titolo }: { occhiello: string; titolo: string }) {
+  return (
+    <>
+      <p className="m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla">{occhiello}</p>
+      <h1 className="bab-display m-0 mt-[6px] text-[28px] leading-[34px] font-bold tracking-[-0.56px] text-ink">
+        {titolo}
+      </h1>
+    </>
+  )
+}
+
+/**
+ * I riquadri sotto alla scheda-parola.
+ *
+ * Quali riquadri ci sono lo dice `blocchi` in `data/percorso.ts`, cosa c'e'
+ * scritto lo dicono i testi: qui in mezzo c'e' solo come sono fatti. Le due
+ * vesti usano lo stesso renderer — la scheda sopra e' diversa, i riquadri
+ * sotto no.
+ */
+export function Blocchi({
+  tipi,
+  testi,
+  livello,
+  buchi,
+}: {
+  tipi: BloccoTipo[]
+  testi: BloccoTesto[]
+  /** il nome del livello della parola: e' la pastiglia quando i testi non ne danno una */
+  livello: string
+  /** i buchi da riempire nelle frasi: `{uno}` e `{due}` */
+  buchi: Record<string, string>
+}) {
+  return (
+    <>
+      {tipi.map((tipo, i) => {
+        const t = testi[i]
+        if (!t) return null
+        const testo = <Corpo testo={riempi(t.testo, buchi)} />
+
+        if (tipo === 'nota') {
+          return (
+            <p key={i} className="m-0 mt-[21px] text-[14px] leading-[1.5] text-ink-soft">
+              {riempi(t.testo, buchi)}
+            </p>
+          )
+        }
+
+        if (tipo === 'titolato') {
+          return (
+            <div
+              key={i}
+              className="mt-[21px] rounded-[20px] border-[0.5px] border-[rgba(209,201,196,0.5)] bg-surface px-4 py-[14px] shadow-[0px_6px_20px_0px_rgba(0,0,0,0.04)]"
+            >
+              {t.etichetta && (
+                <>
+                  <p className="m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla">
+                    {t.etichetta}
+                  </p>
+                  <Riga />
+                </>
+              )}
+              {testo}
+            </div>
+          )
+        }
+
+        const riga =
+          tipo === 'pastiglia'
+            ? 'linear-gradient(to bottom, #ffd1c1, var(--color-lime))'
+            : 'linear-gradient(to bottom, #e9d5ff, var(--color-lime))'
+
+        return (
+          <div key={i} className="mt-[21px]">
+            <Scheda riga={riga}>
+              <div className="px-4 py-[14px] pl-[22px]">
+                {tipo === 'pastiglia' && (
+                  <>
+                    {/*
+                      Con l'etichetta la pastiglia va a destra, in fondo alla
+                      riga; senza, va a sinistra e comincia lei la scheda —
+                      e' quello che fanno i due frame, ed e' anche l'unico
+                      modo in cui una pastiglia da sola non sembra persa.
+                    */}
+                    <div className="flex items-center justify-between gap-3">
+                      {t.etichetta && (
+                        <p className="m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla">
+                          {t.etichetta}
+                        </p>
+                      )}
+                      <span
+                        className={`shrink-0 rounded-pill px-[10px] py-1 text-[11px] font-bold text-ink ${
+                          t.etichetta ? 'ml-auto' : 'mr-auto'
+                        }`}
+                        style={{ background: 'var(--color-lime)' }}
+                      >
+                        {t.pastiglia || livello}
+                      </span>
+                    </div>
+                    <Riga />
+                  </>
+                )}
+                {testo}
+              </div>
+            </Scheda>
+          </div>
+        )
+      })}
+    </>
+  )
+}
+
+/*
+ * `whitespace-pre-line` perche' un riquadro titolato puo' contenere un
+ * elenco puntato, e in Figma gli a capo sono veri a capo dentro alla stessa
+ * scritta. Senza, i due punti dell'elenco finiscono sulla stessa riga.
+ */
+function Corpo({ testo }: { testo: string }) {
+  return (
+    <p className="m-0 text-[13px] leading-[1.5] whitespace-pre-line text-ink-soft">{testo}</p>
+  )
+}
+
+/**
+ * L'ombra della pastiglia che segue il dito.
+ *
+ * Sta fuori dal flusso e non prende tocchi: se li prendesse, `elementFromPoint`
+ * troverebbe sempre e solo lei e non si potrebbe posare niente.
+ */
+export function Fantasma({ presa, cesto }: { presa: Presa | null; cesto: string[] }) {
+  if (!presa) return null
+  const n = Number(presa.id)
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none fixed z-50"
+      style={{ left: presa.x, top: presa.y }}
+    >
+      <Pastiglia
+        testo={cesto[n]}
+        tinta={TINTE_PASTIGLIA[n % TINTE_PASTIGLIA.length]}
+        fantasma
+      />
+    </span>
+  )
+}

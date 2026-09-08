@@ -1,20 +1,12 @@
-import { useState } from 'react'
 import { Guscio } from '../../ui/percorso/Guscio'
-import {
-  Cesto,
-  Esito,
-  Pastiglia,
-  TINTE_PASTIGLIA,
-  Titolo,
-  icona,
-} from '../../ui/percorso/pezzi'
-import { useTrascina } from '../../lib/trascina'
+import { Cesto, Esito, Fantasma, Pastiglia, TINTE_PASTIGLIA, Titolo, icona } from '../../ui/percorso/pezzi'
+import { useIncastri } from './incastri'
 import { useLingua } from '../../lib/lingua'
 import type { Passo } from '../../data/percorso'
 import type { PropsEsercizio } from './tipi'
 
 /**
- * Abbina ogni parola alla sua immagine.
+ * Abbina ogni parola alla sua immagine — la veste della lezione 1.
  *
  * ── DUE RIGHE NON HANNO RISPOSTA, ED E' IL PUNTO ───────────────────────────
  * Nella prima lezione le parole sono due e le righe sono quattro: la scarica
@@ -23,7 +15,7 @@ import type { PropsEsercizio } from './tipi'
  * parte. Lasciarle vuote e' la risposta giusta.
  *
  * Non e' un tranello. Il check-in chiede ogni giorno di scegliere fra sedici
- * parole, e la cosa piu' dannosa che possa imparare qui e' che una parola va
+ * parole, e la cosa peggiore che si possa imparare qui e' che una parola va
  * sempre messa da qualche parte. Se non c'e' la parola, non c'e'.
  */
 export function Abbina({
@@ -42,73 +34,28 @@ export function Abbina({
     ...t.esche.slice(0, passo.esche),
   ]
 
-  /** per ogni riga, quale pastiglia c'e' sopra */
-  const [posato, setPosato] = useState<(number | null)[]>(() => passo.righe.map(() => null))
-  const [scelta, setScelta] = useState<number | null>(null)
-  const [esito, setEsito] = useState<boolean | null>(null)
-
-  const dove = (n: number) => posato.findIndex((p) => p === n)
-
-  function metti(n: number, riga: number | null) {
-    setPosato((prima) => {
-      const dopo = prima.map((p) => (p === n ? null : p))
-      if (riga !== null) dopo[riga] = n
-      return dopo
-    })
-    setScelta(null)
-    setEsito(null)
-  }
-
-  const { presa, pastiglia } = useTrascina({
-    onPosa(id, bersaglio) {
-      const n = Number(id)
-      if (bersaglio === null) return
-      metti(n, bersaglio === 'cesto' ? null : Number(bersaglio))
-    },
-    onTocco(id) {
-      const n = Number(id)
-      /* una gia' posata torna in mano invece di non fare niente */
-      if (dove(n) >= 0) {
-        metti(n, null)
-        setScelta(n)
-        return
-      }
-      setScelta((s) => (s === n ? null : n))
-      setEsito(null)
-    },
-  })
-
-  function toccaRiga(riga: number) {
-    if (scelta !== null) {
-      metti(scelta, riga)
-      return
-    }
-    const n = posato[riga]
-    if (n !== null) metti(n, null)
-  }
-
-  const qualcosa = posato.some((p) => p !== null)
+  const g = useIncastri(passo.righe.length)
 
   return (
     <Guscio
       avanzamento={avanzamento}
       indietro={indietro}
-      attivo={esito === true || qualcosa}
-      azione={esito === true ? tpe.comune.continua : tpe.comune.verifica}
+      attivo={g.esito === true || g.qualcosa}
+      azione={g.esito === true ? tpe.comune.continua : t.azione}
       onAzione={() => {
-        if (esito === true) {
+        if (g.esito === true) {
           avanti()
           return
         }
-        setEsito(passo.righe.every((r, i) => posato[i] === r.giusta))
+        g.setEsito(passo.righe.every((r, i) => g.posato[i] === r.giusta))
       }}
       esito={
         <Esito
-          aperto={esito !== null}
-          giusto={esito === true}
-          titolo={esito ? tpe.comune.giusto : tpe.comune.sbagliato}
+          aperto={g.esito !== null}
+          giusto={g.esito === true}
+          titolo={g.esito ? tpe.comune.giusto : tpe.comune.sbagliato}
         >
-          {esito ? null : tpe.comune.riprova}
+          {g.esito ? null : tpe.comune.riprova}
         </Esito>
       }
     >
@@ -116,7 +63,7 @@ export function Abbina({
 
       <div className="mt-[21px] flex flex-col gap-3">
         {passo.righe.map((riga, i) => {
-          const n = posato[i]
+          const n = g.posato[i]
           const tinta = TINTE_PASTIGLIA[i % TINTE_PASTIGLIA.length]
           return (
             <div
@@ -128,19 +75,21 @@ export function Abbina({
                 className="absolute inset-y-0 left-0 w-[6px]"
                 style={{ background: tinta }}
               />
-              <span
-                className="flex size-11 shrink-0 items-center justify-center rounded-full"
-                style={{ background: tinta }}
-              >
-                <img src={icona(riga.icona)} alt="" aria-hidden className="size-5" />
-              </span>
+              {riga.icona && (
+                <span
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full"
+                  style={{ background: tinta }}
+                >
+                  <img src={icona(riga.icona)} alt="" aria-hidden className="size-5" />
+                </span>
+              )}
               <span className="min-w-0 flex-1 text-[14px] leading-[1.4] text-ink">
                 {t.righe[i]}
               </span>
               <button
                 type="button"
                 data-posa={String(i)}
-                onClick={() => toccaRiga(i)}
+                onClick={() => g.toccaCasella(i)}
                 aria-label={t.righe[i]}
                 className={`flex h-11 min-w-[98px] items-center justify-center rounded-pill px-2 ${
                   n === null
@@ -170,39 +119,20 @@ export function Abbina({
               key={n}
               testo={testo}
               tinta={TINTE_PASTIGLIA[n % TINTE_PASTIGLIA.length]}
-              presa={scelta === n}
-              spenta={dove(n) >= 0}
-              gesti={pastiglia(String(n))}
-              onTocco={() => {
-                if (dove(n) >= 0) {
-                  metti(n, null)
-                  setScelta(n)
-                } else {
-                  setScelta((s) => (s === n ? null : n))
-                }
-              }}
+              presa={g.scelta === n}
+              spenta={g.dove(n) >= 0}
+              gesti={g.pastiglia(String(n))}
+              onTocco={() => g.toccaPastiglia(n)}
             />
           ))}
         </Cesto>
       </div>
 
       <p className="m-0 mt-3 text-center text-[12px] leading-[1.4] text-ink-mute">
-        {tpe.comune.aiuto}
+        {t.aiuto ?? tpe.comune.aiuto}
       </p>
 
-      {presa && (
-        <span
-          aria-hidden
-          className="pointer-events-none fixed z-50"
-          style={{ left: presa.x, top: presa.y }}
-        >
-          <Pastiglia
-            testo={cesto[Number(presa.id)]}
-            tinta={TINTE_PASTIGLIA[Number(presa.id) % TINTE_PASTIGLIA.length]}
-            fantasma
-          />
-        </span>
-      )}
+      <Fantasma presa={g.presa} cesto={cesto} />
     </Guscio>
   )
 }

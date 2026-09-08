@@ -1,28 +1,55 @@
 import { useEffect } from 'react'
 import type { ComponentType } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { LEZIONI, lezionePronta, passiDi } from '../data/percorso'
-import type { Passo } from '../data/percorso'
+import { LEZIONI, lezionePronta, passiDi, vesteDi } from '../data/percorso'
+import type { Passo, Veste } from '../data/percorso'
 import { caricaProgresso, lezioneAperta, useProgresso } from '../lib/percorso'
 import { useLingua } from '../lib/lingua'
 import type { TestiLezione } from '../copy/percorso'
 import type { PropsEsercizio } from './percorso/tipi'
 import { Incontra } from './percorso/Incontra'
+import { IncontraClassico } from './percorso/IncontraClassico'
 import { Abbina } from './percorso/Abbina'
+import { AbbinaClassico } from './percorso/AbbinaClassico'
 import { Scelta } from './percorso/Scelta'
 import { Mossa } from './percorso/Mossa'
 import { Frase } from './percorso/Frase'
 import { Fatto } from './percorso/Fatto'
+import { FattoClassico } from './percorso/FattoClassico'
+import { Allarme } from './percorso/Allarme'
 
+/*
+ * Chi disegna cosa.
+ *
+ * Due righe perche' i frame sono disegnati in due modi: la lezione 1 da una
+ * parte, le lezioni 2-8 dall'altra. Tre esercizi su sette hanno lo stesso
+ * impaginato in tutte e due — la scelta, la mossa e la frase cambiano cosi'
+ * poco che sono un componente solo che sa in quale veste sta.
+ */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const CORPI: Record<Passo['tipo'], ComponentType<PropsEsercizio<any>>> = {
-  incontra: Incontra,
-  abbina: Abbina,
-  storia: Scelta,
-  gemelle: Scelta,
-  mossa: Mossa,
-  frase: Frase,
-  fatto: Fatto,
+type Corpi = Record<Passo['tipo'], ComponentType<PropsEsercizio<any>>>
+
+const CORPI: Record<Veste, Corpi> = {
+  uno: {
+    incontra: Incontra,
+    abbina: Abbina,
+    storia: Scelta,
+    gemelle: Scelta,
+    mossa: Mossa,
+    allarme: Allarme,
+    frase: Frase,
+    fatto: Fatto,
+  },
+  classico: {
+    incontra: IncontraClassico,
+    abbina: AbbinaClassico,
+    storia: Scelta,
+    gemelle: Scelta,
+    mossa: Mossa,
+    allarme: Allarme,
+    frase: Frase,
+    fatto: FattoClassico,
+  },
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
@@ -80,7 +107,7 @@ export function Lezione() {
   if (!buona || posizione < 0 || !passi || !lez) return null
 
   const corrente = passi[posizione]
-  const Corpo = CORPI[corrente.tipo]
+  const Corpo = CORPI[vesteDi(numero)][corrente.tipo]
   const testi = (tpe.lezioni as Record<number, TestiLezione>)[numero]
   if (!testi) return null
 

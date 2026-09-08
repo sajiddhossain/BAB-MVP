@@ -1,7 +1,18 @@
-import { useState } from 'react'
 import { Guscio } from '../../ui/percorso/Guscio'
-import { Cesto, Esito, Pastiglia, Riga, Scheda, TINTE_PASTIGLIA, Occhiello, Titolo } from '../../ui/percorso/pezzi'
-import { useTrascina } from '../../lib/trascina'
+import {
+  Cesto,
+  Esito,
+  Fantasma,
+  Pastiglia,
+  Riga,
+  Scheda,
+  TINTE_PASTIGLIA,
+  Occhiello,
+  Testa,
+  Titolo,
+} from '../../ui/percorso/pezzi'
+import { useIncastri } from './incastri'
+import { vesteDi } from '../../data/percorso'
 import { useLingua } from '../../lib/lingua'
 import type { Parola } from '../../data/sessione'
 import type { Passo } from '../../data/percorso'
@@ -29,12 +40,14 @@ import type { PropsEsercizio } from './tipi'
 export function Frase({
   passo,
   testi,
+  lezione,
   avanzamento,
   indietro,
   avanti,
 }: PropsEsercizio<Extract<Passo, { tipo: 'frase' }>>) {
   const { tpe, ts } = useLingua()
   const t = testi.frase
+  const classico = vesteDi(lezione) === 'classico'
 
   const cesto = [
     ...passo.parole.map((p) => ts.foglio.parole[p] ?? p),
@@ -45,84 +58,51 @@ export function Frase({
   const pezzi = spezza(t.modello, passo.parole)
   const buchi = pezzi.filter((p) => p.buco !== null)
 
-  const [messo, setMesso] = useState<(number | null)[]>(() => buchi.map(() => null))
-  const [scelta, setScelta] = useState<number | null>(null)
-  const [esito, setEsito] = useState<boolean | null>(null)
-
-  const dove = (n: number) => messo.findIndex((m) => m === n)
-
-  function metti(n: number, buco: number | null) {
-    setMesso((prima) => {
-      const dopo = prima.map((m) => (m === n ? null : m))
-      if (buco !== null) dopo[buco] = n
-      return dopo
-    })
-    setScelta(null)
-    setEsito(null)
-  }
-
-  const { presa, pastiglia } = useTrascina({
-    onPosa(id, bersaglio) {
-      const n = Number(id)
-      if (bersaglio === null) return
-      metti(n, bersaglio === 'cesto' ? null : Number(bersaglio))
-    },
-    onTocco(id) {
-      const n = Number(id)
-      if (dove(n) >= 0) {
-        metti(n, null)
-        setScelta(n)
-        return
-      }
-      setScelta((s) => (s === n ? null : n))
-      setEsito(null)
-    },
-  })
-
-  function toccaBuco(i: number) {
-    if (scelta !== null) {
-      metti(scelta, i)
-      return
-    }
-    const n = messo[i]
-    if (n !== null) metti(n, null)
-  }
-
-  const pieni = messo.every((m) => m !== null)
-  const giusto = () => buchi.every((b, i) => messo[i] === passo.parole.indexOf(b.buco as Parola))
+  const g = useIncastri(buchi.length)
+  const giusto = () => buchi.every((b, i) => g.posato[i] === passo.parole.indexOf(b.buco as Parola))
 
   return (
     <Guscio
       avanzamento={avanzamento}
       indietro={indietro}
-      attivo={esito === true || pieni}
-      azione={esito === true ? t.azione : tpe.comune.verifica}
+      attivo={g.esito === true || g.pieno}
+      azione={g.esito === true ? t.azione : tpe.comune.verifica}
       onAzione={() => {
-        if (esito === true) {
+        if (g.esito === true) {
           avanti()
           return
         }
-        setEsito(giusto())
+        g.setEsito(giusto())
       }}
       esito={
         <Esito
-          aperto={esito !== null}
-          giusto={esito === true}
-          titolo={esito ? tpe.comune.giusto : tpe.comune.sbagliato}
+          aperto={g.esito !== null}
+          giusto={g.esito === true}
+          titolo={g.esito ? tpe.comune.giusto : tpe.comune.sbagliato}
         >
-          {esito ? null : tpe.comune.riprova}
+          {g.esito ? null : tpe.comune.riprova}
         </Esito>
       }
     >
-      <Occhiello nome="fumetto">{t.occhiello}</Occhiello>
+      {classico ? (
+        <Testa occhiello={t.occhiello} titolo={t.titolo} />
+      ) : (
+        <>
+          <Occhiello nome="fumetto">{t.occhiello}</Occhiello>
+          <div className="mt-[3px]">
+            <Titolo>{t.titolo}</Titolo>
+          </div>
+        </>
+      )}
 
-      <div className="mt-[3px]">
-        <Titolo>{t.titolo}</Titolo>
-      </div>
-
-      <div className="mt-[63px]">
+      <div className={classico ? 'mt-[36px]' : 'mt-[63px]'}>
         <Scheda riga="linear-gradient(to bottom, #ffd1c1, #e9d5ff)">
           <div className="px-4 py-6 pl-[22px]">
+            {t.etichetta && (
+              <p className="m-0 mb-4 text-[10px] font-bold tracking-[1px] uppercase text-lilla">
+                {t.etichetta}
+              </p>
+            )}
             <p className="m-0 text-[16px] leading-[1.9] text-ink">
               {pezzi.map((p, i) =>
                 p.buco === null ? (
@@ -130,9 +110,9 @@ export function Frase({
                 ) : (
                   <Buco
                     key={i}
-                    dentro={messo[p.numero]}
+                    dentro={g.posato[p.numero]}
                     cesto={cesto}
-                    onClick={() => toccaBuco(p.numero)}
+                    onClick={() => g.toccaCasella(p.numero)}
                     numero={p.numero}
                   />
                 ),
@@ -151,17 +131,10 @@ export function Frase({
               key={n}
               testo={testo}
               tinta={TINTE_PASTIGLIA[n % TINTE_PASTIGLIA.length]}
-              presa={scelta === n}
-              spenta={dove(n) >= 0}
-              gesti={pastiglia(String(n))}
-              onTocco={() => {
-                if (dove(n) >= 0) {
-                  metti(n, null)
-                  setScelta(n)
-                } else {
-                  setScelta((s) => (s === n ? null : n))
-                }
-              }}
+              presa={g.scelta === n}
+              spenta={g.dove(n) >= 0}
+              gesti={g.pastiglia(String(n))}
+              onTocco={() => g.toccaPastiglia(n)}
             />
           ))}
         </Cesto>
@@ -171,19 +144,7 @@ export function Frase({
         {tpe.comune.aiuto}
       </p>
 
-      {presa && (
-        <span
-          aria-hidden
-          className="pointer-events-none fixed z-50"
-          style={{ left: presa.x, top: presa.y }}
-        >
-          <Pastiglia
-            testo={cesto[Number(presa.id)]}
-            tinta={TINTE_PASTIGLIA[Number(presa.id) % TINTE_PASTIGLIA.length]}
-            fantasma
-          />
-        </span>
-      )}
+      <Fantasma presa={g.presa} cesto={cesto} />
     </Guscio>
   )
 }
