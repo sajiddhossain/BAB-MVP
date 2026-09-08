@@ -6,8 +6,8 @@ import type { CorpoSessione, Tipo } from '../data/sessione'
 import { datiSessione, salvaSessione, scriviSessione, useDatiSessione } from '../lib/sessione'
 import { segna } from '../lib/giornata'
 import { useLingua } from '../lib/lingua'
-import { testiSessione } from '../copy/sessione'
 import { riempi } from '../copy/riempi'
+import type { TestiSessione } from '../copy/sessione'
 import type { PropsSessione } from './tipi'
 import { CorpoRitmo } from './corpi/SessioneRitmo'
 import { CorpoSintonia } from './corpi/SessioneSintonia'
@@ -52,7 +52,7 @@ export function Sessione() {
   const passo = PERCORSI[buono].find((p) => p.id === id)
   const visibile = passo !== undefined && percorso.includes(passo)
 
-  const { lingua } = useLingua()
+  const { ts } = useLingua()
 
   // l'ora in cui ha cominciato: finisce in `started_at`, che e' come si
   // misura quanto tempo si prende — non per metterle fretta, per capire
@@ -129,7 +129,7 @@ export function Sessione() {
       segna({
         fattoCheckout: true,
         sentito: adesso.ritmo,
-        riassunto: riassuntoDelGiorno(previsto, adesso.ritmo, lingua),
+        riassunto: riassuntoDelGiorno(previsto, adesso.ritmo, ts),
       })
     }
     vai('/casa')
@@ -166,9 +166,8 @@ export function Sessione() {
 function riassuntoDelGiorno(
   previsto: string | null,
   sentito: string | null,
-  lingua: 'it' | 'en',
+  ts: TestiSessione,
 ): string {
-  const ts = testiSessione(lingua)
   const nomi = ts.comune.ritmi
   if (!sentito) return ''
   const dopo = nomi[sentito as keyof typeof nomi]

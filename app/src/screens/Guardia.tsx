@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { acceso, caricaProfilo, useSessione } from '../lib/conto'
 import { useProfilo } from '../lib/profilo'
+import { IN_ANTEPRIMA, SENZA_ACCESSO } from '../lib/sviluppo'
 
 /**
  * Chi puo' stare dove.
@@ -21,19 +22,6 @@ import { useProfilo } from '../lib/profilo'
  */
 const ACCESSO = ['/onboarding/accesso', '/onboarding/link']
 
-/**
- * Il lasciapassare per lavorare sugli schermi.
- *
- * Serve a guardare l'onboarding senza rifare l'accesso ogni volta. Vive solo
- * con il server di sviluppo: `import.meta.env.DEV` e' falso in ogni versione
- * costruita per essere pubblicata, quindi questo `if` sparisce proprio dal
- * codice compilato — non e' una porta chiusa a chiave, e' una porta che in
- * produzione non e' mai stata murata perche' non e' mai esistita.
- *
- * Si accende mettendo `VITE_SENZA_ACCESSO=1` in `.env.local`, che git ignora.
- */
-const SENZA_ACCESSO = import.meta.env.DEV && import.meta.env.VITE_SENZA_ACCESSO === '1'
-
 export function Guardia({ children }: { children: ReactNode }) {
   const { sessione, caricata } = useSessione()
   const dove = useLocation()
@@ -44,7 +32,25 @@ export function Guardia({ children }: { children: ReactNode }) {
     if (profilo === 'si') void caricaProfilo()
   }, [profilo])
 
-  if (!acceso || SENZA_ACCESSO) return <>{children}</>
+  /*
+   * L'anteprima passa sempre.
+   *
+   * Dentro alla cornice dell'amministrazione i dati sono finti e chi guarda
+   * e' quasi sempre qualcuno che scrive i testi, non un'atleta: non ha un
+   * profilo, e la guardia lo rimanderebbe all'onboarding a ogni schermo. Non
+   * e' una porta sui dati — quelli li difende il database, non questa riga.
+   */
+  if (!acceso || SENZA_ACCESSO || IN_ANTEPRIMA) return <>{children}</>
+
+  /*
+   * L'amministrazione dei testi si difende da sola.
+   *
+   * Chi ci entra non e' un'atleta e quasi sempre non ha un profilo: le regole
+   * qui sotto lo rimanderebbero all'onboarding. Chi puo' vedere davvero
+   * quella pagina lo decide `platform_admins` nel database, e lo decide la'
+   * anche se qualcuno arrivasse qui a mano.
+   */
+  if (dove.pathname.startsWith('/admin')) return <>{children}</>
 
   // finche' non si sa, non si decide: mandare all'accesso qui vorrebbe dire
   // buttare fuori a ogni ricarica chi la sessione ce l'ha

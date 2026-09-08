@@ -8,10 +8,8 @@ import { Scelta } from '../../ui/sessione/Comandi'
 import { TINTA_LIVELLO } from '../../ui/sessione/SchedaParola'
 import { LIVELLI, LIVELLO_DI, nomeCodice } from '../../data/sessione'
 import type { Livello, Parola } from '../../data/sessione'
-import { testiSessione } from '../../copy/sessione'
 import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
-import { testiParole } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
 import { datiSessione, useDatiSessione, scriviSessione } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
@@ -98,8 +96,8 @@ function paroleViste(s: Sensazione, ts: TestiSessione): string {
  * cosa fa un segnale, e cambiarla fra il prima e il dopo vorrebbe dire
  * insegnare due cose diverse nello stesso giorno.
  */
-function ComeLeggere({ lingua }: { lingua: 'it' | 'en' }) {
-  const tp = testiParole(lingua)
+function ComeLeggere() {
+  const { tp } = useLingua()
   return (
     <Scheda piatta className="px-[15px] py-[13px]">
       <p className="m-0 text-[13px] font-bold text-ink">{tp.comeLeggere}</p>
@@ -124,8 +122,8 @@ function ComeLeggere({ lingua }: { lingua: 'it' | 'en' }) {
 }
 
 /** La pastiglia "La mossa di oggi · Spingi", col colore del livello. */
-function MossaDiOggi({ livello, lingua }: { livello: Livello; lingua: 'it' | 'en' }) {
-  const tp = testiParole(lingua)
+function MossaDiOggi({ livello }: { livello: Livello }) {
+  const { tp } = useLingua()
   const tinta = TINTA_LIVELLO[livello]
   return (
     <div className="flex flex-wrap items-center gap-x-[10px] gap-y-1">
@@ -168,9 +166,7 @@ export function CorpoSegnali({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkin')
-  const { lingua } = useLingua()
-  const ts = testiSessione(lingua)
-  const tp = testiParole(lingua)
+  const { lingua, ts, tp } = useLingua()
   const t = ts.segnali
   const sensazioni = dati.sensazioni
 
@@ -251,7 +247,7 @@ export function CorpoSegnali({
                   <>
                     <div className="mt-3 h-px bg-riga" />
                     <div className="mt-[10px]">
-                      <MossaDiOggi livello={livello} lingua={lingua} />
+                      <MossaDiOggi livello={livello} />
                     </div>
                   </>
                 )}
@@ -262,7 +258,7 @@ export function CorpoSegnali({
       })}
 
       <div className="mt-[18px]">
-        <ComeLeggere lingua={lingua} />
+        <ComeLeggere />
       </div>
 
       <div className="mt-[18px]">
@@ -316,8 +312,7 @@ export function CorpoRendiconto({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkout')
-  const { lingua } = useLingua()
-  const ts = testiSessione(lingua)
+  const { lingua, ts } = useLingua()
   const t = ts.rendiconto
   const nomi = ts.comune.ritmi
   const mattina = datiSessione('checkin')
@@ -409,7 +404,7 @@ export function CorpoRendiconto({
                 <>
                   <div className="mt-3 h-px bg-riga" />
                   <div className="mt-[10px]">
-                    <MossaDiOggi livello={livello} lingua={lingua} />
+                    <MossaDiOggi livello={livello} />
                   </div>
                 </>
               )}
@@ -430,7 +425,7 @@ export function CorpoRendiconto({
       })}
 
       <div className="mt-[18px]">
-        <ComeLeggere lingua={lingua} />
+        <ComeLeggere />
       </div>
 
       <div className="mt-[18px]">

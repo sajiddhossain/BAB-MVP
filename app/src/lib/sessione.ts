@@ -129,6 +129,8 @@ function leggi(): Magazzino {
 }
 
 let stato = leggi()
+/* in vetrina non si scrive sul telefono: vedi `accendiVetrina` */
+let vetrina = false
 const ascoltatori = new Set<() => void>()
 
 function iscrivi(f: () => void) {
@@ -138,10 +140,79 @@ function iscrivi(f: () => void) {
 
 function salva() {
   try {
-    localStorage.setItem(CHIAVE, JSON.stringify(stato))
+    if (!vetrina) localStorage.setItem(CHIAVE, JSON.stringify(stato))
   } catch {
     // spazio finito o navigazione privata: la sessione funziona lo stesso,
     // solo non sopravvive alla chiusura dell'app
+  }
+  ascoltatori.forEach((f) => f())
+}
+
+/**
+ * Il modo vetrina: una giornata finta, in memoria, che non tocca il telefono.
+ *
+ * Serve all'anteprima dell'amministrazione dei testi: chi scrive deve vedere
+ * lo schermo dei segnali con delle sensazioni dentro, se no meta' delle
+ * scritte non compare. I dati sono quelli degli esempi in Figma, cosi' le
+ * frasi escono uguali a come sono state disegnate.
+ *
+ * Da qui in poi niente finisce piu' in `localStorage`: se chi scrive i testi
+ * fosse anche un'atleta, la sua giornata vera resterebbe intatta.
+ */
+export function accendiVetrina(): void {
+  vetrina = true
+  const zona = 'front_quad_r'
+  stato = {
+    giorno: giornoAtleta(),
+    checkin: {
+      ...VUOTI,
+      ritmo: 'costante',
+      sonno: 4,
+      oreSonno: '7-8h',
+      energia: 4,
+      umore: 5,
+      scuola: 3,
+      ciclo: true,
+      antidolorifici: false,
+      iniziata: new Date().toISOString(),
+      sensazioni: [
+        {
+          id: 'vetrina-1',
+          zona,
+          zonaLibera: '',
+          parole: ['teso', 'indolenzito', 'bruciante'],
+          sue: '',
+          unLato: true,
+          quando: 'muovo',
+          comparsa: null,
+          effetto: null,
+          intensita: 4,
+        },
+      ],
+    },
+    checkout: {
+      ...VUOTI,
+      ritmo: 'leggero',
+      sforzo: 5,
+      energia: 3,
+      soddisfazione: 'satisfied',
+      bottino: ['ascoltato', 'gentile'],
+      iniziata: new Date().toISOString(),
+      sensazioni: [
+        {
+          id: 'vetrina-2',
+          zona,
+          zonaLibera: '',
+          parole: ['indolenzito'],
+          sue: '',
+          unLato: true,
+          quando: null,
+          comparsa: 'durante',
+          effetto: 'scaldata',
+          intensita: 3,
+        },
+      ],
+    },
   }
   ascoltatori.forEach((f) => f())
 }

@@ -524,6 +524,8 @@ const en: Lingua = {
   },
 }
 
+export const TESTI_PAROLE = { it, en }
+
 /** Le schede nella lingua giusta. Qui l'inglese c'e' davvero: viene dai frame. */
 export function testiParole(lingua: 'it' | 'en'): Lingua {
   return lingua === 'en' ? en : it

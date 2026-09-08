@@ -1,0 +1,236 @@
+import { useSyncExternalStore } from 'react'
+import { supabase } from './supabase'
+import { TESTI } from '../copy/testi'
+import { TESTI_SESSIONE } from '../copy/sessione'
+import { TESTI_PAROLE } from '../copy/parole'
+import type { Lingua } from './lingua'
+
+/**
+ * Le scritte cambiate da fuori.
+ *
+ * I file di `copy/` restano la verita' di partenza: sono compilati dentro
+ * all'app, e con questa tabella vuota — o con Supabase spento, o senza rete
+ * al primo avvio — l'app dice esattamente quello che ha sempre detto. Qui
+ * dentro c'e' solo cio' che qualcuno ha cambiato dopo, e ogni scritta puo'
+ * sempre tornare a quella di partenza togliendo la riga.
+ *
+ * Questo e' il motivo per cui non si scarica l'intero testo dell'app dal
+ * database: un testo che vive solo la' e' un testo che sparisce quando la
+ * rete non c'e'. Le sovrascritture invece possono mancare senza che si rompa
+ * niente.
+ */
+
+/** Una scritta e' una stringa, o una lista di stringhe (i quattro passi). */
+export type Valore = string | string[]
+
+/** chiave -> valore, dove la chiave e' `sessione.ritmoPrima.titolo`. */
+export type Mappa = Record<string, Valore>
+
+export type Scritte = Record<Lingua, Mappa>
+
+const VUOTE: Scritte = { it: {}, en: {} }
+
+/*
+ * I tre alberi, col nome con cui cominciano le loro chiavi.
+ *
+ * `parole` e' un albero a se' e non un ramo di `sessione` perche' e' l'unico
+ * pezzo di testo che ha una vita sua: le sedici schede si leggono anche dal
+ * glossario, fuori dal check-in.
+ */
+export const ALBERI = {
+  testi: TESTI,
+  sessione: TESTI_SESSIONE,
+  parole: TESTI_PAROLE,
+} as const
+
+export type Albero = keyof typeof ALBERI
+
+/**
+ * Tutte le foglie di un albero di testi, come chiave -> valore.
+ *
+ * Foglia e' una stringa o una lista di stringhe. Non c'e' niente altro:
+ * dopo che le frasi coi buchi sono diventate modelli, in `copy/` non e'
+ * rimasta una sola funzione, ed e' quello che rende possibile indirizzare
+ * ogni scritta per nome.
+ */
+export function foglie(nodo: unknown, prefisso: string, dentro: Mappa = {}): Mappa {
+  if (typeof nodo === 'string') {
+    dentro[prefisso] = nodo
+    return dentro
+  }
+  if (Array.isArray(nodo)) {
+    if (nodo.every((v) => typeof v === 'string')) dentro[prefisso] = nodo as string[]
+    return dentro
+  }
+  if (nodo && typeof nodo === 'object') {
+    for (const [k, v] of Object.entries(nodo)) {
+      foglie(v, prefisso ? `${prefisso}.${k}` : k, dentro)
+    }
+  }
+  return dentro
+}
+
+/** Tutte le scritte dell'app in una lingua, come stanno nel codice. */
+export function scrittePartenza(lingua: Lingua): Mappa {
+  const tutte: Mappa = {}
+  for (const [nome, albero] of Object.entries(ALBERI)) {
+    foglie((albero as Record<Lingua, unknown>)[lingua], nome, tutte)
+  }
+  return tutte
+}
+
+/**
+ * Un albero con le sovrascritture applicate.
+ *
+ * Se sotto a `prefisso` non c'e' niente da cambiare torna lo STESSO oggetto,
+ * non una copia: React confronta per identita', e copiare l'albero a ogni
+ * render farebbe ridisegnare mezza app per niente.
+ */
+export function conScritte<T>(albero: T, prefisso: string, mappa: Mappa): T {
+  const chiavi = Object.keys(mappa).filter((k) => k === prefisso || k.startsWith(`${prefisso}.`))
+  if (chiavi.length === 0) return albero
+
+  const copia = struttura(albero)
+  for (const chiave of chiavi) {
+    const pezzi = chiave.slice(prefisso.length + 1).split('.')
+    scrivi(copia as Record<string, unknown>, pezzi, mappa[chiave])
+  }
+  return copia
+}
+
+/** Copia profonda, ma solo di oggetti e liste: le foglie sono immutabili. */
+function struttura<T>(nodo: T): T {
+  if (Array.isArray(nodo)) return nodo.map(struttura) as unknown as T
+  if (nodo && typeof nodo === 'object') {
+    const fuori: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(nodo)) fuori[k] = struttura(v)
+    return fuori as T
+  }
+  return nodo
+}
+
+/**
+ * Scrive un valore in fondo a un percorso.
+ *
+ * Se il percorso non esiste piu' — una chiave salvata mesi fa per una scritta
+ * che nel frattempo e' stata tolta — non fa niente. Meglio una sovrascrittura
+ * che non ha piu' effetto di un'app che si rompe leggendo il database.
+ */
+function scrivi(nodo: Record<string, unknown>, pezzi: string[], valore: Valore): void {
+  let qui: Record<string, unknown> = nodo
+  for (let i = 0; i < pezzi.length - 1; i++) {
+    const dopo = qui[pezzi[i]]
+    if (!dopo || typeof dopo !== 'object') return
+    qui = dopo as Record<string, unknown>
+  }
+  const ultima = pezzi[pezzi.length - 1]
+  if (!(ultima in qui)) return
+  qui[ultima] = valore
+}
+
+/* ── il magazzino ─────────────────────────────────────────────────────────── */
+
+const CHIAVE_CACHE = 'bab.scritte'
+
+/*
+ * La copia locale.
+ *
+ * Serve perche' l'app apre e mostra qualcosa prima che la rete risponda: se
+ * le sovrascritture arrivassero solo dal server, ogni avvio farebbe lampeggiare
+ * il testo di partenza per un attimo e poi quello vero. Con la copia locale il
+ * lampo c'e' solo la primissima volta.
+ */
+function dallaCache(): Scritte {
+  try {
+    const grezzo = localStorage.getItem(CHIAVE_CACHE)
+    if (!grezzo) return VUOTE
+    const letto = JSON.parse(grezzo) as Scritte
+    return { it: letto.it ?? {}, en: letto.en ?? {} }
+  } catch {
+    return VUOTE
+  }
+}
+
+let vive: Scritte = dallaCache()
+/** quando c'e', vince su tutto: e' l'anteprima dell'amministrazione */
+let forzate: Scritte | null = null
+const ascoltatori = new Set<() => void>()
+
+function annuncia() {
+  for (const f of ascoltatori) f()
+}
+
+function adesso(): Scritte {
+  return forzate ?? vive
+}
+
+export function useScritte(): Scritte {
+  return useSyncExternalStore(
+    (f) => {
+      ascoltatori.add(f)
+      return () => ascoltatori.delete(f)
+    },
+    adesso,
+    () => VUOTE,
+  )
+}
+
+/**
+ * Le scritte in onda, dal database.
+ *
+ * Passa dalla vista `copy_vivo`, che mostra solo la colonna pubblicata: la
+ * bozza di chi sta scrivendo non esce di li'. La vista si legge anche senza
+ * essere entrate, perche' il primo schermo che l'app mostra — quello
+ * dell'accesso — viene prima di qualsiasi sessione.
+ */
+export async function caricaScritte(): Promise<void> {
+  if (!supabase) return
+  const { data, error } = await supabase.from('copy_vivo').select('chiave,lingua,valore')
+  if (error || !data) return
+
+  const nuove: Scritte = { it: {}, en: {} }
+  for (const riga of data as { chiave: string; lingua: Lingua; valore: Valore }[]) {
+    if (riga.lingua !== 'it' && riga.lingua !== 'en') continue
+    nuove[riga.lingua][riga.chiave] = riga.valore
+  }
+  vive = nuove
+  try {
+    localStorage.setItem(CHIAVE_CACHE, JSON.stringify(nuove))
+  } catch {
+    /* niente spazio: si riparte dal codice al prossimo avvio, e va bene */
+  }
+  if (!forzate) annuncia()
+}
+
+/**
+ * L'anteprima: quello che l'amministrazione manda dentro alla cornice mentre
+ * qualcuno scrive. `null` la spegne e si torna a quello che vedono tutte.
+ */
+export function forzaScritte(s: Scritte | null): void {
+  forzate = s
+  annuncia()
+}
+
+/**
+ * L'anteprima, vista da dentro alla cornice.
+ *
+ * L'app di amministrazione tiene questa stessa app dentro a un <iframe> e le
+ * manda le bozze mentre qualcuno scrive. Non e' una scorciatoia: e'
+ * l'anteprima piu' onesta possibile, perche' sono gli stessi componenti, le
+ * stesse misure e lo stesso carattere di quello che vedra' un'atleta.
+ *
+ * Si accetta solo da chi sta sulla stessa origine. Una pagina di un altro
+ * sito che ci mettesse dentro a una cornice e provasse a mandare qualcosa
+ * verrebbe scartata qui.
+ */
+export function ascoltaAnteprima(): void {
+  if (window.parent === window) return
+  window.addEventListener('message', (e: MessageEvent) => {
+    if (e.origin !== window.location.origin) return
+    const m = e.data as { tipo?: string; scritte?: Scritte } | null
+    if (!m || m.tipo !== 'bab:scritte') return
+    forzaScritte(m.scritte ?? null)
+  })
+  // "sono in piedi": l'amministrazione risponde mandando le bozze di adesso
+  window.parent.postMessage({ tipo: 'bab:pronta' }, window.location.origin)
+}

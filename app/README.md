@@ -53,7 +53,10 @@ funziona tutta ma resta nel telefono, e la schermata finale lo dice.
    È idempotente: si può rilanciare. Su un database già acceso prima di
    settembre 2026 basta l'ultimo blocco, staccato in
    `supabase/migrazione-sessione.sql`: senza quello il check-in e il
-   check-out si vedono ma non riescono a salvare.
+   check-out si vedono ma non riescono a salvare. Con lo stesso criterio
+   c'e' `supabase/migrazione-testi.sql`, che serve solo alla pagina
+   `/admin` — senza, l'app funziona tutta e le scritte restano quelle
+   compilate.
 2. Authentication → Sign In / Providers → Email: acceso, e in cima alla
    pagina "Allow new users to sign up" acceso. Email OTP length: 6.
 3. **Authentication → Emails**: nei due modelli `Magic Link` e
@@ -121,6 +124,44 @@ L'età minima (12 anni) è nel vincolo di `athletes.birth_date` **e** nello
 schermo del compleanno: se stesse solo nella UI basterebbe una chiamata
 diretta all'API per aggirarla, e se stesse solo nel database l'inserimento
 fallirebbe alla fine con un errore che a chi legge non dice niente.
+
+## Cambiare le scritte senza toccare il codice
+
+`/admin` e' la pagina da cui si cambiano le parole dell'app. Il layout non si
+tocca: si tocca solo cio' che c'e' scritto dentro.
+
+A sinistra gli schermi, in mezzo lo schermo vero dentro a una cornice, a
+destra i suoi campi. La cornice e' un `<iframe>` con questa stessa app dentro,
+quindi l'anteprima non e' una somiglianza: sono gli stessi componenti, le
+stesse misure e lo stesso carattere che vedra' un'atleta. Mentre si scrive, il
+testo cambia dentro alla cornice senza salvare niente.
+
+**Chi entra.** Chi sta in `platform_admins`. Non e' una password controllata
+nel browser: la anon key sta dentro al pacchetto che scarica chiunque, quindi
+un controllo fatto nel browser sarebbe una serratura su una porta senza muri.
+A decidere e' il database, riga per riga (`is_admin()`). Il primo admin si
+aggiunge a mano, una volta sola — vedi il fondo di `supabase/schema.sql`.
+
+**Bozza e pubblicato.** Due colonne. Si salva la bozza quante volte si vuole
+senza che nessuno se ne accorga; alle atlete arriva solo premendo "pubblica".
+Durante il pilota un refuso salvato per sbaglio non deve finire sullo schermo
+di una ragazza di dodici anni.
+
+**Cosa succede se il database non risponde.** Niente. I testi restano dove
+sono, in `src/copy/`, compilati dentro all'app: la tabella tiene solo cio' che
+qualcuno ha cambiato dopo. Tabella vuota, Supabase spento o rete assente
+vogliono dire l'app di sempre, non un'app muta. Ogni scritta torna
+all'originale togliendo la sua riga, e c'e' un bottone che lo fa.
+
+**Le frasi coi buchi.** Alcune scritte hanno un pezzo che cambia:
+`Pensavi che il ritmo del tuo corpo fosse {previsto}, ma si e' rivelato
+{sentito}.` I buchi vanno lasciati come sono; il campo li elenca sotto. Un
+buco cancellato per sbaglio non rompe niente, semplicemente quel pezzo non
+compare piu'.
+
+**Le liste.** Qualche scritta e' un elenco — i quattro passi di "Prova questo
+oggi", i nomi dei giorni. Li' il campo vuole una riga per voce: togliendo una
+riga si toglie una voce.
 
 ### Lavorare sugli schermi senza rifare l'accesso
 

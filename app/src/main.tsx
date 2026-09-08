@@ -9,6 +9,23 @@ import './index.css'
 import { App } from './App'
 import { LinguaProvider } from './lib/lingua'
 import { Rete } from './ui/Rete'
+import { IN_ANTEPRIMA } from './lib/sviluppo'
+import { ascoltaAnteprima } from './lib/scritte'
+import { accendiVetrina } from './lib/sessione'
+
+/*
+ * L'anteprima dell'amministrazione dei testi.
+ *
+ * Questa stessa app gira dentro a una cornice nella pagina di
+ * amministrazione. La' dentro le serve una giornata finta da mostrare — se no
+ * meta' delle scritte non compare, perche' parlano di sensazioni che nessuno
+ * ha segnato — e un orecchio per le bozze che arrivano mentre qualcuno
+ * scrive.
+ */
+if (IN_ANTEPRIMA) {
+  accendiVetrina()
+  ascoltaAnteprima()
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

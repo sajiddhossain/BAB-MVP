@@ -2,7 +2,6 @@ import { useEffect } from 'react'
 import type { Parola } from '../../data/sessione'
 import { LIVELLO_DI } from '../../data/sessione'
 import type { Livello } from '../../data/sessione'
-import { testiParole } from '../../copy/parole'
 import type { Tono } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
 
@@ -61,8 +60,8 @@ export function SchedaParola({
   onUsa: () => void
   onChiudi: () => void
 }) {
-  const { lingua } = useLingua()
-  const t = testiParole(lingua)
+  const { tp } = useLingua()
+  const t = tp
   const scheda = t.schede[parola]
   const livello = LIVELLO_DI[parola]
   const tinta = TINTA_LIVELLO[livello]

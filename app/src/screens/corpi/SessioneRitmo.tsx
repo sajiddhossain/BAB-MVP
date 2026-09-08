@@ -5,7 +5,6 @@ import { OcchielloSessione } from '../../ui/sessione/Testo'
 import { Scheda } from '../../ui/sessione/Scheda'
 import { Ritmi } from '../../ui/sessione/Ritmi'
 import { Apri } from '../../ui/Apri'
-import { testiSessione } from '../../copy/sessione'
 import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
 import { useLingua } from '../../lib/lingua'
@@ -27,8 +26,7 @@ import type { PropsSessione } from '../tipi'
 export function CorpoRitmo({ tipo, passo, verso, avanzamento, avanti, indietro }: PropsSessione) {
   const dati = useDatiSessione(tipo)
   const prima = tipo === 'checkin'
-  const { lingua } = useLingua()
-  const ts = testiSessione(lingua)
+  const { ts } = useLingua()
   const t = prima ? ts.ritmoPrima : ts.ritmoDopo
 
   return (

@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { COMPARSA, EFFETTO, PAROLE, QUANDO, nomeCodice } from '../../data/sessione'
 import type { Parola, Tipo } from '../../data/sessione'
-import { testiSessione } from '../../copy/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import { Cursore } from './Cursore'
 import { SchedaParola } from './SchedaParola'
 import { Parole } from '../../screens/Parole'
-import { testiParole } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
 import { Pastiglia, Scelta, SiNo } from './Comandi'
 import { Apri } from '../Apri'
@@ -49,10 +47,8 @@ export function Foglio({
   /* la parola di cui sta leggendo la scheda, se ne sta leggendo una */
   const [spiega, setSpiega] = useState<Parola | null>(null)
   const [elenco, setElenco] = useState(false)
-  const { lingua } = useLingua()
-  const ts = testiSessione(lingua)
+  const { lingua, ts, tp } = useLingua()
   const t = ts.foglio
-  const tp = testiParole(lingua)
 
   // Esc chiude, come ogni cosa che sta sopra a un'altra
   useEffect(() => {

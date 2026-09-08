@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { testiSessione } from '../../copy/sessione'
 import { useLingua } from '../../lib/lingua'
 
 /**
@@ -84,8 +83,8 @@ export function SiNo({
   etichetta: string
   className?: string
 }) {
-  const { lingua } = useLingua()
-  const t = testiSessione(lingua).comune
+  const { ts } = useLingua()
+  const t = ts.comune
   return (
     <Interruttore<boolean>
       voci={[

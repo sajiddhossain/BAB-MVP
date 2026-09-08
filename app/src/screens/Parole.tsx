@@ -8,8 +8,6 @@ import { Nota } from '../ui/sessione/Scheda'
 import { SchedaParola, TINTA_LIVELLO } from '../ui/sessione/SchedaParola'
 import { LIVELLI, paroleDi } from '../data/sessione'
 import type { Parola } from '../data/sessione'
-import { testiParole } from '../copy/parole'
-import { testiSessione } from '../copy/sessione'
 import { useLingua } from '../lib/lingua'
 
 /**
@@ -27,9 +25,9 @@ import { useLingua } from '../lib/lingua'
  */
 export function Parole({ onChiudi }: { onChiudi?: () => void } = {}) {
   const vai = useNavigate()
-  const { lingua } = useLingua()
-  const t = testiParole(lingua)
-  const parole = testiSessione(lingua).foglio.parole
+  const { ts, tp } = useLingua()
+  const t = tp
+  const parole = ts.foglio.parole
   const [spiega, setSpiega] = useState<Parola | null>(null)
   /*
    * Con `onChiudi` questo schermo e' uno strato sopra a quello che c'era —

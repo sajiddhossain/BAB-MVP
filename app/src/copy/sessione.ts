@@ -621,7 +621,7 @@ const en: typeof it = {
   },
 }
 
-const TESTI_SESSIONE = { it, en }
+export const TESTI_SESSIONE = { it, en }
 
 /** I testi della sessione nella lingua chiesta. */
 export function testiSessione(lingua: 'it' | 'en') {
