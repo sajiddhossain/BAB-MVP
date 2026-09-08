@@ -1,6 +1,7 @@
 import type { Tempo } from '../../data/casa'
 import { RITMI } from '../../data/sessione'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
+import { useLingua } from '../../lib/lingua'
 
 const ICONE = import.meta.glob<string>('../../assets/sessione/tempo-*.svg', {
   eager: true,
@@ -21,6 +22,8 @@ export function Ritmi({
   scelto: Tempo | null
   onChange: (t: Tempo) => void
 }) {
+  const { lingua } = useLingua()
+  const nomi = testiSessione(lingua).comune.ritmi
   return (
     <div className="flex gap-3" role="radiogroup" aria-label="Ritmo">
       {RITMI.map((r) => {
@@ -51,7 +54,7 @@ export function Ritmi({
                 className="size-[17px]"
               />
               <span className="text-[13px] font-bold text-ink">
-                {SESSIONE.comune.ritmi[r.id]}
+                {nomi[r.id]}
               </span>
             </span>
           </button>

@@ -5,7 +5,8 @@ import { PERCORSI, percorsoSessione } from '../data/sessione'
 import type { CorpoSessione, Tipo } from '../data/sessione'
 import { datiSessione, salvaSessione, scriviSessione, useDatiSessione } from '../lib/sessione'
 import { segna } from '../lib/giornata'
-import { SESSIONE } from '../copy/sessione'
+import { useLingua } from '../lib/lingua'
+import { testiSessione } from '../copy/sessione'
 import type { PropsSessione } from './tipi'
 import { CorpoRitmo } from './corpi/SessioneRitmo'
 import { CorpoSintonia } from './corpi/SessioneSintonia'
@@ -49,6 +50,8 @@ export function Sessione() {
   const percorso = percorsoSessione(buono, dati)
   const passo = PERCORSI[buono].find((p) => p.id === id)
   const visibile = passo !== undefined && percorso.includes(passo)
+
+  const { lingua } = useLingua()
 
   // l'ora in cui ha cominciato: finisce in `started_at`, che e' come si
   // misura quanto tempo si prende — non per metterle fretta, per capire
@@ -125,7 +128,7 @@ export function Sessione() {
       segna({
         fattoCheckout: true,
         sentito: adesso.ritmo,
-        riassunto: riassuntoDelGiorno(previsto, adesso.ritmo),
+        riassunto: riassuntoDelGiorno(previsto, adesso.ritmo, lingua),
       })
     }
     vai('/casa')
@@ -159,12 +162,17 @@ export function Sessione() {
  * Il disegno della home non dice cosa ci vada dentro: qui si scrive il
  * confronto, che e' l'unica cosa che la giornata ha davvero prodotto.
  */
-function riassuntoDelGiorno(previsto: string | null, sentito: string | null): string {
-  const nomi = SESSIONE.comune.ritmi
+function riassuntoDelGiorno(
+  previsto: string | null,
+  sentito: string | null,
+  lingua: 'it' | 'en',
+): string {
+  const ts = testiSessione(lingua)
+  const nomi = ts.comune.ritmi
   if (!sentito) return ''
   const dopo = nomi[sentito as keyof typeof nomi]
-  if (!previsto) return `Il tuo corpo oggi ha chiesto un ritmo ${dopo.toLowerCase()}.`
+  if (!previsto) return ts.giorno.soloDopo(dopo)
   const prima = nomi[previsto as keyof typeof nomi]
-  if (previsto === sentito) return `Avevi previsto ${prima}, ed era ${dopo.toLowerCase()}.`
-  return `Avevi previsto ${prima}, il tuo corpo ha chiesto ${dopo.toLowerCase()}.`
+  if (previsto === sentito) return ts.giorno.uguale(prima, dopo)
+  return ts.giorno.diverso(prima, dopo)
 }

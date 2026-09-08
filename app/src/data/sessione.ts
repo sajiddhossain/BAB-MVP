@@ -11,9 +11,10 @@ import { FRONT_ZONES, BACK_ZONES } from '../ui/bodyZones'
  * sensazioni — e tenerli separati vorrebbe dire scrivere due volte le stesse
  * cose e lasciarle divergere.
  *
- * `nodo` e' il node-id Figma dello schermo italiano. Gli inglesi non esistono
- * ancora: quando arriveranno, questo campo diventa `{ it, en }` come
- * nell'onboarding.
+ * `nodo` e' il node-id Figma dello schermo italiano, e non cambia con la
+ * lingua: serve solo a `Sfondo` come chiave delle macchie di decoro, che
+ * sono le stesse su tutt'e due i frame. I testi, quelli si', cambiano — ma
+ * stanno in `copy/sessione.ts`.
  */
 
 export type Tipo = 'checkin' | 'checkout'
@@ -213,10 +214,12 @@ export const ZONE = { front: FRONT_ZONES, back: BACK_ZONES } as const
 /*
  * I nomi italiani delle zone.
  *
- * `bodyZones.ts` e' generato e ha le etichette in inglese: qui si ricostruisce
- * il nome dalla radice dell'id piu' il lato, invece di elencare 66 stringhe a
- * mano. Il genere serve perche' in italiano "destro" cambia con il nome: il
- * quadricipite destro, la coscia posteriore destra.
+ * `bodyZones.ts` e' generato e ha gia' le etichette inglesi, quelle che si
+ * vedono nei frame ("Right quad", "Left hamstring"): per l'inglese si legge
+ * di li'. L'italiano qui si ricostruisce dalla radice dell'id piu' il lato,
+ * invece di elencare 66 stringhe a mano. Il genere serve perche' in italiano
+ * "destro" cambia con il nome: il quadricipite destro, la coscia posteriore
+ * destra.
  */
 type Genere = 'm' | 'f' | 'mp' | 'fp'
 
@@ -255,8 +258,14 @@ const SINISTRO: Record<Genere, string> = {
   fp: 'sinistre',
 }
 
+/** L'etichetta inglese generata, cercata per id fra le zone dei due lati. */
+const ETICHETTE: Record<string, string> = Object.fromEntries(
+  [...FRONT_ZONES, ...BACK_ZONES].map((z) => [z.id, z.label]),
+)
+
 /** "Quadricipite destro". Senza lato per la testa, che di lati non ne ha. */
-export function nomeZona(id: string): string {
+export function nomeZona(id: string, lingua: 'it' | 'en' = 'it'): string {
+  if (lingua === 'en') return ETICHETTE[id] ?? id
   const [radice, lato] = id.split('-')
   const voce = NOMI[radice]
   if (!voce) return id

@@ -3,28 +3,34 @@ import type { Tempo } from '../data/casa'
 /**
  * I testi del check-in e del check-out.
  *
- * Sono in un file a parte da `testi.ts` per una ragione sola: li' `en` e'
- * tipato come `typeof it`, quindi ogni chiave italiana pretende subito la sua
- * inglese. Di questi schermi l'inglese non c'e' ancora — i frame in Figma
- * sono solo italiani — e mettere traduzioni inventate dentro al file dei
- * testi le farebbe sembrare approvate. Quando arriveranno, questo file
- * diventa `{ it, en }` e `testiSessione` smette di ignorare la lingua.
+ * Sono in un file a parte da `testi.ts` per ragioni storiche: quando gli
+ * schermi sono stati costruiti i frame inglesi non c'erano ancora, e li'
+ * `en` e' tipato come `typeof it` — ogni chiave italiana avrebbe preteso
+ * subito la sua inglese. Ora ci sono, e la forma e' la stessa di `testi.ts`:
+ * due oggetti gemelli e una funzione che sceglie.
  *
  * ── COSA NON VIENE DAL DISEGNO ──────────────────────────────────────────────
- * Tre cose qui sotto le abbiamo scritte noi, e vanno riviste da chi scrive i
- * testi prima di considerarle finite:
+ * Queste cose le abbiamo scritte noi, e vanno riviste da chi scrive i testi
+ * prima di considerarle finite:
  *
  * 1. `confronto` e `rendiconto.frase` hanno tre versioni. Il disegno ne mostra
  *    una sola — quella di chi si aspettava piu' di quanto il corpo ha dato —
  *    ma i casi sono tre, e con una versione sola chi ci prende si sentirebbe
- *    dire che si era sbagliata.
+ *    dire che si era sbagliata. In inglese la frase del frame va bene in
+ *    tutte e due le direzioni ("You guessed X — your body's tempo was Y"),
+ *    quindi li' l'invenzione e' solo il caso in cui ci ha preso.
  * 2. `provaOggi`: nel disegno la scheda "Prova questo oggi" e' chiusa, quindi
- *    dentro non c'e' niente da leggere.
- * 3. Tre refusi corretti: "Zoombie" -> "Zombie", "Alcune segnali" -> "Alcuni
- *    segnali", e i toggle italiani che nel frame dicono ancora "Yes".
+ *    dentro non c'e' niente da leggere. In tutt'e due le lingue e' nostra.
+ * 3. `mappa.altroveDomanda`, `mappa.altroveSegnaposto`, `mappa.salta`,
+ *    `bottino.segnaposto`, `energia.nota.senzaPrima`, `foglio.chiudi` e
+ *    `foglio.togli`: schermi e stati che il disegno non mostra.
+ * 4. Refusi corretti: "Zoombie" -> "Zombie", "Alcune segnali" -> "Alcuni
+ *    segnali", i toggle italiani che nel frame dicono ancora "Yes", e — nel
+ *    frame inglese — l'umore che aveva "Worst I've fell" a tutt'e due gli
+ *    estremi del cursore.
  */
 
-export const SESSIONE = {
+const it = {
   comune: {
     si: 'Sì',
     no: 'No',
@@ -223,6 +229,21 @@ export const SESSIONE = {
     azione: 'Fatto per oggi',
   },
 
+  /*
+   * La frase che la home mostra a giornata finita.
+   *
+   * Non sta su nessuno schermo del check-out: e' il riassunto che resta
+   * dopo, e il disegno della home non dice cosa ci vada dentro. L'abbiamo
+   * scritta noi, ed e' l'unica cosa che la giornata ha davvero prodotto.
+   */
+  giorno: {
+    soloDopo: (dopo: string) => `Il tuo corpo oggi ha chiesto un ritmo ${dopo.toLowerCase()}.`,
+    uguale: (prima: string, dopo: string) =>
+      `Avevi previsto ${prima}, ed era ${dopo.toLowerCase()}.`,
+    diverso: (prima: string, dopo: string) =>
+      `Avevi previsto ${prima}, il tuo corpo ha chiesto ${dopo.toLowerCase()}.`,
+  },
+
   // ── LA MAPPA E IL FOGLIO ──────────────────────────────────────────────────
 
   mappa: {
@@ -240,6 +261,9 @@ export const SESSIONE = {
     azioneDopo: 'Quasi finito',
     /* si puo' anche non sentire niente, e non e' un fallimento */
     salta: 'Oggi non sento niente di particolare',
+    /* un lato solo, come lo scrive il riassunto di una sensazione */
+    unLato: 'un lato',
+    dueLati: 'tutti e due i lati',
   },
 
   foglio: {
@@ -272,13 +296,267 @@ export const SESSIONE = {
     chiudi: 'Chiudi',
     togli: 'Togli questa sensazione',
   },
-} as const
-
-/**
- * I testi della sessione. La lingua per ora non cambia niente: gli schermi
- * inglesi non esistono ancora, e mostrare mezza traduzione sarebbe peggio che
- * mostrarne nessuna.
- */
-export function testiSessione(_lingua: 'it' | 'en') {
-  return SESSIONE
 }
+
+const en: typeof it = {
+  comune: {
+    si: 'Yes',
+    no: 'No',
+    avanti: 'Next',
+    ritmi: { carica: 'Upbeat', costante: 'Steady', leggero: 'Gentle' } as Record<Tempo, string>,
+  },
+
+  // ── CHECK-IN ──────────────────────────────────────────────────────────────
+
+  ritmoPrima: {
+    occhiello: 'STEP 1 · PREDICT',
+    titolo: 'What’s your tempo today?',
+    occhio:
+      'Your tempo is just how much your body’s got to give today. Take a guess now — you’ll check it again after training. Guessing first is how your inner read gets sharp.',
+    carta: {
+      titolo: 'No tempo is good or bad.',
+      corpo:
+        'It’s your body’s unique message for you — you notice it, honour it, and learn to work with it.',
+    },
+    azione: 'Now let’s tune in',
+  },
+
+  sintonia: {
+    occhiello: 'STEP 2 · TUNE IN',
+    titolo: 'What’s your body saying?',
+    sonno: {
+      titolo: 'Sleep',
+      domanda: 'How rested do you feel from last night?',
+      sinistra: 'Barely slept',
+      destra: 'Well rested',
+      ore: 'Roughly how long did you sleep?',
+    },
+    energia: {
+      titolo: 'Energy',
+      domanda: 'Where’s your energy gauge sitting?',
+      sinistra: 'Running empty',
+      destra: 'Fully charged',
+    },
+    umore: {
+      titolo: 'Mood',
+      domanda: 'Slide to where you are today.',
+      /* nel frame l'estremo destro ripete quello sinistro: e' un refuso */
+      sinistra: 'Worst I’ve felt',
+      destra: 'Best I’ve felt',
+    },
+    scuola: {
+      titolo: 'School',
+      domanda: 'How’s the pressure right now?',
+      sinistra: 'Chilled',
+      destra: 'Exam week',
+    },
+    ciclo: 'On your period?',
+    antidolorifici: 'Taken pain relief?',
+    azione: 'Pinpoint how it feels',
+  },
+
+  segnali: {
+    occhiello: 'BEFORE KICKING OFF',
+    titolo: 'Mind these signals',
+    decifra: 'Let’s decode it',
+    affaticamento: {
+      titolo: 'Working ache',
+      corpo: 'Muscle burn or tightness from previous sessions which eases as you warm up.',
+    },
+    protettivo: {
+      titolo: 'Protective pain',
+      corpo:
+        'Sharp, sudden or deep in a joint. One side only. Moving it makes you limp, or worsens the pain.',
+    },
+    prova: 'Try this today',
+    provaOggi: {
+      affaticamento: [
+        'Add five minutes to your warm-up and start easy: this kind of ache usually loosens off once you get moving.',
+        'If it’s still exactly the same halfway through, tell your coach — don’t wait until the end.',
+      ],
+      protettivo: [
+        'Skip the movement that makes it worse today. You can still do the rest of the session.',
+        'Tell your coach BEFORE you start, and a parent or a doctor if it’s still there tonight.',
+      ],
+    },
+    nota: 'BAB helps you translate body signals into clear information, without replacing your support system. Always consult your coach, doctor, or a parent if something feels wrong.',
+    azione: 'Got it! Let’s start',
+  },
+
+  // ── CHECK-OUT ─────────────────────────────────────────────────────────────
+
+  ritmoDopo: {
+    occhiello: 'STEP 1 · LOOK BACK',
+    titolo: 'How did your body feel?',
+    occhio: 'Thinking back on training, pick the tempo your body actually followed.',
+    /*
+     * La frase del frame va bene in tutte e due le direzioni, quindi qui
+     * `piu` e `meno` sono la stessa: l'unica scritta da noi e' `uguale`.
+     */
+    confronto: {
+      piu: (previsto: string, sentito: string) =>
+        `You guessed ${previsto} — your body’s tempo was ${sentito}.`,
+      meno: (previsto: string, sentito: string) =>
+        `You guessed ${previsto} — your body’s tempo was ${sentito}.`,
+      uguale: (previsto: string) =>
+        `You guessed ${previsto} — and that’s exactly the tempo your body followed.`,
+      corpo:
+        'The space between your guess and your body’s tempo is where you get sharper at decoding its signals. Being "off" isn’t a fail: it’s information.',
+    },
+    azione: 'Next',
+  },
+
+  sforzo: {
+    occhiello: 'STEP 1 · LOOK BACK',
+    titolo: 'How intense did it feel in your body?',
+    carta: 'Effort',
+    sinistra: 'Nothing at all',
+    destra: 'All-out',
+    nota: {
+      titolo: 'Only you can answer this one.',
+      corpo:
+        'Two people can do the exact same session and feel it completely differently — and both are right because each body is unique.',
+    },
+    azione: 'Next',
+  },
+
+  soddisfazione: {
+    occhiello: 'STEP 1 · LOOK BACK',
+    titolo: 'And how do you feel about it?',
+    domanda: 'How satisfied do you feel?',
+    facce: {
+      disappointed: 'Disappointed',
+      frustrated: 'Frustrated',
+      satisfied: 'Satisfied',
+      confident: 'Confident',
+      proud: 'Proud',
+    },
+    bottino: {
+      titolo: 'What did you bring home?',
+      aiuto: 'Select all that apply',
+      voci: {
+        imparato: 'Learned something new',
+        ascoltato: 'Listened to my body',
+        aiutato: 'Helped a teammate',
+        gentile: 'Showed kindness to myself',
+        eseguito: 'Nailed an exercise',
+      },
+      tua: 'Add your own...',
+      segnaposto: 'What are you taking home?',
+    },
+    azione: 'Now let’s tune in',
+  },
+
+  energia: {
+    occhiello: 'STEP 2 · TUNE IN',
+    titolo: 'Where’s your energy now?',
+    carta: 'Energy',
+    sinistra: 'Drained',
+    destra: 'Still buzzing',
+    nota: {
+      titolo: (prima: number) => `This morning you were at ${prima}.`,
+      corpo: 'Energy dropping after a session is normal and expected.',
+      senzaPrima:
+        'You didn’t check in this morning, so there’s no before to compare today with.',
+    },
+    azione: 'Pinpoint how it feels',
+  },
+
+  rendiconto: {
+    occhiello: 'STEP 4 · YOUR READ',
+    titolo: 'Here’s what today taught you.',
+    previsione: 'Prediction',
+    richiesta: 'body’s ask',
+    frase: {
+      piu: 'You expected more than your body could give today, and you noticed it: well done! ',
+      meno: 'Your body had more to give than you thought, and you noticed it: well done! ',
+      uguale: 'You called exactly the tempo your body followed. ',
+      chiusa: 'Your read is getting sharper.',
+    },
+    decodifica: {
+      titolo: 'Decode the ache',
+      occhio:
+        'Some things only show up once you stop. Naming it comes first — deciding what to do comes after.',
+      affaticamento: {
+        titolo: 'Working ache',
+        corpo:
+          'Burn or tiredness in muscles that worked, fairly even on both sides, easing as you cool down.',
+      },
+      protettivo: {
+        titolo: 'Protective pain',
+        corpo:
+          'Sharp or sudden, inside a joint or bone, one side only, makes you limp, or does not settle.',
+      },
+      domanda: 'Feeling any of the protective kind?',
+    },
+    nota: 'Recovery isn’t the boring bit after training — it’s where the training actually works. For protective pain or anything that feels off, loop in your coach, physio or a parent.',
+    azione: 'Done for today',
+  },
+
+  giorno: {
+    soloDopo: (dopo: string) => `Your body asked for a ${dopo.toLowerCase()} tempo today.`,
+    uguale: (prima: string, _dopo: string) => `You guessed ${prima}, and that’s what it was.`,
+    diverso: (prima: string, dopo: string) =>
+      `You guessed ${prima}, your body asked for ${dopo.toLowerCase()}.`,
+  },
+
+  // ── LA MAPPA E IL FOGLIO ──────────────────────────────────────────────────
+
+  mappa: {
+    occhiello: 'STEP 3 · PINPOINT',
+    titolo: 'Where do you feel it?',
+    occhio: 'Tap a spot, then name what you feel.',
+    davanti: 'Front',
+    dietro: 'Back',
+    altrove: 'Somewhere else',
+    altroveDomanda: 'Where, then?',
+    altroveSegnaposto: 'Head, stomach, throat…',
+    nota: 'Pausing to find where a sensation sits and putting a word to it helps you understand, manage and communicate it.',
+    conteggio: (n: number) => (n === 1 ? '1 spot added' : `${n} spots added`),
+    azionePrima: 'Almost done',
+    azioneDopo: 'Next',
+    salta: 'I don’t feel anything in particular today',
+    unLato: 'one side',
+    dueLati: 'both sides',
+  },
+
+  foglio: {
+    come: 'What does it feel like?',
+    segnaposto: 'Describe it in your own words...',
+    aiuto: 'A little help ✨',
+    parole: {
+      forte: 'strong',
+      leggero: 'light',
+      indolenzito: 'sore',
+      sordo: 'achy',
+      teso: 'tight',
+      rigido: 'stiff',
+      pungente: 'sharp',
+      trafittivo: 'stabbing',
+      crampo: 'crampy',
+      morsa: 'gripping',
+      bruciante: 'burning',
+      formicolante: 'tingling',
+      intorpidito: 'numb',
+      instabile: 'unstable',
+      gonfio: 'swollen',
+      caldo: 'hot',
+    },
+    unLato: 'Only on one side?',
+    intensita: 'Intensity:',
+    lieve: 'No pain',
+    atroce: 'Worst possible pain',
+    aggiungi: 'Add this sensation',
+    chiudi: 'Close',
+    togli: 'Remove this sensation',
+  },
+}
+
+const TESTI_SESSIONE = { it, en }
+
+/** I testi della sessione nella lingua chiesta. */
+export function testiSessione(lingua: 'it' | 'en') {
+  return TESTI_SESSIONE[lingua]
+}
+
+export type TestiSessione = typeof it

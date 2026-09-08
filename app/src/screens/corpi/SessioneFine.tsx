@@ -8,7 +8,9 @@ import { OcchielloSessione } from '../../ui/sessione/Testo'
 import { Scheda, Nota } from '../../ui/sessione/Scheda'
 import { Apri } from '../../ui/Apri'
 import { PAROLE_DA_GUARDARE } from '../../data/sessione'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
+import type { TestiSessione } from '../../copy/sessione'
+import { useLingua } from '../../lib/lingua'
 import { datiSessione, useDatiSessione, scriviSessione } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
@@ -33,12 +35,12 @@ function daGuardare(sensazioni: Sensazione[]): boolean {
 }
 
 /** "teso · indolenzito · bruciante  |  un lato  |  4/10" */
-function riassunto(s: Sensazione): string {
+function riassunto(s: Sensazione, ts: TestiSessione): string {
   const pezzi: string[] = []
-  const parole = s.parole.map((p) => SESSIONE.foglio.parole[p])
+  const parole = s.parole.map((p) => ts.foglio.parole[p])
   if (parole.length) pezzi.push(parole.join(' · '))
   else if (s.sue.trim()) pezzi.push(s.sue.trim())
-  if (s.unLato !== null) pezzi.push(s.unLato ? 'un lato' : 'tutti e due i lati')
+  if (s.unLato !== null) pezzi.push(s.unLato ? ts.mappa.unLato : ts.mappa.dueLati)
   pezzi.push(`${s.intensita}/10`)
   return pezzi.join('  |  ')
 }
@@ -60,7 +62,9 @@ export function CorpoSegnali({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkin')
-  const t = SESSIONE.segnali
+  const { lingua } = useLingua()
+  const ts = testiSessione(lingua)
+  const t = ts.segnali
   const [aperto, setAperto] = useState(false)
   const guardare = daGuardare(dati.sensazioni)
   const consigli = guardare ? t.provaOggi.protettivo : t.provaOggi.affaticamento
@@ -95,7 +99,7 @@ export function CorpoSegnali({
               <span className="block truncate text-[16px] font-bold text-ink">
                 {s.zona === 'altrove' ? s.zonaLibera : s.nome}
               </span>
-              <span className="block truncate text-[12px] text-ink-mute">{riassunto(s)}</span>
+              <span className="block truncate text-[12px] text-ink-mute">{riassunto(s, ts)}</span>
             </span>
           </Scheda>
         ))}
@@ -184,8 +188,10 @@ export function CorpoRendiconto({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkout')
-  const t = SESSIONE.rendiconto
-  const nomi = SESSIONE.comune.ritmi
+  const { lingua } = useLingua()
+  const ts = testiSessione(lingua)
+  const t = ts.rendiconto
+  const nomi = ts.comune.ritmi
   const previsto = datiSessione('checkin').ritmo
   const sentito = dati.ritmo
 
@@ -278,7 +284,7 @@ export function CorpoRendiconto({
                       : 'border-line bg-surface text-ink-soft'
                   }`}
                 >
-                  {v ? SESSIONE.comune.si : SESSIONE.comune.no}
+                  {v ? ts.comune.si : ts.comune.no}
                 </button>
               )
             })}

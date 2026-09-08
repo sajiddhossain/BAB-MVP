@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { PAROLE } from '../../data/sessione'
 import type { Parola } from '../../data/sessione'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import { Cursore } from './Cursore'
 import { SchedaParola } from './SchedaParola'
@@ -46,7 +46,8 @@ export function Foglio({
   const [spiega, setSpiega] = useState<Parola | null>(null)
   const [elenco, setElenco] = useState(false)
   const { lingua } = useLingua()
-  const t = SESSIONE.foglio
+  const ts = testiSessione(lingua)
+  const t = ts.foglio
   const tp = testiParole(lingua)
 
   // Esc chiude, come ogni cosa che sta sopra a un'altra
@@ -91,7 +92,7 @@ export function Foglio({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={altrove ? SESSIONE.mappa.altrove : bozza.nome}
+          aria-label={altrove ? ts.mappa.altrove : bozza.nome}
           className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[20px] bg-surface"
           style={{ boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)' }}
         >
@@ -101,7 +102,7 @@ export function Foglio({
 
           <div className="flex shrink-0 items-start justify-between gap-3 px-4 pt-[18px]">
             <h2 className="bab-display m-0 text-[26px] leading-[1.12] font-bold text-ink">
-              {altrove ? bozza.zonaLibera.trim() || SESSIONE.mappa.altrove : bozza.nome}
+              {altrove ? bozza.zonaLibera.trim() || ts.mappa.altrove : bozza.nome}
             </h2>
             <button
               type="button"
@@ -121,13 +122,13 @@ export function Foglio({
             */}
             {altrove && (
               <div className="mb-[18px]">
-                <p className="m-0 text-[15px] font-bold text-ink">{SESSIONE.mappa.altroveDomanda}</p>
+                <p className="m-0 text-[15px] font-bold text-ink">{ts.mappa.altroveDomanda}</p>
                 <input
                   value={bozza.zonaLibera}
                   onChange={(e) =>
                     setBozza((b) => ({ ...b, zonaLibera: e.target.value.slice(0, 40) }))
                   }
-                  placeholder={SESSIONE.mappa.altroveSegnaposto}
+                  placeholder={ts.mappa.altroveSegnaposto}
                   className="mt-[10px] block h-12 w-full rounded-chip border-[1.5px] border-line bg-surface px-[12px] text-[14px] text-ink outline-none placeholder:text-ink-soft focus:border-verde-tenue"
                 />
               </div>

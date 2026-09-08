@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
+import { useLingua } from '../../lib/lingua'
 
 /**
  * L'interruttore a due posizioni: Davanti/Dietro, Sì/No.
@@ -83,11 +84,13 @@ export function SiNo({
   etichetta: string
   className?: string
 }) {
+  const { lingua } = useLingua()
+  const t = testiSessione(lingua).comune
   return (
     <Interruttore<boolean>
       voci={[
-        { id: true, testo: SESSIONE.comune.si },
-        { id: false, testo: SESSIONE.comune.no },
+        { id: true, testo: t.si },
+        { id: false, testo: t.no },
       ]}
       scelta={scelta}
       onChange={onChange}

@@ -6,7 +6,8 @@ import { OcchielloSessione } from '../../ui/sessione/Testo'
 import { Interruttore } from '../../ui/sessione/Comandi'
 import { Mappa, Riquadro } from '../../ui/sessione/Mappa'
 import { Foglio } from '../../ui/sessione/Foglio'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
+import { useLingua } from '../../lib/lingua'
 import { scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { Lato } from '../../data/sessione'
@@ -38,7 +39,8 @@ function nuovaSensazione(zona: string, nome: string): Sensazione {
  */
 export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }: PropsSessione) {
   const dati = useDatiSessione(tipo)
-  const t = SESSIONE.mappa
+  const { lingua } = useLingua()
+  const t = testiSessione(lingua).mappa
   const [lato, setLato] = useState<Lato>('front')
   const [aperta, setAperta] = useState<Sensazione | null>(null)
   const [eNuova, setENuova] = useState(true)

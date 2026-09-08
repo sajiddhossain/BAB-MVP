@@ -6,7 +6,8 @@ import { Scheda } from '../../ui/sessione/Scheda'
 import { Cursore } from '../../ui/sessione/Cursore'
 import { Pastiglia, SiNo } from '../../ui/sessione/Comandi'
 import { ORE_SONNO } from '../../data/sessione'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
+import { useLingua } from '../../lib/lingua'
 import { scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { Dati } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
@@ -25,7 +26,8 @@ import type { PropsSessione } from '../tipi'
  */
 export function CorpoSintonia({ tipo, passo, verso, avanzamento, avanti, indietro }: PropsSessione) {
   const dati = useDatiSessione(tipo)
-  const t = SESSIONE.sintonia
+  const { lingua } = useLingua()
+  const t = testiSessione(lingua).sintonia
   const scrivi = (campi: Partial<Dati>) => scriviSessione(tipo, campi)
 
   return (

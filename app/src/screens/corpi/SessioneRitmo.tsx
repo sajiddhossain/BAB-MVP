@@ -5,7 +5,9 @@ import { OcchielloSessione } from '../../ui/sessione/Testo'
 import { Scheda } from '../../ui/sessione/Scheda'
 import { Ritmi } from '../../ui/sessione/Ritmi'
 import { Apri } from '../../ui/Apri'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
+import type { TestiSessione } from '../../copy/sessione'
+import { useLingua } from '../../lib/lingua'
 import { datiSessione, scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
 
@@ -24,7 +26,9 @@ import type { PropsSessione } from '../tipi'
 export function CorpoRitmo({ tipo, passo, verso, avanzamento, avanti, indietro }: PropsSessione) {
   const dati = useDatiSessione(tipo)
   const prima = tipo === 'checkin'
-  const t = prima ? SESSIONE.ritmoPrima : SESSIONE.ritmoDopo
+  const { lingua } = useLingua()
+  const ts = testiSessione(lingua)
+  const t = prima ? ts.ritmoPrima : ts.ritmoDopo
 
   return (
     <Schermo
@@ -54,13 +58,13 @@ export function CorpoRitmo({ tipo, passo, verso, avanzamento, avanti, indietro }
 
       <div className="mt-[22px]">
         {prima ? (
-          <SchedaSpiega titolo={SESSIONE.ritmoPrima.carta.titolo}>
-            {SESSIONE.ritmoPrima.carta.corpo}
+          <SchedaSpiega titolo={ts.ritmoPrima.carta.titolo}>
+            {ts.ritmoPrima.carta.corpo}
           </SchedaSpiega>
         ) : (
           <Apri aperto={dati.ritmo !== null}>
-            <SchedaSpiega titolo={confronto(dati.ritmo)}>
-              {SESSIONE.ritmoDopo.confronto.corpo}
+            <SchedaSpiega titolo={confronto(dati.ritmo, ts)}>
+              {ts.ritmoDopo.confronto.corpo}
             </SchedaSpiega>
           </Apri>
         )}
@@ -79,10 +83,10 @@ export function CorpoRitmo({ tipo, passo, verso, avanzamento, avanti, indietro }
  * L'ordine dei ritmi e' quello di `RITMI`, dal piu' carico al piu' leggero:
  * un indice piu' alto vuol dire un ritmo piu' basso.
  */
-function confronto(sentito: string | null): string {
-  const c = SESSIONE.ritmoDopo.confronto
+function confronto(sentito: string | null, ts: TestiSessione): string {
+  const c = ts.ritmoDopo.confronto
   const previsto = datiSessione('checkin').ritmo
-  const nomi = SESSIONE.comune.ritmi
+  const nomi = ts.comune.ritmi
   if (!sentito) return ''
   const dopo = nomi[sentito as keyof typeof nomi]
   // senza check-in stamattina non c'e' una previsione da confrontare

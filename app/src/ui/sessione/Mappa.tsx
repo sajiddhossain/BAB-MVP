@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { BACK_INK, BODY_SIZE, FRONT_INK, OUTLINE } from '../bodyZones'
 import type { BodyZone } from '../bodyZones'
 import { ZONE, codiceZona, nomeZona } from '../../data/sessione'
+import { useLingua } from '../../lib/lingua'
 import type { Lato } from '../../data/sessione'
 
 /** Il corallo delle zone segnate, misurato sul disegno. */
@@ -46,11 +47,12 @@ export function Mappa({
   onTocca: (zona: { codice: string; nome: string }) => void
 }) {
   const svg = useRef<SVGSVGElement>(null)
+  const { lingua } = useLingua()
   const zone = ZONE[lato]
   const [x, y, w, h] = lato === 'front' ? FRONT_INK : BACK_INK
 
   function scegli(z: BodyZone) {
-    onTocca({ codice: codiceZona(lato, z.id), nome: nomeZona(z.id) })
+    onTocca({ codice: codiceZona(lato, z.id), nome: nomeZona(z.id, lingua) })
   }
 
   /*
@@ -117,7 +119,7 @@ export function Mappa({
             className="cursor-pointer outline-none transition-[fill] duration-200 focus-visible:stroke-lilla focus-visible:[stroke-width:10] motion-reduce:transition-none"
             role="button"
             tabIndex={0}
-            aria-label={nomeZona(z.id)}
+            aria-label={nomeZona(z.id, lingua)}
             aria-pressed={segnata}
             onClick={() => scegli(z)}
             onKeyDown={(e) => {

@@ -7,7 +7,8 @@ import { Scheda } from '../../ui/sessione/Scheda'
 import { Cursore } from '../../ui/sessione/Cursore'
 import { BOTTINO, FACCE } from '../../data/sessione'
 import type { Bottino } from '../../data/sessione'
-import { SESSIONE } from '../../copy/sessione'
+import { testiSessione } from '../../copy/sessione'
+import { useLingua } from '../../lib/lingua'
 import { datiSessione, scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
 
@@ -20,7 +21,8 @@ const icona = (n: string) => ICONE[`../../assets/sessione/${n}.svg`]
 /** Lo sforzo percepito: la scala CR-10 di Foster, che nel database e' `effort`. */
 export function CorpoSforzo({ tipo, passo, verso, avanzamento, avanti, indietro }: PropsSessione) {
   const dati = useDatiSessione(tipo)
-  const t = SESSIONE.sforzo
+  const { lingua } = useLingua()
+  const t = testiSessione(lingua).sforzo
 
   return (
     <Schermo
@@ -78,7 +80,8 @@ export function CorpoSoddisfazione({
   indietro,
 }: PropsSessione) {
   const dati = useDatiSessione(tipo)
-  const t = SESSIONE.soddisfazione
+  const { lingua } = useLingua()
+  const t = testiSessione(lingua).soddisfazione
   const [scriveSua, setScriveSua] = useState(false)
 
   function commuta(b: Bottino) {
@@ -230,7 +233,8 @@ export function CorpoSoddisfazione({
  */
 export function CorpoEnergia({ tipo, passo, verso, avanzamento, avanti, indietro }: PropsSessione) {
   const dati = useDatiSessione(tipo)
-  const t = SESSIONE.energia
+  const { lingua } = useLingua()
+  const t = testiSessione(lingua).energia
   const prima = datiSessione('checkin')
   // il check-in c'e' stato solo se ha scelto un ritmo: l'energia da sola parte
   // gia' dal centro e non distingue "ha risposto 4" da "non ha aperto niente"
