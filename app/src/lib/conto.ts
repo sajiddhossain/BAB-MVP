@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
+import { dimenticaProfilo } from './profilo'
 import type { Risposte } from './risposte'
+import { scrivi, tutte } from './risposte'
 import type { Lingua } from './lingua'
 
 /**
@@ -65,6 +67,7 @@ export async function verificaCodice(email: string, codice: string): Promise<Esi
 }
 
 export async function esci() {
+  dimenticaProfilo()
   await supabase?.auth.signOut()
 }
 
@@ -158,6 +161,8 @@ export async function salvaOnboarding(r: Risposte, lingua: Lingua): Promise<Esit
     first_period_age: etaAlPrimoCiclo(r),
   })
   if (atleta.error) return { ok: false, errore: atleta.error.message }
+  // da adesso il profilo c'e': chi lo aveva chiesto prima aveva un'altra risposta
+  dimenticaProfilo()
 
   // gli sport: `athletes.sport` e' il principale, questa e' la lista intera
   if (r.sport.length) {
@@ -219,4 +224,89 @@ export async function salvaOnboarding(r: Risposte, lingua: Lingua): Promise<Esit
   }
 
   return { ok: true }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * Dalle righe alle risposte.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/** "2011-03-14" -> "14/03/2011". */
+function dataDaIso(v: string | null): string {
+  if (!v) return ''
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v)
+  return m ? `${m[3]}/${m[2]}/${m[1]}` : ''
+}
+
+const CICLO_DA_STATO: Record<string, Risposte['ciclo']> = {
+  tracking: 'si',
+  not_yet: 'non-ancora',
+  undisclosed: 'preferisco-non-dirlo',
+}
+
+/**
+ * Rilegge il profilo dal database e lo rimette nelle risposte.
+ *
+ * Serve la prima volta che si entra da un telefono nuovo: la sessione si apre
+ * col codice, ma tutto quello che ha risposto sta nel database e non in
+ * quel telefono. Senza questo passaggio si entra in una app vuota, che dice
+ * "Ciao" senza nome e crede che oggi sia un giorno di riposo.
+ *
+ * Non tocca niente se in locale c'e' gia' un nome: chi e' a meta' onboarding
+ * ha le risposte piu' fresche di quelle salvate, e sovrascriverle vorrebbe
+ * dire fargli perdere quello che ha appena scritto.
+ */
+export async function caricaProfilo(): Promise<boolean> {
+  if (!supabase) return false
+  if (tutte().nome !== '') return false
+
+  const { data: sessione } = await supabase.auth.getSession()
+  const id = sessione.session?.user.id
+  if (!id) return false
+
+  const [atleta, sport, settimana, cicli] = await Promise.all([
+    supabase.from('athletes').select('*').eq('id', id).maybeSingle(),
+    supabase.from('athlete_sports').select('sport'),
+    supabase.from('athlete_schedule').select('weekday,kind,sport'),
+    supabase.from('cycle_events').select('event_date').eq('kind', 'period_start'),
+  ])
+  if (atleta.error || !atleta.data) return false
+  const a = atleta.data as Record<string, string | null>
+
+  // la settimana torna indietro: lo schema conta da 1, l'app da 0
+  const allenamenti: Risposte['allenamenti'] = {}
+  const edFisica: number[] = []
+  for (const riga of settimana.data ?? []) {
+    const giorno = Number(riga.weekday) - 1
+    if (riga.kind === 'pe') {
+      edFisica.push(giorno)
+      continue
+    }
+    const nome = riga.sport ?? ''
+    allenamenti[nome] ??= { giorni: [], fascia: 1 }
+    allenamenti[nome].giorni.push(giorno)
+  }
+  for (const v of Object.values(allenamenti)) v.giorni.sort((x, y) => x - y)
+  edFisica.sort((x, y) => x - y)
+
+  const date = (cicli.data ?? [])
+    .map((c) => String(c.event_date))
+    .sort()
+    .reverse()
+    .slice(0, 3)
+    .map(dataDaIso)
+
+  scrivi({
+    email: sessione.session?.user.email ?? '',
+    nome: a.display_name ?? '',
+    nascita: dataDaIso(a.birth_date),
+    sport: (sport.data ?? []).map((s) => String(s.sport)),
+    sportPrincipale: a.sport ?? '',
+    allenamenti,
+    edFisica,
+    ciclo: CICLO_DA_STATO[a.cycle_status ?? ''] ?? '',
+    cicliUltimi: [date[0] ?? '', date[1] ?? '', date[2] ?? ''],
+    contraccettivo: a.contraception === 'hormonal' ? 'si' : a.contraception === 'natural' ? 'no' : '',
+    consensi: [true, true],
+  })
+  return true
 }
