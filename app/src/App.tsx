@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Onboarding } from './screens/Onboarding'
 import { Sessione } from './screens/Sessione'
+import { Parole } from './screens/Parole'
 import { Casa } from './screens/Casa'
 import { Prossimamente } from './screens/Prossimamente'
 import { Guardia } from './screens/Guardia'
@@ -14,6 +15,9 @@ export function App() {
         {/* :tipo e' `checkin` o `checkout`; :id e' il passo dentro a quel giro */}
         <Route path="/sessione/:tipo/:id" element={<Sessione />} />
         <Route path="/sessione/:tipo" element={<Sessione />} />
+        {/* il glossario delle sedici parole: ci si arriva dal foglio, ma ha
+            anche un indirizzo suo perche' e' una cosa che si va a rileggere */}
+        <Route path="/parole" element={<Parole />} />
         <Route path="/percorso" element={<Prossimamente titolo="Percorso" />} />
         <Route path="/storico" element={<Prossimamente titolo="Storico" />} />
         <Route path="/profilo" element={<Prossimamente titolo="Profilo" profilo />} />

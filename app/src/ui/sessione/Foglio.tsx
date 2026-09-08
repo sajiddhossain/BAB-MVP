@@ -4,6 +4,10 @@ import type { Parola } from '../../data/sessione'
 import { SESSIONE } from '../../copy/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import { Cursore } from './Cursore'
+import { SchedaParola } from './SchedaParola'
+import { Parole } from '../../screens/Parole'
+import { testiParole } from '../../copy/parole'
+import { useLingua } from '../../lib/lingua'
 import { Pastiglia, SiNo } from './Comandi'
 import { Apri } from '../Apri'
 import giu from '../../assets/chevron-down.svg'
@@ -38,7 +42,12 @@ export function Foglio({
 }) {
   const [bozza, setBozza] = useState(sensazione)
   const [aiuto, setAiuto] = useState(true)
+  /* la parola di cui sta leggendo la scheda, se ne sta leggendo una */
+  const [spiega, setSpiega] = useState<Parola | null>(null)
+  const [elenco, setElenco] = useState(false)
+  const { lingua } = useLingua()
   const t = SESSIONE.foglio
+  const tp = testiParole(lingua)
 
   // Esc chiude, come ogni cosa che sta sopra a un'altra
   useEffect(() => {
@@ -133,6 +142,17 @@ export function Foglio({
               className="mt-[10px] block h-14 w-full resize-none rounded-chip border-[1.5px] border-line bg-surface px-[12px] py-[9px] text-[14px] leading-[1.35] text-ink outline-none placeholder:text-ink-soft focus:border-verde-tenue"
             />
 
+            {/*
+              La riga di aiuto viene dal disegno ed e' il modo in cui una
+              ragazza scopre che le pastiglie si possono aprire: senza,
+              nessuna toccherebbe mai una ⓘ grande sei pixel.
+            */}
+            {aiuto && (
+              <p className="mt-[14px] mb-0 text-[12.5px] font-bold text-lilla-vivo">
+                ⓘ {tp.aiuto}
+              </p>
+            )}
+
             <button
               type="button"
               onClick={() => setAiuto((a) => !a)}
@@ -156,12 +176,25 @@ export function Foglio({
                     key={p}
                     accesa={bozza.parole.includes(p)}
                     onClick={() => commuta(p)}
+                    onInfo={() => setSpiega(p)}
                     icona={ICONE[`../../assets/sessione/p-${p}.svg`]}
                   >
                     {t.parole[p]}
                   </Pastiglia>
                 ))}
               </div>
+              {/*
+                Il rimando all'elenco intero. Si chiama come lo schermo a cui
+                porta — "Le sedici parole" — cosi' non c'e' un'etichetta in
+                piu' da tradurre e da mantenere.
+              */}
+              <button
+                type="button"
+                onClick={() => setElenco(true)}
+                className="mt-3 block text-[12.5px] font-bold text-lilla-vivo underline underline-offset-[3px]"
+              >
+                {tp.schermo.titolo}
+              </button>
             </Apri>
 
             <div className="mt-[18px] h-px bg-riga" />
@@ -213,6 +246,24 @@ export function Foglio({
           </div>
         </div>
       </div>
+
+      {/*
+        La scheda della parola sta SOPRA al foglio, non al posto suo: chi la
+        chiude ritrova il foglio com'era, con quello che aveva gia' scelto.
+        "Usa questa parola" la accende e torna indietro in un gesto solo.
+      */}
+      {elenco && <Parole onChiudi={() => setElenco(false)} />}
+
+      {spiega && (
+        <SchedaParola
+          parola={spiega}
+          onUsa={() => {
+            if (!bozza.parole.includes(spiega)) commuta(spiega)
+            setSpiega(null)
+          }}
+          onChiudi={() => setSpiega(null)}
+        />
+      )}
     </div>
   )
 }

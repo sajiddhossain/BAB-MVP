@@ -78,6 +78,26 @@
   --color-lilla-testo: #4a3fc0;
   --color-spento: #9090a0;
 
+  /*
+   * I colori delle sedici schede-parola.
+   *
+   * Il badge prende il colore del livello: verde chi spinge, ambra chi chiede
+   * un aggiustamento, rosso chi chiede una mano. I riquadri dentro alla
+   * scheda ne hanno tre: la prova e' grigia perche' e' una cosa da fare e non
+   * un giudizio, la bandiera e' rossa, il confronto e' lilla come tutto cio'
+   * che in questa app e' informazione e non domanda.
+   *
+   * `#6b6a72` del disegno non e' qui: e' `ink-medio` a meno di un punto.
+   */
+  --color-ambra-testo: #9a6a16;
+  --color-rosso: #c0392b;
+  --color-rosso-bordo: #f7cec7;
+  --color-lilla-cupo: #5b4fd6;
+  --color-nebbia: #fcfbf8;
+  --color-nebbia-bordo: #e7e5e1;
+  --color-nebbia-testo: #a7a39c;
+  --color-grigio-tenue: #dedcdb;
+
   /* caratteri */
   --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
   --font-ui: 'Space Grotesk', system-ui, sans-serif;

@@ -108,32 +108,71 @@ export function SiNo({
 export function Pastiglia({
   accesa,
   onClick,
+  onInfo,
   icona,
   children,
   tratteggiata = false,
 }: {
   accesa: boolean
   onClick: () => void
+  /**
+   * Se c'e', la pastiglia guadagna una ⓘ che apre la scheda della parola.
+   * Sono due bottoni dentro a un bordo solo e non un bottone dentro l'altro:
+   * annidare due <button> non e' HTML valido, e sul telefono la ⓘ diventa
+   * irraggiungibile perche' il tocco lo prende quello di fuori.
+   */
+  onInfo?: () => void
   icona?: string
   children: ReactNode
   /** il bordo a trattini di "Aggiungi tu...": e' un invito, non una scelta */
   tratteggiata?: boolean
 }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={accesa}
-      onClick={onClick}
-      className={`inline-flex items-center gap-[6px] rounded-[24px] border-[1.5px] py-[6px] pl-[9px] pr-[11px] text-[13px] leading-[16px] transition-colors duration-150 ${
-        tratteggiata ? 'border-dashed' : ''
-      } ${
-        accesa
-          ? 'border-verde-tenue bg-verde-fondo font-bold text-verde-testo'
-          : 'border-line bg-surface text-ink'
-      }`}
-    >
+  const bordo = `inline-flex items-center rounded-[24px] border-[1.5px] text-[13px] leading-[16px] transition-colors duration-150 ${
+    tratteggiata ? 'border-dashed' : ''
+  } ${
+    accesa
+      ? 'border-verde-tenue bg-verde-fondo font-bold text-verde-testo'
+      : 'border-line bg-surface text-ink'
+  }`
+
+  const dentro = (
+    <>
       {icona && <img src={icona} alt="" aria-hidden className="size-[14px] shrink-0" />}
       <span className="text-left">{children}</span>
-    </button>
+    </>
+  )
+
+  if (!onInfo) {
+    return (
+      <button
+        type="button"
+        aria-pressed={accesa}
+        onClick={onClick}
+        className={`${bordo} gap-[6px] py-[6px] pl-[9px] pr-[11px]`}
+      >
+        {dentro}
+      </button>
+    )
+  }
+
+  return (
+    <span className={`${bordo} pr-[3px]`}>
+      <button
+        type="button"
+        aria-pressed={accesa}
+        onClick={onClick}
+        className="flex items-center gap-[6px] py-[6px] pr-[6px] pl-[9px]"
+      >
+        {dentro}
+      </button>
+      <button
+        type="button"
+        onClick={onInfo}
+        aria-label={`Cosa vuol dire?`}
+        className="flex size-[22px] shrink-0 items-center justify-center rounded-full text-[13px] leading-none text-ink-mute"
+      >
+        ⓘ
+      </button>
+    </span>
   )
 }

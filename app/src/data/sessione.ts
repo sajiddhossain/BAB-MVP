@@ -122,14 +122,55 @@ export const PAROLE = [
 export type Parola = (typeof PAROLE)[number]
 
 /**
- * Le parole che, da sole, non bastano piu': quando compaiono, lo schermo dei
- * segnali mette in evidenza il dolore protettivo invece di quello da
- * affaticamento.
+ * I tre livelli in cui stanno le sedici parole.
  *
- * Non e' una diagnosi ed e' scritto negli schermi: e' il criterio con cui
- * BAB decide QUALE delle due spiegazioni mettere per prima.
+ * Non e' una scala di gravita' e non e' una diagnosi: e' cosa il corpo sta
+ * CHIEDENDO. `push` vuol dire che sta lavorando, `calibra` che chiede un
+ * aggiustamento, `sostegno` che chiede aiuto a qualcuno.
+ *
+ * Prima di avere questo, lo schermo dei segnali sceglieva quale spiegazione
+ * mettere per prima con un elenco di aggettivi deciso da noi. Questa
+ * tassonomia viene dal disegno — e' la stessa che l'atleta vede scritta
+ * sullo schermo delle sedici parole — e quindi quello che BAB mostra e
+ * quello che BAB sa sono la stessa cosa.
  */
-export const PAROLE_DA_GUARDARE: Parola[] = ['trafittivo', 'pungente', 'instabile', 'intorpidito']
+export const LIVELLI = ['push', 'calibra', 'sostegno'] as const
+export type Livello = (typeof LIVELLI)[number]
+
+export const LIVELLO_DI: Record<Parola, Livello> = {
+  forte: 'push',
+  leggero: 'push',
+  indolenzito: 'push',
+  teso: 'push',
+  bruciante: 'push',
+
+  sordo: 'calibra',
+  rigido: 'calibra',
+  crampo: 'calibra',
+  morsa: 'calibra',
+  pungente: 'calibra',
+
+  trafittivo: 'sostegno',
+  formicolante: 'sostegno',
+  intorpidito: 'sostegno',
+  instabile: 'sostegno',
+  gonfio: 'sostegno',
+  caldo: 'sostegno',
+}
+
+/** Le parole di un livello, nell'ordine in cui stanno sul disegno. */
+export function paroleDi(livello: Livello): Parola[] {
+  return PAROLE.filter((p) => LIVELLO_DI[p] === livello)
+}
+
+/**
+ * Le parole che chiedono sostegno: quando ce n'e' una, lo schermo dei segnali
+ * mette in evidenza il dolore protettivo invece di quello da affaticamento.
+ *
+ * E' un ordine di lettura, non una diagnosi — lo schermo dice tutte e due le
+ * cose comunque.
+ */
+export const PAROLE_DA_GUARDARE: Parola[] = paroleDi('sostegno')
 
 /** Le cinque facce della soddisfazione, dalla meno alla piu' contenta. */
 export const FACCE = [
