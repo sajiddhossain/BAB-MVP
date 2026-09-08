@@ -37,9 +37,10 @@ export function Bottone({
             ? 'linear-gradient(to right, var(--color-lime), var(--color-lime-deep))'
             : 'var(--color-surface)',
           transform: giu && attivo ? 'translateY(6px)' : undefined,
-          transition: giu ? 'transform 90ms cubic-bezier(0.4,0,1,1)' : 'transform 260ms cubic-bezier(0.34,1.56,0.64,1)',
         }}
-        className="absolute inset-x-0 top-0 h-14 rounded-pill border-[1.5px] border-line text-[16px] font-bold text-ink disabled:text-ink-mute"
+        className={`absolute inset-x-0 top-0 h-14 rounded-pill border-[1.5px] border-line text-[16px] font-bold text-ink disabled:text-ink-mute ${
+          giu ? 'bab-premuto' : 'bab-rilasciato'
+        }`}
       >
         {children}
       </button>

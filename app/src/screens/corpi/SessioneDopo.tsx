@@ -130,7 +130,14 @@ export function CorpoSoddisfazione({
                   className="flex w-[56px] flex-col items-center gap-[6px]"
                 >
                   <span
-                    className={`flex items-center justify-center rounded-full transition-all duration-150 ${
+                    /*
+                      Le tre cose che cambiano davvero, invece di `all`: la
+                      faccia scelta cresce di quattro pixel, prende un bordo e
+                      cambia fondo. `all` prometteva di animare anche tutto il
+                      resto, compreso quello che un domani si aggiunge qui
+                      senza pensarci.
+                    */
+                    className={`flex items-center justify-center rounded-full transition-[width,height,background-color,border-color] duration-150 motion-reduce:transition-none ${
                       accesa
                         ? 'size-12 border-2 border-verde-vivo bg-verde-fondo'
                         : 'size-11 bg-chip'

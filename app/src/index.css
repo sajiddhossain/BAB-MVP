@@ -270,6 +270,41 @@ textarea {
 }
 
 /*
+ * I due movimenti che stavano scritti dentro agli elementi.
+ *
+ * Erano `style={{ transition: … }}`, e uno stile scritto li' non lo raggiunge
+ * nessuna media query: erano gli unici due movimenti dell'app che
+ * continuavano a muoversi anche per chi ha chiesto di non vedere movimento.
+ * Da qui invece li si raggiunge, come tutti gli altri.
+ */
+
+/* Il bottone che si abbassa sulla sua ombra: giu' di scatto, su di rimbalzo. */
+.bab-premuto {
+  transition: transform 90ms cubic-bezier(0.4, 0, 1, 1);
+}
+.bab-rilasciato {
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* La barra in cima che si allunga passando da una domanda all'altra. */
+.bab-avanzamento {
+  transition: width 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Un millisecondo e non zero: la cosa arriva dov'e' arrivata senza che la si
+ * veda muoversi, ma il browser manda lo stesso `transitionend`, e chi
+ * l'aspettasse non resterebbe a aspettarlo per sempre.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .bab-premuto,
+  .bab-rilasciato,
+  .bab-avanzamento {
+    transition-duration: 1ms;
+  }
+}
+
+/*
  * Il cursore delle scale.
  *
  * Sotto e' un <input type="range"> vero, con la pista dipinta da un div

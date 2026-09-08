@@ -24,11 +24,10 @@ export function Barra({ avanzamento, indietro }: { avanzamento: number; indietro
       >
         <div className="p-[3px]">
           <div
-            className="h-2 rounded-[99px]"
+            className="bab-avanzamento h-2 rounded-[99px]"
             style={{
               width: `${Math.max(0, Math.min(1, avanzamento)) * 100}%`,
               background: 'linear-gradient(to right, var(--color-lime), var(--color-lime-deep))',
-              transition: 'width 420ms cubic-bezier(0.22,1,0.36,1)',
             }}
           />
         </div>
