@@ -3,18 +3,17 @@ import {
   Cesto,
   Esito,
   Fantasma,
+  Occhiello,
   Pastiglia,
   Riga,
   Scheda,
   TINTE_PASTIGLIA,
-  Occhiello,
   Testa,
   Titolo,
 } from '../../ui/percorso/pezzi'
 import { useIncastri } from './incastri'
 import { vesteDi } from '../../data/percorso'
 import { useLingua } from '../../lib/lingua'
-import type { Parola } from '../../data/sessione'
 import type { Passo } from '../../data/percorso'
 import type { PropsEsercizio } from './tipi'
 
@@ -24,16 +23,19 @@ import type { PropsEsercizio } from './tipi'
  * ── I BUCHI STANNO NELLA FRASE ─────────────────────────────────────────────
  * Il modello si scrive cosi':
  *
- *     'Oggi mi sento {forte} perché ho corso, ma le gambe erano {leggero}.'
+ *     'Oggi mi sento {forte} perché ho corso, ma il passo era {leggero}.'
+ *     'Sento {0} particolarmente {rigido} stamattina, quindi preferisco {2}.'
  *
- * Dentro alle graffe c'e' l'identificativo della parola giusta. Quindi quanti
- * buchi ci sono, dove sono, e cosa ci va lo dice il testo — e non serve una
- * seconda tabella da tenere allineata. E' anche l'unico modo in cui la frase
- * italiana puo' avere due buchi e quella inglese uno, come succede davvero:
- * sono due frasi diverse, scritte in due momenti diversi, e nessuna delle due
- * e' la traduzione dell'altra.
+ * Dentro alle graffe c'e' il nome della parola giusta, oppure il numero della
+ * pastiglia quando la pastiglia non e' una parola ma un pezzo di frase
+ * ("entrambe le caviglie"). Quindi quanti buchi ci sono, dove sono, e cosa ci
+ * va lo dice il testo — e non serve una seconda tabella da tenere allineata.
  *
- * Un buco che nomina una parola che non e' nel cesto resta scritto com'e' —
+ * E' anche l'unico modo in cui la frase italiana puo' avere due buchi e
+ * quella inglese uno, come succede davvero: sono due frasi diverse, scritte
+ * in due momenti diversi, e nessuna delle due e' la traduzione dell'altra.
+ *
+ * Un buco che nomina una pastiglia che non c'e' resta scritto com'e' —
  * `{pinco}` — invece di sparire: e' un refuso che si vede, come per tutti gli
  * altri buchi dell'app.
  */
@@ -49,17 +51,16 @@ export function Frase({
   const t = testi.frase
   const classico = vesteDi(lezione) === 'classico'
 
-  const cesto = [
-    ...passo.parole.map((p) => ts.foglio.parole[p] ?? p),
-    ...t.esche.slice(0, passo.esche),
-  ]
+  /* le pastiglie nell'ordine del disegno: parole dell'app ed esche dei testi */
+  const cesto = passo.cesto.map((c) =>
+    'parola' in c ? (ts.foglio.parole[c.parola] ?? c.parola) : (t.esche[c.esca] ?? ''),
+  )
 
-  /* la frase spezzata: pezzi di testo e buchi, nell'ordine in cui si leggono */
-  const pezzi = spezza(t.modello, passo.parole)
-  const buchi = pezzi.filter((p) => p.buco !== null)
+  const pezzi = spezza(t.modello, passo.cesto)
+  const buchi = pezzi.filter((p) => p.pastiglia >= 0)
 
   const g = useIncastri(buchi.length)
-  const giusto = () => buchi.every((b, i) => g.posato[i] === passo.parole.indexOf(b.buco as Parola))
+  const giusto = () => buchi.every((b, i) => g.posato[i] === b.pastiglia)
 
   return (
     <Guscio
@@ -85,7 +86,7 @@ export function Frase({
       }
     >
       {classico ? (
-        <Testa occhiello={t.occhiello} titolo={t.titolo} />
+        <Testa sopra={t.sopra} occhiello={t.occhiello} titolo={t.titolo} />
       ) : (
         <>
           <Occhiello nome="fumetto">{t.occhiello}</Occhiello>
@@ -95,7 +96,11 @@ export function Frase({
         </>
       )}
 
-      <div className={classico ? 'mt-[36px]' : 'mt-[63px]'}>
+      {t.intro && (
+        <p className="m-0 mt-4 text-[15px] leading-[1.5] text-ink-soft">{t.intro}</p>
+      )}
+
+      <div className={t.intro ? 'mt-[24px]' : classico ? 'mt-[36px]' : 'mt-[63px]'}>
         <Scheda riga="linear-gradient(to bottom, #ffd1c1, #e9d5ff)">
           <div className="px-4 py-6 pl-[22px]">
             {t.etichetta && (
@@ -105,7 +110,7 @@ export function Frase({
             )}
             <p className="m-0 text-[16px] leading-[1.9] text-ink">
               {pezzi.map((p, i) =>
-                p.buco === null ? (
+                p.pastiglia < 0 ? (
                   <span key={i}>{p.testo}</span>
                 ) : (
                   <Buco
@@ -118,8 +123,12 @@ export function Frase({
                 ),
               )}
             </p>
-            <Riga />
-            <p className="m-0 text-[12px] leading-[1.5] text-ink-soft opacity-75">{t.nota}</p>
+            {t.nota && (
+              <>
+                <Riga />
+                <p className="m-0 text-[12px] leading-[1.5] text-ink-soft opacity-75">{t.nota}</p>
+              </>
+            )}
           </div>
         </Scheda>
       </div>
@@ -166,8 +175,12 @@ function Buco({
       type="button"
       data-posa={String(numero)}
       onClick={onClick}
-      className={`mx-[2px] inline-flex min-w-[76px] translate-y-[3px] items-center justify-center rounded-pill px-1 align-baseline ${
-        dentro === null ? 'h-[30px] border border-dashed border-line bg-[rgba(0,0,0,0.03)]' : ''
+      /* la larghezza minima e' quella del buco vuoto: da pieno stringe sulla
+         pastiglia, se no una parola corta resta a mezz'aria fra le virgolette */
+      className={`mx-[2px] inline-flex translate-y-[3px] items-center justify-center rounded-pill px-1 align-baseline ${
+        dentro === null
+          ? 'h-[30px] min-w-[76px] border border-dashed border-line bg-[rgba(0,0,0,0.03)]'
+          : ''
       }`}
     >
       {dentro !== null && (
@@ -181,27 +194,41 @@ function Buco({
   )
 }
 
-type Pezzo = { testo: string; buco: string | null; numero: number }
+type Pezzo = {
+  testo: string
+  /** l'indice della pastiglia giusta, o -1 se questo pezzo e' testo */
+  pastiglia: number
+  /** il numero del buco, contando da sinistra */
+  numero: number
+}
+
+type VoceCesto = { parola: string } | { esca: number }
 
 /**
  * Spezza il modello in testo e buchi.
  *
- * Solo le graffe che nominano una parola di QUESTA lezione diventano buchi:
- * tutte le altre restano testo, e si vedono scritte com'erano. Cosi' un
- * modello sbagliato si nota subito invece di sparire.
+ * Una graffa diventa un buco solo se dentro c'e' il nome di una parola che
+ * sta nel cesto, oppure il numero di una pastiglia. Tutto il resto resta
+ * testo, e si vede scritto com'era: cosi' un modello sbagliato si nota
+ * subito invece di sparire.
  */
-function spezza(modello: string, parole: Parola[]): Pezzo[] {
+function spezza(modello: string, cesto: VoceCesto[]): Pezzo[] {
   const pezzi: Pezzo[] = []
   let numero = 0
   let da = 0
+
   for (const trovato of modello.matchAll(/\{(\w+)\}/g)) {
-    const nome = trovato[1] as Parola
-    if (!parole.includes(nome)) continue
+    const dentro = trovato[1]
+    const quale = /^\d+$/.test(dentro)
+      ? Number(dentro)
+      : cesto.findIndex((c) => 'parola' in c && c.parola === dentro)
+    if (quale < 0 || quale >= cesto.length) continue
+
     const i = trovato.index
-    if (i > da) pezzi.push({ testo: modello.slice(da, i), buco: null, numero: -1 })
-    pezzi.push({ testo: '', buco: nome, numero: numero++ })
+    if (i > da) pezzi.push({ testo: modello.slice(da, i), pastiglia: -1, numero: -1 })
+    pezzi.push({ testo: '', pastiglia: quale, numero: numero++ })
     da = i + trovato[0].length
   }
-  if (da < modello.length) pezzi.push({ testo: modello.slice(da), buco: null, numero: -1 })
+  if (da < modello.length) pezzi.push({ testo: modello.slice(da), pastiglia: -1, numero: -1 })
   return pezzi
 }

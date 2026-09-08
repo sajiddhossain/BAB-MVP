@@ -31,6 +31,10 @@
  *    Riscritta sul modello di quella inglese.
  * 5. Le note sotto alle mosse in italiano, dove Figma ripeteva due volte la
  *    stessa frase.
+ * 6. La frase da comporre della lezione 3, in tutte e due le lingue. Il
+ *    tassello e' la parola dell'app, che non si piega: "sento entrambe le
+ *    caviglie rigido" e "my both ankles" non stanno in piedi. Riscritte
+ *    perche' il buco cada dove la parola ci entra com'e'.
  *
  * ── I NOMI DELLE UNITA' NON DICONO LE PAROLE ───────────────────────────────
  * Sotto a ogni unita' il disegno elenca le sue quattro parole
@@ -61,6 +65,8 @@ export type BloccoTesto = {
 }
 
 export type TestiIncontra = {
+  /** la riga sopra all'occhiello ("BODY LANGUAGE"): ce l'hanno solo alcune lezioni */
+  sopra?: string
   occhiello: string
   /** il titolo sopra alla scheda: ce l'ha solo la veste delle lezioni 2-8 */
   titolo?: string
@@ -84,6 +90,7 @@ export type ContenutoLezione = {
   incontra: TestiIncontra[]
 
   abbina: {
+    sopra?: string
     occhiello?: string
     titolo: string
     cesto: string
@@ -95,6 +102,7 @@ export type ContenutoLezione = {
   }
 
   gemelle: {
+    sopra?: string
     occhiello: string
     /** il titolo sopra allo scenario: ce l'ha solo la veste classica */
     titolo?: string
@@ -103,21 +111,32 @@ export type ContenutoLezione = {
     domanda: string
     /** una riga per risposta, mostrata dopo la verifica */
     glosse: string[]
+    /**
+     * Cosa c'e' scritto sulle carte, quando non e' la parola.
+     *
+     * Dalla terza lezione le risposte sono frasi intere ("Sofia si sente
+     * «rigido»") invece di una parola sola. Dove manca, la carta dice il nome
+     * della parola, che e' quello che l'app sa gia'.
+     */
+    etichette?: string[]
     esito: string
     azione: string
   }
 
   storia: {
+    sopra?: string
     occhiello: string
     titolo?: string
     badge: string
     scenario: string
     domanda: string
+    etichette?: string[]
     esito: string
     azione: string
   }
 
   mossa: {
+    sopra?: string
     occhiello: string
     titolo: string
     /** la pastiglia e lo scenario sopra alle tre carte: solo veste classica */
@@ -125,6 +144,8 @@ export type ContenutoLezione = {
     scenario?: string
     /** una riga per mossa, nell'ordine spingi / calibra / sostegno */
     scelte: string[]
+    /** cosa c'e' scritto sulle carte, quando non e' il nome del livello */
+    etichette?: string[]
     esito: string
     /** la riga sotto alle tre carte, dove c'e' */
     nota?: string
@@ -144,14 +165,21 @@ export type ContenutoLezione = {
   }
 
   frase: {
+    sopra?: string
     occhiello: string
     titolo: string
-    /** l'etichetta dentro alla scheda: ce l'ha solo la veste classica */
+    /** l'etichetta dentro alla scheda, dove c'e' */
     etichetta?: string
+    /** la riga sopra alla scheda, dove la nota non sta dentro */
+    intro?: string
     cesto: string
-    /** i buchi portano dentro il nome della parola giusta: `{forte}` */
+    /**
+     * I buchi si scrivono `{forte}` col nome della parola giusta, oppure
+     * `{0}` col numero della pastiglia. Il nome quando si puo', perche' si
+     * legge; il numero per i pezzi di frase, che una parola non ce l'hanno.
+     */
     modello: string
-    nota: string
+    nota?: string
     esche: string[]
     azione: string
   }
@@ -421,6 +449,133 @@ const it = {
         azione: 'Torna al percorso',
       },
     },
+
+    3: {
+      incontra: [
+        {
+          sopra: 'BODY LANGUAGE',
+          occhiello: 'PAROLA 1 DI 2',
+          titolo: 'Incontra «{uno}»',
+          metafora: 'Come un elastico.',
+          descrizione:
+            "È quella sensazione di tensione muscolare o accorciamento che senti tirare ma che, con un po' di movimento o riscaldamento, tende a sciogliersi e migliorare.",
+          blocchi: [
+            {
+              testo:
+                'Un muscolo «{uno}» ha solo bisogno di essere svegliato con dolcezza: non è bloccato né danneggiato.',
+            },
+            {
+              testo:
+                'Un allungamento leggero o un movimento circolare graduale è perfetto per far capire al sistema nervoso che può rilasciare la tensione.',
+            },
+          ],
+          azione: 'Prossima parola',
+        },
+        {
+          sopra: 'BODY LANGUAGE',
+          occhiello: 'PAROLA 2 DI 2',
+          titolo: 'Incontra «{due}»',
+          metafora: 'Come una cerniera arrugginita.',
+          descrizione:
+            "È una resistenza che avverti soprattutto a livello dell'articolazione. Senti che il movimento è limitato, come se ci fosse un blocco fisico.",
+          blocchi: [
+            {
+              etichetta: 'LA DIFFERENZA IN BREVE',
+              testo:
+                '• «{uno}» si sente come una tensione muscolare: tira.\n• «{due}» si sente come un blocco articolare: frena.',
+            },
+            {
+              testo:
+                "Usa mobilità dolce e passiva senza forzare l'angolo limite, per lubrificare l'articolazione.",
+            },
+          ],
+          azione: 'Facciamo pratica',
+        },
+      ],
+
+      abbina: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'ESERCIZIO 1',
+        titolo: 'Collega i segnali corporei',
+        cesto: 'PAROLE DISPONIBILI',
+        righe: [
+          'Sensazione di elastico che tira',
+          'Cerniera arrugginita che blocca',
+          'Risentimento muscolare post-sforzo',
+          'Dolore sordo e diffuso costante',
+        ],
+        esche: [],
+        azione: 'Verifica',
+      },
+
+      gemelle: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'ESERCIZIO 2 • FALSI AMICI',
+        titolo: 'Il trucco del fisioterapista',
+        badge: 'SCENARIO',
+        scenario:
+          "Sei sul lettino e l'allenatore ti solleva la gamba tesa. Senti tirare dietro la coscia, ma lui riesce a spingerla molto in alto senza sforzo.",
+        domanda: 'Come definisci questa sensazione?',
+        etichette: ['È una sensazione di «{uno}»', 'È una sensazione di «{due}»'],
+        glosse: [],
+        esito:
+          "Ricorda: poiché l'articolazione si muove liberamente quando la guida qualcun altro, la restrizione non è strutturale («{due}») ma è una risposta di tensione attiva del muscolo («{uno}»).",
+        azione: 'Verifica',
+      },
+
+      storia: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'ESERCIZIO 3 • STORIE REALI',
+        titolo: 'La storia di Sofia',
+        badge: 'SCENARIO',
+        scenario:
+          "«Ogni mese, 3-4 giorni prima dell'inizio delle mestruazioni, mi sveglio sentendo le caviglie spesse, rigide e pesanti. Fare le scale la mattina presto sembra un'impresa, finché non inizio a camminare un po'.»",
+        domanda: '',
+        etichette: ['Sofia si sente «{uno}»', 'Sofia si sente «{due}»'],
+        esito:
+          "Ottimo! Le caviglie che si sentono spesse e lente nei primi minuti e migliorano col movimento sono un segnale «{due}». È l'articolazione che ha bisogno di lubrificazione, non il muscolo.",
+        azione: 'Verifica',
+      },
+
+      mossa: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'ESERCIZIO 4 • IL TUO CHECK-IN',
+        titolo: 'Sintonizzati su di te',
+        badge: 'LA TUA MOSSA',
+        scenario:
+          'Se anche tu avvertissi questa rigidità («{due}») alle caviglie prima del ciclo o al mattino, quale azione dovresti scegliere?',
+        scelte: [],
+        etichette: [
+          'GO: allunga con forza finché non passa',
+          'CALIBRA: mobilità dolce e lubrificazione',
+          'STOP: non muoverti per evitare danni',
+        ],
+        esito:
+          'Esatto! La rigidità articolare («{due}») risponde meglio alla mobilizzazione controllata e leggera.',
+        azione: 'Verifica',
+      },
+
+      frase: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'ESERCIZIO 5 • COMPONI LA FRASE',
+        titolo: 'Componi il tuo report',
+        intro:
+          'Usa i tasselli per descrivere al tuo coach il segnale di oggi, con parole sue.',
+        cesto: 'TRASCINA LE PAROLE',
+        modello: 'Stamattina sento «{rigido}» in {0}, quindi preferisco {2}.',
+        esche: ['entrambe le caviglie', 'iniziare la sessione con mobilità'],
+        azione: 'Salva & finisci',
+      },
+
+      fatto: {
+        titolo: 'Lezione 3 completata!',
+        sotto: 'Hai imparato a distinguere «{uno}» da «{due}».',
+        etichetta: 'PAROLE SBLOCCATE OGGI',
+        etichettaProgresso: 'IL TUO PROGRESSO COMPLESSIVO',
+        conteggio: '{fatte} / {tutte} sbloccate',
+        azione: 'Torna al percorso',
+      },
+    },
   } as Record<number, ContenutoLezione>,
 }
 
@@ -664,6 +819,117 @@ const en: typeof it = {
         titolo: 'Lesson 2 done.',
         sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
         etichettaProgresso: 'NOW AVAILABLE WHEN YOU CHECK IN',
+        conteggio: '{fatte} / {tutte} words unlocked',
+        azione: 'Back to the path',
+      },
+    },
+
+    3: {
+      incontra: [
+        {
+          sopra: 'BODY LANGUAGE',
+          occhiello: 'WORD 1 OF 2',
+          titolo: '{uno}',
+          metafora: 'A guitar string tuned too high.',
+          descrizione: 'The muscle feels short and pulling — and it loosens as you warm up.',
+          blocchi: [
+            { testo: 'Like jeans a size too small: restrictive, not painful.' },
+            {
+              pastiglia: 'Push — after a real warm-up',
+              testo: 'Normal after hard work, long sitting, or a new range of movement.',
+            },
+          ],
+          azione: 'Next word',
+        },
+        {
+          sopra: 'BODY LANGUAGE',
+          occhiello: 'WORD 2 OF 2',
+          titolo: '{due}',
+          metafora: 'A stuck zip.',
+          descrizione:
+            "It's the joint that won't move all the way, not the muscle that won't stretch.",
+          blocchi: [
+            { etichetta: 'THE SPLIT', testo: 'Tight feels like a pull. Stiff feels like a block.' },
+            {
+              pastiglia: "Calibrate — move it gently and often, don't force it",
+              testo: "Tight lets go once you're warm. Stiff opens up the more times you move it.",
+            },
+          ],
+          azione: "Let's practise",
+        },
+      ],
+
+      abbina: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'MATCH',
+        titolo: 'Put the word on its picture.',
+        cesto: 'WORD BANK',
+        righe: [
+          'A guitar string tuned too high',
+          'A stuck zip',
+          'The day-after receipt',
+          "A radio hum you can't turn off",
+        ],
+        esche: [],
+        azione: 'Check',
+      },
+
+      gemelle: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'FALSE FRIENDS',
+        titolo: 'Which one is this?',
+        badge: 'SCENARIO',
+        scenario:
+          'You lie down, relax completely, and your coach lifts your leg — it goes up easily, even though it felt locked a minute ago.',
+        domanda: '',
+        glosse: [],
+        esito:
+          'Relax completely and let someone move the limb for you. If it moves easily, it was {uno}.',
+        azione: 'Check',
+      },
+
+      storia: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'REAL LIFE',
+        titolo: 'Name it.',
+        badge: 'CYCLE · TRAINING',
+        scenario:
+          "The days before your period your ankles feel thick and slow in the first minutes of every session. After ten minutes they're nearly normal.",
+        domanda: '',
+        esito:
+          "Move it slowly, ten times. Does it go further on the tenth than on the first? That's {due}.",
+        azione: 'Check',
+      },
+
+      mossa: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'YOUR MOVE',
+        titolo: 'Same day. What do you do?',
+        badge: 'YOUR MOVE',
+        scenario:
+          'The days before your period your ankles feel thick and slow. You called it {due}.',
+        scelte: [],
+        esito:
+          "The joint opens up the more you move it — that's {due} behaving normally. Calibrate: longer, gentler warm-up, don't force it, log where you are in your cycle.",
+        azione: 'Check',
+      },
+
+      frase: {
+        sopra: 'BODY LANGUAGE',
+        occhiello: 'SAY IT OUT LOUD',
+        titolo: 'Build the sentence.',
+        intro: 'Knowing the word only counts if you can hand it to someone. Tap each gap.',
+        cesto: 'PICK A WORD',
+        modello: "This morning {0} feel {rigido}, so I'd rather {2}.",
+        esche: ['both my ankles', 'start the session with mobility'],
+        azione: 'Finish lesson',
+      },
+
+      fatto: {
+        titolo: 'Lesson 3 done.',
+        sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
+        etichetta: 'NOW AVAILABLE WHEN YOU CHECK IN',
+        etichettaProgresso: 'TOTAL PROGRESS',
         conteggio: '{fatte} / {tutte} words unlocked',
         azione: 'Back to the path',
       },

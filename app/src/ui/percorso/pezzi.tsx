@@ -294,9 +294,23 @@ export const TINTE_PASTIGLIA = ['#ffd1c1', '#e9d5ff', '#d1fae5', '#fef3c7']
  * sempre. Sono due gruppi di frame disegnati in momenti diversi, e la
  * differenza si vede.
  */
-export function Testa({ occhiello, titolo }: { occhiello: string; titolo: string }) {
+export function Testa({
+  sopra,
+  occhiello,
+  titolo,
+}: {
+  /** la riga sopra all'occhiello, dove il disegno la mette */
+  sopra?: string
+  occhiello: string
+  titolo: string
+}) {
   return (
     <>
+      {sopra && (
+        <p className="m-0 mb-[4px] text-[10px] font-bold tracking-[1px] uppercase text-ink-mute">
+          {sopra}
+        </p>
+      )}
       <p className="m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla">{occhiello}</p>
       <h1 className="bab-display m-0 mt-[6px] text-[28px] leading-[34px] font-bold tracking-[-0.56px] text-ink">
         {titolo}
@@ -369,6 +383,14 @@ export function Blocchi({
           <div key={i} className="mt-[21px]">
             <Scheda riga={riga}>
               <div className="px-4 py-[14px] pl-[22px]">
+                {tipo === 'accento' && t.etichetta && (
+                  <>
+                    <p className="m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla">
+                      {t.etichetta}
+                    </p>
+                    <Riga />
+                  </>
+                )}
                 {tipo === 'pastiglia' && (
                   <>
                     {/*

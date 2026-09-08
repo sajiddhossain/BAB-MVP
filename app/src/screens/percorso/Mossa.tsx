@@ -71,7 +71,7 @@ export function Mossa({
       }
     >
       {classico ? (
-        <Testa occhiello={t.occhiello} titolo={riempi(t.titolo, buchi)} />
+        <Testa sopra={t.sopra} occhiello={t.occhiello} titolo={riempi(t.titolo, buchi)} />
       ) : (
         <>
           <Occhiello nome="scudo-mossa">{t.occhiello}</Occhiello>
@@ -99,8 +99,18 @@ export function Mossa({
             lettera={LETTERE[i]}
             tinta={TINTE_RISPOSTA[i % TINTE_RISPOSTA.length]}
             stato={stato(i)}
-            titolo={tp.livelli[livello].nome}
-            glossa={t.scelte[i] || undefined}
+            /*
+              Dalla terza lezione le carte non dicono piu' il nome del
+              livello ma una frase intera ("CALIBRA: mobilita' dolce"): dove
+              i testi ne danno una, vince quella.
+
+              L'ordine resta sempre spingi / calibra / sostegno, anche dove
+              il frame le mette al contrario. E' lo stesso ordine delle
+              sedici schede e del check-in, e girarlo per uno schermo solo
+              vorrebbe dire insegnare due scale diverse.
+            */
+            titolo={t.etichette?.[i] ? riempi(t.etichette[i], buchi) : tp.livelli[livello].nome}
+            glossa={t.scelte[i] ? riempi(t.scelte[i], buchi) : undefined}
             onClick={() => {
               setScelta(i)
               setEsito(null)

@@ -10,12 +10,10 @@ import type { PropsEsercizio } from './percorso/tipi'
 import { Incontra } from './percorso/Incontra'
 import { IncontraClassico } from './percorso/IncontraClassico'
 import { Abbina } from './percorso/Abbina'
-import { AbbinaClassico } from './percorso/AbbinaClassico'
 import { Scelta } from './percorso/Scelta'
 import { Mossa } from './percorso/Mossa'
 import { Frase } from './percorso/Frase'
 import { Fatto } from './percorso/Fatto'
-import { FattoClassico } from './percorso/FattoClassico'
 import { Allarme } from './percorso/Allarme'
 
 /*
@@ -42,13 +40,13 @@ const CORPI: Record<Veste, Corpi> = {
   },
   classico: {
     incontra: IncontraClassico,
-    abbina: AbbinaClassico,
+    abbina: Abbina,
     storia: Scelta,
     gemelle: Scelta,
     mossa: Mossa,
     allarme: Allarme,
     frase: Frase,
-    fatto: FattoClassico,
+    fatto: Fatto,
   },
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

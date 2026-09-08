@@ -35,6 +35,8 @@ export type IconaLezione =
   | 'battito'
   | 'bicipite'
   | 'onde'
+  | 'frecce'
+  | 'cerniera'
 
 /**
  * I due impaginati.
@@ -49,6 +51,17 @@ export type IconaLezione =
  * Li teniamo tutti e due, come sta nel file. `veste` dice quale.
  */
 export type Veste = 'uno' | 'classico'
+
+/*
+ * ── PERCHE' OGNI ESERCIZIO HA UNA `forma` ──────────────────────────────────
+ * Perche' in Figma ogni lezione e' disegnata a se'. Lo schermo finale esiste
+ * in cinque versioni, l'abbinamento in tre, lo scenario in quattro. Non e'
+ * una svista: e' un file cresciuto una lezione alla volta.
+ *
+ * `forma` dice quale versione, e i componenti hanno un ramo per ognuna. E'
+ * piu' onesto di trenta file quasi uguali, e quando due lezioni finiranno
+ * per assomigliarsi davvero, condivideranno un ramo invece di due copie.
+ */
 
 /**
  * I riquadri sotto alla scheda-parola, nella veste classica.
@@ -91,15 +104,29 @@ export type Passo =
    */
   | {
       tipo: 'abbina'
-      /** l'icona c'e' solo nella veste della lezione 1: la classica non ne ha */
+      /**
+       * `icone`   le righe hanno il cerchio con l'icona, e il cesto e' una
+       *           scheda semplice (lezione 1)
+       * `largo`   righe senza icone, casella larga, cesto dentro a una scheda
+       *           con la riga di colore e l'aiuto in fondo (lezione 2)
+       * `stretto` righe senza icone, casella piccola come una pastiglia, e il
+       *           cesto e' solo un'etichetta con sotto le parole (lezione 3)
+       */
+      forma: 'icone' | 'largo' | 'stretto'
+      /** l'icona c'e' solo nella forma `icone` */
       righe: { icona?: IconaLezione; giusta: number | null }[]
       parole: Parola[]
       esche: number
     }
-  /** due parole che si somigliano e non sono la stessa cosa */
-  | { tipo: 'gemelle'; risposte: Parola[]; giusta: number }
-  /** uno scenario di vita vera: quale parola lo dice? */
-  | { tipo: 'storia'; risposte: Parola[]; giusta: number }
+  /**
+   * Due parole che si somigliano, o uno scenario di vita vera.
+   *
+   * `forma` dice come si presenta lo scenario: come titolo grosso, dentro a
+   * una scheda, come testo sciolto, o dentro a una scheda che si porta
+   * dentro anche la pastiglia.
+   */
+  | { tipo: 'gemelle'; forma: FormaScenario; risposte: Parola[]; giusta: number }
+  | { tipo: 'storia'; forma: FormaScenario; risposte: Parola[]; giusta: number }
   /** cosa fai adesso: e' il segnale che decide, non la parola */
   | { tipo: 'mossa'; giusta: Livello }
   /**
@@ -119,9 +146,46 @@ export type Passo =
    * l'unico modo in cui l'italiano puo' avere due buchi e l'inglese uno —
    * come succede, perche' le due frasi vengono da due disegni diversi.
    */
-  | { tipo: 'frase'; parole: Parola[]; esche: number }
-  /** la lezione e' finita */
-  | { tipo: 'fatto' }
+  | {
+      tipo: 'frase'
+      /**
+       * `scheda` la frase e la nota dentro alla stessa scheda (lezioni 1 e 2)
+       * `intro`  una riga sopra alla scheda, e dentro solo la frase (lezione 3)
+       */
+      forma: 'scheda' | 'intro'
+      /**
+       * Le pastiglie, nell'ordine in cui stanno nel disegno.
+       *
+       * Una pastiglia e' una parola dell'app — e allora il nome lo prende da
+       * li' — oppure un'esca scritta nei testi. Dalla terza lezione le esche
+       * non sono piu' parole singole ma pezzi di frase ("entrambe le
+       * caviglie"), e servono a comporre una frase intera invece di
+       * riempire un buco solo.
+       */
+      cesto: ({ parola: Parola } | { esca: number })[]
+    }
+  /**
+   * La lezione e' finita.
+   *
+   * `stat`      la coppa in un cerchio sfumato e la scheda del progresso
+   *             (lezione 1)
+   * `scintilla` la scintilla, le due parole come pastiglie e la barra
+   *             (lezione 2)
+   * `coppa`     la coppa piccola in alto a sinistra e gli otto pallini
+   *             U1..U8 (lezione 3)
+   */
+  | { tipo: 'fatto'; forma: 'stat' | 'scintilla' | 'coppa' }
+
+/** Come si presenta lo scenario di uno schermo a scelta multipla. */
+export type FormaScenario =
+  /** grosso come un titolo, senza scheda */
+  | 'titolo'
+  /** dentro a una scheda bianca con la riga di colore */
+  | 'carta'
+  /** testo sciolto sotto alla pastiglia */
+  | 'testo'
+  /** dentro a una scheda che contiene anche la pastiglia */
+  | 'zona'
 
 export type Lezione = {
   /** da 1 a 8 */
@@ -185,12 +249,17 @@ export const PASSI: Record<number, Passo[]> = {
       ],
       parole: ['forte', 'leggero'],
       esche: 1,
+      forma: 'icone',
     },
-    { tipo: 'gemelle', risposte: ['forte', 'leggero'], giusta: 0 },
-    { tipo: 'storia', risposte: ['leggero', 'forte', 'indolenzito', 'sordo'], giusta: 0 },
+    { tipo: 'gemelle', forma: 'titolo', risposte: ['forte', 'leggero'], giusta: 0 },
+    { tipo: 'storia', forma: 'carta', risposte: ['leggero', 'forte', 'indolenzito', 'sordo'], giusta: 0 },
     { tipo: 'mossa', giusta: 'calibra' },
-    { tipo: 'frase', parole: ['forte', 'leggero'], esche: 2 },
-    { tipo: 'fatto' },
+    {
+      tipo: 'frase',
+      forma: 'scheda',
+      cesto: [{ parola: 'forte' }, { parola: 'leggero' }, { esca: 0 }, { esca: 1 }],
+    },
+    { tipo: 'fatto', forma: 'stat' },
   ],
 
   2: [
@@ -206,12 +275,44 @@ export const PASSI: Record<number, Passo[]> = {
       righe: [{ giusta: 0 }, { giusta: 1 }, { giusta: 2 }, { giusta: 3 }],
       parole: ['indolenzito', 'sordo', 'forte', 'leggero'],
       esche: 0,
+      forma: 'largo',
     },
-    { tipo: 'gemelle', risposte: ['indolenzito', 'sordo'], giusta: 0 },
-    { tipo: 'storia', risposte: ['indolenzito', 'sordo', 'forte'], giusta: 1 },
+    { tipo: 'gemelle', forma: 'testo', risposte: ['indolenzito', 'sordo'], giusta: 0 },
+    { tipo: 'storia', forma: 'testo', risposte: ['indolenzito', 'sordo', 'forte'], giusta: 1 },
     { tipo: 'mossa', giusta: 'calibra' },
-    { tipo: 'frase', parole: ['indolenzito', 'sordo'], esche: 2 },
-    { tipo: 'fatto' },
+    {
+      tipo: 'frase',
+      forma: 'scheda',
+      cesto: [{ parola: 'indolenzito' }, { parola: 'sordo' }, { esca: 0 }, { esca: 1 }],
+    },
+    { tipo: 'fatto', forma: 'scintilla' },
+  ],
+
+  3: [
+    { tipo: 'incontra', parola: 'teso', icona: 'frecce', blocchi: ['nota', 'pastiglia'] },
+    { tipo: 'incontra', parola: 'rigido', icona: 'cerniera', blocchi: ['accento', 'pastiglia'] },
+    {
+      /* si ripassano anche le due parole della lezione 2 */
+      tipo: 'abbina',
+      forma: 'stretto',
+      righe: [{ giusta: 0 }, { giusta: 1 }, { giusta: 2 }, { giusta: 3 }],
+      parole: ['teso', 'rigido', 'indolenzito', 'sordo'],
+      esche: 0,
+    },
+    { tipo: 'gemelle', forma: 'testo', risposte: ['teso', 'rigido'], giusta: 0 },
+    { tipo: 'storia', forma: 'zona', risposte: ['teso', 'rigido'], giusta: 1 },
+    { tipo: 'mossa', giusta: 'calibra' },
+    {
+      /*
+       * Tre buchi, e due su tre non sono parole del vocabolario ma pezzi di
+       * frase: e' il primo esercizio in cui non si sceglie una parola, si
+       * scrive un referto.
+       */
+      tipo: 'frase',
+      forma: 'intro',
+      cesto: [{ esca: 0 }, { parola: 'rigido' }, { esca: 1 }],
+    },
+    { tipo: 'fatto', forma: 'coppa' },
   ],
 }
 
