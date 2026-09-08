@@ -7,6 +7,7 @@ import { datiSessione, salvaSessione, scriviSessione, useDatiSessione } from '..
 import { segna } from '../lib/giornata'
 import { useLingua } from '../lib/lingua'
 import { testiSessione } from '../copy/sessione'
+import { riempi } from '../copy/riempi'
 import type { PropsSessione } from './tipi'
 import { CorpoRitmo } from './corpi/SessioneRitmo'
 import { CorpoSintonia } from './corpi/SessioneSintonia'
@@ -171,8 +172,8 @@ function riassuntoDelGiorno(
   const nomi = ts.comune.ritmi
   if (!sentito) return ''
   const dopo = nomi[sentito as keyof typeof nomi]
-  if (!previsto) return ts.giorno.soloDopo(dopo)
+  if (!previsto) return riempi(ts.giorno.soloDopo, { dopo: dopo.toLowerCase() })
   const prima = nomi[previsto as keyof typeof nomi]
-  if (previsto === sentito) return ts.giorno.uguale(prima, dopo)
-  return ts.giorno.diverso(prima, dopo)
+  const modello = previsto === sentito ? ts.giorno.uguale : ts.giorno.diverso
+  return riempi(modello, { prima, dopo: dopo.toLowerCase() })
 }

@@ -9,6 +9,7 @@ import { TINTA_LIVELLO } from '../../ui/sessione/SchedaParola'
 import { LIVELLI, LIVELLO_DI, nomeCodice } from '../../data/sessione'
 import type { Livello, Parola } from '../../data/sessione'
 import { testiSessione } from '../../copy/sessione'
+import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
 import { testiParole } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
@@ -37,6 +38,50 @@ function livelloDi(parole: Parola[]): Livello | null {
 function nome(s: Sensazione, ts: TestiSessione, lingua: 'it' | 'en'): string {
   if (s.zona === 'altrove') return s.zonaLibera.trim() || ts.mappa.altrove
   return nomeCodice(s.zona, lingua)
+}
+
+/**
+ * "Quadricipite destro: teso, indolenzito e bruciante, circa 4 su 10. La noto
+ * solo quando mi muovo."
+ *
+ * Tre modelli e non uno: la coda del "quando" c'e' solo se ha risposto, e
+ * l'elenco delle parole non c'e' se non ne ha scelta nessuna. La congiunzione
+ * finale ("e", "and") e' un modello anche lei — in un'altra lingua l'elenco
+ * potrebbe non funzionare cosi'.
+ */
+function fraseDelGiorno(s: Sensazione, ts: TestiSessione, lingua: 'it' | 'en'): string {
+  const t = ts.segnali.frase
+  const parole = s.parole.map((p) => ts.foglio.parole[p])
+  const elenco =
+    parole.length > 1
+      ? `${parole.slice(0, -1).join(', ')} ${t.e} ${parole[parole.length - 1]}`
+      : parole.join('')
+  const zona = nome(s, ts, lingua)
+  const dove = { zona, zonaMinuscola: zona.toLowerCase() }
+  const base = elenco
+    ? riempi(t.testo, { ...dove, parole: elenco, intensita: s.intensita })
+    : riempi(t.senzaParole, { ...dove, intensita: s.intensita })
+  if (!s.quando) return base
+  const coda = riempi(t.coda, { quando: minuscola(ts.foglio.quando.voci[s.quando]) })
+  // la coda inglese comincia con una virgola: attaccarla vuol dire togliere
+  // il punto che la frase base ha gia' in fondo
+  return coda.startsWith(',') ? base.replace(/\.$/, '') + coda : base + coda
+}
+
+/**
+ * I due buchi del nome della zona.
+ *
+ * Uno com'e' scritto e uno tutto minuscolo, perche' in italiano la zona apre
+ * la frase ("Quadricipite destro: teso…") e in inglese sta in mezzo ("About
+ * that right quad"): quale delle due serve lo decide il testo, non il codice.
+ */
+function zone(nome: string): Record<string, string> {
+  return { zona: nome, zonaMinuscola: nome.toLowerCase() }
+}
+
+/** "Solo quando mi muovo" dentro a una frase diventa minuscolo. */
+function minuscola(s: string): string {
+  return s.charAt(0).toLowerCase() + s.slice(1)
 }
 
 /** "teso · indolenzito · bruciante", oppure le sue parole se non ne ha scelte. */
@@ -148,7 +193,9 @@ export function CorpoSegnali({
     >
       <OcchielloSessione icona="scintilla">{t.occhiello}</OcchielloSessione>
       <Titolo>
-        {sensazioni.length === 1 ? t.titolo(nome(sensazioni[0], ts, lingua)) : t.titoloPiu}
+        {sensazioni.length === 1
+          ? riempi(t.titolo, zone(nome(sensazioni[0], ts, lingua)))
+          : t.titoloPiu}
       </Titolo>
 
       {sensazioni.map((s) => {
@@ -160,12 +207,7 @@ export function CorpoSegnali({
                 {t.frase.etichetta}
               </p>
               <p className="m-0 mt-[10px] text-[15px] leading-[1.5] font-bold text-ink">
-                {t.frase.testo(
-                  nome(s, ts, lingua),
-                  s.parole.map((p) => ts.foglio.parole[p]),
-                  s.intensita,
-                  s.quando ? ts.foglio.quando.voci[s.quando] : null,
-                )}
+{fraseDelGiorno(s, ts, lingua)}
               </p>
             </Scheda>
 
@@ -341,7 +383,7 @@ export function CorpoRendiconto({
         return (
           <div key={s.id} className="mt-[18px]">
             <Scheda piatta className="px-[15px] py-[13px]">
-              <p className="m-0 text-[13px] font-bold text-ink">{t.confronto.titolo(nome(s, ts, lingua))}</p>
+              <p className="m-0 text-[13px] font-bold text-ink">{riempi(t.confronto.titolo, zone(nome(s, ts, lingua)))}</p>
               <p className="m-0 mt-2 text-[12px] leading-[1.4] text-ink-medio">
                 {t.confronto.occhio}
               </p>

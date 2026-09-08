@@ -1,5 +1,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Sfondo } from '../ui/Sfondo'
+import { riempi } from '../copy/riempi'
 import { Bottone } from '../ui/Bottone'
 import { Testata } from '../ui/casa/Testata'
 import { BarraSotto } from '../ui/casa/BarraSotto'
@@ -159,7 +160,7 @@ function Checkin({ ora }: { ora: string }) {
   return (
     <SchedaEroe
       stato="checkin"
-      etichetta={t.casa.checkin.etichetta(ora)}
+      etichetta={riempi(t.casa.checkin.etichetta, { ora })}
       titolo={t.casa.checkin.titolo}
       corpo={t.casa.checkin.corpo}
     >
@@ -302,7 +303,10 @@ function Settimana() {
   const righe: [string, string][] = [
     [
       t.casa.settimana.righe.checkin,
-      t.casa.settimana.valori.checkin(giorniAllenamento, giorniAllenamento),
+      riempi(t.casa.settimana.valori.checkin, {
+        fatti: giorniAllenamento,
+        su: giorniAllenamento,
+      }),
     ],
     [t.casa.settimana.righe.tempo, t.casa.tempi.costante],
     [t.casa.settimana.righe.parole, t.casa.settimana.valori.nessuna],

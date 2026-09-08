@@ -7,6 +7,7 @@ import { Interruttore } from '../../ui/sessione/Comandi'
 import { Mappa, Riquadro } from '../../ui/sessione/Mappa'
 import { Foglio } from '../../ui/sessione/Foglio'
 import { testiSessione } from '../../copy/sessione'
+import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
 import { scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
@@ -90,7 +91,10 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
               schermo, e li' il numero e' proprio dove sta guardando.
             */}
             <p className="m-0 mt-[10px] h-4 text-center text-[14px] font-bold text-lilla">
-              {dati.sensazioni.length > 0 ? t.conteggio(dati.sensazioni.length) : ''}
+              {dati.sensazioni.length > 0 ? riempi(
+                    dati.sensazioni.length === 1 ? t.conteggio.uno : t.conteggio.molte,
+                    { n: dati.sensazioni.length },
+                  ) : ''}
             </p>
           </>
         }

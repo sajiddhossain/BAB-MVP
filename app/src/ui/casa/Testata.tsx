@@ -1,4 +1,5 @@
 import { useLingua } from '../../lib/lingua'
+import { riempi } from '../../copy/riempi'
 import fuoco from '../../assets/casa/fuoco.svg'
 
 /**
@@ -20,7 +21,7 @@ export function Testata({ giorno, ora, nome, streak }: { giorno: Date; ora?: str
           {ora ? `${nomeGiorno} · ${ora}` : nomeGiorno}
         </p>
         <p className="bab-display m-0 mt-[3px] text-[19px] font-bold leading-[23px] text-ink">
-          {t.casa.saluto(nome)}
+          {riempi(t.casa.saluto, { nome })}
         </p>
       </div>
 

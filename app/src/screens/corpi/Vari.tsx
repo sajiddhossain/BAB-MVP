@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import type { TESTI } from '../../copy/testi'
+import { riempi } from '../../copy/riempi'
 import { Schermo } from '../../ui/Schermo'
 import { Occhiello, Titolo, Occhio, Gruppo, Etichetta, Errore } from '../../ui/Testo'
 import { Campo } from '../../ui/Campo'
@@ -36,7 +38,7 @@ export function CorpoAccesso({ nodo, verso, avanti }: PropsSchermo) {
       console.error('[accesso]', esito.errore)
       setErrore(
         esito.fraSecondi !== undefined
-          ? t.accesso.aspetta(esito.fraSecondi)
+          ? attesa(t, esito.fraSecondi)
           : esito.lento
             ? t.accesso.troppoLento
             : t.accesso.nonRiuscito,
@@ -129,7 +131,7 @@ export function CorpoLink({ nodo, verso, avanti }: PropsSchermo) {
     }
     console.error('[rimando]', esito.errore)
     setErrore(
-      esito.fraSecondi !== undefined ? t.accesso.aspetta(esito.fraSecondi) : t.accesso.nonRiuscito,
+      esito.fraSecondi !== undefined ? attesa(t, esito.fraSecondi) : t.accesso.nonRiuscito,
     )
   }
 
@@ -169,7 +171,7 @@ export function CorpoLink({ nodo, verso, avanti }: PropsSchermo) {
       <div className="mt-4">
         <Occhiello>{t.linkMandato.occhiello}</Occhiello>
         <Titolo>{t.linkMandato.titolo}</Titolo>
-        <Occhio>{t.linkMandato.occhio(email || 'demo@babsport.com')}</Occhio>
+        <Occhio>{riempi(t.linkMandato.occhio, { mail: email || 'demo@babsport.com' })}</Occhio>
       </div>
 
       <div className="mt-4">
@@ -364,4 +366,15 @@ export function CorpoConsenso({
       </div>
     </Schermo>
   )
+}
+
+/**
+ * "Aspetta 12 secondi e riprova."
+ *
+ * Singolare e plurale sono due modelli separati e non un `?:` dentro alla
+ * frase: chi scrive i testi deve poter cambiare tutt'e due, e in una lingua
+ * che non sia l'italiano potrebbero non essere nemmeno due.
+ */
+function attesa(t: (typeof TESTI)['it'], secondi: number): string {
+  return riempi(secondi === 1 ? t.accesso.aspetta.uno : t.accesso.aspetta.molti, { secondi })
 }

@@ -57,14 +57,13 @@ const it = {
     invio: 'Sto mandando…',
     nonRiuscito: 'Non siamo riusciti a mandare la mail. Riprova fra un momento.',
     troppoLento: 'La mail ci sta mettendo troppo. Riprova fra qualche minuto.',
-    aspetta: (secondi: number) => `Aspetta ${secondi} second${secondi === 1 ? 'o' : 'i'} e riprova.`,
+    aspetta: { uno: 'Aspetta {secondi} secondo e riprova.', molti: 'Aspetta {secondi} secondi e riprova.' },
   },
 
   linkMandato: {
     occhiello: 'ACCESSO',
     titolo: 'Guarda la posta',
-    occhio: (mail: string) =>
-      `Abbiamo mandato un codice a ${mail}. Scrivilo qui sotto ed è fatta.`,
+    occhio: 'Abbiamo mandato un codice a {mail}. Scrivilo qui sotto ed è fatta.',
     rimanda: 'Non è arrivato? Rimandalo',
     rimandato: 'Rimandato. Guarda la posta.',
     spiegaCodice: 'Se non lo trovi, guarda nella posta indesiderata. Il codice vale un\'ora.',
@@ -276,13 +275,13 @@ const it = {
   },
 
   casa: {
-    saluto: (nome: string) => `Ciao ${nome}`,
+    saluto: 'Ciao {nome}',
     giorni: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
     nav: { home: 'Home', percorso: 'Percorso', storico: 'Storico', profilo: 'Profilo' },
     tempi: { carica: 'Carica', costante: 'Costante', leggero: 'Leggero' },
 
     checkin: {
-      etichetta: (ora: string) => `Allenamento oggi · ${ora}`,
+      etichetta: 'Allenamento oggi · {ora}',
       titolo: 'Facciamo il check-in.',
       corpo: 'Prima di iniziare la sessione, prenditi un momento per ascoltare il tuo corpo.',
       azione: 'Inizia check-in',
@@ -345,7 +344,7 @@ const it = {
         parole: 'Parole registrate',
       },
       valori: {
-        checkin: (fatti: number, su: number) => `${fatti} su ${su} giorni di allenamento`,
+        checkin: '{fatti} su {su} giorni di allenamento',
         nessuna: '—',
       },
     },
@@ -392,14 +391,13 @@ const en: typeof it = {
     invio: 'Sending…',
     nonRiuscito: 'We could not send the email. Try again in a moment.',
     troppoLento: 'The email is taking too long. Try again in a few minutes.',
-    aspetta: (secondi: number) => `Wait ${secondi} second${secondi === 1 ? '' : 's'} and try again.`,
+    aspetta: { uno: 'Wait {secondi} second and try again.', molti: 'Wait {secondi} seconds and try again.' },
   },
 
   linkMandato: {
     occhiello: 'ACCESS',
     titolo: 'Check your inbox',
-    occhio: (mail: string) =>
-      `We have sent a code to ${mail}. Type it in below and you're all set.`,
+    occhio: "We have sent a code to {mail}. Type it in below and you're all set.",
     rimanda: 'Did it not arrive? Resend it.',
     rimandato: 'Sent again. Check your inbox.',
     spiegaCodice: 'If you cannot find it, check your spam folder. The code lasts an hour.',
@@ -609,13 +607,13 @@ const en: typeof it = {
   },
 
   casa: {
-    saluto: (nome: string) => `Hey ${nome}`,
+    saluto: 'Hey {nome}',
     giorni: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     nav: { home: 'Home', percorso: 'Journey', storico: 'History', profilo: 'Profile' },
     tempi: { carica: 'Upbeat', costante: 'Steady', leggero: 'Gentle' },
 
     checkin: {
-      etichetta: (ora: string) => `Training today · ${ora}`,
+      etichetta: 'Training today · {ora}',
       titolo: "Let's check in.",
       corpo: "Before the session starts, take a moment to listen to your body's signals.",
       azione: "I'm ready",
@@ -678,7 +676,7 @@ const en: typeof it = {
         parole: 'Words logged',
       },
       valori: {
-        checkin: (fatti: number, su: number) => `${fatti} of ${su} training days`,
+        checkin: '{fatti} of {su} training days',
         nessuna: '—',
       },
     },

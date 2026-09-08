@@ -6,6 +6,7 @@ import { Scheda } from '../../ui/sessione/Scheda'
 import { Ritmi } from '../../ui/sessione/Ritmi'
 import { Apri } from '../../ui/Apri'
 import { testiSessione } from '../../copy/sessione'
+import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
 import { useLingua } from '../../lib/lingua'
 import { datiSessione, scriviSessione, useDatiSessione } from '../../lib/sessione'
@@ -90,11 +91,12 @@ function confronto(sentito: string | null, ts: TestiSessione): string {
   if (!sentito) return ''
   const dopo = nomi[sentito as keyof typeof nomi]
   // senza check-in stamattina non c'e' una previsione da confrontare
-  if (!previsto) return c.uguale(dopo)
+  if (!previsto) return riempi(c.uguale, { previsto: dopo })
   const ordine = ['carica', 'costante', 'leggero']
   const d = ordine.indexOf(sentito) - ordine.indexOf(previsto)
-  if (d === 0) return c.uguale(dopo)
-  return d > 0 ? c.piu(nomi[previsto], dopo) : c.meno(nomi[previsto], dopo)
+  const prima = nomi[previsto]
+  if (d === 0) return riempi(c.uguale, { previsto: prima })
+  return riempi(d > 0 ? c.piu : c.meno, { previsto: prima, sentito: dopo })
 }
 
 function SchedaSpiega({ titolo, children }: { titolo: string; children: string }) {

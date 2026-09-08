@@ -30,31 +30,6 @@ import type { Tempo } from '../data/casa'
  *    estremi del cursore.
  */
 
-/*
- * Due aiuti per le frasi che si compongono.
- *
- * L'elenco di parole va con la virgola e la congiunzione in fondo — "teso,
- * indolenzito e bruciante" — perche' e' una frase da dire a voce a un
- * adulto, non un riassunto. La congiunzione cambia con la lingua, il resto
- * no.
- */
-function elencoIt(parole: string[]): string {
-  if (parole.length === 0) return ''
-  if (parole.length === 1) return parole[0]
-  return `${parole.slice(0, -1).join(', ')} e ${parole[parole.length - 1]}`
-}
-
-function elencoEn(parole: string[]): string {
-  if (parole.length === 0) return ''
-  if (parole.length === 1) return parole[0]
-  return `${parole.slice(0, -1).join(', ')} and ${parole[parole.length - 1]}`
-}
-
-/** "Solo quando mi muovo" dentro a una frase diventa minuscolo. */
-function minuscola(s: string): string {
-  return s.charAt(0).toLowerCase() + s.slice(1)
-}
-
 const it = {
   comune: {
     si: 'Sì',
@@ -122,23 +97,31 @@ const it = {
    */
   segnali: {
     occhiello: 'PASSO 4 · DAGLI UN SENSO',
-    titolo: (zona: string) => `Parliamo di: ${zona.toLowerCase()}.`,
+    titolo: 'Parliamo di: {zonaMinuscola}.',
     titoloPiu: 'Parliamo di quello che hai segnato.',
     frase: {
       etichetta: 'La tua frase di oggi',
       /*
-       * La frase che potrebbe dire a chi la allena. In italiano non usa il
-       * possessivo ("il mio quadricipite") perche' meta' delle zone sono
-       * femminili e le parole sono tutte al maschile: sarebbe "la mia
-       * caviglia teso". Due punti e l'elenco lo evitano.
+       * `{zona}` e' il nome come si scrive ("Quadricipite destro"),
+       * `{zonaMinuscola}` lo stesso tutto minuscolo. Servono tutt'e due
+       * perche' in italiano la zona apre la frase e in inglese sta in mezzo:
+       * una lingua la vuole maiuscola, l'altra no, e non e' una cosa che il
+       * codice possa decidere per conto suo.
+       *
+       * La frase che potrebbe dire a chi la allena. Tre modelli e non uno:
+       * la coda del "quando" c'e' solo se ha risposto, e l'elenco delle
+       * parole non c'e' se non ne ha scelta nessuna.
+       *
+       * In italiano la frase non usa il possessivo ("il mio quadricipite")
+       * perche' meta' delle zone sono femminili e le parole sono tutte al
+       * maschile: sarebbe "la mia caviglia teso". Due punti e l'elenco lo
+       * evitano.
        */
-      testo: (zona: string, parole: string[], intensita: number, quando: string | null) => {
-        const elenco = elencoIt(parole)
-        const base = elenco
-          ? `${zona}: ${elenco}, circa ${intensita} su 10.`
-          : `${zona}: circa ${intensita} su 10.`
-        return quando ? `${base} La noto ${minuscola(quando)}.` : base
-      },
+      testo: '{zona}: {parole}, circa {intensita} su 10.',
+      senzaParole: '{zona}: circa {intensita} su 10.',
+      coda: ' La noto {quando}.',
+      /** la congiunzione dell'elenco: "teso, indolenzito e bruciante" */
+      e: 'e',
     },
     parole: {
       titolo: 'Cosa dicono le tue parole',
@@ -174,11 +157,9 @@ const it = {
      * senza, chi ci prende leggerebbe che si e' sbagliata.
      */
     confronto: {
-      piu: (previsto: string, sentito: string) =>
-        `Pensavi che il ritmo del tuo corpo fosse ${previsto}, ma si è rivelato ${sentito}.`,
-      meno: (previsto: string, sentito: string) =>
-        `Pensavi che il ritmo del tuo corpo fosse ${previsto}, e ne aveva da dare di più: si è rivelato ${sentito}.`,
-      uguale: (previsto: string) => `L'avevi indovinato: il ritmo era ${previsto}.`,
+      piu: 'Pensavi che il ritmo del tuo corpo fosse {previsto}, ma si è rivelato {sentito}.',
+      meno: 'Pensavi che il ritmo del tuo corpo fosse {previsto}, e ne aveva da dare di più: si è rivelato {sentito}.',
+      uguale: "L'avevi indovinato: il ritmo era {previsto}.",
       corpo:
         'Confrontare la tua stima con quanto il tuo corpo aveva da dare oggi ti aiuta a decifrare i suoi segnali più in fretta.',
     },
@@ -233,7 +214,7 @@ const it = {
     sinistra: 'Sfinita',
     destra: 'Ancora carica',
     nota: {
-      titolo: (prima: number) => `Questa mattina eri a ${prima}.`,
+      titolo: 'Questa mattina eri a {prima}.',
       corpo: "L'energia che diminuisce dopo una sessione è normale.",
       /* quando non ha fatto il check-in, un confronto non c'e' */
       senzaPrima:
@@ -261,7 +242,7 @@ const it = {
       uguale: "L'avevi indovinato esattamente. È la lettura che si affina.",
     },
     confronto: {
-      titolo: (zona: string) => `${zona}, da stamattina a ora`,
+      titolo: '{zona}, da stamattina a ora',
       occhio: 'Stesso punto, stesse sedici parole: è questo che li rende confrontabili.',
       prima: 'PRIMA',
       dopo: 'DOPO',
@@ -281,11 +262,9 @@ const it = {
    * scritta noi, ed e' l'unica cosa che la giornata ha davvero prodotto.
    */
   giorno: {
-    soloDopo: (dopo: string) => `Il tuo corpo oggi ha chiesto un ritmo ${dopo.toLowerCase()}.`,
-    uguale: (prima: string, dopo: string) =>
-      `Avevi previsto ${prima}, ed era ${dopo.toLowerCase()}.`,
-    diverso: (prima: string, dopo: string) =>
-      `Avevi previsto ${prima}, il tuo corpo ha chiesto ${dopo.toLowerCase()}.`,
+    soloDopo: 'Il tuo corpo oggi ha chiesto un ritmo {dopo}.',
+    uguale: 'Avevi previsto {prima}, ed era {dopo}.',
+    diverso: 'Avevi previsto {prima}, il tuo corpo ha chiesto {dopo}.',
   },
 
   // ── LA MAPPA E IL FOGLIO ──────────────────────────────────────────────────
@@ -300,7 +279,7 @@ const it = {
     altroveDomanda: 'Dove, allora?',
     altroveSegnaposto: 'Testa, stomaco, gola…',
     nota: 'Fermarsi a localizzare una sensazione e descriverla ti aiuta a capire, gestire e comunicare meglio ciò che senti.',
-    conteggio: (n: number) => (n === 1 ? '1 sensazione aggiunta' : `${n} sensazioni aggiunte`),
+    conteggio: { uno: '1 sensazione aggiunta', molte: '{n} sensazioni aggiunte' },
     azionePrima: 'Quasi fatto',
     azioneDopo: 'Quasi finito',
     /* si puo' anche non sentire niente, e non e' un fallimento */
@@ -430,17 +409,14 @@ const en: typeof it = {
 
   segnali: {
     occhiello: 'STEP 4 · MAKE SENSE OF IT',
-    titolo: (zona: string) => `About that ${zona.toLowerCase()}.`,
+    titolo: 'About that {zonaMinuscola}.',
     titoloPiu: 'About what you flagged.',
     frase: {
       etichetta: 'Your sentence today',
-      testo: (zona: string, parole: string[], intensita: number, quando: string | null) => {
-        const elenco = elencoEn(parole)
-        const base = elenco
-          ? `My ${zona.toLowerCase()} feels ${elenco}, about ${intensita} out of 10`
-          : `My ${zona.toLowerCase()} is about ${intensita} out of 10`
-        return quando ? `${base}, and I notice it ${minuscola(quando)}.` : `${base}.`
-      },
+      testo: 'My {zonaMinuscola} feels {parole}, about {intensita} out of 10.',
+      senzaParole: 'My {zonaMinuscola} is about {intensita} out of 10.',
+      coda: ', and I notice it {quando}.',
+      e: 'and',
     },
     parole: {
       titolo: 'What your words are saying',
@@ -475,12 +451,9 @@ const en: typeof it = {
      * `piu` e `meno` sono la stessa: l'unica scritta da noi e' `uguale`.
      */
     confronto: {
-      piu: (previsto: string, sentito: string) =>
-        `You guessed ${previsto} — your body’s tempo was ${sentito}.`,
-      meno: (previsto: string, sentito: string) =>
-        `You guessed ${previsto} — your body’s tempo was ${sentito}.`,
-      uguale: (previsto: string) =>
-        `You guessed ${previsto} — and that’s exactly the tempo your body followed.`,
+      piu: 'You guessed {previsto} — your body’s tempo was {sentito}.',
+      meno: 'You guessed {previsto} — your body’s tempo was {sentito}.',
+      uguale: 'You guessed {previsto} — and that’s exactly the tempo your body followed.',
       corpo:
         'The space between your guess and your body’s tempo is where you get sharper at decoding its signals. Being "off" isn’t a fail: it’s information.',
     },
@@ -535,7 +508,7 @@ const en: typeof it = {
     sinistra: 'Drained',
     destra: 'Still buzzing',
     nota: {
-      titolo: (prima: number) => `This morning you were at ${prima}.`,
+      titolo: 'This morning you were at {prima}.',
       corpo: 'Energy dropping after a session is normal and expected.',
       senzaPrima:
         'You didn’t check in this morning, so there’s no before to compare today with.',
@@ -554,7 +527,7 @@ const en: typeof it = {
       uguale: 'You called it exactly. That’s the read getting sharper.',
     },
     confronto: {
-      titolo: (zona: string) => `Your ${zona.toLowerCase()}, morning to now`,
+      titolo: 'Your {zonaMinuscola}, morning to now',
       occhio: 'Same spot, same 16 words — that’s what makes them comparable.',
       prima: 'BEFORE',
       dopo: 'AFTER',
@@ -566,10 +539,9 @@ const en: typeof it = {
   },
 
   giorno: {
-    soloDopo: (dopo: string) => `Your body asked for a ${dopo.toLowerCase()} tempo today.`,
-    uguale: (prima: string, _dopo: string) => `You guessed ${prima}, and that’s what it was.`,
-    diverso: (prima: string, dopo: string) =>
-      `You guessed ${prima}, your body asked for ${dopo.toLowerCase()}.`,
+    soloDopo: 'Your body asked for a {dopo} tempo today.',
+    uguale: 'You guessed {prima}, and that’s what it was.',
+    diverso: 'You guessed {prima}, your body asked for {dopo}.',
   },
 
   // ── LA MAPPA E IL FOGLIO ──────────────────────────────────────────────────
@@ -584,7 +556,7 @@ const en: typeof it = {
     altroveDomanda: 'Where, then?',
     altroveSegnaposto: 'Head, stomach, throat…',
     nota: 'Pausing to find where a sensation sits and putting a word to it helps you understand, manage and communicate it.',
-    conteggio: (n: number) => (n === 1 ? '1 spot added' : `${n} spots added`),
+    conteggio: { uno: '1 spot added', molte: '{n} spots added' },
     azionePrima: 'Almost done',
     azioneDopo: 'Next',
     salta: 'I don’t feel anything in particular today',

@@ -8,6 +8,7 @@ import { Cursore } from '../../ui/sessione/Cursore'
 import { BOTTINO, FACCE } from '../../data/sessione'
 import type { Bottino } from '../../data/sessione'
 import { testiSessione } from '../../copy/sessione'
+import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
 import { datiSessione, scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
@@ -269,7 +270,7 @@ export function CorpoEnergia({ tipo, passo, verso, avanzamento, avanti, indietro
         <Scheda piatta className="px-[16px] py-[14px]">
           {ceStata ? (
             <>
-              <p className="m-0 text-[15.5px] font-bold text-ink">{t.nota.titolo(prima.energia)}</p>
+              <p className="m-0 text-[15.5px] font-bold text-ink">{riempi(t.nota.titolo, { prima: prima.energia })}</p>
               <p className="m-0 mt-[6px] text-[12.5px] leading-[1.5] tracking-[-0.25px] text-ink-medio">
                 {t.nota.corpo}
               </p>
