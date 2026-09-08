@@ -50,7 +50,10 @@ Le risposte finiscono in Supabase solo se ci sono le chiavi. Senza, l'app
 funziona tutta ma resta nel telefono, e la schermata finale lo dice.
 
 1. Nel progetto Supabase, SQL Editor → incolla e lancia `supabase/schema.sql`.
-   È idempotente: si può rilanciare.
+   È idempotente: si può rilanciare. Su un database già acceso prima di
+   settembre 2026 basta l'ultimo blocco, staccato in
+   `supabase/migrazione-sessione.sql`: senza quello il check-in e il
+   check-out si vedono ma non riescono a salvare.
 2. Authentication → Sign In / Providers → Email: acceso, e in cima alla
    pagina "Allow new users to sign up" acceso. Email OTP length: 6.
 3. **Authentication → Emails**: nei due modelli `Magic Link` e
@@ -85,6 +88,29 @@ mandare. L'altra meta' e' il punto 3 qui sopra, che sta nel pannello.
 | giorni di allenamento e di educazione fisica | `athlete_schedule` |
 | le tre date del ciclo | `cycle_events` (`period_start`) |
 | le due spunte del consenso | `consents` (`athlete`, `guardian`) |
+
+| Check-in e check-out | Tabella |
+|---|---|
+| il ritmo indovinato la mattina | `check_ins.tempo_predicted` (`kind = 'pre'`) |
+| il ritmo sentito dopo | `check_ins.tempo_chosen` (`kind = 'post'`) |
+| sonno, energia, umore, scuola (1–7) | `check_ins` |
+| ore dormite, ciclo, antidolorifici | `check_ins` |
+| lo sforzo (0–10, CR-10 di Foster) | `check_ins.effort` |
+| la faccia e cosa si è portata a casa | `check_ins.satisfaction`, `brought_home` |
+| la frase che scrive lei | `check_ins.note` — fuori dalla vista del coach |
+| "senti un dolore protettivo?" | `check_ins.protective_pain` |
+| ogni punto segnato sul corpo | `body_signals` (una riga per punto) |
+
+Una riga per tipo per giorno, tenuta ferma da un indice unico su
+`(athlete_id, kind, local_date)`: rifare un check-out corregge quello di
+prima invece di aggiungerne un secondo. Il giorno dell'atleta finisce alle
+quattro del mattino, quindi un check-out dell'una di notte appartiene
+all'allenamento della sera prima.
+
+Il codice della zona porta il lato dentro (`front_quad_r`, `back_ham_l`):
+diciannove zone su trentatré hanno lo stesso nome davanti e dietro, e senza
+il lato un ginocchio che fa male davanti e uno che fa male dietro sarebbero
+la stessa riga.
 
 Si scrive tutto in fondo al percorso, in un colpo solo: a metà onboarding non
 c'è ancora una riga `athletes` valida da aggiornare. Rifare l'onboarding

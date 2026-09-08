@@ -1130,9 +1130,21 @@ drop view if exists public.coach_body_signals;
 
 -- Una sensazione ha piu' di una parola: "teso · indolenzito · bruciante".
 -- Erano tre pastiglie accese sullo stesso punto gia' nel primo disegno.
-alter table public.body_signals
-  alter column sensation type text[] using
-    case when sensation is null then null else array[sensation] end;
+--
+-- Il cambio di tipo si fa solo se la colonna e' ancora `text`: rieseguendo
+-- questo file su un database gia' migrato, `array[sensation]` su una colonna
+-- che e' gia' un array darebbe un array a due dimensioni e fallirebbe.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'body_signals'
+      and column_name = 'sensation' and data_type <> 'ARRAY'
+  ) then
+    execute 'alter table public.body_signals alter column sensation type text[] using
+               case when sensation is null then null else array[sensation] end';
+  end if;
+end $$;
 alter table public.body_signals add constraint body_signals_sensation_check
   check (array_length(sensation,1) between 1 and 4);
 

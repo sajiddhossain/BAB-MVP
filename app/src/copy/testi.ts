@@ -37,6 +37,30 @@ export const DA_RIVEDERE = [
   '09-pe/giorni',
 ] as const
 
+/**
+ * Gli schermi che in Figma esistono SOLO in italiano.
+ *
+ * Sono i dodici del check-in e del check-out: i frame inglesi non sono ancora
+ * stati disegnati. Il loro testo sta in `copy/sessione.ts`, fuori da questo
+ * file, proprio per non doverne inventare la traduzione — qui `en` e' tipato
+ * come `typeof it`, e una chiave italiana pretenderebbe subito la sua
+ * inglese. Quando i frame arriveranno, quel file diventa `{ it, en }`.
+ */
+export const SOLO_ITALIANO = [
+  'checkin-1-predict',
+  'checkin-2-tune-in',
+  'checkin-3-body-map',
+  'checkin-4-sensation-sheet',
+  'checkin-5-make-sense',
+  'checkout-1a-pick-tempo',
+  'checkout-1b-reveal-comparison',
+  'checkout-2-rpe',
+  'checkout-3-satisfaction',
+  'checkout-4-energy',
+  'checkout-5-body-map',
+  'checkout-7-close-loop',
+] as const
+
 const it = {
   comune: {
     continua: 'Continua',
