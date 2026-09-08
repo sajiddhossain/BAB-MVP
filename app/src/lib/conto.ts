@@ -4,6 +4,7 @@ import { supabase } from './supabase'
 import { dimenticaProfilo } from './profilo'
 import type { Risposte } from './risposte'
 import { azzera, scrivi, tutte } from './risposte'
+import { dimenticaSessione } from './sessione'
 import type { Lingua } from './lingua'
 
 /**
@@ -91,6 +92,7 @@ export async function verificaCodice(email: string, codice: string): Promise<Esi
 export async function esci() {
   dimenticaProfilo()
   azzera()
+  dimenticaSessione()
   try {
     localStorage.removeItem('bab.giornata')
   } catch {

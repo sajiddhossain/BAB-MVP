@@ -21,6 +21,8 @@ export function Schermo({
   avanzamento,
   indietro,
   azione,
+  stacco = 70,
+  margini = 30,
   children,
 }: {
   /** il node-id Figma: serve a ritrovare le macchie di sfondo di questo schermo */
@@ -34,6 +36,14 @@ export function Schermo({
   avanzamento?: number
   indietro?: () => void
   azione?: ReactNode
+  /**
+   * Quanto stacco fra la barra e il contenuto. Settanta nell'onboarding, dove
+   * l'occhiello sta a 170; trenta negli schermi del check-in, dove sta a 130.
+   * Non e' un gusto: sono due gruppi di frame disegnati in momenti diversi.
+   */
+  stacco?: number
+  /** i margini laterali. La mappa del corpo ne vuole meno: la sua scheda e' piu' larga */
+  margini?: number
   children: ReactNode
 }) {
   /*
@@ -65,7 +75,12 @@ export function Schermo({
           {avanzamento !== undefined && <Barra avanzamento={avanzamento} indietro={indietro} />}
         </div>
         <div className={`relative flex flex-1 flex-col ${entrata}`}>
-          <div className="flex flex-1 flex-col px-[30px] pt-[70px] pb-6">{children}</div>
+          <div
+            className="flex flex-1 flex-col pb-6"
+            style={{ paddingLeft: margini, paddingRight: margini, paddingTop: stacco }}
+          >
+            {children}
+          </div>
           {azione && (
             <div className="px-6 pb-[calc(34px+env(safe-area-inset-bottom))]">{azione}</div>
           )}

@@ -53,6 +53,31 @@
   --color-allarme-fondo: #fde9e6;
   --color-allarme-testo: #6e2a22;
 
+  /*
+   * I colori del check-in e del check-out.
+   *
+   * Terza tavolozza, come la home era la seconda: questi schermi nel file
+   * Figma sono stati disegnati dopo e usano tre famiglie che prima non
+   * c'erano — l'ambra del ritmo scelto, il verde delle cose selezionate nei
+   * fogli, e il lilla che marca tutto cio' che e' informazione e non domanda.
+   *
+   * Due valori NON sono qui perche' sono gli stessi di prima a meno di un
+   * punto su 255: le tacche spente del cursore (#b0aca5) sono `ink-tenue`, e
+   * le etichette agli estremi (#9a968f) sono `ink-mute`.
+   */
+  --color-ritmo-bordo: #d4b26f;
+  --color-ritmo-fondo: #fcf3e2;
+  --color-verde-vivo: #10b981;
+  --color-verde-tenue: #4ab5a0;
+  --color-verde-fondo: #e5f5f2;
+  --color-verde-testo: #367569;
+  --color-lilla: #866bf2;
+  --color-lilla-vivo: #7b6ef6;
+  --color-lilla-fondo: #f1effd;
+  --color-lilla-bordo: #dcd7fb;
+  --color-lilla-testo: #4a3fc0;
+  --color-spento: #9090a0;
+
   /* caratteri */
   --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
   --font-ui: 'Space Grotesk', system-ui, sans-serif;
@@ -66,6 +91,18 @@
 
 :root {
   color-scheme: light;
+
+  /*
+   * Le due scale dei cursori.
+   *
+   * Non sono decorazione: il colore dice da che parte sta il bene. Sonno,
+   * energia, umore vanno dal corallo al verde (piu' a destra e' meglio);
+   * scuola, sforzo e intensita' vanno al contrario, perche' li' a destra c'e'
+   * il carico. Averle come due variabili invece che come due liste di stop
+   * copiate e' quello che impedisce di girarne una per sbaglio.
+   */
+  --scala-verso-bene: linear-gradient(90deg, #eb9576 0%, #f6c27a 29.8%, #cee767 63.9%, #67cda7 100%);
+  --scala-verso-carico: linear-gradient(90deg, #67cda7 0%, #cee767 36.1%, #f6c27a 70.2%, #eb9576 100%);
 }
 
 html,
@@ -173,4 +210,71 @@ textarea {
   .bab-entra-indietro {
     animation-duration: 1ms;
   }
+}
+
+/*
+ * Il foglio che sale dal fondo.
+ *
+ * Un'animazione e non una transizione, per lo stesso motivo delle macchie:
+ * il foglio nasce nel momento in cui deve muoversi, e una transizione non ha
+ * un valore di partenza da cui partire. Il velo dietro affiora con
+ * `bab-affiora`, che c'e' gia'.
+ */
+@keyframes bab-sale {
+  from { transform: translate3d(0, 100%, 0); }
+  to { transform: none; }
+}
+.bab-sale {
+  animation: bab-sale 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bab-sale {
+    animation-duration: 1ms;
+  }
+}
+
+/*
+ * Il cursore delle scale.
+ *
+ * Sotto e' un <input type="range"> vero, con la pista dipinta da un div
+ * dietro. Rifarlo a mano con i pointer event verrebbe uguale a vedersi e
+ * peggio a usarsi: il range di sistema ha gia' il trascinamento col dito, le
+ * frecce della tastiera, e si annuncia da solo a chi usa VoiceOver.
+ *
+ * Il pallino e' largo 24: un range di sistema fa correre il centro del
+ * pallino da 12px a larghezza-12px, ed e' esattamente dove stanno le tacche
+ * qui sotto. E' per questo che il numero sta sempre sotto al pallino.
+ */
+.bab-cursore {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 36px;
+  margin: 0;
+  background: transparent;
+  outline: none;
+}
+.bab-cursore::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 100px;
+  background: #fff;
+  border: 3px solid var(--color-ink);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+}
+.bab-cursore::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 100px;
+  background: #fff;
+  border: 3px solid var(--color-ink);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+}
+.bab-cursore:focus-visible::-webkit-slider-thumb {
+  border-color: var(--color-lilla);
+}
+.bab-cursore:focus-visible::-moz-range-thumb {
+  border-color: var(--color-lilla);
 }

@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Sfondo } from '../ui/Sfondo'
 import { Bottone } from '../ui/Bottone'
 import { Testata } from '../ui/casa/Testata'
@@ -155,6 +155,7 @@ export function Casa() {
 /* ── home-1: c'e' l'allenamento e il check-in e' da fare ─────────────────── */
 function Checkin({ ora }: { ora: string }) {
   const { t } = useLingua()
+  const vai = useNavigate()
   return (
     <SchedaEroe
       stato="checkin"
@@ -177,7 +178,7 @@ function Checkin({ ora }: { ora: string }) {
       </div>
 
       <div className="mt-[14px]">
-        <Bottone>{t.casa.checkin.azione}</Bottone>
+        <Bottone onClick={() => vai('/sessione/checkin')}>{t.casa.checkin.azione}</Bottone>
       </div>
     </SchedaEroe>
   )
@@ -186,6 +187,7 @@ function Checkin({ ora }: { ora: string }) {
 /* ── home-2: la sessione e' finita, manca il check-out ───────────────────── */
 function Checkout({ previsto }: { previsto: Tempo | null }) {
   const { t } = useLingua()
+  const vai = useNavigate()
   return (
     <SchedaEroe
       stato="checkout"
@@ -202,7 +204,7 @@ function Checkout({ previsto }: { previsto: Tempo | null }) {
       )}
 
       <div className="mt-[14px]">
-        <Bottone>{t.casa.checkout.azione}</Bottone>
+        <Bottone onClick={() => vai('/sessione/checkout')}>{t.casa.checkout.azione}</Bottone>
       </div>
     </SchedaEroe>
   )
@@ -255,6 +257,7 @@ function Pastiglia({ tempo }: { tempo: Tempo }) {
 /* ── home-4: giorno senza allenamento ────────────────────────────────────── */
 function Riposo() {
   const { t } = useLingua()
+  const vai = useNavigate()
   return (
     <SchedaEroe
       stato="riposo"
@@ -284,7 +287,7 @@ function Riposo() {
       </div>
 
       <div className="mt-[14px]">
-        <Bottone>{t.casa.riposo.azione}</Bottone>
+        <Bottone onClick={() => vai('/sessione/checkin')}>{t.casa.riposo.azione}</Bottone>
       </div>
     </SchedaEroe>
   )

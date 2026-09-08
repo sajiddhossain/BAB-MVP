@@ -1,0 +1,293 @@
+import { useCallback, useSyncExternalStore } from 'react'
+import { supabase } from './supabase'
+import type { Tempo } from '../data/casa'
+import type { Bottino, Faccia, OreSonno, Parola, Tipo } from '../data/sessione'
+import { RITMI } from '../data/sessione'
+import type { Esito } from './conto'
+
+/**
+ * Quello che si raccoglie in un check-in o in un check-out.
+ *
+ * Una forma sola per tutti e due, con i campi che l'altro non usa lasciati a
+ * null: nel database sono gia' la stessa tabella (`check_ins`, con `kind` che
+ * dice quale dei due), e avere due forme qui vorrebbe dire tenere allineati
+ * due tipi che descrivono la stessa riga.
+ */
+export type Sensazione = {
+  /** chiave locale, non finisce nel database */
+  id: string
+  /** `front_quad_r`, oppure `altrove` */
+  zona: string
+  /** il nome visibile, gia' in italiano: "Quadricipite destro" */
+  nome: string
+  /** dove, quando ha scelto "Altrove" */
+  zonaLibera: string
+  parole: Parola[]
+  /** le sue parole, quando le pastiglie non bastano */
+  sue: string
+  unLato: boolean | null
+  /** 0–10, come l'RPE */
+  intensita: number
+}
+
+export type Dati = {
+  ritmo: Tempo | null
+  /* check-in */
+  sonno: number
+  oreSonno: OreSonno | null
+  energia: number
+  umore: number
+  scuola: number
+  ciclo: boolean | null
+  antidolorifici: boolean | null
+  /* check-out */
+  sforzo: number
+  soddisfazione: Faccia | null
+  bottino: Bottino[]
+  bottinoMio: string
+  protettivo: boolean | null
+  /* tutti e due */
+  sensazioni: Sensazione[]
+  /** quando ha aperto il primo schermo: finisce in `started_at` */
+  iniziata: string
+}
+
+/*
+ * I cursori partono dal centro.
+ *
+ * Nel disegno stanno a 4, 6, 5, 3 — ma quelli sono valori d'esempio, non
+ * default. Il centro e' l'unico punto che non suggerisce una risposta: farli
+ * partire da 6 vorrebbe dire chiedere "quanto stai bene" avendo gia' scritto
+ * "parecchio", e chi ha fretta lascia li' quello che trova.
+ */
+export const VUOTI: Dati = {
+  ritmo: null,
+  sonno: 4,
+  oreSonno: null,
+  energia: 4,
+  umore: 4,
+  scuola: 4,
+  ciclo: null,
+  antidolorifici: null,
+  sforzo: 5,
+  soddisfazione: null,
+  bottino: [],
+  bottinoMio: '',
+  protettivo: null,
+  sensazioni: [],
+  iniziata: '',
+}
+
+/**
+ * Il giorno DELL'ATLETA, che finisce alle quattro del mattino.
+ *
+ * Un check-out fatto all'una di notte appartiene all'allenamento della sera
+ * prima, non al giorno dopo. Lo schema chiede questa data gia' calcolata,
+ * perche' il fuso orario lo conosce solo il telefono.
+ */
+export function giornoAtleta(quando = new Date()): string {
+  const d = new Date(quando)
+  if (d.getHours() < 4) d.setDate(d.getDate() - 1)
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`
+}
+
+type Magazzino = { giorno: string; checkin: Dati; checkout: Dati }
+
+const CHIAVE = 'bab.sessione'
+
+function vuoto(): Magazzino {
+  return { giorno: giornoAtleta(), checkin: { ...VUOTI }, checkout: { ...VUOTI } }
+}
+
+function leggi(): Magazzino {
+  try {
+    const m = JSON.parse(localStorage.getItem(CHIAVE) ?? 'null') as Magazzino | null
+    // le risposte di ieri non sono le risposte di oggi
+    if (!m || m.giorno !== giornoAtleta()) return vuoto()
+    return {
+      giorno: m.giorno,
+      checkin: { ...VUOTI, ...m.checkin },
+      checkout: { ...VUOTI, ...m.checkout },
+    }
+  } catch {
+    return vuoto()
+  }
+}
+
+let stato = leggi()
+const ascoltatori = new Set<() => void>()
+
+function iscrivi(f: () => void) {
+  ascoltatori.add(f)
+  return () => void ascoltatori.delete(f)
+}
+
+function salva() {
+  try {
+    localStorage.setItem(CHIAVE, JSON.stringify(stato))
+  } catch {
+    // spazio finito o navigazione privata: la sessione funziona lo stesso,
+    // solo non sopravvive alla chiusura dell'app
+  }
+  ascoltatori.forEach((f) => f())
+}
+
+/**
+ * Cambia uno o piu' campi di uno dei due giri.
+ *
+ * Accetta anche una funzione, come `scrivi` delle risposte: aggiungere una
+ * sensazione e chiudere il foglio finiscono nello stesso giro di React, e chi
+ * legge dallo stato del render avrebbe in mano la lista di prima.
+ */
+export function scriviSessione(
+  tipo: Tipo,
+  campi: Partial<Dati> | ((d: Dati) => Partial<Dati>),
+) {
+  const ora = stato[tipo]
+  stato = {
+    ...stato,
+    giorno: giornoAtleta(),
+    [tipo]: { ...ora, ...(typeof campi === 'function' ? campi(ora) : campi) },
+  }
+  salva()
+}
+
+export function datiSessione(tipo: Tipo): Dati {
+  return stato[tipo]
+}
+
+export function useDatiSessione(tipo: Tipo): Dati {
+  return useSyncExternalStore(
+    iscrivi,
+    useCallback(() => stato[tipo], [tipo]),
+  )
+}
+
+/** Azzera tutti e due i giri. Serve all'uscita, come per le risposte. */
+export function dimenticaSessione() {
+  try {
+    localStorage.removeItem(CHIAVE)
+  } catch {
+    // niente da fare: lo stato in memoria si azzera comunque
+  }
+  stato = vuoto()
+  ascoltatori.forEach((f) => f())
+}
+
+/*
+ * ── IL SALVATAGGIO ──────────────────────────────────────────────────────────
+ */
+
+const RITMO_DB: Record<Tempo, string> = Object.fromEntries(
+  RITMI.map((r) => [r.id, r.db]),
+) as Record<Tempo, string>
+
+/**
+ * Scrive un check-in o un check-out nel database.
+ *
+ * Come per l'onboarding: si scrive alla fine, in un colpo solo. A meta' giro
+ * non c'e' ancora una riga sensata da salvare — un check-in senza il ritmo e
+ * senza la mappa non e' un check-in a meta', e' un dato che non vuol dire
+ * niente e che poi qualcuno leggerebbe come se lo volesse dire.
+ */
+export async function salvaSessione(tipo: Tipo, d: Dati): Promise<Esito> {
+  if (!supabase) return { ok: true }
+
+  const { data: sessione } = await supabase.auth.getSession()
+  const atleta = sessione.session?.user.id
+  // senza sessione non c'e' nessuno per cui salvare, e "riprova" non puo'
+  // funzionare: si rientra, esattamente come alla fine dell'onboarding
+  if (!atleta) return { ok: false, errore: 'nessuna sessione', scaduta: true }
+
+  const kind = tipo === 'checkin' ? 'pre' : 'post'
+  const giorno = giornoAtleta()
+  const adesso = new Date().toISOString()
+
+  /*
+   * L'id della riga si riusa se ce n'e' gia' una per oggi.
+   *
+   * `check_ins.id` e' la chiave primaria e `body_signals.check_in_id` ci punta
+   * contro: se rifacendo un check-out mandassimo un id nuovo, l'upsert
+   * sull'indice unico (atleta, tipo, giorno) proverebbe a cambiare la chiave
+   * primaria sotto ai segnali gia' attaccati. Una lettura in piu' costa meno
+   * di quel guaio.
+   */
+  const esistente = await supabase
+    .from('check_ins')
+    .select('id')
+    .eq('athlete_id', atleta)
+    .eq('kind', kind)
+    .eq('local_date', giorno)
+    .maybeSingle()
+  if (esistente.error) return { ok: false, errore: `lettura: ${esistente.error.message}` }
+
+  const id = esistente.data?.id ?? crypto.randomUUID()
+  const ritmo = d.ritmo ? RITMO_DB[d.ritmo] : null
+
+  const riga = {
+    id,
+    athlete_id: atleta,
+    kind,
+    local_date: giorno,
+    started_at: d.iniziata || adesso,
+    completed_at: adesso,
+    // il ritmo va in due colonne diverse a seconda del giro: quella prima e'
+    // una previsione, quella dopo e' un esito, e confonderle vorrebbe dire
+    // perdere l'unica cosa che il confronto misura
+    tempo_predicted: tipo === 'checkin' ? ritmo : null,
+    tempo_chosen: tipo === 'checkout' ? ritmo : null,
+    sleep: tipo === 'checkin' ? d.sonno : null,
+    sleep_hours: tipo === 'checkin' ? d.oreSonno : null,
+    mood: tipo === 'checkin' ? d.umore : null,
+    school_load: tipo === 'checkin' ? d.scuola : null,
+    on_period: tipo === 'checkin' ? d.ciclo : null,
+    painkillers: tipo === 'checkin' ? d.antidolorifici : null,
+    // l'energia si chiede tutte e due le volte: e' la stessa domanda, ed e'
+    // la differenza fra le due risposte che dice qualcosa
+    energy: d.energia,
+    effort: tipo === 'checkout' ? d.sforzo : null,
+    satisfaction: tipo === 'checkout' ? d.soddisfazione : null,
+    brought_home: tipo === 'checkout' && d.bottino.length ? d.bottino : null,
+    note: tipo === 'checkout' && d.bottinoMio.trim() ? d.bottinoMio.trim().slice(0, 500) : null,
+    protective_pain: tipo === 'checkout' ? d.protettivo : null,
+  }
+
+  const scritto = await supabase.from('check_ins').upsert(riga)
+  if (scritto.error) return { ok: false, errore: `check-in: ${scritto.error.message}` }
+
+  /*
+   * I segnali si cancellano e si riscrivono, come la settimana
+   * dell'onboarding: non hanno una chiave stabile lato client, e un upsert
+   * non saprebbe distinguere "ne ha aggiunta una" da "ne ha cambiata una".
+   */
+  const via = await supabase.from('body_signals').delete().eq('check_in_id', id)
+  if (via.error) return { ok: false, errore: `segnali (pulizia): ${via.error.message}` }
+
+  if (d.sensazioni.length) {
+    const segnali = d.sensazioni.map((s) => ({
+      athlete_id: atleta,
+      check_in_id: id,
+      created_at: adesso,
+      region: s.zona,
+      region_free: s.zona === 'altrove' ? s.zonaLibera.slice(0, 40) || null : null,
+      sensation: s.parole,
+      words: s.sue.trim() ? s.sue.trim().slice(0, 200) : null,
+      one_side: s.unLato,
+      intensity: s.intensita,
+      /*
+       * `is_red_flag` lo mettiamo solo quando l'ha detto lei, alla fine del
+       * check-out. Dedurlo dalle parole sarebbe un giudizio clinico preso da
+       * un elenco di aggettivi — e la tabella `red_flags`, che e' quella che
+       * fa arrivare la cosa a un adulto, non ha ancora nessuno schermo che la
+       * chiuda: aprirci righe che nessuno vede sarebbe il modo piu'
+       * silenzioso di non far arrivare niente a nessuno.
+       */
+      is_red_flag: tipo === 'checkout' && d.protettivo === true,
+    }))
+    const messi = await supabase.from('body_signals').insert(segnali)
+    if (messi.error) return { ok: false, errore: `segnali: ${messi.error.message}` }
+  }
+
+  return { ok: true }
+}
