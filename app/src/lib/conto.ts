@@ -3,7 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { dimenticaProfilo } from './profilo'
 import type { Risposte } from './risposte'
-import { scrivi, tutte } from './risposte'
+import { azzera, scrivi, tutte } from './risposte'
 import type { Lingua } from './lingua'
 
 /**
@@ -20,7 +20,9 @@ export const acceso = supabase !== null
 /** La versione del testo dei consensi che si sta accettando. */
 const VERSIONE_CONSENSI = '2026-09-draft'
 
-export type Esito = { ok: true } | { ok: false; errore: string; lento?: boolean }
+export type Esito =
+  | { ok: true }
+  | { ok: false; errore: string; lento?: boolean; fraSecondi?: number }
 
 /*
  * Quanto aspettare la mail prima di dire che non ce l'abbiamo fatta.
@@ -52,7 +54,18 @@ export async function mandaCodice(email: string): Promise<Esito> {
   const scaduto = new Promise<'scaduto'>((r) => setTimeout(() => r('scaduto'), ATTESA_MAX))
   const esito = await Promise.race([invio, scaduto])
   if (esito === 'scaduto') return { ok: false, errore: 'la posta non risponde', lento: true }
-  return esito.error ? { ok: false, errore: esito.error.message } : { ok: true }
+  if (!esito.error) return { ok: true }
+
+  /*
+   * Il limite di una mail al minuto per persona non e' un guasto: e' una
+   * difesa contro chi usa il nostro server per riempire la casella di
+   * qualcun altro. Va detto come tale — "aspetta venti secondi" e' una cosa
+   * che si puo' fare, "non siamo riusciti a mandare" no.
+   */
+  const attesa = /after (\d+) seconds?/i.exec(esito.error.message)
+  if (attesa) return { ok: false, errore: esito.error.message, fraSecondi: Number(attesa[1]) }
+
+  return { ok: false, errore: esito.error.message }
 }
 
 /** Controlla il codice a sei cifre. Apre la sessione se e' giusto. */
@@ -82,7 +95,26 @@ export function useSessione(): { sessione: Session | null; caricata: boolean } {
       setSessione(data.session)
       setCaricata(true)
     })
-    const { data } = supabase.auth.onAuthStateChange((_e, s) => setSessione(s))
+    const { data } = supabase.auth.onAuthStateChange((evento, s) => {
+      setSessione(s)
+      /*
+       * Uscendo si porta via tutto quello che sta su questo telefono.
+       *
+       * Fra le risposte ci sono le date del ciclo. Un telefono si presta, si
+       * perde, si vende: quei dati non devono restare leggibili a chi non ha
+       * piu' la sessione, e questo vale anche quando la sessione scade da
+       * sola invece che perche' e' uscita lei.
+       */
+      if (evento === 'SIGNED_OUT') {
+        dimenticaProfilo()
+        azzera()
+        try {
+          localStorage.removeItem('bab.giornata')
+        } catch {
+          // niente da fare: non e' un motivo per non uscire
+        }
+      }
+    })
     return () => data.subscription.unsubscribe()
   }, [])
 
@@ -164,14 +196,25 @@ export async function salvaOnboarding(r: Risposte, lingua: Lingua): Promise<Esit
   // da adesso il profilo c'e': chi lo aveva chiesto prima aveva un'altra risposta
   dimenticaProfilo()
 
+  /*
+   * Da qui in poi si scrive nelle tabelle figlie. Prima gli errori non li
+   * guardavamo: se la settimana non passava, l'onboarding diceva lo stesso
+   * "fatto" e i giorni di allenamento sparivano senza che nessuno lo
+   * sapesse. Ora ogni passo dice com'e' andata, e se anche uno solo fallisce
+   * fallisce tutto — rifare l'onboarding riscrive le stesse righe, quindi
+   * riprovare e' sempre sicuro.
+   */
+  const passi: [string, PromiseLike<{ error: { message: string } | null }>][] = []
+
   // gli sport: `athletes.sport` e' il principale, questa e' la lista intera
   if (r.sport.length) {
-    await supabase
-      .from('athlete_sports')
-      .upsert(
+    passi.push([
+      'sport',
+      supabase.from('athlete_sports').upsert(
         r.sport.map((sport) => ({ athlete_id: id, sport })),
         { onConflict: 'athlete_id,sport' },
-      )
+      ),
+    ])
   }
 
   /*
@@ -184,22 +227,29 @@ export async function salvaOnboarding(r: Risposte, lingua: Lingua): Promise<Esit
    * riempirebbe di doppioni. Rifare l'onboarding vuol dire rifare la
    * settimana, non aggiungerne un'altra.
    */
-  await supabase.from('athlete_schedule').delete().eq('athlete_id', id)
+  const pulizia = await supabase.from('athlete_schedule').delete().eq('athlete_id', id)
+  if (pulizia.error) return { ok: false, errore: `settimana: ${pulizia.error.message}` }
+
   const settimana = [
     ...Object.entries(r.allenamenti).flatMap(([sport, a]) =>
       a.giorni.map((g) => ({ athlete_id: id, weekday: g + 1, kind: 'training', sport })),
     ),
     ...r.edFisica.map((g) => ({ athlete_id: id, weekday: g + 1, kind: 'pe', sport: null })),
   ]
-  if (settimana.length) await supabase.from('athlete_schedule').insert(settimana)
+  if (settimana.length) {
+    passi.push(['settimana', supabase.from('athlete_schedule').insert(settimana)])
+  }
 
   // le date del ciclo: si salvano solo quelle, le fasi si calcolano nell'app
   const date = r.cicliUltimi.map(isoDaData).filter((d): d is string => d !== null)
   if (date.length) {
-    await supabase.from('cycle_events').upsert(
-      date.map((event_date) => ({ athlete_id: id, kind: 'period_start', event_date })),
-      { onConflict: 'athlete_id,kind,event_date' },
-    )
+    passi.push([
+      'ciclo',
+      supabase.from('cycle_events').upsert(
+        date.map((event_date) => ({ athlete_id: id, kind: 'period_start', event_date })),
+        { onConflict: 'athlete_id,kind,event_date' },
+      ),
+    ])
   }
 
   /*
@@ -215,13 +265,21 @@ export async function salvaOnboarding(r: Risposte, lingua: Lingua): Promise<Esit
       .select('kind')
       .eq('athlete_id', id)
       .eq('text_version', VERSIONE_CONSENSI)
+    if (gia.error) return { ok: false, errore: `consensi: ${gia.error.message}` }
     const fatti = new Set((gia.data ?? []).map((c) => c.kind as string))
     const nuovi = [
       { athlete_id: id, kind: 'athlete', text_version: VERSIONE_CONSENSI, granted: r.consensi[0] },
       { athlete_id: id, kind: 'guardian', text_version: VERSIONE_CONSENSI, granted: r.consensi[1] },
     ].filter((c) => !fatti.has(c.kind))
-    if (nuovi.length) await supabase.from('consents').insert(nuovi)
+    if (nuovi.length) passi.push(['consensi', supabase.from('consents').insert(nuovi)])
   }
+
+  const esiti = await Promise.all(passi.map(([, p]) => p))
+  const rotti = esiti
+    .map((e, i) => (e.error ? `${passi[i][0]}: ${e.error.message}` : null))
+    .filter((x): x is string => x !== null)
+
+  if (rotti.length) return { ok: false, errore: rotti.join(' · ') }
 
   return { ok: true }
 }

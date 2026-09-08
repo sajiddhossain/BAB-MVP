@@ -8,13 +8,16 @@ import '@fontsource/space-grotesk/700.css'
 import './index.css'
 import { App } from './App'
 import { LinguaProvider } from './lib/lingua'
+import { Rete } from './ui/Rete'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <LinguaProvider>
-        <App />
-      </LinguaProvider>
-    </BrowserRouter>
+    <Rete>
+      <BrowserRouter>
+        <LinguaProvider>
+          <App />
+        </LinguaProvider>
+      </BrowserRouter>
+    </Rete>
   </StrictMode>,
 )

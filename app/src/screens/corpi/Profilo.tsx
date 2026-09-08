@@ -15,16 +15,20 @@ import type { PropsSchermo } from '../tipi'
 const STACCO = 'mt-[52px]'
 
 /* 05-name — 3771:104 / 3958:567 */
-export function CorpoNome({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoNome({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { nome } = useRisposte()
+  // lo schema accetta da 1 a 40 caratteri: fermarlo qui vuol dire dirglielo
+  // adesso invece di farglielo scoprire dall'errore in fondo all'onboarding
+  const buono = nome.trim().length > 0 && nome.trim().length <= 40
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={
-        <Bottone attivo={nome.trim().length > 0} onClick={avanti}>
+        <Bottone attivo={buono} onClick={avanti}>
           {t.comune.continua}
         </Bottone>
       }
@@ -37,6 +41,7 @@ export function CorpoNome({ nodo, avanzamento, avanti, indietro }: PropsSchermo)
           <Campo
             autoComplete="given-name"
             placeholder={t.nome.segnaposto}
+            maxLength={40}
             value={nome}
             onChange={(e) => scrivi({ nome: e.target.value })}
           />
@@ -47,7 +52,7 @@ export function CorpoNome({ nodo, avanzamento, avanti, indietro }: PropsSchermo)
 }
 
 /* 06-birthday — 3771:122 / 3958:592 */
-export function CorpoCompleanno({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoCompleanno({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { nascita } = useRisposte()
   const completa = dataValida(nascita)
@@ -55,6 +60,7 @@ export function CorpoCompleanno({ nodo, avanzamento, avanti, indietro }: PropsSc
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={
@@ -81,7 +87,7 @@ export function CorpoCompleanno({ nodo, avanzamento, avanti, indietro }: PropsSc
 }
 
 /* 07-sport — 3771:140 / 3958:616 */
-export function CorpoSport({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t, lingua } = useLingua()
   const { sport, sportPrincipale } = useRisposte()
   const [cerca, setCerca] = useState('')
@@ -110,6 +116,7 @@ export function CorpoSport({ nodo, avanzamento, avanti, indietro }: PropsSchermo
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={
@@ -192,7 +199,7 @@ export function CorpoSport({ nodo, avanzamento, avanti, indietro }: PropsSchermo
 }
 
 /* 08-training — 3771:160 / 3958:641 */
-export function CorpoAllenamenti({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoAllenamenti({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t, lingua } = useLingua()
   const { sport, allenamenti } = useRisposte()
 
@@ -206,6 +213,7 @@ export function CorpoAllenamenti({ nodo, avanzamento, avanti, indietro }: PropsS
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={<Bottone onClick={avanti}>{t.comune.continua}</Bottone>}
@@ -243,12 +251,13 @@ export function CorpoAllenamenti({ nodo, avanzamento, avanti, indietro }: PropsS
 }
 
 /* 09-pe — 3772:193 / 3958:709 */
-export function CorpoEdFisica({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoEdFisica({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { edFisica } = useRisposte()
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={<Bottone onClick={avanti}>{t.comune.continua}</Bottone>}
@@ -266,12 +275,13 @@ export function CorpoEdFisica({ nodo, avanzamento, avanti, indietro }: PropsSche
 }
 
 /* 10-competitions — 3772:223 / 3958:745 */
-export function CorpoGare({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoGare({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { prossimaGara } = useRisposte()
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={<Bottone onClick={avanti}>{t.comune.continua}</Bottone>}

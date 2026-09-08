@@ -28,7 +28,7 @@ const STACCO = 'mt-[52px]'
  * Chiusa non ha bottone: si tocca una carta e si va. E' l'unica domanda
  * dell'onboarding senza "Continua", ed e' cosi' anche nel disegno.
  */
-export function CorpoCicloSiNo({ passo, nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoCicloSiNo({ passo, nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { ciclo, primoCicloMese, primoCicloAnno } = useRisposte()
   const aperto = passo.id === 'primo-ciclo'
@@ -46,6 +46,7 @@ export function CorpoCicloSiNo({ passo, nodo, avanzamento, avanti, indietro }: P
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={
@@ -128,7 +129,7 @@ export function CorpoCicloSiNo({ passo, nodo, avanzamento, avanti, indietro }: P
 }
 
 /* 12-cycle-dates — 3772:261 / 3958:797 */
-export function CorpoCicloDate({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoCicloDate({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { cicliUltimi } = useRisposte()
 
@@ -143,6 +144,7 @@ export function CorpoCicloDate({ nodo, avanzamento, avanti, indietro }: PropsSch
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={<Bottone onClick={avanti}>{t.comune.continua}</Bottone>}
@@ -166,12 +168,13 @@ export function CorpoCicloDate({ nodo, avanzamento, avanti, indietro }: PropsSch
 }
 
 /* 14-contraceptive — 3772:287 / 3958:1437 */
-export function CorpoContraccettivo({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoContraccettivo({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { contraccettivo } = useRisposte()
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={

@@ -57,6 +57,7 @@ const it = {
     invio: 'Sto mandando…',
     nonRiuscito: 'Non siamo riusciti a mandare la mail. Riprova fra un momento.',
     troppoLento: 'La mail ci sta mettendo troppo. Riprova fra qualche minuto.',
+    aspetta: (secondi: number) => `Aspetta ${secondi} second${secondi === 1 ? 'o' : 'i'} e riprova.`,
   },
 
   linkMandato: {
@@ -65,6 +66,7 @@ const it = {
     occhio: (mail: string) =>
       `Abbiamo mandato un codice a ${mail}. Scrivilo qui sotto ed è fatta.`,
     rimanda: 'Non è arrivato? Rimandalo',
+    rimandato: 'Rimandato. Guarda la posta.',
     spiegaCodice: 'Se non lo trovi, guarda nella posta indesiderata. Il codice vale un\'ora.',
     etichettaCodice: 'CODICE',
     codiceSbagliato: 'Questo codice non va. Controlla la mail.',
@@ -389,6 +391,7 @@ const en: typeof it = {
     invio: 'Sending…',
     nonRiuscito: 'We could not send the email. Try again in a moment.',
     troppoLento: 'The email is taking too long. Try again in a few minutes.',
+    aspetta: (secondi: number) => `Wait ${secondi} second${secondi === 1 ? '' : 's'} and try again.`,
   },
 
   linkMandato: {
@@ -397,6 +400,7 @@ const en: typeof it = {
     occhio: (mail: string) =>
       `We have sent a code to ${mail}. Type it in below and you're all set.`,
     rimanda: 'Did it not arrive? Resend it.',
+    rimandato: 'Sent again. Check your inbox.',
     spiegaCodice: 'If you cannot find it, check your spam folder. The code lasts an hour.',
     etichettaCodice: 'CODE',
     codiceSbagliato: 'That code does not work. Check the email.',

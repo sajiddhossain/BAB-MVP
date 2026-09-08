@@ -15,7 +15,7 @@ import logo from '../../assets/logo-bab.svg'
 import sparkles from '../../assets/icon-sparkles.svg'
 
 /* 01-auth-login — 3771:2 / 3958:461 */
-export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
+export function CorpoAccesso({ nodo, verso, avanti }: PropsSchermo) {
   const { t } = useLingua()
   const { email } = useRisposte()
   const [inCorso, setInCorso] = useState(false)
@@ -31,7 +31,13 @@ export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
     // a chi legge non dice niente, a noi serve per capire cosa e' successo
     if (!esito.ok) {
       console.error('[accesso]', esito.errore)
-      setErrore(esito.lento ? t.accesso.troppoLento : t.accesso.nonRiuscito)
+      setErrore(
+        esito.fraSecondi !== undefined
+          ? t.accesso.aspetta(esito.fraSecondi)
+          : esito.lento
+            ? t.accesso.troppoLento
+            : t.accesso.nonRiuscito,
+      )
       return
     }
     avanti()
@@ -40,6 +46,7 @@ export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       azione={
         <Bottone attivo={valida && !inCorso} onClick={manda}>
           {inCorso ? t.accesso.invio : t.accesso.azione}
@@ -87,11 +94,36 @@ export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
  * torna indietro da sole. Quando sono piene sei si va avanti senza toccare
  * niente — un codice a sei cifre non ha bisogno di un bottone di conferma.
  */
-export function CorpoLink({ nodo, avanti }: PropsSchermo) {
+export function CorpoLink({ nodo, verso, avanti }: PropsSchermo) {
   const { t } = useLingua()
   const { email } = useRisposte()
   const [cifre, setCifre] = useState<string[]>(['', '', '', '', '', ''])
   const [errore, setErrore] = useState('')
+  const [avviso, setAvviso] = useState('')
+  const [rimandando, setRimandando] = useState(false)
+
+  /*
+   * Rimandare la mail e' l'unica via d'uscita da questo schermo se la prima
+   * non arriva. Prima era scritto e basta: si toccava e non succedeva
+   * niente, che e' peggio di non averlo — chi lo tocca resta li' a
+   * aspettare una mail che nessuno ha rimandato.
+   */
+  async function rimanda() {
+    if (rimandando) return
+    setRimandando(true)
+    setErrore('')
+    setAvviso('')
+    const esito = await mandaCodice(email)
+    setRimandando(false)
+    if (esito.ok) {
+      setAvviso(t.linkMandato.rimandato)
+      return
+    }
+    console.error('[rimando]', esito.errore)
+    setErrore(
+      esito.fraSecondi !== undefined ? t.accesso.aspetta(esito.fraSecondi) : t.accesso.nonRiuscito,
+    )
+  }
 
   function scriviCifra(i: number, v: string) {
     const c = v.replace(/\D/g, '').slice(-1)
@@ -121,7 +153,7 @@ export function CorpoLink({ nodo, avanti }: PropsSchermo) {
   }
 
   return (
-    <Schermo nodo={nodo}>
+    <Schermo nodo={nodo} verso={verso}>
       <div className="flex h-[220px] items-center justify-center rounded-card border-[1.5px] border-line bg-veil">
         <img src={logo} alt="BAB" className="h-[82px] w-[178px]" />
       </div>
@@ -133,7 +165,12 @@ export function CorpoLink({ nodo, avanti }: PropsSchermo) {
       </div>
 
       <div className="mt-4">
-        <Rimando>{t.linkMandato.rimanda}</Rimando>
+        <Rimando onClick={() => void rimanda()}>
+          {rimandando ? t.accesso.invio : t.linkMandato.rimanda}
+        </Rimando>
+        {avviso && (
+          <p className="m-0 mt-[6px] text-center text-[13px] font-bold text-violet">{avviso}</p>
+        )}
       </div>
 
       <p className="m-0 mt-7 text-[13px] leading-[1.5] text-ink-soft">
@@ -173,10 +210,10 @@ export function CorpoLink({ nodo, avanti }: PropsSchermo) {
  * l'inglese e' gia' diviso nei tre passi. Qui c'e' l'inglese, che e' il piu'
  * recente dei due, con il paragrafo italiano tenuto sopra.
  */
-export function CorpoIntro({ nodo, avanti }: PropsSchermo) {
+export function CorpoIntro({ nodo, verso, avanti }: PropsSchermo) {
   const { t } = useLingua()
   return (
-    <Schermo nodo={nodo} azione={<Bottone onClick={avanti}>{t.cosaEBab.azione}</Bottone>}>
+    <Schermo nodo={nodo} verso={verso} azione={<Bottone onClick={avanti}>{t.cosaEBab.azione}</Bottone>}>
       <Occhiello>{t.cosaEBab.occhiello}</Occhiello>
       <Titolo>{t.cosaEBab.titolo}</Titolo>
       <Occhio>{t.cosaEBab.occhio}</Occhio>
@@ -205,6 +242,7 @@ export function CorpoIntro({ nodo, avanti }: PropsSchermo) {
 /* 14-summary — 3772:308 / 3958:853 */
 export function CorpoRiepilogo({
   nodo,
+  verso,
   avanzamento,
   avanti,
   indietro,
@@ -233,6 +271,7 @@ export function CorpoRiepilogo({
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={
@@ -266,6 +305,7 @@ export function CorpoRiepilogo({
 /* 15-consent — 3771:81 / 3958:538 */
 export function CorpoConsenso({
   nodo,
+  verso,
   avanzamento,
   avanti,
   indietro,
@@ -286,6 +326,7 @@ export function CorpoConsenso({
   return (
     <Schermo
       nodo={nodo}
+      verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}
       azione={

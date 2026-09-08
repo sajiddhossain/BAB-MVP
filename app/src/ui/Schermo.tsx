@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { Sfondo } from './Sfondo'
 import { Barra } from './Barra'
@@ -16,6 +17,7 @@ import { Barra } from './Barra'
  */
 export function Schermo({
   nodo,
+  verso = 'niente',
   avanzamento,
   indietro,
   azione,
@@ -23,11 +25,32 @@ export function Schermo({
 }: {
   /** il node-id Figma: serve a ritrovare le macchie di sfondo di questo schermo */
   nodo: string
+  /**
+   * Da che parte e' arrivato questo schermo. `niente` quando lo schermo non
+   * e' cambiato ma e' cambiato dentro — la domanda sul ciclo che si apre: li'
+   * il movimento e' quello, e un'entrata gli passerebbe sopra.
+   */
+  verso?: 'avanti' | 'indietro' | 'niente'
   avanzamento?: number
   indietro?: () => void
   azione?: ReactNode
   children: ReactNode
 }) {
+  /*
+   * Il verso si prende una volta sola, quando lo schermo nasce, e non cambia
+   * piu' finche' vive.
+   *
+   * Se lo leggessimo a ogni render, la domanda sul ciclo che si apre — dove
+   * lo schermo NON rinasce, cambia solo l'indirizzo — si vedrebbe cambiare la
+   * classe da `indietro` ad `avanti`, e cambiare nome a un'animazione la fa
+   * ripartire: l'entrata passerebbe sopra all'apertura, e si muoverebbero
+   * tutte e due insieme.
+   *
+   * Chi deve rinascere lo decide il motore con la chiave, non questo file.
+   */
+  const [entrataIniziale] = useState(verso)
+  const entrata = entrataIniziale === 'niente' ? '' : `bab-entra-${entrataIniziale}`
+
   return (
     <div className="flex min-h-dvh justify-center bg-paper">
       <div className="relative flex w-full max-w-[402px] flex-col overflow-hidden">
@@ -41,10 +64,12 @@ export function Schermo({
         <div className="relative h-11 pt-[calc(56px+env(safe-area-inset-top))] box-content">
           {avanzamento !== undefined && <Barra avanzamento={avanzamento} indietro={indietro} />}
         </div>
-        <div className="relative flex flex-1 flex-col px-[30px] pt-[70px] pb-6">{children}</div>
-        {azione && (
-          <div className="relative px-6 pb-[calc(34px+env(safe-area-inset-bottom))]">{azione}</div>
-        )}
+        <div className={`relative flex flex-1 flex-col ${entrata}`}>
+          <div className="flex flex-1 flex-col px-[30px] pt-[70px] pb-6">{children}</div>
+          {azione && (
+            <div className="px-6 pb-[calc(34px+env(safe-area-inset-bottom))]">{azione}</div>
+          )}
+        </div>
       </div>
     </div>
   )
