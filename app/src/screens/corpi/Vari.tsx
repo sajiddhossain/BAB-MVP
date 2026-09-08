@@ -31,7 +31,7 @@ export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
     // a chi legge non dice niente, a noi serve per capire cosa e' successo
     if (!esito.ok) {
       console.error('[accesso]', esito.errore)
-      setErrore(t.accesso.nonRiuscito)
+      setErrore(esito.lento ? t.accesso.troppoLento : t.accesso.nonRiuscito)
       return
     }
     avanti()

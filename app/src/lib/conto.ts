@@ -18,7 +18,17 @@ export const acceso = supabase !== null
 /** La versione del testo dei consensi che si sta accettando. */
 const VERSIONE_CONSENSI = '2026-09-draft'
 
-export type Esito = { ok: true } | { ok: false; errore: string }
+export type Esito = { ok: true } | { ok: false; errore: string; lento?: boolean }
+
+/*
+ * Quanto aspettare la mail prima di dire che non ce l'abbiamo fatta.
+ *
+ * Non e' un numero a caso: quando il servizio di posta di Supabase non
+ * risponde, la richiesta resta appesa e torna 504 dopo mezzo minuto. Mezzo
+ * minuto di "Sto mandando..." e' tempo in cui non si capisce se e' rotto, se
+ * e' lento, o se si e' sbagliato qualcosa. Dopo dodici secondi lo diciamo.
+ */
+const ATTESA_MAX = 12_000
 
 /**
  * Manda la mail con il codice a sei cifre.
@@ -36,8 +46,11 @@ export type Esito = { ok: true } | { ok: false; errore: string }
  */
 export async function mandaCodice(email: string): Promise<Esito> {
   if (!supabase) return { ok: true }
-  const { error } = await supabase.auth.signInWithOtp({ email: email.trim() })
-  return error ? { ok: false, errore: error.message } : { ok: true }
+  const invio = supabase.auth.signInWithOtp({ email: email.trim() })
+  const scaduto = new Promise<'scaduto'>((r) => setTimeout(() => r('scaduto'), ATTESA_MAX))
+  const esito = await Promise.race([invio, scaduto])
+  if (esito === 'scaduto') return { ok: false, errore: 'la posta non risponde', lento: true }
+  return esito.error ? { ok: false, errore: esito.error.message } : { ok: true }
 }
 
 /** Controlla il codice a sei cifre. Apre la sessione se e' giusto. */

@@ -48,6 +48,7 @@ const it = {
     azione: 'Mandami il codice',
     invio: 'Sto mandando…',
     nonRiuscito: 'Non siamo riusciti a mandare la mail. Riprova fra un momento.',
+    troppoLento: 'La mail ci sta mettendo troppo. Riprova fra qualche minuto.',
   },
 
   linkMandato: {
@@ -303,6 +304,7 @@ const en: typeof it = {
     azione: 'Send me the code',
     invio: 'Sending…',
     nonRiuscito: 'We could not send the email. Try again in a moment.',
+    troppoLento: 'The email is taking too long. Try again in a few minutes.',
   },
 
   linkMandato: {
