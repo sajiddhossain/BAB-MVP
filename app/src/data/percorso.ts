@@ -41,6 +41,7 @@ export type IconaLezione =
   | 'mano'
   | 'freccia-su-destra'
   | 'lucchetto'
+  | 'cerchio-allarme'
 
 /**
  * I due impaginati.
@@ -179,8 +180,10 @@ export type Passo =
    *             U1..U8 (lezione 3)
    * `trofeo`    la coppa in mezzo dentro a un alone, le due parole in due
    *             schede alte, e la percentuale accanto al progresso (lezione 4)
+   * `spunta`    la spunta grande in mezzo e le due parole in righe dentro a
+   *             una scheda sola, col pallino e la descrizione (lezione 5)
    */
-  | { tipo: 'fatto'; forma: 'stat' | 'scintilla' | 'coppa' | 'trofeo' }
+  | { tipo: 'fatto'; forma: 'stat' | 'scintilla' | 'coppa' | 'trofeo' | 'spunta' }
 
 /** Come si presenta lo scenario di uno schermo a scelta multipla. */
 export type FormaScenario =
@@ -351,6 +354,35 @@ export const PASSI: Record<number, Passo[]> = {
       cesto: [{ esca: 0 }, { parola: 'morsa' }, { esca: 1 }, { esca: 2 }],
     },
     { tipo: 'fatto', forma: 'trofeo' },
+  ],
+
+  5: [
+    { tipo: 'incontra', parola: 'pungente', icona: 'fulmine', blocchi: ['nota', 'pastiglia'] },
+    { tipo: 'incontra', parola: 'trafittivo', icona: 'cerchio-allarme', blocchi: ['accento'] },
+    {
+      tipo: 'abbina',
+      forma: 'largo',
+      righe: [{ giusta: 0 }, { giusta: 1 }, { giusta: 2 }, { giusta: 3 }],
+      parole: ['pungente', 'trafittivo', 'morsa', 'crampo'],
+      esche: 0,
+    },
+    { tipo: 'gemelle', forma: 'testo', risposte: ['pungente', 'trafittivo'], giusta: 0 },
+    /*
+     * La bandiera rossa sta qui in mezzo, e non in fondo: lo dice la barra di
+     * avanzamento del frame, che a questo punto e' piena poco piu' di meta'.
+     * E' anche l'unico posto in cui ha senso — subito dopo aver imparato a
+     * distinguere le due parole, e prima di doverlo fare su una storia vera.
+     */
+    { tipo: 'allarme', parola: 'trafittivo' },
+    /* qui le carte sono al contrario: prima la fitta, poi l'acuto */
+    { tipo: 'storia', forma: 'zona', risposte: ['trafittivo', 'pungente'], giusta: 0 },
+    { tipo: 'mossa', giusta: 'sostegno' },
+    {
+      tipo: 'frase',
+      forma: 'intro',
+      cesto: [{ esca: 0 }, { parola: 'trafittivo' }, { esca: 1 }],
+    },
+    { tipo: 'fatto', forma: 'spunta' },
   ],
 }
 

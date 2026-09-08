@@ -93,6 +93,8 @@ export type ContenutoLezione = {
     sopra?: string
     occhiello?: string
     titolo: string
+    /** la riga fra il titolo e le righe, dove c'e' */
+    intro?: string
     cesto: string
     /** la riga sotto al cesto; assente vuol dire quella di `comune` */
     aiuto?: string
@@ -719,6 +721,138 @@ const it = {
         azione: 'Torna al percorso',
       },
     },
+
+    5: {
+      incontra: [
+        {
+          occhiello: 'PAROLA 1 DI 2',
+          titolo: 'Incontra «{uno}»',
+          metafora: 'Un taglio di carta, non un livido.',
+          descrizione:
+            'È quel dolore improvviso, rapido e localizzato. Come una puntura di spillo o una scossa elettrica.',
+          blocchi: [
+            {
+              testo:
+                'Si manifesta all’improvviso, spesso legato a un movimento preciso, e di solito sparisce subito dopo.',
+            },
+            {
+              testo:
+                'Se senti un dolore «{uno}», prova a rallentare o a cambiare il movimento. Spesso basta un piccolo aggiustamento.',
+            },
+          ],
+          azione: 'Prossima parola',
+        },
+        {
+          occhiello: 'PAROLA 2 DI 2',
+          titolo: 'Incontra «{due}»',
+          metafora: 'Acuto con la forza dietro.',
+          descrizione:
+            'È un dolore intenso, profondo e penetrante. Come una pugnalata, o una fitta forte che sembra trafiggere la zona.',
+          blocchi: [
+            {
+              etichetta: 'QUAL È LA DIFFERENZA?',
+              testo:
+                '«{uno}» di solito è breve e superficiale, e svanisce in fretta.\n«{due}» è più profondo, intenso, e tende a restare.',
+            },
+          ],
+          azione: 'Facciamo pratica',
+        },
+      ],
+
+      abbina: {
+        occhiello: 'COLLEGA LE PAROLE',
+        titolo: 'Abbina la sensazione',
+        intro: 'Collega ogni descrizione alla parola giusta della lingua del corpo:',
+        cesto: 'TRASCINA LE PAROLE',
+        righe: [
+          'Un ago improvviso che punge',
+          'Una lama profonda che trafigge',
+          'Una morsa costante che stringe',
+          'Un muscolo teso e dolorante',
+        ],
+        esche: [],
+        azione: 'Verifica',
+      },
+
+      gemelle: {
+        occhiello: 'FALSI AMICI',
+        titolo: 'Occhio alla differenza',
+        badge: 'Scenario',
+        scenario: 'Ti storta improvvisamente la caviglia.',
+        domanda:
+          'Senti un flash doloroso e istantaneo che sparisce appena rimetti dritto il piede. È:',
+        glosse: ['Istantaneo, superficiale, passa subito.', 'Profondo, persistente, come una fitta che continua.'],
+        etichette: ['Dolore «{uno}»', 'Dolore «{due}»'],
+        esito:
+          '«{uno}» di solito ti dice che hai fatto un movimento azzardato sul momento; «{due}» indica qualcosa di più profondo.',
+        azione: 'Verifica',
+      },
+
+      allarme: {
+        occhiello: 'ATTENZIONE',
+        titolo: 'Segnale d’allarme',
+        intestazione: 'Bandiera rossa: «{due}»',
+        testo:
+          'Se il dolore che senti è davvero «{due}», e non sparisce nel giro di pochissimi minuti, o torna a ogni tentativo di muoverti…',
+        dafare:
+          'Fermati subito e dillo al tuo allenatore, al tuo medico o a un genitore.',
+        nota:
+          'Un segnale così vuol dire che insistere potrebbe fare un danno vero. Imparare a fermarsi fa parte dell’allenamento.',
+        azione: 'Ho capito',
+      },
+
+      storia: {
+        occhiello: 'STORIA DI KATIA',
+        titolo: 'Cosa sente Katia?',
+        badge: 'FASE CICLO: OVULAZIONE',
+        scenario:
+          'Katia sta correndo da 15 minuti. All’improvviso sente un dolore profondo al ginocchio destro, come se qualcosa lo trafiggesse dall’interno a ogni passo. Rallenta, ma la fitta non accenna a passare.',
+        domanda: 'Scegli la definizione:',
+        etichette: ['«{due}» (che trafigge)', '«{uno}» (acuto e di passaggio)'],
+        esito:
+          'È un dolore «{due}» che non passa: la cosa giusta da fare è fermarsi, per non farsi male davvero.',
+        azione: 'Verifica',
+      },
+
+      mossa: {
+        occhiello: 'DECIDERE L’AZIONE',
+        titolo: 'Cosa dovrebbe fare?',
+        badge: 'Scenario',
+        scenario:
+          'Katia sente un dolore «{due}» al ginocchio destro mentre corre, e non passa neanche rallentando.',
+        etichette: [
+          'Stringere i denti e finire la corsa programmata',
+          'Continuare camminando, senza correre',
+          'Fermarsi subito e avvertire allenatore o genitori',
+        ],
+        scelte: [],
+        esito:
+          'Un dolore «{due}» che non passa non si negozia: si smette, e lo si dice a qualcuno.',
+        azione: 'Verifica',
+      },
+
+      frase: {
+        occhiello: 'COMPILAZIONE CHECK-IN',
+        titolo: 'Scrivi il tuo messaggio',
+        intro: 'Completa il report per l’allenatore dicendo esattamente cosa senti:',
+        cesto: 'TRASCINA LE PAROLE',
+        modello:
+          'Oggi durante la sessione ho sentito un dolore al {0}. Era una sensazione di tipo {trafittivo}, quindi ho deciso di {2} per sicurezza.',
+        esche: ['ginocchio destro', 'fermarmi subito'],
+        azione: 'Salva & finisci',
+      },
+
+      fatto: {
+        titolo: 'Lezione 5 completata!',
+        sotto:
+          'Hai imparato a distinguere il dolore «{uno}» da quello «{due}», e quando far scattare l’allarme.',
+        etichetta: 'NUOVE PAROLE SBLOCCATE',
+        righe: ['acuto improvviso', 'fitta penetrante'],
+        etichettaProgresso: 'PROGRESSO TOTALE',
+        conteggio: '{fatte} / {tutte} parole sbloccate',
+        azione: 'Torna al percorso',
+      },
+    },
   } as Record<number, ContenutoLezione>,
 }
 
@@ -1179,6 +1313,128 @@ const en: typeof it = {
         sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
         righe: ['A fist clenching and unclenching', "A hand that won't let go"],
         etichettaProgresso: 'TOTAL PROGRESS',
+        conteggio: '{fatte} / {tutte} words unlocked',
+        azione: 'Back to the path',
+      },
+    },
+
+    5: {
+      incontra: [
+        {
+          occhiello: 'WORD 1 OF 2',
+          titolo: '{uno}',
+          metafora: 'A paper cut, not a bruise.',
+          descrizione:
+            'Sudden, precise, and you can point at it with one finger. It arrives at a specific moment in a movement.',
+          blocchi: [
+            { testo: 'Sore highlights a whole page. Sharp underlines one word.' },
+            {
+              pastiglia: 'Calibrate — change the movement, change the load, check again',
+              testo:
+                'Usually a structure — tendon, joint edge, bone — rather than the belly of a muscle.',
+            },
+          ],
+          azione: 'Next word',
+        },
+        {
+          occhiello: 'WORD 2 OF 2',
+          titolo: '{due}',
+          metafora: 'Sharp with force behind it.',
+          descrizione:
+            "It makes you catch your breath, flinch, or stop mid-rep before you've decided to.",
+          blocchi: [
+            {
+              etichetta: 'THE SPLIT',
+              testo:
+                "{uno} makes you change what you're doing.\n{due} makes you stop doing it.",
+            },
+          ],
+          azione: "Let's practise",
+        },
+      ],
+
+      abbina: {
+        occhiello: 'MATCH',
+        titolo: 'Put the word on its picture.',
+        intro: 'Tap a word, then tap where it belongs.',
+        cesto: 'WORD BANK',
+        righe: [
+          'A paper cut, not a bruise',
+          'Sharp with force behind it',
+          "A hand that won't let go",
+          'A fist clenching and unclenching',
+        ],
+        esche: [],
+        azione: 'Check',
+      },
+
+      gemelle: {
+        occhiello: 'FALSE FRIENDS',
+        titolo: 'Which one is this?',
+        badge: 'SCENARIO',
+        scenario:
+          'Every time you land on your right leg, one exact spot on the front of your knee bites. You can cover it with one fingertip.',
+        domanda: 'Which signal fits this best?',
+        glosse: ['a paper cut, not a bruise', 'sharp with force behind it'],
+        esito: 'One finger or a whole hand? One finger = {uno}.',
+        azione: 'Check',
+      },
+
+      allarme: {
+        occhiello: 'FLAG',
+        titolo: 'Tell someone today.',
+        intestazione: 'Red flag: {due}',
+        testo:
+          "Your right hamstring went ping mid-sprint and stopped you before you decided to. That's a {due} signal — it's not something to warm out or finish the session on.",
+        dafare:
+          "This isn't a diagnosis and it isn't drama. It's a signal that needs a second pair of eyes — and you noticing it is the skill working.",
+        nota: 'I’ll tell one of them before my next session.',
+        azione: 'Got it',
+      },
+
+      storia: {
+        occhiello: 'REAL LIFE',
+        titolo: 'Name it.',
+        badge: 'TRAINING',
+        scenario:
+          "Third sprint. Your right hamstring goes ping and you've stopped before you decided to stop.",
+        domanda: 'Which word?',
+        esito: 'Did your body stop before your brain did? That’s {due}.',
+        azione: 'Check',
+      },
+
+      mossa: {
+        occhiello: 'YOUR MOVE',
+        titolo: 'Same day. What do you do?',
+        badge: 'YOUR MOVE',
+        scenario:
+          "Third sprint. Your right hamstring goes ping and you've stopped before you decided to stop. You called it {due}.",
+        scelte: [
+          'Train it as planned',
+          'Adjust something, then check it again',
+          'Tell someone — coach, physio, parent, doctor',
+        ],
+        esito:
+          'Your body stopped before your brain did. That’s a flag, not drama. Stop the session and tell someone today.',
+        azione: 'Check',
+      },
+
+      frase: {
+        occhiello: 'SAY IT OUT LOUD',
+        titolo: 'Build the sentence.',
+        intro: 'Knowing the word only counts if you can hand it to someone. Tap each gap.',
+        cesto: 'PICK A WORD',
+        modello: "My {0} feels {trafittivo} {2}, it's 7/10, since just now.",
+        esche: ['right hamstring', 'when I sprint'],
+        azione: 'Finish lesson',
+      },
+
+      fatto: {
+        titolo: 'Lesson 5 done.',
+        sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
+        etichetta: 'WORDS UNLOCKED',
+        righe: ['A paper cut, not a bruise.', 'Sharp with force behind it.'],
+        etichettaProgresso: 'YOUR PROGRESS',
         conteggio: '{fatte} / {tutte} words unlocked',
         azione: 'Back to the path',
       },

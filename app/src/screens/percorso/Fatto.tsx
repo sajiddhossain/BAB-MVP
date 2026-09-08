@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Guscio } from '../../ui/percorso/Guscio'
-import { icona } from '../../ui/percorso/pezzi'
+import { Riga, Scheda, icona } from '../../ui/percorso/pezzi'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
 import { finisciLezione, useProgresso } from '../../lib/percorso'
@@ -10,6 +10,7 @@ import type { PropsEsercizio } from './tipi'
 import medaglia from '../../assets/percorso/medaglia.svg'
 import scintilla from '../../assets/percorso/scintilla.svg'
 import coppa from '../../assets/percorso/coppa.svg'
+import spuntaGrande from '../../assets/percorso/spunta-grande.svg'
 
 /** Le tinte dei cerchietti delle due parole, nell'ordine del disegno. */
 const TINTE = ['#ffd1c1', '#e9d5ff']
@@ -81,6 +82,11 @@ export function Fatto({
           <img src={coppa} alt="" aria-hidden className="size-8" />
         </span>
       )}
+      {passo.forma === 'spunta' && (
+        <div className="mx-auto mt-[6px] flex size-[120px] items-center justify-center">
+          <img src={spuntaGrande} alt="" aria-hidden className="size-[80px]" />
+        </div>
+      )}
       {passo.forma === 'trofeo' && (
         <div className="relative mx-auto mt-[10px] flex size-[140px] items-center justify-center">
           {/* l'alone: e' un cerchio sfumato che sta dietro alla coppa, non un bordo */}
@@ -95,7 +101,7 @@ export function Fatto({
 
       <h1
         className={`bab-display m-0 text-[28px] leading-[34px] font-bold tracking-[-0.56px] text-ink ${
-          passo.forma === 'coppa' ? 'mt-[26px]' : 'mt-5 text-center'
+          passo.forma === 'coppa' || passo.forma === 'spunta' ? 'mt-[26px]' : 'mt-5 text-center'
         }`}
       >
         {t.titolo}
@@ -114,7 +120,11 @@ export function Fatto({
       {t.sotto && (
         <p
           className={`m-0 text-[15px] leading-[1.4] text-ink-soft ${
-            passo.forma === 'coppa' ? 'mt-4' : passo.forma === 'trofeo' ? 'mt-[6px]' : 'mt-4 text-center'
+            passo.forma === 'coppa' || passo.forma === 'spunta'
+              ? 'mt-4'
+              : passo.forma === 'trofeo'
+                ? 'mt-[6px]'
+                : 'mt-4 text-center'
           }`}
         >
           {riempi(t.sotto, { ...numeri, uno: nome(incontri, 0, ts), due: nome(incontri, 1, ts) })}
@@ -124,7 +134,9 @@ export function Fatto({
       {t.etichetta && passo.forma !== 'trofeo' && (
         <p
           className={`m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla ${
-            passo.forma === 'coppa' ? 'mt-[30px]' : 'mt-[26px] text-center'
+            passo.forma === 'coppa' || passo.forma === 'spunta'
+              ? 'mt-[30px]'
+              : 'mt-[26px] text-center'
           }`}
         >
           {t.etichetta}
@@ -153,6 +165,37 @@ export function Fatto({
               </p>
             </div>
           ))}
+        </div>
+      )}
+
+      {/*
+        Nella forma `spunta` le due parole stanno in una scheda sola, una per
+        riga: il pallino colorato, il nome, e la descrizione a destra.
+      */}
+      {passo.forma === 'spunta' && (
+        <div className="mt-[14px]">
+          <Scheda riga="linear-gradient(to bottom, #ffd1c1, var(--color-lime))">
+            <div className="px-5 py-[18px] pl-[26px]">
+              {incontri.map((p, i) => (
+                <div key={p.parola}>
+                  {i > 0 && <Riga />}
+                  <div className="flex items-center gap-3">
+                    <span
+                      aria-hidden
+                      className="size-3 shrink-0 rounded-full"
+                      style={{ background: TINTE[i % TINTE.length] }}
+                    />
+                    <span className="text-[15px] font-bold text-ink">
+                      {ts.foglio.parole[p.parola] ?? p.parola}
+                    </span>
+                    <span className="ml-auto text-right text-[13px] leading-[1.3] text-ink-soft">
+                      {t.righe?.[i]}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Scheda>
         </div>
       )}
 
@@ -197,7 +240,9 @@ export function Fatto({
           passo.forma === 'stat'
             ? 'mt-5 flex items-center gap-3'
             : `border-[0.5px] border-[rgba(209,201,196,0.5)] bg-surface pl-[30px] shadow-[0px_6px_20px_0px_rgba(0,0,0,0.04)] ${
-                passo.forma === 'trofeo' ? 'mt-[30px] flex items-center gap-3' : 'mt-[26px]'
+                passo.forma === 'trofeo' || passo.forma === 'spunta'
+                  ? 'mt-[26px] flex items-center gap-3'
+                  : 'mt-[26px]'
               }`
         }`}
         style={
@@ -264,7 +309,7 @@ export function Fatto({
           )}
         </span>
 
-        {(passo.forma === 'stat' || passo.forma === 'trofeo') && (
+        {(passo.forma === 'stat' || passo.forma === 'trofeo' || passo.forma === 'spunta') && (
           <span
             className={`shrink-0 rounded-pill px-3 py-[6px] text-[13px] font-bold ${
               passo.forma === 'stat' ? 'bg-surface text-[#2b662b]' : 'bg-chip text-lilla'

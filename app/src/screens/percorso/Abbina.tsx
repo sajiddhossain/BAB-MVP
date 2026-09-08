@@ -97,7 +97,11 @@ export function Abbina({
         <Testa sopra={t.sopra} occhiello={t.occhiello ?? ''} titolo={t.titolo} />
       )}
 
-      <div className={`flex flex-col gap-3 ${icone ? 'mt-[21px]' : 'mt-[30px]'}`}>
+      {t.intro && (
+        <p className="m-0 mt-4 text-[15px] leading-[1.4] text-ink-soft">{t.intro}</p>
+      )}
+
+      <div className={`flex flex-col gap-3 ${t.intro ? 'mt-[22px]' : icone ? 'mt-[21px]' : 'mt-[30px]'}`}>
         {passo.righe.map((riga, i) => {
           const n = g.posato[i]
           const tinta = TINTE_PASTIGLIA[i % TINTE_PASTIGLIA.length]
