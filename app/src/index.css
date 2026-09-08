@@ -89,3 +89,31 @@ textarea {
   font-family: var(--font-display);
   font-variation-settings: 'opsz' 14, 'wdth' 100;
 }
+
+/*
+ * Le due meta' di una dissolvenza. Servono dove un elemento nasce gia' in
+ * movimento: una transizione non parte, perche' non c'e' un valore di prima
+ * da cui muoversi.
+ */
+@keyframes bab-svanisce {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes bab-affiora {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.bab-svanisce {
+  animation: bab-svanisce 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.bab-affiora {
+  animation: bab-affiora 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Chi ha chiesto meno movimento non lo vede: le cose ci sono, non si muovono. */
+@media (prefers-reduced-motion: reduce) {
+  .bab-svanisce,
+  .bab-affiora {
+    animation-duration: 1ms;
+  }
+}

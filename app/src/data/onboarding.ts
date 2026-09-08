@@ -24,7 +24,6 @@ export type Corpo =
   | 'gare'
   | 'cicloSiNo'
   | 'cicloDate'
-  | 'primoCiclo'
   | 'contraccettivo'
   | 'riepilogo'
   | 'consenso'
@@ -82,13 +81,18 @@ export const PERCORSO: Passo[] = [
   { id: 'gare', corpo: 'gare', nodo: { it: '3772:223', en: '3958:745' } },
 
   { id: 'ciclo', corpo: 'cicloSiNo', nodo: { it: '3772:241', en: '3958:769' } },
-  { id: 'ciclo-date', corpo: 'cicloDate', nodo: { it: '3772:261', en: '3958:797' }, salta: haCiclo },
   /*
+   * Stesso corpo di `ciclo`, non un altro: 3907:2 e' quel frame li' con la
+   * prima carta aperta. Due voci nel percorso e un componente solo — cosi'
+   * l'indirizzo cambia (e il tasto indietro richiude) ma le due carte che
+   * restano scorrono in giu' invece di rinascere.
+   *
    * 13-cycle-age (3871:2) chiedeva la stessa cosa come numero di anni. Resta
    * in Figma ma non nel percorso: mese e anno sono piu' facili da rispondere
    * di un'eta' che va ricordata a mente.
    */
-  { id: 'primo-ciclo', corpo: 'primoCiclo', nodo: { it: '3907:2', en: '3958:1308' }, salta: haCiclo },
+  { id: 'primo-ciclo', corpo: 'cicloSiNo', nodo: { it: '3907:2', en: '3958:1308' }, salta: haCiclo },
+  { id: 'ciclo-date', corpo: 'cicloDate', nodo: { it: '3772:261', en: '3958:797' }, salta: haCiclo },
   {
     id: 'contraccettivo',
     corpo: 'contraccettivo',

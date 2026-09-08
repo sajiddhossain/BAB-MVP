@@ -7,7 +7,7 @@ import { Nota } from '../../ui/Nota'
 import { Casella, Rimando } from '../../ui/Scelte'
 import { useLingua } from '../../lib/lingua'
 import { scrivi, useRisposte } from '../../lib/risposte'
-import { mandaLink, verificaCodice } from '../../lib/conto'
+import { mandaCodice, verificaCodice } from '../../lib/conto'
 import type { Risposte } from '../../lib/risposte'
 import { SPORT } from '../../data/sport'
 import type { PropsSchermo } from '../tipi'
@@ -25,7 +25,7 @@ export function CorpoAccesso({ nodo, avanti }: PropsSchermo) {
   async function manda() {
     setInCorso(true)
     setErrore('')
-    const esito = await mandaLink(email)
+    const esito = await mandaCodice(email)
     setInCorso(false)
     // il messaggio vero di Supabase finisce nella console, non a schermo:
     // a chi legge non dice niente, a noi serve per capire cosa e' successo

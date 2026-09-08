@@ -51,12 +51,30 @@ funziona tutta ma resta nel telefono, e la schermata finale lo dice.
 
 1. Nel progetto Supabase, SQL Editor → incolla e lancia `supabase/schema.sql`.
    È idempotente: si può rilanciare.
-2. Authentication → Providers → Email: acceso, con "Confirm email" attivo.
-   Il link e il codice a sei cifre arrivano dalla stessa mail.
-3. Authentication → URL Configuration → Redirect URLs: aggiungi
-   `<indirizzo dell'app>/onboarding/intro`.
+2. Authentication → Sign In / Providers → Email: acceso, e in cima alla
+   pagina "Allow new users to sign up" acceso. Email OTP length: 6.
+3. **Authentication → Emails**: nei due modelli `Magic Link` e
+   `Confirm signup` sostituisci `{{ .ConfirmationURL }}` con `{{ .Token }}`.
+   Senza questo passaggio nella mail arriva ancora un link, e l'app non lo
+   aspetta piu' (vedi sotto).
 4. Copia `.env.example` in `.env` e metti `VITE_SUPABASE_URL` e
    `VITE_SUPABASE_ANON_KEY` (Project Settings → API).
+
+Nessun Redirect URL da configurare: senza link non c'e' niente da far
+rientrare.
+
+### Perche' il codice e non il link
+
+Si entra solo col codice a sei cifre. La mail si apre quasi sempre su un
+dispositivo diverso da quello in cui si sta usando la app — il computer di
+casa, il telefono di un genitore — e il link aprirebbe la sessione li',
+lasciando fuori la app che si aveva in mano. Il codice si porta a mano da
+dove si legge a dove si sta, e funziona anche quando la mail si guarda su un
+altro schermo.
+
+Nel codice questo e' `mandaCodice`, che chiama `signInWithOtp` **senza**
+`emailRedirectTo`: senza indirizzo di rientro Supabase non ha un link da
+mandare. L'altra meta' e' il punto 3 qui sopra, che sta nel pannello.
 
 ### Dove finisce cosa
 

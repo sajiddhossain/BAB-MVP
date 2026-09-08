@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import giu from '../assets/chevron-down.svg'
 
 /**
  * Una fila di pastiglie di cui se ne accende una: le fasce orarie, il si'/no.
@@ -56,7 +57,7 @@ export function Selettore({
       <select
         value={valore ?? ''}
         onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
-        className={`h-12 w-full appearance-none rounded-field border-[1.5px] border-line bg-surface px-[14.5px] pr-10 text-[15px] outline-none focus:border-violet ${
+        className={`h-12 w-full appearance-none rounded-chip border-[1.5px] border-[rgba(209,201,196,0.7)] bg-surface px-[14.5px] pr-10 text-[15px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.04)] outline-none focus:border-violet ${
           valore === null ? 'text-ink-mute' : 'text-ink'
         }`}
       >
@@ -67,7 +68,12 @@ export function Selettore({
           </option>
         ))}
       </select>
-      <span className="pointer-events-none absolute right-[14px] top-1/2 -mt-[3px] block h-0 w-0 border-x-[5px] border-t-[6px] border-x-transparent border-t-ink-soft" />
+      <img
+        src={giu}
+        alt=""
+        aria-hidden
+        className="pointer-events-none absolute right-[14.5px] top-1/2 size-4 -translate-y-1/2"
+      />
     </div>
   )
 }

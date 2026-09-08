@@ -20,13 +20,23 @@ const VERSIONE_CONSENSI = '2026-09-draft'
 
 export type Esito = { ok: true } | { ok: false; errore: string }
 
-/** Manda la mail con il link e il codice a sei cifre. */
-export async function mandaLink(email: string): Promise<Esito> {
+/**
+ * Manda la mail con il codice a sei cifre.
+ *
+ * Niente `emailRedirectTo`: senza un indirizzo di rientro Supabase non ha piu'
+ * un link da far aprire, e resta solo il codice. Perche' nella mail arrivi
+ * davvero il codice e non il link vanno cambiati i due modelli di mail —
+ * "Magic Link" e "Confirm signup" — mettendoci `{{ .Token }}` al posto di
+ * `{{ .ConfirmationURL }}`. Questo qui e' meta' del lavoro; l'altra meta' sta
+ * nel pannello, ed e' scritta nel README.
+ *
+ * Il codice e' meglio del link perche' la mail spesso si apre su un altro
+ * dispositivo: il link aprirebbe la sessione li' invece che sul telefono in
+ * mano, e la ragazza si ritroverebbe fuori dalla app che stava usando.
+ */
+export async function mandaCodice(email: string): Promise<Esito> {
   if (!supabase) return { ok: true }
-  const { error } = await supabase.auth.signInWithOtp({
-    email: email.trim(),
-    options: { emailRedirectTo: `${location.origin}/onboarding/intro` },
-  })
+  const { error } = await supabase.auth.signInWithOtp({ email: email.trim() })
   return error ? { ok: false, errore: error.message } : { ok: true }
 }
 

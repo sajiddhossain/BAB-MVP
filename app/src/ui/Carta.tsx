@@ -12,11 +12,19 @@ export function Carta({
   titolo,
   sotto,
   scelta,
+  striscia = 'sopra',
   onClick,
 }: {
   titolo: ReactNode
   sotto?: ReactNode
   scelta?: boolean
+  /**
+   * Da che parte sta la riga di colore. Finche' non ha scelto e' in cima a
+   * tutte le carte; quando una scelta c'e', le carte che restano la portano
+   * di lato — e' cosi' che nel disegno si distingue "ancora da decidere" da
+   * "puoi ancora cambiare idea".
+   */
+  striscia?: 'sopra' | 'lato'
   onClick?: () => void
 }) {
   return (
@@ -30,7 +38,11 @@ export function Carta({
       style={{ boxShadow: '0px 4px 8px 0px rgba(0,0,0,0.06)' }}
     >
       <span
-        className="absolute inset-x-0 top-0 block h-1"
+        className={
+          striscia === 'lato'
+            ? 'absolute inset-y-0 left-0 block w-[6px]'
+            : 'absolute inset-x-0 top-0 block h-1'
+        }
         style={{ background: scelta ? 'var(--color-lime)' : 'rgba(16,185,129,0.6)' }}
       />
       <span className="block text-[15px] font-bold text-ink">{titolo}</span>

@@ -17,6 +17,10 @@
 
 /** Gli schermi in cui il frame inglese di Figma contiene ancora l'italiano. */
 export const DA_RIVEDERE = [
+  // i due schermi dell'accesso: in Figma parlano di un link, ma il link non
+  // esiste piu' — si entra solo col codice a sei cifre
+  '01-auth-login',
+  '02-auth-link-sent',
   '11-cycle-question',
   '12-cycle-dates',
   '13b-first-period-date',
@@ -37,11 +41,11 @@ const it = {
   accesso: {
     occhiello: 'ACCESSO',
     titolo: 'Entra in BAB',
-    occhio: 'Inserisci la tua mail e riceverai subito un link per attivare BAB.',
+    occhio: 'Inserisci la tua mail e ti mandiamo subito un codice per attivare BAB.',
     nota: 'Siamo felici che tu sia qui 🎉',
     etichetta: 'LA TUA EMAIL',
     segnaposto: 'nome@esempio.it',
-    azione: 'Mandami il link',
+    azione: 'Mandami il codice',
     invio: 'Sto mandando…',
     nonRiuscito: 'Non siamo riusciti a mandare la mail. Riprova fra un momento.',
   },
@@ -50,10 +54,9 @@ const it = {
     occhiello: 'ACCESSO',
     titolo: 'Guarda la posta',
     occhio: (mail: string) =>
-      `Abbiamo mandato un link a ${mail}. Aprilo da questo telefono ed è fatta.`,
+      `Abbiamo mandato un codice a ${mail}. Scrivilo qui sotto ed è fatta.`,
     rimanda: 'Non è arrivato? Rimandalo',
-    spiegaCodice:
-      'Il link non si apre dove vuoi tu? Puoi usare il codice a 6 cifre che trovi nella mail.',
+    spiegaCodice: 'Se non lo trovi, guarda nella posta indesiderata. Il codice vale un\'ora.',
     etichettaCodice: 'CODICE',
     codiceSbagliato: 'Questo codice non va. Controlla la mail.',
   },
@@ -293,11 +296,11 @@ const en: typeof it = {
   accesso: {
     occhiello: 'ACCESS',
     titolo: 'Enter BAB',
-    occhio: 'Enter your email and you will immediately receive a link to activate BAB.',
+    occhio: 'Enter your email and we will send you a code to activate BAB right away.',
     nota: 'We are happy to have you here 🎉',
     etichetta: 'YOUR EMAIL',
     segnaposto: 'name@example.com',
-    azione: 'Send me the link',
+    azione: 'Send me the code',
     invio: 'Sending…',
     nonRiuscito: 'We could not send the email. Try again in a moment.',
   },
@@ -306,10 +309,9 @@ const en: typeof it = {
     occhiello: 'ACCESS',
     titolo: 'Check your inbox',
     occhio: (mail: string) =>
-      `We have sent a link to ${mail}. Open it from this phone and you're all set.`,
+      `We have sent a code to ${mail}. Type it in below and you're all set.`,
     rimanda: 'Did it not arrive? Resend it.',
-    spiegaCodice:
-      'Is the link not opening where you want it to? You can use the 6-digit code found in the email.',
+    spiegaCodice: 'If you cannot find it, check your spam folder. The code lasts an hour.',
     etichettaCodice: 'CODE',
     codiceSbagliato: 'That code does not work. Check the email.',
   },

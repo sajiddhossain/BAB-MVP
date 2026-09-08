@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ComponentType } from 'react'
-import { useNavigate, useParams, Navigate } from 'react-router-dom'
-import { percorsoVisibile } from '../data/onboarding'
+import { useNavigate, useParams } from 'react-router-dom'
+import { PERCORSO, percorsoVisibile } from '../data/onboarding'
 import type { Corpo } from '../data/onboarding'
 import { useLingua } from '../lib/lingua'
 import { salvaOnboarding } from '../lib/conto'
@@ -18,7 +18,6 @@ import {
 import {
   CorpoCicloSiNo,
   CorpoCicloDate,
-  CorpoPrimoCiclo,
   CorpoContraccettivo,
 } from './corpi/Ciclo'
 import {
@@ -41,7 +40,6 @@ const CORPI: Record<Corpo, ComponentType<PropsSchermo>> = {
   gare: CorpoGare,
   cicloSiNo: CorpoCicloSiNo,
   cicloDate: CorpoCicloDate,
-  primoCiclo: CorpoPrimoCiclo,
   contraccettivo: CorpoContraccettivo,
   riepilogo: CorpoRiepilogo,
   consenso: CorpoConsenso,
@@ -67,10 +65,34 @@ export function Onboarding() {
   const [nonSalvato, setNonSalvato] = useState(false)
 
   const percorso = percorsoVisibile(risposte)
-  const i = percorso.findIndex((p) => p.id === id)
-  if (i === -1) return <Navigate to={`/onboarding/${percorso[0].id}`} replace />
+  const passo = PERCORSO.find((p) => p.id === id)
+  const visibile = passo !== undefined && percorso.includes(passo)
 
-  const passo = percorso[i]
+  /*
+   * Il rimando a uno schermo valido sta qui e non nel render.
+   *
+   * Rispondendo si cambia il percorso, e puo' capitare di far sparire lo
+   * schermo su cui si e' — cambiare idea sul ciclo mentre il modulo del primo
+   * ciclo e' aperto. Se il rimando fosse nel render partirebbe in quel
+   * momento, prima che la navigazione decisa dalla risposta arrivi, e
+   * riporterebbe all'inizio dell'onboarding invece che avanti.
+   *
+   * Da qui invece calcola la stessa cosa che calcola `avanti` — il primo
+   * schermo che si vede ancora, da qui in poi — quindi anche se partono tutti
+   * e due finiscono nello stesso posto.
+   */
+  useEffect(() => {
+    if (!passo) {
+      vai('/onboarding/accesso', { replace: true })
+      return
+    }
+    if (visibile) return
+    const da = PERCORSO.indexOf(passo)
+    const dopo = PERCORSO.slice(da + 1).find((p) => percorso.includes(p))
+    vai(dopo ? `/onboarding/${dopo.id}` : '/casa', { replace: true })
+  })
+
+  if (!passo) return null
 
   // l'avanzamento conta solo gli schermi del percorso vero: accesso, codice e
   // presentazione vengono prima, e li' la barra non c'e' proprio
@@ -83,8 +105,15 @@ export function Onboarding() {
     // ancora quello di prima — e sono proprio quelle risposte a decidere
     // quale schermo viene dopo
     const aggiornato = percorsoVisibile(tutte())
-    const qui = aggiornato.findIndex((p) => p.id === passo.id)
-    const prossimo = aggiornato[qui + 1]
+    /*
+     * Il prossimo si cerca scorrendo il percorso INTERO da dove siamo, e
+     * prendendo il primo che con le risposte nuove si vede ancora. Cercarlo
+     * dentro `aggiornato` non basta: se la risposta appena data ha fatto
+     * sparire lo schermo su cui siamo — rispondere "non ancora" mentre si e'
+     * sul modulo del primo ciclo — li' dentro non ci saremmo piu'.
+     */
+    const da = PERCORSO.indexOf(passo!)
+    const prossimo = PERCORSO.slice(da + 1).find((p) => aggiornato.includes(p))
 
     if (prossimo) {
       vai(`/onboarding/${prossimo.id}`)
@@ -118,7 +147,7 @@ export function Onboarding() {
       avanti={() => void avanti()}
       salvando={salvando}
       erroreSalvataggio={nonSalvato}
-      indietro={i > 0 ? () => vai(-1) : undefined}
+      indietro={percorso.indexOf(passo) > 0 ? () => vai(-1) : undefined}
     />
   )
 }

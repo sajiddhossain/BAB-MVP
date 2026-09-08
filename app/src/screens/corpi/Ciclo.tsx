@@ -1,5 +1,6 @@
 import { Schermo } from '../../ui/Schermo'
 import { Occhiello, Titolo, Occhio, Gruppo } from '../../ui/Testo'
+import { Apri } from '../../ui/Apri'
 import { CampoData } from '../../ui/Campo'
 import { Bottone } from '../../ui/Bottone'
 import { Carta, Carte } from '../../ui/Carta'
@@ -12,35 +13,116 @@ import type { PropsSchermo } from '../tipi'
 const STACCO = 'mt-[52px]'
 
 /*
- * 11-cycle-question — 3772:241 / 3958:769
+ * 11-cycle-question + 13b-first-period-date — 3772:241 / 3958:769 e 3907:2
  *
- * Non ha bottone: si tocca una carta e si va avanti. E' l'unica domanda
- * dell'onboarding senza "Continua", ed e' cosi' anche nel disegno — il frame
- * non ha il cta-button.
+ * Sono un frame solo, non due schermi: in 3907:2 le altre due carte sono
+ * ancora li' sotto, scese di 70px, e la prima si e' aperta nel modulo del
+ * mese e dell'anno. Per questo qui c'e' un componente solo che si apre,
+ * invece di due schermi che si sostituiscono — sostituendoli, le due carte
+ * che restano ripartirebbero da capo invece di scorrere in giu'.
+ *
+ * L'indirizzo pero' resta diverso (`ciclo` e `primo-ciclo`): cosi' il tasto
+ * indietro del telefono richiude il modulo invece di uscire dalla domanda, e
+ * la barra dell'avanzamento sale, come sale in Figma fra i due frame.
+ *
+ * Chiusa non ha bottone: si tocca una carta e si va. E' l'unica domanda
+ * dell'onboarding senza "Continua", ed e' cosi' anche nel disegno.
  */
-export function CorpoCicloSiNo({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
+export function CorpoCicloSiNo({ passo, nodo, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
-  const { ciclo } = useRisposte()
+  const { ciclo, primoCicloMese, primoCicloAnno } = useRisposte()
+  const aperto = passo.id === 'primo-ciclo'
+
+  const oggi = new Date().getFullYear()
+  const anni = Array.from({ length: 20 }, (_, i) => oggi - i)
+
+  function rispondi(id: string) {
+    scrivi({ ciclo: id as Risposte['ciclo'] })
+    avanti()
+  }
+
+  const altre = t.cicloSiNo.scelte.filter((s) => s.id !== 'si')
+
   return (
-    <Schermo nodo={nodo} avanzamento={avanzamento} indietro={indietro}>
+    <Schermo
+      nodo={nodo}
+      avanzamento={avanzamento}
+      indietro={indietro}
+      azione={
+        aperto ? (
+          <Bottone attivo={primoCicloAnno !== null} onClick={avanti}>
+            {t.comune.continua}
+          </Bottone>
+        ) : undefined
+      }
+    >
       <Occhiello>{t.cicloSiNo.occhiello}</Occhiello>
-      <Titolo>{t.cicloSiNo.titolo}</Titolo>
-      <div className="mt-[68px]">
-        <Carte>
-          {t.cicloSiNo.scelte.map((s) => (
-            <Carta
-              key={s.id}
-              titolo={s.titolo}
-              sotto={s.sotto}
-              scelta={ciclo === s.id}
-              onClick={() => {
-                scrivi({ ciclo: s.id as Risposte['ciclo'] })
-                avanti()
-              }}
+      {/*
+        Le due domande stanno tutte e due nel titolo, una aperta e una chiusa.
+        Scambiando solo il testo il titolo passerebbe da una riga a due di
+        scatto, e tutto quello che sta sotto salterebbe di 40px nel momento
+        esatto in cui comincia a scorrere.
+      */}
+      <Titolo>
+        <Apri aperto={!aperto} dentroTesto>
+          {t.cicloSiNo.titolo}
+        </Apri>
+        <Apri aperto={aperto} dentroTesto>
+          {t.primoCiclo.titolo}
+        </Apri>
+      </Titolo>
+
+      {/* quello che compare aprendo: la spiegazione e i due menu */}
+      <Apri aperto={aperto}>
+        <div className="pt-[10px]">
+          <Occhio>{t.primoCiclo.occhio}</Occhio>
+        </div>
+        <div className="mt-9 flex flex-col gap-3">
+          <Gruppo etichetta={t.primoCiclo.mese}>
+            <Selettore
+              valore={primoCicloMese}
+              onChange={(v) => scrivi({ primoCicloMese: v })}
+              segnaposto={t.primoCiclo.scegliMese}
+              voci={t.mesi.map((testo, i) => ({ valore: i, testo }))}
             />
-          ))}
-        </Carte>
-      </div>
+          </Gruppo>
+          <Gruppo etichetta={t.primoCiclo.anno}>
+            <Selettore
+              valore={primoCicloAnno}
+              onChange={(v) => scrivi({ primoCicloAnno: v })}
+              segnaposto={t.primoCiclo.scegliAnno}
+              voci={anni.map((a) => ({ valore: a, testo: String(a) }))}
+            />
+          </Gruppo>
+        </div>
+        <div className="h-5" />
+      </Apri>
+
+      {/* la carta del "si'": e' quella che si trasforma, quindi sparisce */}
+      <Apri aperto={!aperto}>
+        <div className="h-[134px]" />
+        <Carta
+          titolo={t.cicloSiNo.scelte[0].titolo}
+          sotto={t.cicloSiNo.scelte[0].sotto}
+          scelta={ciclo === 'si'}
+          onClick={() => rispondi('si')}
+        />
+        <div className="h-[9px]" />
+      </Apri>
+
+      {/* le altre due restano, e scendono da sole perche' stanno nel flusso */}
+      <Carte>
+        {altre.map((s) => (
+          <Carta
+            key={s.id}
+            titolo={s.titolo}
+            sotto={s.sotto}
+            scelta={ciclo === s.id}
+            striscia={aperto ? 'lato' : 'sopra'}
+            onClick={() => rispondi(s.id)}
+          />
+        ))}
+      </Carte>
     </Schermo>
   )
 }
@@ -78,49 +160,6 @@ export function CorpoCicloDate({ nodo, avanzamento, avanti, indietro }: PropsSch
             />
           </Gruppo>
         ))}
-      </div>
-    </Schermo>
-  )
-}
-
-/* 13b-first-period-date — 3907:2 / 3958:1308 */
-export function CorpoPrimoCiclo({ nodo, avanzamento, avanti, indietro }: PropsSchermo) {
-  const { t } = useLingua()
-  const { primoCicloMese, primoCicloAnno } = useRisposte()
-  const oggi = new Date().getFullYear()
-  const anni = Array.from({ length: 20 }, (_, i) => oggi - i)
-
-  return (
-    <Schermo
-      nodo={nodo}
-      avanzamento={avanzamento}
-      indietro={indietro}
-      azione={
-        <Bottone attivo={primoCicloAnno !== null} onClick={avanti}>
-          {t.comune.continua}
-        </Bottone>
-      }
-    >
-      <Occhiello>{t.primoCiclo.occhiello}</Occhiello>
-      <Titolo>{t.primoCiclo.titolo}</Titolo>
-      <Occhio>{t.primoCiclo.occhio}</Occhio>
-      <div className={`${STACCO} flex flex-col gap-5`}>
-        <Gruppo etichetta={t.primoCiclo.mese}>
-          <Selettore
-            valore={primoCicloMese}
-            onChange={(v) => scrivi({ primoCicloMese: v })}
-            segnaposto={t.primoCiclo.scegliMese}
-            voci={t.mesi.map((testo, i) => ({ valore: i, testo }))}
-          />
-        </Gruppo>
-        <Gruppo etichetta={t.primoCiclo.anno}>
-          <Selettore
-            valore={primoCicloAnno}
-            onChange={(v) => scrivi({ primoCicloAnno: v })}
-            segnaposto={t.primoCiclo.scegliAnno}
-            voci={anni.map((a) => ({ valore: a, testo: String(a) }))}
-          />
-        </Gruppo>
       </div>
     </Schermo>
   )
