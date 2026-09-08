@@ -112,6 +112,7 @@ export function Pastiglia({
   accesa,
   onClick,
   onInfo,
+  etichettaInfo,
   icona,
   children,
   tratteggiata = false,
@@ -125,6 +126,8 @@ export function Pastiglia({
    * irraggiungibile perche' il tocco lo prende quello di fuori.
    */
   onInfo?: () => void
+  /** cosa legge VoiceOver sulla ⓘ: il testo lo passa chi la usa */
+  etichettaInfo?: string
   icona?: string
   children: ReactNode
   /** il bordo a trattini di "Aggiungi tu...": e' un invito, non una scelta */
@@ -171,11 +174,49 @@ export function Pastiglia({
       <button
         type="button"
         onClick={onInfo}
-        aria-label={`Cosa vuol dire?`}
+        aria-label={etichettaInfo}
         className="flex size-[22px] shrink-0 items-center justify-center rounded-full text-[13px] leading-none text-ink-mute"
       >
         ⓘ
       </button>
     </span>
+  )
+}
+
+/**
+ * Una scelta fra tre: quando la senti, quando e' comparsa, cosa le ha fatto
+ * la sessione.
+ *
+ * Non e' una `Pastiglia` con un altro colore: la pastiglia e' una parola che
+ * si accende insieme ad altre, questa e' una risposta sola. La forma lo dice
+ * — angolo piccolo invece che pillola — e il bordo e' di due pixel, l'unico
+ * di tutto il foglio.
+ *
+ * Si puo' anche spegnere ritoccandola: non rispondere e' una risposta, e
+ * lasciarla accesa per sbaglio sarebbe peggio che lasciarla vuota.
+ */
+export function Scelta({
+  accesa,
+  onClick,
+  children,
+}: {
+  accesa: boolean
+  onClick: () => void
+  children: ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={accesa}
+      onClick={onClick}
+      className={`inline-flex h-[37px] items-center rounded-[10px] px-[13px] text-[13px] font-medium text-ink transition-colors duration-150 ${
+        accesa
+          ? 'border-2 border-verde-acceso bg-verde-chiaro'
+          : 'border border-scelta-bordo bg-chip'
+      }`}
+    >
+      {children}
+    </button>
   )
 }

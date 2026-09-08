@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { PAROLE } from '../../data/sessione'
-import type { Parola } from '../../data/sessione'
+import type { ReactNode } from 'react'
+import { COMPARSA, EFFETTO, PAROLE, QUANDO } from '../../data/sessione'
+import type { Parola, Tipo } from '../../data/sessione'
 import { testiSessione } from '../../copy/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import { Cursore } from './Cursore'
@@ -8,7 +9,7 @@ import { SchedaParola } from './SchedaParola'
 import { Parole } from '../../screens/Parole'
 import { testiParole } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
-import { Pastiglia, SiNo } from './Comandi'
+import { Pastiglia, Scelta, SiNo } from './Comandi'
 import { Apri } from '../Apri'
 import giu from '../../assets/chevron-down.svg'
 
@@ -27,12 +28,15 @@ const ICONE = import.meta.glob<string>('../../assets/sessione/p-*.svg', {
  * eccome appena qualcuno cambia un token.
  */
 export function Foglio({
+  tipo,
   sensazione,
   nuova,
   onSalva,
   onTogli,
   onChiudi,
 }: {
+  /** quale giro: decide quali delle tre domande "when" compaiono */
+  tipo: Tipo
   sensazione: Sensazione
   /** falso quando sta correggendo una sensazione gia' messa */
   nuova: boolean
@@ -178,6 +182,7 @@ export function Foglio({
                     accesa={bozza.parole.includes(p)}
                     onClick={() => commuta(p)}
                     onInfo={() => setSpiega(p)}
+                    etichettaInfo={t.cosaVuolDire}
                     icona={ICONE[`../../assets/sessione/p-${p}.svg`]}
                   >
                     {t.parole[p]}
@@ -198,6 +203,38 @@ export function Foglio({
               </button>
             </Apri>
 
+            {tipo === 'checkout' && (
+              <>
+                <Domanda testo={t.comparsa.domanda}>
+                  {COMPARSA.map((c) => (
+                    <Scelta
+                      key={c}
+                      accesa={bozza.comparsa === c}
+                      onClick={() =>
+                        setBozza((b) => ({ ...b, comparsa: b.comparsa === c ? null : c }))
+                      }
+                    >
+                      {t.comparsa.voci[c]}
+                    </Scelta>
+                  ))}
+                </Domanda>
+
+                <Domanda testo={t.effetto.domanda}>
+                  {EFFETTO.map((e) => (
+                    <Scelta
+                      key={e}
+                      accesa={bozza.effetto === e}
+                      onClick={() =>
+                        setBozza((b) => ({ ...b, effetto: b.effetto === e ? null : e }))
+                      }
+                    >
+                      {t.effetto.voci[e]}
+                    </Scelta>
+                  ))}
+                </Domanda>
+              </>
+            )}
+
             <div className="mt-[18px] h-px bg-riga" />
 
             <p className="mt-[13px] mb-[10px] text-[14px] font-bold text-ink">{t.unLato}</p>
@@ -206,6 +243,20 @@ export function Foglio({
               onChange={(v) => setBozza((b) => ({ ...b, unLato: v }))}
               etichetta={t.unLato}
             />
+
+            {tipo === 'checkin' && (
+              <Domanda testo={t.quando.domanda}>
+                {QUANDO.map((q) => (
+                  <Scelta
+                    key={q}
+                    accesa={bozza.quando === q}
+                    onClick={() => setBozza((b) => ({ ...b, quando: b.quando === q ? null : q }))}
+                  >
+                    {t.quando.voci[q]}
+                  </Scelta>
+                ))}
+              </Domanda>
+            )}
 
             <div className="mt-[18px] h-px bg-riga" />
 
@@ -266,5 +317,24 @@ export function Foglio({
         />
       )}
     </div>
+  )
+}
+
+/**
+ * Una domanda con le sue tre risposte: riga sopra, titolo, e le scelte che
+ * vanno a capo da sole se non ci stanno.
+ *
+ * Sta qui e non in `Comandi` perche' e' la spaziatura di questo foglio, non
+ * un comando: le stesse `Scelta` altrove staranno dentro a un'altra misura.
+ */
+function Domanda({ testo, children }: { testo: string; children: ReactNode }) {
+  return (
+    <>
+      <div className="mt-[18px] h-px bg-riga" />
+      <p className="mt-[13px] mb-[10px] text-[14px] font-bold text-ink">{testo}</p>
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={testo}>
+        {children}
+      </div>
+    </>
   )
 }

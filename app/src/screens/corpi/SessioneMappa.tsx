@@ -23,6 +23,9 @@ function nuovaSensazione(zona: string, nome: string): Sensazione {
     parole: [],
     sue: '',
     unLato: null,
+    quando: null,
+    comparsa: null,
+    effetto: null,
     // il centro della scala: come per i cursori, e' l'unico punto che non
     // suggerisce gia' una risposta
     intensita: 5,
@@ -137,6 +140,7 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
       {aperta && (
         <Foglio
           key={aperta.id}
+          tipo={tipo}
           sensazione={aperta}
           nuova={eNuova}
           onSalva={salva}

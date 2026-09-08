@@ -98,6 +98,21 @@
   --color-nebbia-testo: #a7a39c;
   --color-grigio-tenue: #dedcdb;
 
+  /*
+   * Le scelte "when" nel foglio delle sensazioni.
+   *
+   * Sono rettangoli con l'angolo piccolo, non pastiglie: il disegno le fa
+   * cosi' apposta, perche' non sono parole da accendere ma una risposta sola
+   * fra tre. Il verde e' piu' acceso di quello delle pastiglie — e' l'unico
+   * bordo di due pixel di tutto lo schermo.
+   *
+   * Il fondo di quelle spente (#f7f5f2) non e' qui: e' `chip` a meno di un
+   * punto su 255.
+   */
+  --color-scelta-bordo: #e0dbd6;
+  --color-verde-acceso: #0fa36b;
+  --color-verde-chiaro: #f0fcf5;
+
   /* caratteri */
   --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
   --font-ui: 'Space Grotesk', system-ui, sans-serif;

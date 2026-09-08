@@ -1163,10 +1163,37 @@ alter table public.body_signals drop constraint if exists body_signals_words_che
 alter table public.body_signals add constraint body_signals_words_check
   check (words is null or char_length(words) <= 200);
 
+-- Le tre domande "when" del foglio delle sensazioni.
+--
+-- Il check-in ne chiede una — quando la senti — e il check-out due: quando
+-- e' comparsa, e cosa le ha fatto la sessione. Sono tre colonne e non una
+-- sola con tre insiemi di valori perche' sono tre domande diverse: "e'
+-- rimasta uguale" e "la sento anche da ferma" non si sostituiscono a vicenda,
+-- e una riga di check-out le ha tutt'e due.
+--
+-- `behaviour` (l'enum eases/worse_load/at_rest) resta dov'e' e non viene
+-- riusata: e' un'idea vicina ma non la stessa, e infilarci dentro valori che
+-- non le appartengono renderebbe illeggibili tutt'e due.
+alter table public.body_signals add column if not exists when_noticed text;
+alter table public.body_signals drop constraint if exists body_signals_when_noticed_check;
+alter table public.body_signals add constraint body_signals_when_noticed_check
+  check (when_noticed is null or when_noticed in ('on_move','on_press','at_rest'));
+
+alter table public.body_signals add column if not exists onset text;
+alter table public.body_signals drop constraint if exists body_signals_onset_check;
+alter table public.body_signals add constraint body_signals_onset_check
+  check (onset is null or onset in ('this_morning','during','after_stopping'));
+
+alter table public.body_signals add column if not exists session_effect text;
+alter table public.body_signals drop constraint if exists body_signals_session_effect_check;
+alter table public.body_signals add constraint body_signals_session_effect_check
+  check (session_effect is null or session_effect in ('warmed_out','unchanged','worse'));
+
 create or replace view public.coach_body_signals as
   select id, athlete_id, check_in_id, created_at,
          region,                         -- `region_free` NO: e' testo libero
-         sensation, intensity, one_side, behaviour, is_red_flag
+         sensation, intensity, one_side, behaviour, is_red_flag,
+         when_noticed, onset, session_effect
                                          -- `words` NO: sono le sue parole
   from public.body_signals
   where public.is_staff_of(athlete_id);

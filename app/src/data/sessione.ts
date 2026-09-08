@@ -187,6 +187,43 @@ export type Faccia = (typeof FACCE)[number]['id']
 export const BOTTINO = ['imparato', 'ascoltato', 'aiutato', 'gentile', 'eseguito'] as const
 export type Bottino = (typeof BOTTINO)[number]
 
+/*
+ * Le tre domande che il disegno chiama "when".
+ *
+ * Non sono decorazione: sono quello che distingue un dolore che ha lavorato
+ * da uno che protegge, e che nessuna parola da sola dice. Il check-in chiede
+ * QUANDO la senti — mentre ti muovi, premendoci sopra, o anche stando ferma.
+ * Il check-out ne chiede due: quando e' comparsa, e cosa le ha fatto la
+ * sessione. Sono due giri diversi, quindi tre colonne diverse: una risposta
+ * "e' rimasta uguale" non e' la stessa cosa di "la sento anche da ferma".
+ *
+ * I codici che finiscono nel database sono inglesi come tutto il resto dello
+ * schema; qui restano italiani come gli id delle parole.
+ */
+export const QUANDO = ['muovo', 'premo', 'ferma'] as const
+export type Quando = (typeof QUANDO)[number]
+export const QUANDO_DB: Record<Quando, string> = {
+  muovo: 'on_move',
+  premo: 'on_press',
+  ferma: 'at_rest',
+}
+
+export const COMPARSA = ['mattina', 'durante', 'dopo'] as const
+export type Comparsa = (typeof COMPARSA)[number]
+export const COMPARSA_DB: Record<Comparsa, string> = {
+  mattina: 'this_morning',
+  durante: 'during',
+  dopo: 'after_stopping',
+}
+
+export const EFFETTO = ['scaldata', 'uguale', 'peggio'] as const
+export type Effetto = (typeof EFFETTO)[number]
+export const EFFETTO_DB: Record<Effetto, string> = {
+  scaldata: 'warmed_out',
+  uguale: 'unchanged',
+  peggio: 'worse',
+}
+
 /** Le fasce di ore dormite, come stanno sul disegno. */
 export const ORE_SONNO = ['<6h', '6-7h', '7-8h', '8h+'] as const
 export type OreSonno = (typeof ORE_SONNO)[number]

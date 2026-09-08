@@ -289,6 +289,35 @@ const it = {
       caldo: 'caldo',
     },
     unLato: 'Solo da un lato?',
+    /*
+     * Le tre domande "when". Nel disegno stanno solo in inglese: l'italiano
+     * qui sotto e' nostro e va riletto.
+     */
+    quando: {
+      domanda: 'Quando la senti?',
+      voci: {
+        muovo: 'Solo quando la muovo',
+        premo: 'Quando ci premo sopra',
+        ferma: 'Anche stando ferma',
+      },
+    },
+    comparsa: {
+      domanda: 'Quando è comparsa?',
+      voci: {
+        mattina: 'C’era già stamattina',
+        durante: 'Durante l’allenamento',
+        dopo: 'Appena mi sono fermata',
+      },
+    },
+    effetto: {
+      domanda: 'Cosa le ha fatto la sessione?',
+      voci: {
+        scaldata: 'Si è sciolta scaldandomi',
+        uguale: 'È rimasta uguale',
+        peggio: 'È peggiorata',
+      },
+    },
+    cosaVuolDire: 'Cosa vuol dire?',
     intensita: 'Intensità:',
     lieve: 'Lieve',
     atroce: 'Atroce',
@@ -543,6 +572,31 @@ const en: typeof it = {
       caldo: 'hot',
     },
     unLato: 'Only on one side?',
+    quando: {
+      domanda: 'When do you notice it?',
+      voci: {
+        muovo: 'Only when I move it',
+        premo: 'When I press it',
+        ferma: 'Even sitting still',
+      },
+    },
+    comparsa: {
+      domanda: 'When did it show up?',
+      voci: {
+        mattina: 'It was there this morning',
+        durante: 'During training',
+        dopo: 'Once I stopped',
+      },
+    },
+    effetto: {
+      domanda: 'What did the session do to it?',
+      voci: {
+        scaldata: 'It warmed out',
+        uguale: 'It stayed the same',
+        peggio: 'It got worse',
+      },
+    },
+    cosaVuolDire: 'What does it mean?',
     intensita: 'Intensity:',
     lieve: 'No pain',
     atroce: 'Worst possible pain',

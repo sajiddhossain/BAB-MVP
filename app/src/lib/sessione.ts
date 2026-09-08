@@ -1,8 +1,17 @@
 import { useCallback, useSyncExternalStore } from 'react'
 import { supabase } from './supabase'
 import type { Tempo } from '../data/casa'
-import type { Bottino, Faccia, OreSonno, Parola, Tipo } from '../data/sessione'
-import { RITMI } from '../data/sessione'
+import type {
+  Bottino,
+  Comparsa,
+  Effetto,
+  Faccia,
+  OreSonno,
+  Parola,
+  Quando,
+  Tipo,
+} from '../data/sessione'
+import { COMPARSA_DB, EFFETTO_DB, QUANDO_DB, RITMI } from '../data/sessione'
 import type { Esito } from './conto'
 
 /**
@@ -26,6 +35,12 @@ export type Sensazione = {
   /** le sue parole, quando le pastiglie non bastano */
   sue: string
   unLato: boolean | null
+  /** check-in: quando la senti */
+  quando: Quando | null
+  /** check-out: quando e' comparsa */
+  comparsa: Comparsa | null
+  /** check-out: cosa le ha fatto la sessione */
+  effetto: Effetto | null
   /** 0–10, come l'RPE */
   intensita: number
 }
@@ -274,6 +289,11 @@ export async function salvaSessione(tipo: Tipo, d: Dati): Promise<Esito> {
       sensation: s.parole,
       words: s.sue.trim() ? s.sue.trim().slice(0, 200) : null,
       one_side: s.unLato,
+      // le tre "when": una la chiede il check-in, due il check-out, e nel
+      // giro sbagliato restano nulle perche' quella domanda li' non c'era
+      when_noticed: s.quando ? QUANDO_DB[s.quando] : null,
+      onset: s.comparsa ? COMPARSA_DB[s.comparsa] : null,
+      session_effect: s.effetto ? EFFETTO_DB[s.effetto] : null,
       intensity: s.intensita,
       /*
        * `is_red_flag` lo mettiamo solo quando l'ha detto lei, alla fine del
