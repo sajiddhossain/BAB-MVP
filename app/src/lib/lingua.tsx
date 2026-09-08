@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { TESTI } from '../copy/testi'
 import { TESTI_SESSIONE } from '../copy/sessione'
 import { TESTI_PAROLE } from '../copy/parole'
+import { TESTI_PERCORSO } from '../copy/percorso'
 import { caricaScritte, conMarcatori, conScritte, elencoChiavi, useScritte } from './scritte'
 import { IN_ANTEPRIMA } from './sviluppo'
 
@@ -35,6 +36,8 @@ type Valore = {
   ts: (typeof TESTI_SESSIONE)['it']
   /** le sedici schede-parola */
   tp: (typeof TESTI_PAROLE)['it']
+  /** il percorso: la mappa e le otto lezioni */
+  tpe: (typeof TESTI_PERCORSO)['it']
 }
 
 const Contesto = createContext<Valore | null>(null)
@@ -72,6 +75,7 @@ export function LinguaProvider({ children }: { children: ReactNode }) {
     let t = conScritte(TESTI[lingua], 'testi', mappa)
     let ts = conScritte(TESTI_SESSIONE[lingua], 'sessione', mappa)
     let tp = conScritte(TESTI_PAROLE[lingua], 'parole', mappa)
+    let tpe = conScritte(TESTI_PERCORSO[lingua], 'percorso', mappa)
 
     /*
      * Dentro alla cornice ogni scritta si porta dietro il proprio numero,
@@ -84,9 +88,10 @@ export function LinguaProvider({ children }: { children: ReactNode }) {
       t = conMarcatori(t, 'testi', numeri)
       ts = conMarcatori(ts, 'sessione', numeri)
       tp = conMarcatori(tp, 'parole', numeri)
+      tpe = conMarcatori(tpe, 'percorso', numeri)
     }
 
-    return { lingua, cambia, t, ts, tp }
+    return { lingua, cambia, t, ts, tp, tpe }
   }, [lingua, cambia, scritte])
 
   return <Contesto.Provider value={valore}>{children}</Contesto.Provider>

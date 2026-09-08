@@ -13,6 +13,7 @@
 export type Macchia = { t: 'teal' | 'coral' | 'lime' | 'deco'; x: number; y: number; d: number }
 
 export const DECORO: Record<string, Macchia[]> = {
+  "percorso": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
   "3771:2": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
   "3771:104": [{t:"deco",x:340,y:440,d:30}, {t:"deco",x:-20,y:500,d:40}, {t:"deco",x:320,y:680,d:80}, {t:"teal",x:310,y:-30,d:140}, {t:"coral",x:-50,y:700,d:120}, {t:"lime",x:340,y:580,d:32}],
   "3771:14": [{t:"teal",x:-40,y:700,d:140}, {t:"coral",x:320,y:-20,d:100}],

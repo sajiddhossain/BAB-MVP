@@ -352,6 +352,18 @@ create table if not exists public.journey_progress (
 );
 
 
+-- ── IL PERCORSO (body-language) ─────────────────────────────────────────────
+-- Otto lezioni, due parole ciascuna. Una riga = una lezione finita.
+-- Non si riusa `journey_progress`: quella ha `week` 1..16 ed e' il programma di
+-- sedici settimane, un'altra cosa. Staccata in `migrazione-percorso.sql`.
+create table if not exists public.body_language_progress (
+  athlete_id   uuid not null references public.athletes(id) on delete cascade,
+  lesson       smallint not null check (lesson between 1 and 8),
+  completed_at timestamptz not null default now(),
+  primary key (athlete_id, lesson)
+);
+
+
 -- ── CONDIVISIONI (body-story) ───────────────────────────────────────────────
 -- NON contiene i dati: solo l'elenco dei blocchi inclusi. Serve a dimostrare
 -- che il ciclo non è mai stato incluso senza spunta esplicita, e a misurare
@@ -553,7 +565,8 @@ declare t text;
 begin
   foreach t in array array['athletes','consents','check_ins','body_signals',
                            'red_flags','cycle_events','journal_entries','journey_progress','shares',
-                           'ux_events','athlete_schedule','athlete_events','athlete_sports']
+                           'ux_events','athlete_schedule','athlete_events','athlete_sports',
+                           'body_language_progress']
   loop
     execute format('alter table public.%I enable row level security', t);
     execute format('drop policy if exists "own rows" on public.%I', t);

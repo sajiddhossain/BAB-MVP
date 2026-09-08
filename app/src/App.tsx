@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { Onboarding } from './screens/Onboarding'
 import { Sessione } from './screens/Sessione'
 import { Parole } from './screens/Parole'
+import { Percorso } from './screens/Percorso'
 import { Casa } from './screens/Casa'
 import { Prossimamente } from './screens/Prossimamente'
 import { Amministrazione } from './screens/Amministrazione'
@@ -22,7 +23,7 @@ export function App() {
         {/* i testi dell'app, per chi li scrive: entra solo chi sta in
             `platform_admins`, e a dirlo e' il database */}
         <Route path="/admin" element={<Amministrazione />} />
-        <Route path="/percorso" element={<Prossimamente titolo="Percorso" />} />
+        <Route path="/percorso" element={<Percorso />} />
         <Route path="/storico" element={<Prossimamente titolo="Storico" />} />
         <Route path="/profilo" element={<Prossimamente titolo="Profilo" profilo />} />
         <Route path="*" element={<Navigate to="/onboarding/accesso" replace />} />

@@ -3,6 +3,7 @@ import { supabase } from './supabase'
 import { TESTI } from '../copy/testi'
 import { TESTI_SESSIONE } from '../copy/sessione'
 import { TESTI_PAROLE } from '../copy/parole'
+import { TESTI_PERCORSO } from '../copy/percorso'
 import type { Lingua } from './lingua'
 
 /**
@@ -41,6 +42,7 @@ export const ALBERI = {
   testi: TESTI,
   sessione: TESTI_SESSIONE,
   parole: TESTI_PAROLE,
+  percorso: TESTI_PERCORSO,
 } as const
 
 export type Albero = keyof typeof ALBERI
