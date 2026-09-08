@@ -29,6 +29,30 @@
   --color-amber: #f59e0b;
   --color-amber-soft: rgba(245, 158, 11, 0.1);
 
+  /*
+   * I colori della home.
+   *
+   * Sono una tavolozza a parte perche' nel disegno la home e' fatta dopo
+   * l'onboarding e non riusa gli stessi valori. Due li abbiamo uniti a quelli
+   * che c'erano gia', perche' la differenza non si vede: l'inchiostro della
+   * home e' #2b2b3b contro #2c2c3a, e il grigio spento #99948f contro
+   * #999691 — un punto su 255 per canale. Gli altri sono davvero diversi e
+   * restano qui. Prima o poi vanno unificati nel file Figma, non nel codice.
+   */
+  --color-ink-medio: #6b6b73;
+  --color-ink-tenue: #b0aba6;
+  --color-nav: #faf8f5;
+  --color-riga: #e8e5e0;
+  --color-chip: #f6f4f1;
+
+  /* le tre tinte della scheda grande, una per stato della giornata */
+  --color-ambra-scuro: #8b6a1e;
+  --color-verde-scuro: #0b7a5a;
+  --color-viola-scuro: #5346c4;
+  --color-viola-chiaro: #efedfd;
+  --color-allarme-fondo: #fde9e6;
+  --color-allarme-testo: #6e2a22;
+
   /* caratteri */
   --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
   --font-ui: 'Space Grotesk', system-ui, sans-serif;

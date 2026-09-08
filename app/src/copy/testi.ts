@@ -17,6 +17,14 @@
 
 /** Gli schermi in cui il frame inglese di Figma contiene ancora l'italiano. */
 export const DA_RIVEDERE = [
+  // i quattro schermi della home: i frame inglesi (4126) sono un giro
+  // indietro rispetto agli italiani (4141) — non hanno le pastiglie del
+  // tempo, il badge "avevi previsto", la scheda riepilogo. Abbiamo costruito
+  // sull'italiano e tradotto quello che mancava.
+  'home-1-checkin-due',
+  'home-2-checkout-due',
+  'home-3-done-flagged',
+  'home-4-rest-day',
   // i due schermi dell'accesso: in Figma parlano di un link, ma il link non
   // esiste piu' — si entra solo col codice a sei cifre
   '01-auth-login',
@@ -262,6 +270,82 @@ const it = {
     scattante: 'Scattante',
     stabile: 'Stabile',
     tranquillo: 'Tranquillo',
+  },
+
+  casa: {
+    saluto: (nome: string) => `Ciao ${nome}`,
+    giorni: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
+    nav: { home: 'Home', percorso: 'Percorso', storico: 'Storico', profilo: 'Profilo' },
+    tempi: { carica: 'Carica', costante: 'Costante', leggero: 'Leggero' },
+
+    checkin: {
+      etichetta: (ora: string) => `Allenamento oggi · ${ora}`,
+      titolo: 'Facciamo il check-in.',
+      corpo: 'Prima di iniziare la sessione, prenditi un momento per ascoltare il tuo corpo.',
+      azione: 'Inizia check-in',
+    },
+
+    checkout: {
+      etichetta: 'Check-in fatto prima della sessione',
+      titolo: "Com'è andata?",
+      corpo: 'Prenditi un minuto ora, a caldo — guarda come ne sei uscita e come si sente il tuo corpo.',
+      previsto: 'Avevi previsto',
+      azione: 'Check out',
+    },
+
+    fatto: {
+      etichetta: 'Streak +1 · brava!',
+      titolo: 'Oggi, in una frase.',
+      segnalazione:
+        'Da segnalare: stesso punto, stesso gesto, più di una volta. Parlane col tuo coach o un genitore.',
+    },
+
+    riposo: {
+      etichetta: 'Giorno di riposo',
+      titolo: 'Un attimo per ascoltarti.',
+      corpo:
+        'Niente allenamento oggi, nessun tempo da indovinare — ma il tuo corpo merita comunque un minuto. Veloce e leggero.',
+      campi: {
+        sonno: 'Sonno',
+        energia: 'Energia',
+        scuola: 'Scuola',
+        umore: 'Umore',
+        bodymap: 'Body-Map',
+        ciclo: 'Ciclo',
+        antidolorifici: 'Antidolorifici presi?',
+      },
+      azione: 'Inizia body check-in',
+    },
+
+    percorsoCard: {
+      occhiello: 'BODY LANGUAGE · LEZIONE 5',
+      occhielloRiposo: 'BODY LANGUAGE · 4/8 LEZIONI',
+      occhielloFatto: 'BODY LANGUAGE',
+      titolo: 'Sblocca "acuto" e "lancinante"',
+      titoloFatto: 'Continua Lezione 5',
+      sotto: '2 min · 2 parole ti aspettano nel check-in',
+      sottoRiposo: '2 min',
+      sottoFatto: '"acuto" è comparso oggi — scopri cosa significa',
+    },
+
+    sezioni: {
+      intanto: 'INTANTO CHE SEI QUI',
+      nientaltro: "NIENT'ALTRO PER OGGI",
+      percorso: 'IL TUO PERCORSO',
+    },
+
+    settimana: {
+      titolo: 'Questa settimana',
+      righe: {
+        checkin: 'Check-in',
+        tempo: 'Tempo più frequente',
+        parole: 'Parole registrate',
+      },
+      valori: {
+        checkin: (fatti: number, su: number) => `${fatti} su ${su} giorni di allenamento`,
+        nessuna: '—',
+      },
+    },
   },
 
   giorni: ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
@@ -516,6 +600,82 @@ const en: typeof it = {
     scattante: 'Upbeat',
     stabile: 'Steady',
     tranquillo: 'Gentle',
+  },
+
+  casa: {
+    saluto: (nome: string) => `Hey ${nome}`,
+    giorni: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    nav: { home: 'Home', percorso: 'Journey', storico: 'History', profilo: 'Profile' },
+    tempi: { carica: 'Upbeat', costante: 'Steady', leggero: 'Gentle' },
+
+    checkin: {
+      etichetta: (ora: string) => `Training today · ${ora}`,
+      titolo: "Let's check in.",
+      corpo: "Before the session starts, take a moment to listen to your body's signals.",
+      azione: "I'm ready",
+    },
+
+    checkout: {
+      etichetta: 'Checked in before your session',
+      titolo: 'How did it go?',
+      corpo:
+        "Before you move on, let's pause to look back and notice how you feel, while it's still fresh.",
+      previsto: 'You predicted',
+      azione: 'Check out',
+    },
+
+    fatto: {
+      etichetta: 'Streak +1 · nice work',
+      titolo: 'Today, in one line.',
+      segnalazione:
+        'Worth flagging: same spot, same movement, more than once. Talk to your coach or a parent.',
+    },
+
+    riposo: {
+      etichetta: 'Rest day',
+      titolo: 'Just a quick attunement.',
+      corpo: "No training today, but your body's still worth a minute. Quick and light.",
+      campi: {
+        sonno: 'Sleep',
+        energia: 'Energy',
+        scuola: 'School',
+        umore: 'Mood',
+        bodymap: 'Body-Map',
+        ciclo: 'Period',
+        antidolorifici: 'Painkillers taken?',
+      },
+      azione: 'Start body check-in',
+    },
+
+    percorsoCard: {
+      occhiello: 'BODY LANGUAGE · LESSON 5',
+      occhielloRiposo: 'BODY LANGUAGE · 4/8 LESSONS',
+      occhielloFatto: 'BODY LANGUAGE',
+      titolo: 'Unlock "sharp" and "stabbing"',
+      titoloFatto: 'Continue Lesson 5',
+      sotto: '2 min · 2 words waiting in your check-in',
+      sottoRiposo: '2 min',
+      sottoFatto: '"sharp" came up today — find out what it means',
+    },
+
+    sezioni: {
+      intanto: "WHILE YOU'RE HERE",
+      nientaltro: 'NOTHING ELSE FOR TODAY',
+      percorso: 'YOUR JOURNEY',
+    },
+
+    settimana: {
+      titolo: 'This week',
+      righe: {
+        checkin: 'Check-ins',
+        tempo: 'Most frequent tempo',
+        parole: 'Words logged',
+      },
+      valori: {
+        checkin: (fatti: number, su: number) => `${fatti} of ${su} training days`,
+        nessuna: '—',
+      },
+    },
   },
 
   giorni: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
