@@ -2,6 +2,7 @@ import { useCallback, useSyncExternalStore } from 'react'
 import { supabase } from './supabase'
 import { giornoAtleta } from './sessione'
 import { statoFinestra } from './finestre'
+import { fattoInCoda } from './coda'
 import { riempi } from '../copy/riempi'
 import { tutte } from './risposte'
 import { RITMI } from '../data/sessione'
@@ -160,16 +161,36 @@ export async function caricaGiornata(): Promise<void> {
   const pre = diOggi.find((r) => r.kind === 'pre')
   const post = diOggi.find((r) => r.kind === 'post')
 
+  /*
+   * Vale anche quello che deve ancora partire.
+   *
+   * Senza, un check-in finito in palestra senza campo risulterebbe "da fare"
+   * appena la home rilegge dal database — e rifarlo sarebbe la cosa piu'
+   * ovvia da fare, e la piu' sbagliata.
+   */
+  const coda = fattoInCoda()
+
+  const giorniConCheckin = new Set(righe.filter((r) => r.kind === 'pre').map((r) => r.local_date))
+  if (coda.checkin) giorniConCheckin.add(oggi)
+
   segna({
-    fattoCheckin: !!pre,
-    fattoCheckout: !!post,
+    fattoCheckin: !!pre || coda.checkin,
+    fattoCheckout: !!post || coda.checkout,
     previsto: pre?.tempo_predicted ? (RITMO_DA_DB[pre.tempo_predicted] ?? null) : null,
     sentito: post?.tempo_chosen ? (RITMO_DA_DB[post.tempo_chosen] ?? null) : null,
-    striscia: striscia(
-      new Set(righe.filter((r) => r.kind === 'pre').map((r) => r.local_date)),
-      oggi,
-    ),
+    striscia: striscia(giorniConCheckin, oggi),
   })
+}
+
+/*
+ * Quando la coda riesce a mandare qualcosa, la giornata si rilegge.
+ *
+ * Passa da un evento e non da una chiamata diretta perche' `sessione.ts`,
+ * che tiene la coda, e' gia' importato da qui: chiamandosi a vicenda i due
+ * file si terrebbero per mano in cerchio.
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('bab:salvato', () => void caricaGiornata())
 }
 
 /**

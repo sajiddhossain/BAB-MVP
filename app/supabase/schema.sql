@@ -151,13 +151,13 @@ create table if not exists public.check_ins (
   -- ── canali ──
   -- 🔴 OGNI SCALA QUI HA UNO STRUMENTO DIETRO, non un gusto:
   --   sleep, energy  1–7   Hooper Questionnaire
-  --   mood           0–100 VAS (visual analogue scale)
+  --   mood           1–7   come sonno ed energia (era una VAS 0–100)
   --   effort         0–10  session-RPE, CR-10 di Foster
   -- `lib/tempo.ts` le normalizza tutte a 0–1 prima di confrontarle: non
   -- sommare mai due di queste colonne così come sono.
   sleep      smallint check (sleep      between 1 and 7),
   energy     smallint check (energy     between 1 and 7),  -- pre e post
-  mood       smallint check (mood       between 0 and 100),
+  mood       smallint check (mood       between 1 and 7),
   effort     smallint check (effort     between 0 and 10), -- post = session-RPE (CR-10)
 
   -- 🔴 Colonne non più scritte da nessuna schermata, tenute perché i dati già
@@ -225,8 +225,13 @@ alter table public.check_ins add constraint check_ins_effort_check check (effort
 -- Le colonne nuove: l'umore su VAS, la soddisfazione a parole, il ciclo del
 -- giorno. Idempotenti come le altre, così un database già in piedi si allinea
 -- senza ricrearlo.
+-- 1–7 e non la VAS 0–100 di cui parlava il commento: lo schermo chiede l'umore
+-- con lo stesso cursore di sonno ed energia, e una colonna che accetta 0–100
+-- riempita di valori 1–7 e' una colonna che in analisi si legge al contrario.
+-- Il restringimento vero lo fa `migrazione-sessione.sql`, che sui database gia'
+-- accesi rifa' il vincolo; qui e' per quelli nuovi.
 alter table public.check_ins add column if not exists mood smallint
-  check (mood between 0 and 100);
+  check (mood between 1 and 7);
 alter table public.check_ins add column if not exists satisfaction text
   check (satisfaction is null or satisfaction in
     ('disappointed','frustrated','satisfied','confident','proud'));

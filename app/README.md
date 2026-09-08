@@ -252,6 +252,47 @@ tocca "Petto destro" si ritrova "Petto destro".
 oggi", i nomi dei giorni. Li' il campo vuole una riga per voce: togliendo una
 riga si toglie una voce.
 
+### Si installa, e senza rete funziona
+
+`public/manifest.webmanifest` più `public/sw.js`: si aggiunge alla schermata
+home e si apre a pieno schermo, senza la barra del browser. Le icone sono il
+marchio sul fondo inchiostro, in tre tagli — quella `maskable` ha il marchio
+più piccolo perché Android ci ritaglia dentro un cerchio.
+
+Il lavoratore di servizio ha due regole e basta. I file sotto `/assets/` hanno
+il codice del contenuto nel nome, quindi quello in cache è per definizione
+ancora giusto e si serve da lì. Tutto il resto si chiede prima alla rete, e la
+cache è la rete di sicurezza. Non c'è un elenco di file da precaricare —
+vorrebbe dire generarlo a ogni build e tenerlo allineato ai nomi con il codice
+dentro — tranne la pagina di partenza, che si precarica perché tutti gli
+indirizzi dell'app sono quella stessa pagina: senza, senza rete si aprirebbero
+solo gli indirizzi già visitati da quel telefono.
+
+Quello che non passa dalla cache è Supabase. Una risposta del database
+riservata più tardi sarebbe un dato vecchio spacciato per nuovo, e su un
+check-in vorrebbe dire mostrare "già fatto" per una riga che non esiste.
+
+Si accende solo nelle versioni pubblicate (`import.meta.env.PROD`): sul server
+di sviluppo una cache si metterebbe fra una modifica e il vederla. Per provarlo
+serve la versione costruita — `npm run build && npm run preview`.
+
+### I salvataggi che aspettano la rete
+
+In palestra il campo manca. Un check-out finito nello spogliatoio senza segnale
+resta scritto in `bab.insospeso` e riparte da solo appena c'è rete: all'avvio,
+quando il browser dice che è tornata online, e tornando alla home.
+
+Con dentro l'ora in cui è stato **fatto**, non quella in cui riesce a partire.
+Se no un check-out delle dieci di sera spedito la mattina dopo finirebbe
+scritto sul giorno sbagliato.
+
+All'atleta si dice che è salvato, perché lo sarà: la coda è parte del
+salvataggio, non un ripiego. Se invece l'errore è vero — un vincolo, un
+permesso — riprovare non cambierebbe niente, e allora glielo si dice. La home
+conta anche quello che deve ancora partire (`fattoInCoda`): senza, la
+rilettura dal database direbbe "check-in da fare" per un check-in appena
+finito, e rifarlo sarebbe la cosa più ovvia da fare e la più sbagliata.
+
 ### Lavorare sugli schermi senza rifare l'accesso
 
 Con le chiavi in `.env` la guardia chiede una sessione per tutto tranne i due

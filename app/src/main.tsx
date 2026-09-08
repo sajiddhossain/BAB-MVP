@@ -12,7 +12,8 @@ import { Rete } from './ui/Rete'
 import { IN_ANTEPRIMA } from './lib/sviluppo'
 import { ascoltaAnteprima } from './lib/scritte'
 import { accendiTocco } from './lib/tocco'
-import { accendiVetrina } from './lib/sessione'
+import { accendiCoda, accendiVetrina } from './lib/sessione'
+import { accendiServizio } from './lib/servizio'
 
 /*
  * L'anteprima dell'amministrazione dei testi.
@@ -28,6 +29,10 @@ if (IN_ANTEPRIMA) {
   ascoltaAnteprima()
   accendiTocco()
 }
+
+accendiServizio()
+/* i salvataggi rimasti senza campo ripartono da soli */
+accendiCoda()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

@@ -1,0 +1,21 @@
+{
+  "name": "BAB",
+  "short_name": "BAB",
+  "description": "Ascolta il tuo corpo, ogni giorno.",
+  "start_url": "/casa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0ebe6",
+  "theme_color": "#f0ebe6",
+  "icons": [
+    { "src": "/icona-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icona-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    {
+      "src": "/icona-mascherabile-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

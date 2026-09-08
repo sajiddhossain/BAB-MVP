@@ -12,6 +12,7 @@ import type {
   Tipo,
 } from '../data/sessione'
 import { COMPARSA_DB, EFFETTO_DB, QUANDO_DB, RITMI } from '../data/sessione'
+import { accoda, inSospeso, togliDallaCoda } from './coda'
 import type { Esito } from './conto'
 
 /**
@@ -300,6 +301,96 @@ function oraLocale(d: Date): string {
  * niente e che poi qualcuno leggerebbe come se lo volesse dire.
  */
 export async function salvaSessione(tipo: Tipo, d: Dati): Promise<Esito> {
+  const ora = new Date()
+  let esito: Esito
+  try {
+    esito = await scrivi(tipo, d, ora)
+  } catch (guaio) {
+    esito = { ok: false, errore: String(guaio) }
+  }
+  if (esito.ok || esito.scaduta) return esito
+
+  /*
+   * Se e' colpa della rete non e' colpa sua.
+   *
+   * Il salvataggio resta scritto nel telefono e riparte da solo appena c'e'
+   * campo, quindi per lei e' fatto — e infatti le si dice che e' fatto. Se
+   * invece l'errore e' vero (un vincolo, un permesso) riprovare non
+   * cambierebbe niente, e allora glielo si dice.
+   */
+  if (!eColpaDellaRete(esito.errore)) return esito
+  accoda({ tipo, dati: d, giorno: giornoAtleta(ora), quando: ora.toISOString() })
+  return { ok: true }
+}
+
+/**
+ * Quando un errore vuol dire "manca il campo" e non "hai sbagliato".
+ *
+ * Non c'e' un modo pulito di chiederlo: supabase-js impacchetta il guasto di
+ * `fetch` in un messaggio, e ogni browser lo scrive a modo suo — "Failed to
+ * fetch" su Chrome, "Load failed" su Safari, "NetworkError" su Firefox. Il
+ * primo controllo pero' e' quello buono: se il telefono dice che e' offline,
+ * lo e'.
+ */
+function eColpaDellaRete(errore: string): boolean {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return true
+  return /fetch|network|load failed|timeout|abort/i.test(errore)
+}
+
+/**
+ * Manda quello che era rimasto in coda.
+ *
+ * Si chiama all'avvio, quando torna la rete, e tornando alla home. Ogni riga
+ * si riscrive con l'ora in cui e' stata FATTA, non con adesso: un check-out
+ * delle dieci di sera spedito la mattina dopo deve restare di ieri sera.
+ */
+let staSvuotando = false
+
+export async function svuotaCoda(): Promise<void> {
+  if (!supabase || staSvuotando) return
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
+  staSvuotando = true
+  let qualcosaEPartito = false
+  try {
+    for (const v of inSospeso()) {
+      let esito: Esito
+      try {
+        esito = await scrivi(v.tipo, v.dati, new Date(v.quando))
+      } catch (guaio) {
+        esito = { ok: false, errore: String(guaio) }
+      }
+
+      if (esito.ok) {
+        togliDallaCoda(v.tipo, v.giorno)
+        qualcosaEPartito = true
+        continue
+      }
+      // la rete e' andata via di nuovo, o serve rientrare: si riprova dopo,
+      // e intanto non si insiste sulle altre
+      if (esito.scaduta || eColpaDellaRete(esito.errore)) return
+      // un errore vero: resta in coda ma non blocca chi viene dopo, cosi' una
+      // riga malata non si porta dietro tutte le altre
+    }
+  } finally {
+    staSvuotando = false
+  }
+
+  /*
+   * La home rilegge dal database invece di essere avvisata direttamente: se
+   * `sessione.ts` importasse `giornata.ts`, che importa `giornoAtleta` da
+   * qui, i due file si terrebbero per mano in cerchio.
+   */
+  if (qualcosaEPartito) window.dispatchEvent(new Event('bab:salvato'))
+}
+
+/** Riprova quello che e' rimasto indietro, adesso e ogni volta che torna la rete. */
+export function accendiCoda(): void {
+  void svuotaCoda()
+  window.addEventListener('online', () => void svuotaCoda())
+}
+
+async function scrivi(tipo: Tipo, d: Dati, ora: Date): Promise<Esito> {
   if (!supabase) return { ok: true }
 
   const { data: sessione } = await supabase.auth.getSession()
@@ -309,7 +400,6 @@ export async function salvaSessione(tipo: Tipo, d: Dati): Promise<Esito> {
   if (!atleta) return { ok: false, errore: 'nessuna sessione', scaduta: true }
 
   const kind = tipo === 'checkin' ? 'pre' : 'post'
-  const ora = new Date()
   const giorno = giornoAtleta(ora)
   const adesso = ora.toISOString()
 

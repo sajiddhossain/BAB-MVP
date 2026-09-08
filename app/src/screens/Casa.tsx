@@ -11,6 +11,7 @@ import { SchedaPercorso } from '../ui/casa/SchedaPercorso'
 import { useLingua } from '../lib/lingua'
 import { ora as formattaOra, oraDaTesto } from '../lib/ore'
 import { useRisposte } from '../lib/risposte'
+import { svuotaCoda } from '../lib/sessione'
 import {
   allenamentoDiOggi,
   caricaGiornata,
@@ -101,6 +102,7 @@ export function Casa() {
    * l'app e' rimasta aperta in tasca fino a stamattina.
    */
   useEffect(() => {
+    void svuotaCoda()
     void caricaGiornata()
   }, [])
 
