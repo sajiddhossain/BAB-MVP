@@ -147,6 +147,9 @@ ricorda lo schermo.
 Come faccia a sapere quale scritta e' stata toccata: dentro alla cornice ogni
 scritta si porta dietro il proprio numero, scritto in caratteri a larghezza
 zero (`marcatore` in `src/lib/scritte.ts`, `src/lib/tocco.ts` per il tocco).
+Larghi zero non basta: devono anche non essere un punto in cui si puo' andare
+a capo, se no dentro a un bottone stretto il marcatore va su una seconda riga
+vuota e l'anteprima mostra un difetto che nell'app non c'e'.
 Invisibili a chi legge, ma il codice li ritrova. Il vantaggio e' che non c'e'
 niente da annotare a mano nei ~400 punti in cui le scritte vengono usate: una
 scritta nuova e' toccabile il giorno che nasce. Nell'app che usano le atlete

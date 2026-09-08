@@ -166,8 +166,9 @@ function scrivi(nodo: Record<string, unknown>, pezzi: string[], valore: Valore):
  *
  * La via presa: dentro alla cornice dell'anteprima, e SOLO li', ogni scritta
  * si porta dietro il proprio numero scritto in fondo con caratteri a
- * larghezza zero. Non si vedono, non si selezionano, non cambiano
- * l'impaginazione, sopravvivono a `toLowerCase()` e al riempimento dei buchi.
+ * larghezza zero. Non si vedono, non si selezionano, non mandano a capo, non
+ * cambiano l'impaginazione, e sopravvivono a `toLowerCase()` e al riempimento
+ * dei buchi.
  * Quando qualcuno tocca un punto dello schermo, si legge il testo che c'e'
  * li' sotto e dentro ci si trova scritto di quale scritta si tratta.
  *
@@ -180,10 +181,24 @@ function scrivi(nodo: Record<string, unknown>, pezzi: string[], valore: Valore):
  * carattere in piu'.
  */
 
-const SENTINELLA = '\u2060' // word joiner: non e' spazio e non va a capo
-const ZERO = '\u200b'
-const UNO = '\u200c'
-const BIT = 12 // 4096 scritte: oggi sono 450
+/*
+ * I tre caratteri, e perche' proprio questi.
+ *
+ * Tutti e tre sono larghi zero, ma la larghezza non basta: devono anche NON
+ * essere un punto in cui si puo' andare a capo. Il primo tentativo usava lo
+ * zero width space (U+200B), che invece un punto d'a capo lo e' eccome — e
+ * dentro all'anteprima i bottoni stretti mandavano il marcatore su una
+ * seconda riga vuota, alta come le altre. "Front" e "Back" finivano storti, e
+ * chi scriveva i testi vedeva un difetto che nell'app non esiste.
+ *
+ * Word joiner, ZWNJ e ZWJ non lo sono. Il word joiner fa anche da guardia
+ * alle due estremita': cosi' fra un'emoji e uno ZWJ c'e' sempre lui in mezzo,
+ * e non si formano per sbaglio sequenze di emoji unite.
+ */
+const SENTINELLA = '\u2060' // word joiner
+const ZERO = '\u200c' // zero width non-joiner
+const UNO = '\u200d' // zero width joiner
+const BIT = 12 // 4096 scritte: oggi sono 550
 
 export function marcatore(numero: number): string {
   let bit = ''

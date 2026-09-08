@@ -218,6 +218,24 @@ export function accendiVetrina(): void {
 }
 
 /**
+ * La vetrina, ma col corpo ancora da segnare.
+ *
+ * La mappa e' l'unico schermo dell'anteprima che si vuole vuoto: le altre
+ * scritte hanno bisogno di una giornata dentro per comparire, ma un corpo che
+ * arriva gia' segnato non lo si puo' provare — e provarlo e' proprio quello
+ * che serve fare li'. La chiama la mappa quando si apre, e solo in anteprima.
+ */
+export function vetrinaSenzaCorpo(): void {
+  if (!vetrina) return
+  stato = {
+    ...stato,
+    checkin: { ...stato.checkin, sensazioni: [] },
+    checkout: { ...stato.checkout, sensazioni: [] },
+  }
+  ascoltatori.forEach((f) => f())
+}
+
+/**
  * Cambia uno o piu' campi di uno dei due giri.
  *
  * Accetta anche una funzione, come `scrivi` delle risposte: aggiungere una

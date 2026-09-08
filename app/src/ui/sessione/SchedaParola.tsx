@@ -60,8 +60,11 @@ export function SchedaParola({
   onUsa: () => void
   onChiudi: () => void
 }) {
-  const { tp } = useLingua()
+  const { ts, tp } = useLingua()
   const t = tp
+  // il nome della parola sta con le altre quindici, non sulla scheda:
+  // `parola` e' l'identificativo, e in inglese si leggeva "intorpidito"
+  const nome = ts.foglio.parole[parola]
   const scheda = t.schede[parola]
   const livello = LIVELLO_DI[parola]
   const tinta = TINTA_LIVELLO[livello]
@@ -87,7 +90,7 @@ export function SchedaParola({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={parola}
+          aria-label={nome}
           className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[26px] bg-surface"
           style={{ boxShadow: '0px -4px 10px 0px rgba(0,0,0,0.15)' }}
         >
@@ -97,7 +100,7 @@ export function SchedaParola({
 
           <div className="flex-1 overflow-y-auto px-6 pt-[26px]">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="m-0 text-[24px] leading-none font-bold text-ink">{parola}</h2>
+              <h2 className="m-0 text-[24px] leading-none font-bold text-ink">{nome}</h2>
               <button
                 type="button"
                 onClick={onChiudi}

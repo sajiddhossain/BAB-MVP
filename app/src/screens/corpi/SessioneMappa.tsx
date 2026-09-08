@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Schermo } from '../../ui/Schermo'
 import { Bottone } from '../../ui/Bottone'
 import { Titolo } from '../../ui/Testo'
@@ -8,7 +8,7 @@ import { Mappa, Riquadro } from '../../ui/sessione/Mappa'
 import { Foglio } from '../../ui/sessione/Foglio'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
-import { scriviSessione, useDatiSessione } from '../../lib/sessione'
+import { scriviSessione, useDatiSessione, vetrinaSenzaCorpo } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { Lato } from '../../data/sessione'
 import type { PropsSessione } from '../tipi'
@@ -46,6 +46,16 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
   const [lato, setLato] = useState<Lato>('front')
   const [aperta, setAperta] = useState<Sensazione | null>(null)
   const [eNuova, setENuova] = useState(true)
+
+  /*
+   * In anteprima il corpo si apre pulito: la giornata finta serve alle
+   * scritte degli schermi che la riassumono, ma qui si deve poter toccare un
+   * punto qualsiasi e vedere cosa succede. Fuori dall'anteprima non fa
+   * niente, e le sensazioni vere restano dove sono.
+   */
+  useEffect(() => {
+    vetrinaSenzaCorpo()
+  }, [])
 
   function tocca(codice: string) {
     const gia = dati.sensazioni.find((s) => s.zona === codice)
