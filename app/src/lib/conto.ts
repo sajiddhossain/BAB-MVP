@@ -22,7 +22,7 @@ const VERSIONE_CONSENSI = '2026-09-draft'
 
 export type Esito =
   | { ok: true }
-  | { ok: false; errore: string; lento?: boolean; fraSecondi?: number }
+  | { ok: false; errore: string; lento?: boolean; fraSecondi?: number; scaduta?: boolean }
 
 /*
  * Quanto aspettare la mail prima di dire che non ce l'abbiamo fatta.
@@ -79,8 +79,23 @@ export async function verificaCodice(email: string, codice: string): Promise<Esi
   return error ? { ok: false, errore: error.message } : { ok: true }
 }
 
+/**
+ * Uscire davvero: si porta via anche quello che sta su questo telefono.
+ *
+ * Fra le risposte ci sono le date del ciclo. Un telefono si presta, si perde,
+ * si vende, e uscire e' proprio il gesto di chi lo sta per dare a qualcun
+ * altro. Qui invece che nell'evento `SIGNED_OUT`, che scatta anche quando la
+ * sessione scade da sola: li' cancellare vorrebbe dire buttare via venti
+ * risposte a qualcuno che si e' solo distratto per un'ora.
+ */
 export async function esci() {
   dimenticaProfilo()
+  azzera()
+  try {
+    localStorage.removeItem('bab.giornata')
+  } catch {
+    // niente da fare: non e' un motivo per non uscire
+  }
   await supabase?.auth.signOut()
 }
 
@@ -97,23 +112,9 @@ export function useSessione(): { sessione: Session | null; caricata: boolean } {
     })
     const { data } = supabase.auth.onAuthStateChange((evento, s) => {
       setSessione(s)
-      /*
-       * Uscendo si porta via tutto quello che sta su questo telefono.
-       *
-       * Fra le risposte ci sono le date del ciclo. Un telefono si presta, si
-       * perde, si vende: quei dati non devono restare leggibili a chi non ha
-       * piu' la sessione, e questo vale anche quando la sessione scade da
-       * sola invece che perche' e' uscita lei.
-       */
-      if (evento === 'SIGNED_OUT') {
-        dimenticaProfilo()
-        azzera()
-        try {
-          localStorage.removeItem('bab.giornata')
-        } catch {
-          // niente da fare: non e' un motivo per non uscire
-        }
-      }
+      // qui si dimentica solo chi era: cancellare le risposte lo fa `esci`,
+      // perche' questo evento scatta anche quando la sessione scade da sola
+      if (evento === 'SIGNED_OUT') dimenticaProfilo()
     })
     return () => data.subscription.unsubscribe()
   }, [])
@@ -177,7 +178,15 @@ export async function salvaOnboarding(r: Risposte, lingua: Lingua): Promise<Esit
 
   const { data: sessione } = await supabase.auth.getSession()
   const id = sessione.session?.user.id
-  if (!id) return { ok: false, errore: 'nessuna sessione' }
+  /*
+   * Senza sessione non c'e' nessuno per cui salvare, e "riprova" sarebbe un
+   * consiglio che non puo' funzionare: si rientra, e basta.
+   *
+   * Capita davvero: l'onboarding sono venti domande, la sessione dura un'ora,
+   * e in mezzo si viene interrotti. Per questo le risposte restano dove sono
+   * — rientrando le ritrova e finisce, invece di ricominciare da capo.
+   */
+  if (!id) return { ok: false, errore: 'nessuna sessione', scaduta: true }
 
   const nascita = isoDaData(r.nascita)
   if (!nascita) return { ok: false, errore: 'data di nascita mancante' }

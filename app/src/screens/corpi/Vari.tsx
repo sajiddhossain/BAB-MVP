@@ -10,6 +10,7 @@ import { scrivi, useRisposte } from '../../lib/risposte'
 import { mandaCodice, verificaCodice } from '../../lib/conto'
 import type { Risposte } from '../../lib/risposte'
 import { SPORT } from '../../data/sport'
+import { useLocation } from 'react-router-dom'
 import type { PropsSchermo } from '../tipi'
 import logo from '../../assets/logo-bab.svg'
 import sparkles from '../../assets/icon-sparkles.svg'
@@ -20,6 +21,8 @@ export function CorpoAccesso({ nodo, verso, avanti }: PropsSchermo) {
   const { email } = useRisposte()
   const [inCorso, setInCorso] = useState(false)
   const [errore, setErrore] = useState('')
+  // chi arriva qui perche' la sessione e' scaduta merita di sapere perche'
+  const scaduta = (useLocation().state as { scaduta?: boolean } | null)?.scaduta === true
   const valida = /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email.trim())
 
   async function manda() {
@@ -82,6 +85,11 @@ export function CorpoAccesso({ nodo, verso, avanti }: PropsSchermo) {
           />
           {errore && <Errore>{errore}</Errore>}
         </Gruppo>
+        {scaduta && !errore && (
+          <p className="m-0 mt-[6px] text-[13px] font-bold leading-[1.4] text-violet">
+            {t.riepilogo.sessioneScaduta}
+          </p>
+        )}
       </div>
     </Schermo>
   )

@@ -151,6 +151,15 @@ export function Onboarding() {
     setSalvando(false)
     if (!esito.ok) {
       console.error('[onboarding]', esito.errore)
+      /*
+       * Se manca la sessione non c'e' niente da riprovare: si rientra. Le
+       * risposte restano dove sono, quindi rientrando si ritrova qui e
+       * finisce — l'ultimo schermo si ricalcola da solo.
+       */
+      if (esito.scaduta) {
+        vai('/onboarding/accesso', { replace: true, state: { scaduta: true } })
+        return
+      }
       setNonSalvato(true)
       return
     }

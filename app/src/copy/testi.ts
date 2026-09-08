@@ -199,6 +199,7 @@ const it = {
     vuoto: '—',
     salvataggio: 'Sto salvando…',
     nonSalvato: 'Non siamo riusciti a salvare. Riprova.',
+    sessioneScaduta: 'La sessione è scaduta. Rientra: ritrovi tutto com’era.',
   },
 
   consenso: {
@@ -536,6 +537,7 @@ const en: typeof it = {
     vuoto: '—',
     salvataggio: 'Saving…',
     nonSalvato: 'We could not save. Try again.',
+    sessioneScaduta: 'Your session expired. Log back in: everything is still here.',
   },
 
   consenso: {
