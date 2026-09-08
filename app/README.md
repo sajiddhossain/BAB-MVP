@@ -130,11 +130,34 @@ fallirebbe alla fine con un errore che a chi legge non dice niente.
 `/admin` e' la pagina da cui si cambiano le parole dell'app. Il layout non si
 tocca: si tocca solo cio' che c'e' scritto dentro.
 
-A sinistra gli schermi, in mezzo lo schermo vero dentro a una cornice, a
-destra i suoi campi. La cornice e' un `<iframe>` con questa stessa app dentro,
-quindi l'anteprima non e' una somiglianza: sono gli stessi componenti, le
-stesse misure e lo stesso carattere che vedra' un'atleta. Mentre si scrive, il
-testo cambia dentro alla cornice senza salvare niente.
+A sinistra gli schermi, in mezzo lo schermo vero dentro a una cornice. La
+cornice e' un `<iframe>` con questa stessa app dentro, quindi l'anteprima non
+e' una somiglianza: sono gli stessi componenti, le stesse misure e lo stesso
+carattere che vedra' un'atleta. Mentre si scrive, il testo cambia dentro alla
+cornice senza salvare niente.
+
+**Si cambia toccando.** Si punta il dito sulla scritta dentro allo schermo e
+si apre a destra: non c'e' da cercarla in un elenco di ottocento voci e non
+c'e' da sapere come si chiama. Vale per tutto quello che si legge — titoli,
+bottoni, etichette, il grigino dentro ai campi da riempire. Se il tocco prende
+una frase cucita insieme da piu' pezzi, si sceglie quale. L'elenco completo
+resta in fondo, chiuso, con la ricerca: serve a chi cerca una frase di cui non
+ricorda lo schermo.
+
+Come faccia a sapere quale scritta e' stata toccata: dentro alla cornice ogni
+scritta si porta dietro il proprio numero, scritto in caratteri a larghezza
+zero (`marcatore` in `src/lib/scritte.ts`, `src/lib/tocco.ts` per il tocco).
+Invisibili a chi legge, ma il codice li ritrova. Il vantaggio e' che non c'e'
+niente da annotare a mano nei ~400 punti in cui le scritte vengono usate: una
+scritta nuova e' toccabile il giorno che nasce. Nell'app che usano le atlete
+non c'e' niente di tutto questo — il ramo sta dietro a `IN_ANTEPRIMA`, che
+vuole insieme `?anteprima=1` e l'essere dentro a una cornice.
+
+**Due modi.** *Correggi le scritte* trasforma ogni tocco in "apri questa
+scritta", cosi' i bottoni non partono e non si cambia schermo mentre si
+scrive. *Prova lo schermo* lo fa funzionare davvero. Servono tutt'e due: meta'
+delle scritte stanno dentro ai bottoni, ma al foglio delle sensazioni ci si
+arriva solo toccando il corpo.
 
 **Chi entra.** Chi sta in `platform_admins`. Non e' una password controllata
 nel browser: la anon key sta dentro al pacchetto che scarica chiunque, quindi

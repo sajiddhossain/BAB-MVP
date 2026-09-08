@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { TESTI } from '../copy/testi'
 import { TESTI_SESSIONE } from '../copy/sessione'
 import { TESTI_PAROLE } from '../copy/parole'
-import { caricaScritte, conScritte, useScritte } from './scritte'
+import { caricaScritte, conMarcatori, conScritte, elencoChiavi, useScritte } from './scritte'
 import { IN_ANTEPRIMA } from './sviluppo'
 
 export type Lingua = 'it' | 'en'
@@ -69,13 +69,24 @@ export function LinguaProvider({ children }: { children: ReactNode }) {
 
   const valore = useMemo(() => {
     const mappa = scritte[lingua]
-    return {
-      lingua,
-      cambia,
-      t: conScritte(TESTI[lingua], 'testi', mappa),
-      ts: conScritte(TESTI_SESSIONE[lingua], 'sessione', mappa),
-      tp: conScritte(TESTI_PAROLE[lingua], 'parole', mappa),
+    let t = conScritte(TESTI[lingua], 'testi', mappa)
+    let ts = conScritte(TESTI_SESSIONE[lingua], 'sessione', mappa)
+    let tp = conScritte(TESTI_PAROLE[lingua], 'parole', mappa)
+
+    /*
+     * Dentro alla cornice ogni scritta si porta dietro il proprio numero,
+     * invisibile: e' cosi' che toccare un punto dello schermo dice al
+     * pannello quale scritta si sta toccando. Fuori dall'anteprima questo
+     * ramo non viene mai eseguito.
+     */
+    if (IN_ANTEPRIMA) {
+      const numeri = new Map(elencoChiavi(lingua).map((c, i) => [c, i]))
+      t = conMarcatori(t, 'testi', numeri)
+      ts = conMarcatori(ts, 'sessione', numeri)
+      tp = conMarcatori(tp, 'parole', numeri)
     }
+
+    return { lingua, cambia, t, ts, tp }
   }, [lingua, cambia, scritte])
 
   return <Contesto.Provider value={valore}>{children}</Contesto.Provider>

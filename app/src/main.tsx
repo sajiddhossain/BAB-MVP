@@ -11,6 +11,7 @@ import { LinguaProvider } from './lib/lingua'
 import { Rete } from './ui/Rete'
 import { IN_ANTEPRIMA } from './lib/sviluppo'
 import { ascoltaAnteprima } from './lib/scritte'
+import { accendiTocco } from './lib/tocco'
 import { accendiVetrina } from './lib/sessione'
 
 /*
@@ -25,6 +26,7 @@ import { accendiVetrina } from './lib/sessione'
 if (IN_ANTEPRIMA) {
   accendiVetrina()
   ascoltaAnteprima()
+  accendiTocco()
 }
 
 createRoot(document.getElementById('root')!).render(

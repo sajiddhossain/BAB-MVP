@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { useSessione } from '../lib/conto'
 import { SENZA_ACCESSO } from '../lib/sviluppo'
-import { scrittePartenza } from '../lib/scritte'
+import { elencoChiavi, scrittePartenza } from '../lib/scritte'
 import type { Scritte, Valore } from '../lib/scritte'
 import type { Lingua } from '../lib/lingua'
 import { SCHERMI, ramiConosciuti } from '../data/schermi'
@@ -16,13 +17,23 @@ import type { SchermoScritte } from '../data/schermi'
  * schermo, mentre la scrive. Il layout non si tocca: si tocca solo cio' che
  * c'e' scritto dentro.
  *
- * ── COME E' FATTA ──────────────────────────────────────────────────────────
- * A sinistra gli schermi, a destra lo schermo vero dentro a una cornice piu'
- * i campi delle sue scritte. La cornice e' un <iframe> con QUESTA STESSA app
- * dentro: non e' una scorciatoia, e' l'anteprima piu' onesta che ci sia —
- * stessi componenti, stesse misure, stesso carattere. Mentre si scrive, le
- * bozze le arrivano per `postMessage`, quindi il testo cambia sotto le dita
- * senza salvare niente.
+ * ── COME SI USA ────────────────────────────────────────────────────────────
+ * Si tocca la scritta dentro allo schermo. Non c'e' da cercarla in un elenco
+ * e non c'e' da sapere come si chiama: si punta il dito su quello che si
+ * vuole cambiare, si apre, si riscrive. Un elenco di tutte le scritte c'e'
+ * ancora, chiuso in fondo, ma serve solo a chi cerca una frase di cui non
+ * ricorda lo schermo.
+ *
+ * Come faccia a sapere quale scritta e' stata toccata sta in `scritte.ts`:
+ * dentro alla cornice ogni scritta si porta dietro il proprio numero scritto
+ * in caratteri a larghezza zero. Nell'app che usano le atlete non c'e'
+ * niente di tutto questo.
+ *
+ * ── I DUE MODI ─────────────────────────────────────────────────────────────
+ * `correggi` ogni tocco apre la scritta invece di premere il bottone;
+ * `prova` lo schermo funziona e ci si cammina dentro. Servono tutt'e due:
+ * meta' delle scritte stanno dentro ai bottoni, ma al foglio delle
+ * sensazioni ci si arriva solo toccando il corpo.
  *
  * ── CHI PUO' ENTRARE ───────────────────────────────────────────────────────
  * Chi sta in `platform_admins`. Il controllo vero non e' qui: e' nelle regole
@@ -39,6 +50,7 @@ import type { SchermoScritte } from '../data/schermi'
 
 type Riga = { bozza: Valore | null; vivo: Valore | null }
 type Righe = Record<Lingua, Record<string, Riga>>
+type Modo = 'correggi' | 'prova'
 
 const VUOTE: Righe = { it: {}, en: {} }
 
@@ -86,7 +98,7 @@ export function Amministrazione() {
   return <Scrivania />
 }
 
-function Schermata({ children }: { children: React.ReactNode }) {
+function Schermata({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-paper p-8">
       <p className="m-0 max-w-[420px] text-center text-[14px] leading-[1.6] text-ink">{children}</p>
@@ -100,11 +112,17 @@ function Scrivania() {
   const [lingua, setLingua] = useState<Lingua>('it')
   const [righe, setRighe] = useState<Righe>(VUOTE)
   const [scelto, setScelto] = useState<SchermoScritte>(SCHERMI[3].schermi[0])
+  const [modo, setModo] = useState<Modo>('correggi')
+  const [aperta, setAperta] = useState<string | null>(null)
+  /* quando un tocco prende una frase composta da piu' scritte, si sceglie */
+  const [fraQuali, setFraQuali] = useState<string[]>([])
   const [cerca, setCerca] = useState('')
   const [stato, setStato] = useState('')
   const cornice = useRef<HTMLIFrameElement>(null)
 
   const partenza = useMemo(() => ({ it: scrittePartenza('it'), en: scrittePartenza('en') }), [])
+  /* lo stesso ordine che la cornice usa per numerare: e' il ponte fra i due */
+  const perNumero = useMemo(() => elencoChiavi(lingua), [lingua])
 
   /* le righe del database, bozza compresa */
   const carica = useCallback(async () => {
@@ -141,25 +159,45 @@ function Scrivania() {
   }, [righe])
 
   const manda = useCallback(() => {
-    cornice.current?.contentWindow?.postMessage(
-      { tipo: 'bab:scritte', scritte: bozze },
-      window.location.origin,
-    )
-  }, [bozze])
-
-  /* la cornice dice "sono in piedi" a ogni caricamento, anche navigandoci dentro */
-  useEffect(() => {
-    function ascolta(e: MessageEvent) {
-      if (e.origin !== window.location.origin) return
-      if ((e.data as { tipo?: string } | null)?.tipo === 'bab:pronta') manda()
-    }
-    window.addEventListener('message', ascolta)
-    return () => window.removeEventListener('message', ascolta)
-  }, [manda])
+    const f = cornice.current?.contentWindow
+    if (!f) return
+    f.postMessage({ tipo: 'bab:scritte', scritte: bozze }, window.location.origin)
+    f.postMessage({ tipo: 'bab:modo', modo }, window.location.origin)
+  }, [bozze, modo])
 
   useEffect(manda, [manda])
 
-  /* le chiavi di questo schermo, o quelle che rispondono alla ricerca */
+  /* la cornice dice "sono in piedi", e dice cosa e' stato toccato */
+  useEffect(() => {
+    function ascolta(e: MessageEvent) {
+      if (e.origin !== window.location.origin) return
+      const m = e.data as { tipo?: string; numeri?: number[] } | null
+      if (m?.tipo === 'bab:pronta') {
+        manda()
+        return
+      }
+      if (m?.tipo !== 'bab:tocca' || !m.numeri) return
+      const chiavi = m.numeri.map((n) => perNumero[n]).filter(Boolean)
+      if (chiavi.length === 0) return
+      setCerca('')
+      /*
+       * Una sola scritta si apre; se il tocco ne prende piu' d'una — una frase
+       * cucita insieme da pezzi diversi — si chiede quale, perche' indovinare
+       * vorrebbe dire far correggere la parola sbagliata.
+       */
+      if (chiavi.length === 1) {
+        setAperta(chiavi[0])
+        setFraQuali([])
+      } else {
+        setFraQuali(chiavi)
+        setAperta(null)
+      }
+    }
+    window.addEventListener('message', ascolta)
+    return () => window.removeEventListener('message', ascolta)
+  }, [manda, perNumero])
+
+  /* le chiavi dell'elenco in fondo: quelle di questo schermo, o la ricerca */
   const chiavi = useMemo(() => {
     const tutte = Object.keys(partenza[lingua]).sort()
     if (cerca.trim()) {
@@ -180,6 +218,22 @@ function Scrivania() {
     return righe[lingua][k]?.bozza ?? righe[lingua][k]?.vivo ?? partenza[lingua][k]
   }
 
+  /** Quello che le atlete leggono adesso: la riga pubblicata, o il codice. */
+  function pubblicato(k: string): Valore {
+    return righe[lingua][k]?.vivo ?? partenza[lingua][k]
+  }
+
+  /*
+   * Le scritture vanno in fila indiana. Toccare "Rimetti l'originale" prima
+   * toglie il cursore dal campo, e togliere il cursore salva la bozza: sono
+   * due chiamate che partono insieme, e se la cancellazione arrivasse per
+   * prima il salvataggio rimetterebbe al mondo la riga appena tolta.
+   */
+  const coda = useRef<Promise<unknown>>(Promise.resolve())
+  function inFila(fn: () => Promise<void>): void {
+    coda.current = coda.current.then(fn, fn).catch(() => {})
+  }
+
   function scrivi(k: string, v: Valore) {
     setRighe((r) => ({
       ...r,
@@ -187,81 +241,120 @@ function Scrivania() {
     }))
   }
 
-  async function salva(k: string) {
+  function salva(k: string) {
     if (!supabase) return
-    const riga = righe[lingua][k]
-    if (!riga) return
-    setStato('salvo…')
-    const { error } = await supabase
-      .from('copy_overrides')
-      .upsert(
-        { chiave: k, lingua, bozza: riga.bozza, vivo: riga.vivo, aggiornato: new Date().toISOString() },
+    inFila(async () => {
+      const riga = righe[lingua][k]
+      if (!riga) return
+      setStato('salvo…')
+      const { error } = await supabase!.from('copy_overrides').upsert(
+        {
+          chiave: k,
+          lingua,
+          bozza: riga.bozza,
+          vivo: riga.vivo,
+          aggiornato: new Date().toISOString(),
+        },
         { onConflict: 'chiave,lingua' },
       )
-    setStato(error ? `non salvato: ${error.message}` : 'bozza salvata')
+      setStato(error ? `non salvato: ${error.message}` : 'bozza salvata')
+    })
   }
 
   /** torna al testo del codice: la riga sparisce, e con lei la sovrascrittura */
-  async function ripristina(k: string) {
+  function ripristina(k: string) {
     if (!supabase) return
-    setStato('ripristino…')
-    const { error } = await supabase.from('copy_overrides').delete().eq('chiave', k).eq('lingua', lingua)
-    if (error) {
-      setStato(`non riuscito: ${error.message}`)
-      return
-    }
-    setRighe((r) => {
-      const l = { ...r[lingua] }
-      delete l[k]
-      return { ...r, [lingua]: l }
+    inFila(async () => {
+      setStato('ripristino…')
+      const { error } = await supabase!
+        .from('copy_overrides')
+        .delete()
+        .eq('chiave', k)
+        .eq('lingua', lingua)
+      if (error) {
+        setStato(`non riuscito: ${error.message}`)
+        return
+      }
+      setRighe((r) => {
+        const l = { ...r[lingua] }
+        delete l[k]
+        return { ...r, [lingua]: l }
+      })
+      setStato('tornata all’originale')
     })
-    setStato('tornata all’originale')
   }
 
-  /** bozza → pubblicato, per le chiavi che si stanno guardando */
-  async function pubblica(quali: string[]) {
+  /** bozza → pubblicato: da qui in poi la scritta e' quella che leggono loro */
+  function pubblica(quali: string[]) {
     if (!supabase) return
-    const daFare = quali
-      .map((k) => ({ k, r: righe[lingua][k] }))
-      .filter(({ r }) => r && r.bozza !== null && testo(r.bozza) !== testo(r.vivo))
-    if (daFare.length === 0) {
-      setStato('niente da pubblicare')
-      return
-    }
-    setStato(`pubblico ${daFare.length}…`)
-    const { error } = await supabase.from('copy_overrides').upsert(
-      daFare.map(({ k, r }) => ({
-        chiave: k,
-        lingua,
-        bozza: r!.bozza,
-        vivo: r!.bozza,
-        aggiornato: new Date().toISOString(),
-      })),
-      { onConflict: 'chiave,lingua' },
-    )
-    if (error) {
-      setStato(`non pubblicato: ${error.message}`)
-      return
-    }
-    await carica()
-    setStato(`pubblicate ${daFare.length}`)
+    inFila(async () => {
+      const daFare = quali
+        .map((k) => ({ k, r: righe[lingua][k] }))
+        .filter(({ k, r }) => r && r.bozza !== null && testo(r.bozza) !== testo(pubblicato(k)))
+      if (daFare.length === 0) {
+        setStato('niente da pubblicare')
+        return
+      }
+      setStato(`pubblico ${daFare.length}…`)
+      const { error } = await supabase!.from('copy_overrides').upsert(
+        daFare.map(({ k, r }) => ({
+          chiave: k,
+          lingua,
+          bozza: r!.bozza,
+          vivo: r!.bozza,
+          aggiornato: new Date().toISOString(),
+        })),
+        { onConflict: 'chiave,lingua' },
+      )
+      if (error) {
+        setStato(`non pubblicato: ${error.message}`)
+        return
+      }
+      await carica()
+      setStato(daFare.length === 1 ? 'pubblicata' : `pubblicate ${daFare.length}`)
+    })
   }
 
-  const daPubblicare = chiavi.filter((k) => {
-    const r = righe[lingua][k]
-    return r && r.bozza !== null && testo(r.bozza) !== testo(r.vivo)
-  }).length
+  /*
+   * Le bozze in attesa si contano su TUTTE le scritte, non su quelle dello
+   * schermo aperto: correggendo si cammina, e una bozza lasciata indietro
+   * tre schermi fa non deve sparire dal conto.
+   */
+  const daPubblicare = useMemo(
+    () =>
+      Object.keys(partenza[lingua]).filter((k) => {
+        const r = righe[lingua][k]
+        return r && r.bozza !== null && testo(r.bozza) !== testo(r.vivo ?? partenza[lingua][k])
+      }),
+    [partenza, lingua, righe],
+  )
+
+  function apri(k: string) {
+    setAperta(k)
+    setFraQuali([])
+  }
+
+  function vaiA(s: SchermoScritte) {
+    setCerca('')
+    setAperta(null)
+    setFraQuali([])
+    setScelto(s)
+  }
 
   return (
     <div className="flex min-h-dvh bg-paper text-ink">
-      <aside className="w-[230px] shrink-0 overflow-y-auto border-r border-line bg-surface p-4">
+      <aside className="w-[210px] shrink-0 overflow-y-auto border-r border-line bg-surface p-4">
         <p className="m-0 text-[15px] font-bold">Le parole di BAB</p>
         <div className="mt-3 flex gap-1">
           {(['it', 'en'] as const).map((l) => (
             <button
               key={l}
               type="button"
-              onClick={() => setLingua(l)}
+              onClick={() => {
+                setLingua(l)
+                setAperta(null)
+                setFraQuali([])
+              }}
               className={`flex-1 rounded-[8px] border px-2 py-1 text-[12px] font-bold ${
                 lingua === l ? 'border-verde-acceso bg-verde-chiaro' : 'border-line bg-chip'
               }`}
@@ -270,12 +363,6 @@ function Scrivania() {
             </button>
           ))}
         </div>
-        <input
-          value={cerca}
-          onChange={(e) => setCerca(e.target.value)}
-          placeholder="Cerca una scritta…"
-          className="mt-3 w-full rounded-[8px] border border-line bg-chip px-2 py-[6px] text-[12px]"
-        />
         {SCHERMI.map((g) => (
           <div key={g.nome} className="mt-4">
             <p className="m-0 text-[10px] font-bold tracking-[1px] text-ink-mute uppercase">
@@ -286,12 +373,9 @@ function Scrivania() {
                 <li key={s.id}>
                   <button
                     type="button"
-                    onClick={() => {
-                      setCerca('')
-                      setScelto(s)
-                    }}
+                    onClick={() => vaiA(s)}
                     className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] ${
-                      scelto.id === s.id && !cerca ? 'bg-verde-chiaro font-bold' : ''
+                      scelto.id === s.id ? 'bg-verde-chiaro font-bold' : ''
                     }`}
                   >
                     {s.nome}
@@ -304,12 +388,9 @@ function Scrivania() {
         <div className="mt-4">
           <button
             type="button"
-            onClick={() => {
-              setCerca('')
-              setScelto(ALTRE)
-            }}
+            onClick={() => vaiA(ALTRE)}
             className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] ${
-              scelto.id === 'altre' && !cerca ? 'bg-verde-chiaro font-bold' : ''
+              scelto.id === 'altre' ? 'bg-verde-chiaro font-bold' : ''
             }`}
           >
             Tutte le altre
@@ -319,6 +400,25 @@ function Scrivania() {
 
       <main className="flex min-w-0 flex-1 gap-6 overflow-y-auto p-6">
         <div className="shrink-0">
+          <div className="mb-3 flex w-[402px] gap-1 rounded-pill bg-chip p-1">
+            {(
+              [
+                ['correggi', 'Correggi le scritte'],
+                ['prova', 'Prova lo schermo'],
+              ] as const
+            ).map(([m, etichetta]) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setModo(m)}
+                className={`flex-1 rounded-pill px-3 py-[6px] text-[12.5px] font-bold ${
+                  modo === m ? 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.10)]' : 'text-ink-medio'
+                }`}
+              >
+                {etichetta}
+              </button>
+            ))}
+          </div>
           <div className="overflow-hidden rounded-[28px] border-[1.5px] border-line bg-surface shadow-[6px_6px_0_rgba(0,0,0,0.06)]">
             <iframe
               /*
@@ -334,49 +434,116 @@ function Scrivania() {
               className="block h-[874px] w-[402px] border-0"
             />
           </div>
-          {scelto.come && (
-            <p className="m-0 mt-2 w-[402px] text-[11.5px] text-ink-medio">↑ {scelto.come}</p>
-          )}
+          <p className="m-0 mt-2 w-[402px] text-[11.5px] leading-[1.5] text-ink-medio">
+            {modo === 'correggi'
+              ? 'Passa sopra a una scritta e toccala: si apre qui a destra. Così i bottoni non partono, e non cambi schermo mentre correggi.'
+              : `Adesso lo schermo funziona davvero e ci puoi camminare dentro. ${scelto.come ?? ''}`}
+          </p>
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-3">
-            <p className="m-0 text-[17px] font-bold">{cerca ? `“${cerca}”` : scelto.nome}</p>
+            <p className="m-0 text-[17px] font-bold">{scelto.nome}</p>
             <span className="text-[12px] text-ink-medio">{stato}</span>
           </div>
-          <div className="mt-2 flex items-center gap-2">
-            <button
-              type="button"
-              disabled={daPubblicare === 0}
-              onClick={() => void pubblica(chiavi)}
-              className="rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold disabled:bg-chip disabled:text-ink-mute"
-            >
-              {daPubblicare === 0
-                ? 'Niente da pubblicare'
-                : `Pubblica ${daPubblicare} ${daPubblicare === 1 ? 'scritta' : 'scritte'}`}
-            </button>
-            <span className="text-[11.5px] text-ink-medio">
-              finché non pubblichi, le atlete vedono quello di prima
-            </span>
+
+          {daPubblicare.length > 0 && (
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => pubblica(daPubblicare)}
+                className="rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold"
+              >
+                Pubblica tutte le modifiche ({daPubblicare.length})
+              </button>
+              <span className="text-[11.5px] text-ink-medio">
+                finché non pubblichi, le atlete vedono quello di prima
+              </span>
+            </div>
+          )}
+
+          <div className="mt-4">
+            {fraQuali.length > 0 && (
+              <Riquadro>
+                <p className="m-0 text-[13.5px] font-bold">Lì ci sono più scritte insieme.</p>
+                <p className="m-0 mt-1 text-[12px] text-ink-medio">Quale vuoi cambiare?</p>
+                <ul className="m-0 mt-3 flex list-none flex-col gap-1 p-0">
+                  {fraQuali.map((k) => (
+                    <li key={k}>
+                      <button
+                        type="button"
+                        onClick={() => apri(k)}
+                        className="w-full rounded-[8px] border border-line bg-surface px-3 py-2 text-left"
+                      >
+                        <span className="block truncate text-[13px]">{testo(valore(k))}</span>
+                        <code className="block text-[10.5px] text-ink-mute">{k}</code>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </Riquadro>
+            )}
+
+            {aperta && (
+              <Campo
+                key={aperta}
+                chiave={aperta}
+                valore={valore(aperta)}
+                originale={partenza[lingua][aperta]}
+                pubblicato={pubblicato(aperta)}
+                onCambia={(v) => scrivi(aperta, v)}
+                onEsce={() => salva(aperta)}
+                onRipristina={() => ripristina(aperta)}
+                onPubblica={() => pubblica([aperta])}
+                onChiudi={() => setAperta(null)}
+              />
+            )}
+
+            {!aperta && fraQuali.length === 0 && (
+              <Riquadro>
+                <p className="m-0 text-[14px] leading-[1.6]">
+                  Tocca una scritta nello schermo qui accanto per cambiarla.
+                </p>
+                <p className="m-0 mt-2 text-[12px] leading-[1.6] text-ink-medio">
+                  Vale per tutto quello che si legge: titoli, bottoni, etichette, il grigino dentro
+                  ai campi da riempire. Non serve sapere come si chiama.
+                </p>
+              </Riquadro>
+            )}
           </div>
 
-          <ul className="m-0 mt-4 flex list-none flex-col gap-4 p-0">
-            {chiavi.map((k) => (
-              <Campo
-                key={k}
-                chiave={k}
-                valore={valore(k)}
-                originale={partenza[lingua][k]}
-                pubblicato={righe[lingua][k]?.vivo ?? null}
-                onCambia={(v) => scrivi(k, v)}
-                onEsce={() => void salva(k)}
-                onRipristina={() => void ripristina(k)}
-              />
-            ))}
-            {chiavi.length === 0 && (
-              <li className="text-[13px] text-ink-medio">Nessuna scritta qui.</li>
-            )}
-          </ul>
+          <details className="mt-6">
+            <summary className="cursor-pointer text-[12.5px] font-bold text-ink-medio">
+              Tutte le scritte, in elenco
+            </summary>
+            <input
+              value={cerca}
+              onChange={(e) => setCerca(e.target.value)}
+              placeholder="Cerca una parola o una frase, in tutta l’app…"
+              className="mt-3 w-full rounded-[8px] border border-line bg-surface px-2 py-[6px] text-[12.5px]"
+            />
+            <ul className="m-0 mt-3 flex list-none flex-col gap-1 p-0">
+              {chiavi.map((k) => (
+                <li key={k}>
+                  <button
+                    type="button"
+                    onClick={() => apri(k)}
+                    className={`w-full rounded-[8px] border px-3 py-2 text-left ${
+                      aperta === k
+                        ? 'border-verde-acceso bg-verde-chiaro'
+                        : 'border-line bg-surface'
+                    }`}
+                  >
+                    <span className="block truncate text-[13px]">{testo(valore(k))}</span>
+                    <code className="block text-[10.5px] text-ink-mute">{k}</code>
+                  </button>
+                </li>
+              ))}
+              {chiavi.length === 0 && (
+                <li className="mt-2 text-[13px] text-ink-medio">Nessuna scritta qui.</li>
+              )}
+            </ul>
+          </details>
         </div>
       </main>
     </div>
@@ -391,7 +558,11 @@ const ALTRE: SchermoScritte = {
   come: 'Le scritte che nessuno schermo qui accanto rivendica: bottoni comuni, messaggi di errore, i nomi dei giorni.',
 }
 
-/* ── un campo ─────────────────────────────────────────────────────────────── */
+function Riquadro({ children }: { children: ReactNode }) {
+  return <div className="rounded-[14px] border border-line bg-surface p-4">{children}</div>
+}
+
+/* ── la scritta aperta ────────────────────────────────────────────────────── */
 
 function Campo({
   chiave,
@@ -401,14 +572,18 @@ function Campo({
   onCambia,
   onEsce,
   onRipristina,
+  onPubblica,
+  onChiudi,
 }: {
   chiave: string
   valore: Valore
   originale: Valore
-  pubblicato: Valore | null
+  pubblicato: Valore
   onCambia: (v: Valore) => void
   onEsce: () => void
   onRipristina: () => void
+  onPubblica: () => void
+  onChiudi: () => void
 }) {
   const lista = Array.isArray(originale)
   const cambiata = testo(valore) !== testo(originale)
@@ -416,35 +591,63 @@ function Campo({
   const buchi = [...testo(originale).matchAll(/\{(\w+)\}/g)].map((m) => m[1])
 
   return (
-    <li>
+    <Riquadro>
       <div className="flex items-baseline justify-between gap-2">
-        <code className="text-[11px] text-ink-mute">{chiave}</code>
-        <span className="flex items-center gap-2 text-[10.5px]">
-          {inBozza && <span className="font-bold text-ambra-testo">bozza</span>}
+        <span className="text-[11px]">
+          {inBozza && <span className="font-bold text-ambra-testo">bozza non pubblicata</span>}
           {cambiata && !inBozza && <span className="font-bold text-verde-scuro">pubblicata</span>}
-          {cambiata && (
-            <button type="button" onClick={onRipristina} className="underline">
-              originale
-            </button>
-          )}
+          {!cambiata && <span className="text-ink-mute">com’è nel disegno</span>}
         </span>
+        <button type="button" onClick={onChiudi} className="text-[14px] text-ink-mute">
+          chiudi
+        </button>
       </div>
+
       <textarea
+        // e' l'unico campo della pagina, e ci si arriva toccando: il cursore
+        // deve essere gia' dentro, se no si tocca due volte per scrivere
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus
         value={lista ? (valore as string[]).join('\n') : (valore as string)}
         onChange={(e) => onCambia(lista ? e.target.value.split('\n') : e.target.value)}
         onBlur={onEsce}
-        rows={Math.min(8, testo(valore).length > 90 || lista ? 4 : 1)}
-        className={`mt-1 w-full resize-y rounded-[8px] border bg-surface px-2 py-[6px] text-[13px] leading-[1.5] ${
-          cambiata ? 'border-verde-acceso' : 'border-line'
-        }`}
+        rows={lista ? Math.max(3, (valore as string[]).length + 1) : testo(valore).length > 70 ? 4 : 2}
+        className="mt-2 w-full resize-y rounded-[10px] border-[1.5px] border-verde-acceso bg-surface px-3 py-2 text-[14px] leading-[1.55]"
       />
-      {lista && <p className="m-0 text-[10.5px] text-ink-mute">una riga per voce</p>}
-      {buchi.length > 0 && (
-        <p className="m-0 text-[10.5px] text-ink-mute">
-          buchi da lasciare: {buchi.map((b) => `{${b}}`).join(' ')}
+
+      {lista && (
+        <p className="m-0 text-[11px] text-ink-medio">
+          È un elenco: una riga per voce. Togliendo una riga si toglie una voce.
         </p>
       )}
-    </li>
+      {buchi.length > 0 && (
+        <p className="m-0 text-[11px] text-ink-medio">
+          Lascia dove sono i buchi {buchi.map((b) => `{${b}}`).join(' ')} — è lì che l’app mette il
+          nome, il numero o il ritmo.
+        </p>
+      )}
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          disabled={!inBozza}
+          onClick={onPubblica}
+          className="rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold disabled:bg-chip disabled:text-ink-mute"
+        >
+          {inBozza ? 'Pubblica questa' : 'Niente da pubblicare'}
+        </button>
+        {cambiata && (
+          <button
+            type="button"
+            onClick={onRipristina}
+            className="rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold"
+          >
+            Rimetti l’originale
+          </button>
+        )}
+        <code className="ml-auto text-[10.5px] text-ink-mute">{chiave}</code>
+      </div>
+    </Riquadro>
   )
 }
 

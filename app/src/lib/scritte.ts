@@ -128,6 +128,93 @@ function scrivi(nodo: Record<string, unknown>, pezzi: string[], valore: Valore):
   qui[ultima] = valore
 }
 
+/* ── i marcatori invisibili ───────────────────────────────────────────────── */
+
+/*
+ * Come fa l'anteprima a sapere quale scritta hai toccato.
+ *
+ * Il problema: sullo schermo c'e' "Qual e' il ritmo di oggi?", e per
+ * cambiarla bisogna sapere che quella e' `sessione.ritmoPrima.titolo`. La via
+ * ovvia sarebbe marcare ogni scritta nel punto in cui viene usata — ma sono
+ * quattrocento punti, e vorrebbe dire sporcare per sempre il codice dell'app
+ * per un pannello che l'app non sa nemmeno che esiste.
+ *
+ * La via presa: dentro alla cornice dell'anteprima, e SOLO li', ogni scritta
+ * si porta dietro il proprio numero scritto in fondo con caratteri a
+ * larghezza zero. Non si vedono, non si selezionano, non cambiano
+ * l'impaginazione, sopravvivono a `toLowerCase()` e al riempimento dei buchi.
+ * Quando qualcuno tocca un punto dello schermo, si legge il testo che c'e'
+ * li' sotto e dentro ci si trova scritto di quale scritta si tratta.
+ *
+ * Il numero e' la posizione della chiave nell'elenco ordinato di tutte le
+ * scritte: la cornice e il pannello calcolano lo stesso elenco dallo stesso
+ * codice, quindi si capiscono senza doverselo mandare.
+ *
+ * Fuori dall'anteprima niente di tutto questo esiste: `conMarcatori` non
+ * viene mai chiamato, e nell'app che scaricano le atlete non c'e' un solo
+ * carattere in piu'.
+ */
+
+const SENTINELLA = '\u2060' // word joiner: non e' spazio e non va a capo
+const ZERO = '\u200b'
+const UNO = '\u200c'
+const BIT = 12 // 4096 scritte: oggi sono 450
+
+export function marcatore(numero: number): string {
+  let bit = ''
+  for (let i = BIT - 1; i >= 0; i--) bit += (numero >> i) & 1 ? UNO : ZERO
+  return SENTINELLA + bit + SENTINELLA
+}
+
+/** I numeri delle scritte nascosti in un testo, nell'ordine in cui compaiono. */
+export function leggiMarcatori(testo: string): number[] {
+  const trovati: number[] = []
+  const re = new RegExp(`${SENTINELLA}([${ZERO}${UNO}]{${BIT}})${SENTINELLA}`, 'g')
+  let m: RegExpExecArray | null
+  while ((m = re.exec(testo)) !== null) {
+    let n = 0
+    for (const c of m[1]) n = (n << 1) | (c === UNO ? 1 : 0)
+    trovati.push(n)
+  }
+  return trovati
+}
+
+/** Toglie i marcatori: serve a chi deve confrontare o mostrare il testo pulito. */
+export function senzaMarcatori(testo: string): string {
+  return testo.replace(new RegExp(`${SENTINELLA}[${ZERO}${UNO}]{${BIT}}${SENTINELLA}`, 'g'), '')
+}
+
+/** L'elenco ordinato delle chiavi: e' lui a dare il numero a ogni scritta. */
+export function elencoChiavi(lingua: Lingua): string[] {
+  return Object.keys(scrittePartenza(lingua)).sort()
+}
+
+/**
+ * Lo stesso albero, con ogni scritta che si porta dietro il proprio numero.
+ *
+ * Le liste prendono il numero della lista, non uno per riga: una lista e' una
+ * scritta sola, e toccarne una riga apre tutte le sue righe.
+ */
+export function conMarcatori<T>(albero: T, prefisso: string, numeri: Map<string, number>): T {
+  function giu(nodo: unknown, percorso: string): unknown {
+    if (typeof nodo === 'string') {
+      const n = numeri.get(percorso)
+      return n === undefined ? nodo : nodo + marcatore(n)
+    }
+    if (Array.isArray(nodo)) {
+      const n = numeri.get(percorso)
+      return n === undefined ? nodo : nodo.map((v) => (typeof v === 'string' ? v + marcatore(n) : v))
+    }
+    if (nodo && typeof nodo === 'object') {
+      const fuori: Record<string, unknown> = {}
+      for (const [k, v] of Object.entries(nodo)) fuori[k] = giu(v, `${percorso}.${k}`)
+      return fuori
+    }
+    return nodo
+  }
+  return giu(albero, prefisso) as T
+}
+
 /* ── il magazzino ─────────────────────────────────────────────────────────── */
 
 const CHIAVE_CACHE = 'bab.scritte'
