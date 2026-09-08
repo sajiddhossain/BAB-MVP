@@ -45,6 +45,16 @@ export const ALBERI = {
 
 export type Albero = keyof typeof ALBERI
 
+/*
+ * Le stringhe che NON sono scritte.
+ *
+ * `tono` dice di che colore e' un riquadro delle schede-parola, non cosa c'e'
+ * scritto sopra: e' un valore che il codice legge, e cambiarlo in "verde" non
+ * cambierebbe una parola, romperebbe il riquadro. Chi scrive i testi non deve
+ * nemmeno vederlo.
+ */
+const NON_SCRITTE = new Set(['tono'])
+
 /**
  * Tutte le foglie di un albero di testi, come chiave -> valore.
  *
@@ -52,6 +62,12 @@ export type Albero = keyof typeof ALBERI
  * dopo che le frasi coi buchi sono diventate modelli, in `copy/` non e'
  * rimasta una sola funzione, ed e' quello che rende possibile indirizzare
  * ogni scritta per nome.
+ *
+ * Una lista di stringhe e' UNA scritta — i quattro passi si scrivono
+ * insieme. Una lista di oggetti no: i tre riquadri di una scheda-parola sono
+ * tre pezzi diversi, e si numerano (`…riquadri.0.testo`). Senza questo le
+ * caselle delle sedici schede non esistevano per il pannello, e infatti non
+ * si riuscivano a toccare.
  */
 export function foglie(nodo: unknown, prefisso: string, dentro: Mappa = {}): Mappa {
   if (typeof nodo === 'string') {
@@ -59,11 +75,16 @@ export function foglie(nodo: unknown, prefisso: string, dentro: Mappa = {}): Map
     return dentro
   }
   if (Array.isArray(nodo)) {
-    if (nodo.every((v) => typeof v === 'string')) dentro[prefisso] = nodo as string[]
+    if (nodo.every((v) => typeof v === 'string')) {
+      dentro[prefisso] = nodo as string[]
+      return dentro
+    }
+    nodo.forEach((v, i) => foglie(v, `${prefisso}.${i}`, dentro))
     return dentro
   }
   if (nodo && typeof nodo === 'object') {
     for (const [k, v] of Object.entries(nodo)) {
+      if (NON_SCRITTE.has(k)) continue
       foglie(v, prefisso ? `${prefisso}.${k}` : k, dentro)
     }
   }
@@ -111,6 +132,10 @@ function struttura<T>(nodo: T): T {
 
 /**
  * Scrive un valore in fondo a un percorso.
+ *
+ * I pezzi numerici entrano nelle liste: `riquadri.0.testo` va nel primo
+ * riquadro, perche' in JavaScript una lista si legge come un oggetto con le
+ * chiavi "0", "1", "2".
  *
  * Se il percorso non esiste piu' — una chiave salvata mesi fa per una scritta
  * che nel frattempo e' stata tolta — non fa niente. Meglio una sovrascrittura
@@ -203,11 +228,17 @@ export function conMarcatori<T>(albero: T, prefisso: string, numeri: Map<string,
     }
     if (Array.isArray(nodo)) {
       const n = numeri.get(percorso)
-      return n === undefined ? nodo : nodo.map((v) => (typeof v === 'string' ? v + marcatore(n) : v))
+      if (n !== undefined) {
+        return nodo.map((v) => (typeof v === 'string' ? v + marcatore(n) : v))
+      }
+      // una lista di oggetti: ogni voce ha le sue scritte, numerate per posto
+      return nodo.map((v, i) => giu(v, `${percorso}.${i}`))
     }
     if (nodo && typeof nodo === 'object') {
       const fuori: Record<string, unknown> = {}
-      for (const [k, v] of Object.entries(nodo)) fuori[k] = giu(v, `${percorso}.${k}`)
+      for (const [k, v] of Object.entries(nodo)) {
+        fuori[k] = NON_SCRITTE.has(k) ? v : giu(v, `${percorso}.${k}`)
+      }
       return fuori
     }
     return nodo
