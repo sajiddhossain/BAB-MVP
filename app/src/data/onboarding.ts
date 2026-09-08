@@ -36,6 +36,13 @@ export type Passo = {
   salta?: (r: Risposte) => boolean
   /** vero = lo schermo non ha la barra dell'avanzamento (sta prima del percorso) */
   fuoriPercorso?: boolean
+  /**
+   * Il frame Figma della stessa domanda una volta aperta, dove ce n'e' uno.
+   * Serve solo alle macchie di sfondo, che nel disegno cambiano fra i due
+   * stati: sta qui e non nel componente perche' gli id di Figma vivono
+   * tutti in questo file.
+   */
+  nodoAperto?: { it: string; en: string }
 }
 
 /** Meno di 18 anni compiuti oggi. Se la data non c'e' ancora, si assume di si'. */
@@ -80,18 +87,22 @@ export const PERCORSO: Passo[] = [
   { id: 'ed-fisica', corpo: 'edFisica', nodo: { it: '3772:193', en: '3958:709' } },
   { id: 'gare', corpo: 'gare', nodo: { it: '3772:223', en: '3958:745' } },
 
-  { id: 'ciclo', corpo: 'cicloSiNo', nodo: { it: '3772:241', en: '3958:769' } },
+  {
+    id: 'ciclo',
+    corpo: 'cicloSiNo',
+    nodo: { it: '3772:241', en: '3958:769' },
+    nodoAperto: { it: '3907:2', en: '3958:1308' },
+  },
   /*
-   * Stesso corpo di `ciclo`, non un altro: 3907:2 e' quel frame li' con la
-   * prima carta aperta. Due voci nel percorso e un componente solo — cosi'
-   * l'indirizzo cambia (e il tasto indietro richiude) ma le due carte che
-   * restano scorrono in giu' invece di rinascere.
+   * 13b-first-period-date (3907:2) non e' un passo: e' questa stessa domanda
+   * con la prima carta aperta. Si tocca "si'" e la carta diventa il modulo
+   * del mese e dell'anno, senza cambiare schermo ne' far salire la barra —
+   * e' un frame solo, e la barra sale quando la domanda e' finita.
    *
    * 13-cycle-age (3871:2) chiedeva la stessa cosa come numero di anni. Resta
    * in Figma ma non nel percorso: mese e anno sono piu' facili da rispondere
    * di un'eta' che va ricordata a mente.
    */
-  { id: 'primo-ciclo', corpo: 'cicloSiNo', nodo: { it: '3907:2', en: '3958:1308' }, salta: haCiclo },
   { id: 'ciclo-date', corpo: 'cicloDate', nodo: { it: '3772:261', en: '3958:797' }, salta: haCiclo },
   {
     id: 'contraccettivo',

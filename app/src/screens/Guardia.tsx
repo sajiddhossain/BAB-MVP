@@ -21,6 +21,19 @@ import { useProfilo } from '../lib/profilo'
  */
 const ACCESSO = ['/onboarding/accesso', '/onboarding/link']
 
+/**
+ * Il lasciapassare per lavorare sugli schermi.
+ *
+ * Serve a guardare l'onboarding senza rifare l'accesso ogni volta. Vive solo
+ * con il server di sviluppo: `import.meta.env.DEV` e' falso in ogni versione
+ * costruita per essere pubblicata, quindi questo `if` sparisce proprio dal
+ * codice compilato — non e' una porta chiusa a chiave, e' una porta che in
+ * produzione non e' mai stata murata perche' non e' mai esistita.
+ *
+ * Si accende mettendo `VITE_SENZA_ACCESSO=1` in `.env.local`, che git ignora.
+ */
+const SENZA_ACCESSO = import.meta.env.DEV && import.meta.env.VITE_SENZA_ACCESSO === '1'
+
 export function Guardia({ children }: { children: ReactNode }) {
   const { sessione, caricata } = useSessione()
   const dove = useLocation()
@@ -31,7 +44,7 @@ export function Guardia({ children }: { children: ReactNode }) {
     if (profilo === 'si') void caricaProfilo()
   }, [profilo])
 
-  if (!acceso) return <>{children}</>
+  if (!acceso || SENZA_ACCESSO) return <>{children}</>
 
   // finche' non si sa, non si decide: mandare all'accesso qui vorrebbe dire
   // buttare fuori a ogni ricarica chi la sessione ce l'ha

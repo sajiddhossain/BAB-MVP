@@ -15,37 +15,40 @@ const STACCO = 'mt-[52px]'
 /*
  * 11-cycle-question + 13b-first-period-date — 3772:241 / 3958:769 e 3907:2
  *
- * Sono un frame solo, non due schermi: in 3907:2 le altre due carte sono
- * ancora li' sotto, scese di 70px, e la prima si e' aperta nel modulo del
- * mese e dell'anno. Per questo qui c'e' un componente solo che si apre,
- * invece di due schermi che si sostituiscono — sostituendoli, le due carte
- * che restano ripartirebbero da capo invece di scorrere in giu'.
+ * Un frame solo, non due schermi. In 3907:2 le altre due carte sono ancora
+ * li' sotto, scese di 70px, e la prima si e' aperta nel modulo del mese e
+ * dell'anno: non e' la schermata dopo, e' questa che si apre.
  *
- * L'indirizzo pero' resta diverso (`ciclo` e `primo-ciclo`): cosi' il tasto
- * indietro del telefono richiude il modulo invece di uscire dalla domanda, e
- * la barra dell'avanzamento sale, come sale in Figma fra i due frame.
+ * Quindi qui non si naviga: si tocca "si'" e la carta diventa il modulo,
+ * l'indirizzo non cambia e la barra non sale. La barra sale quando la
+ * domanda e' finita, non a meta'. Il tasto indietro esce dalla domanda, come
+ * su tutte le altre.
  *
  * Chiusa non ha bottone: si tocca una carta e si va. E' l'unica domanda
  * dell'onboarding senza "Continua", ed e' cosi' anche nel disegno.
  */
 export function CorpoCicloSiNo({ passo, nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
-  const { t } = useLingua()
+  const { lingua, t } = useLingua()
   const { ciclo, primoCicloMese, primoCicloAnno } = useRisposte()
-  const aperto = passo.id === 'primo-ciclo'
+
+  // aperta e' una risposta, non un indirizzo
+  const aperto = ciclo === 'si'
 
   const oggi = new Date().getFullYear()
   const anni = Array.from({ length: 20 }, (_, i) => oggi - i)
 
   function rispondi(id: string) {
     scrivi({ ciclo: id as Risposte['ciclo'] })
-    avanti()
+    // "si'" apre il modulo e resta qui: le altre due sono risposte finite
+    if (id !== 'si') avanti()
   }
 
   const altre = t.cicloSiNo.scelte.filter((s) => s.id !== 'si')
 
   return (
     <Schermo
-      nodo={nodo}
+      // aprendosi cambiano anche le macchie di sfondo: sfumano, non scattano
+      nodo={aperto ? (passo.nodoAperto?.[lingua] ?? nodo) : nodo}
       verso={verso}
       avanzamento={avanzamento}
       indietro={indietro}

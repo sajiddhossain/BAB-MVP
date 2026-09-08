@@ -103,10 +103,23 @@ export function Onboarding() {
    */
   const verso = tipoDiNavigazione === 'POP' ? 'indietro' : 'avanti'
 
-  // l'avanzamento conta solo gli schermi del percorso vero: accesso, codice e
-  // presentazione vengono prima, e li' la barra non c'e' proprio
-  const nelPercorso = percorso.filter((p) => !p.fuoriPercorso)
-  const posizione = nelPercorso.indexOf(passo)
+  /*
+   * L'avanzamento si conta sul percorso INTERO, non su quello che si vede.
+   *
+   * Contandolo sul visibile, rispondere faceva tornare indietro la barra:
+   * dire "si'" al ciclo fa comparire due domande, il totale cresce, e la
+   * stessa posizione diventa una frazione piu' piccola. Una barra che torna
+   * indietro e' peggio di una imprecisa.
+   *
+   * Sul percorso intero il totale non cambia mai e la barra sale e basta: chi
+   * salta delle domande fa un passo piu' lungo, che e' esattamente quello che
+   * e' successo — ne ha una in meno da fare.
+   *
+   * Accesso, codice e presentazione restano fuori dal conto: vengono prima
+   * del percorso, e li' la barra non c'e' proprio.
+   */
+  const domande = PERCORSO.filter((p) => !p.fuoriPercorso)
+  const posizione = domande.indexOf(passo)
 
   async function avanti() {
     // `tutte()` e non `risposte`: chi risponde toccando una carta scrive e
@@ -159,9 +172,7 @@ export function Onboarding() {
       passo={passo}
       nodo={passo.nodo[lingua]}
       verso={verso}
-      avanzamento={
-        posizione === -1 ? undefined : (posizione + 1) / nelPercorso.length
-      }
+      avanzamento={posizione === -1 ? undefined : (posizione + 1) / domande.length}
       avanti={() => void avanti()}
       salvando={salvando}
       erroreSalvataggio={nonSalvato}

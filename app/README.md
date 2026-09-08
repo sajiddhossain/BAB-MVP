@@ -96,6 +96,22 @@ schermo del compleanno: se stesse solo nella UI basterebbe una chiamata
 diretta all'API per aggirarla, e se stesse solo nel database l'inserimento
 fallirebbe alla fine con un errore che a chi legge non dice niente.
 
+### Lavorare sugli schermi senza rifare l'accesso
+
+Con le chiavi in `.env` la guardia chiede una sessione per tutto tranne i due
+schermi dell'accesso, il che rende scomodo lavorare sull'onboarding. Per
+saltarla mentre si sviluppa:
+
+```bash
+echo 'VITE_SENZA_ACCESSO=1' > app/.env.local
+```
+
+Vive **solo** con il server di sviluppo: e' dietro a `import.meta.env.DEV`,
+che e' falso in ogni versione costruita per essere pubblicata, quindi quella
+riga sparisce proprio dal codice compilato. Non e' una porta chiusa a chiave:
+in produzione non esiste. (Si controlla con
+`grep SENZA_ACCESSO dist/assets/*.js`, che non trova niente.)
+
 ### Provare l'accesso senza mandare mail
 
 Il codice a sei cifre si puo' farsi dare da Supabase senza spedirlo. Serve la
