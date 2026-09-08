@@ -90,7 +90,12 @@ export function Abbina({
         </Esito>
       }
     >
-      {icone ? <Titolo>{t.titolo}</Titolo> : <Testa sopra={t.sopra} occhiello={t.occhiello ?? ''} titolo={t.titolo} />}
+      {/* la lezione 1 ha il titolo e basta; dalla quarta l'occhiello torna */}
+      {icone && !t.occhiello ? (
+        <Titolo>{t.titolo}</Titolo>
+      ) : (
+        <Testa sopra={t.sopra} occhiello={t.occhiello ?? ''} titolo={t.titolo} />
+      )}
 
       <div className={`flex flex-col gap-3 ${icone ? 'mt-[21px]' : 'mt-[30px]'}`}>
         {passo.righe.map((riga, i) => {

@@ -119,6 +119,19 @@ export type ContenutoLezione = {
      * della parola, che e' quello che l'app sa gia'.
      */
     etichette?: string[]
+    /**
+     * Quale risposta e' quella giusta, quando non e' la stessa nelle due
+     * lingue.
+     *
+     * Di norma questo sta nei dati e non nei testi: un indice non e' una
+     * scritta. Ma dalla lezione 4 le due versioni del file raccontano due
+     * scene diverse — la risata che scuote la pancia da una parte, il gluteo
+     * che non molla dall'altra — e la risposta giusta cambia con la scena.
+     * Tenerne una sola vorrebbe dire buttare una delle due scene.
+     *
+     * Dove manca, vale quella dei dati.
+     */
+    giusta?: number
     esito: string
     azione: string
   }
@@ -131,6 +144,8 @@ export type ContenutoLezione = {
     scenario: string
     domanda: string
     etichette?: string[]
+    /** vedi `gemelle.giusta` */
+    giusta?: number
     esito: string
     azione: string
   }
@@ -576,6 +591,134 @@ const it = {
         azione: 'Torna al percorso',
       },
     },
+
+    4: {
+      incontra: [
+        {
+          occhiello: 'PAROLA 1 DI 2',
+          titolo: 'Incontra «{uno}»',
+          metafora: 'Un pugno che si stringe.',
+          descrizione:
+            'È quel dolore che va e viene, simile a un pugno che si stringe e si rilascia in modo ritmico. Tipico del periodo mestruale.',
+          blocchi: [
+            {
+              testo:
+                'Si presenta a ondate: momenti di tensione si alternano a pause di sollievo spontaneo.',
+            },
+            {
+              testo:
+                'Rilassare il respiro durante la fase di rilascio aiuta il corpo a non accumulare altra tensione protettiva.',
+            },
+          ],
+          azione: 'Prossima parola',
+        },
+        {
+          occhiello: 'PAROLA 2 DI 2',
+          titolo: 'Incontra «{due}»',
+          metafora: 'Una mano che non molla.',
+          descrizione:
+            'È una sensazione di stretta costante. Come una pinza che tiene forte senza mai allentare la presa, e blocca la zona.',
+          blocchi: [
+            {
+              etichetta: '«{uno}» O «{due}»?',
+              testo:
+                'Il «{uno}» arriva e se ne va a ondate ritmiche. Il «{due}» è una pressione fissa, che resta.',
+            },
+          ],
+          azione: 'Facciamo pratica',
+        },
+      ],
+
+      abbina: {
+        occhiello: 'ESERCIZIO 1',
+        titolo: 'Associa le sensazioni',
+        cesto: 'PAROLE DISPONIBILI',
+        righe: [
+          'Un pugno che si stringe e si rilascia',
+          'Una pinza che tiene e non molla mai',
+          'Una corda tirata al limite',
+          'Una cerniera che si inceppa',
+        ],
+        esche: [],
+        azione: 'Verifica',
+      },
+
+      gemelle: {
+        occhiello: 'FALSI AMICI',
+        titolo: 'Attenta ai dettagli',
+        badge: 'Scenario',
+        scenario:
+          'Quando ridi fortissimo e la pancia ti fa male a ogni sobbalzo, che sensazione provi?',
+        domanda: '',
+        glosse: [],
+        giusta: 0,
+        esito:
+          'Il sussulto della risata è una contrazione che va e viene a ritmo: è un «{uno}», non un «{due}».',
+        azione: 'Verifica',
+      },
+
+      storia: {
+        occhiello: 'LA TUA STORIA',
+        titolo: 'Ascolta la scena',
+        badge: 'SCENARIO',
+        scenario:
+          '«Durante l’ora di matematica sento un peso costante alla bassa schiena, fisso e sordo, come se qualcosa mi stesse stringendo forte senza mai mollare.»',
+        domanda: '',
+        etichette: ['«{uno}» (a ondate)', '«{due}» (stretta costante)'],
+        giusta: 1,
+        esito:
+          'Un peso fisso che non molla mai è «{due}». Il «{uno}» invece stringe, lascia, e stringe di nuovo.',
+        azione: 'Verifica',
+      },
+
+      mossa: {
+        occhiello: 'CALIBRAZIONE',
+        titolo: 'Cosa fare adesso?',
+        badge: 'YOUR MOVE',
+        scenario:
+          'Se senti la bassa schiena «{due}» durante la lezione, quale strategia applichi?',
+        etichette: [
+          'Continuare camminando velocemente senza fermarti',
+          'Muoverti dolcemente (Calibra)',
+          'Fermarti del tutto (Stop)',
+        ],
+        scelte: [
+          'Non è la scelta migliore in questo scenario.',
+          'Il corpo si sta difendendo dallo sforzo: un movimento leggero scioglie la stretta.',
+          'Solo in caso di fitta acuta o di dolore che impedisce ogni movimento.',
+        ],
+        esito:
+          'Con la bassa schiena «{due}» durante la lezione la strategia migliore è muoverti dolcemente. Fermarti del tutto vale solo per una fitta acuta o un dolore che impedisce ogni movimento.',
+        azione: 'Verifica',
+      },
+
+      frase: {
+        occhiello: 'SALVA LA TUA PAROLA',
+        titolo: 'Componi la frase',
+        intro:
+          'Trascina o scegli gli elementi per raccontare com’è andata oggi:',
+        cesto: 'TRASCINA LE PAROLE',
+        /*
+         * Senza virgolette e senza articolo davanti alla parola: qui i
+         * tasselli sono quattro di fila, e le virgolette basse finivano
+         * spaiate a fine riga. E' un referto, non una frase di scuola.
+         */
+        modello: 'Oggi {0}: {morsa} {2} {3}.',
+        esche: ['bassa schiena', 'durante', 'tutta la lezione'],
+        azione: 'Salva & finisci',
+      },
+
+      fatto: {
+        titolo: 'Ottimo lavoro! 🎉',
+        etichetta: 'LEZIONE 4 COMPLETATA',
+        sotto:
+          'Hai sbloccato 2 nuove parole per descrivere i segnali della pancia e della schiena.',
+        righe: ['Contrazione forte e improvvisa', 'Come se qualcosa stringesse forte'],
+        etichettaProgresso: 'PROGRESSO TOTALE',
+        conteggio: '{fatte} / {tutte} parole sbloccate',
+        azione: 'Torna al percorso',
+      },
+    },
   } as Record<number, ContenutoLezione>,
 }
 
@@ -929,6 +1072,112 @@ const en: typeof it = {
         titolo: 'Lesson 3 done.',
         sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
         etichetta: 'NOW AVAILABLE WHEN YOU CHECK IN',
+        etichettaProgresso: 'TOTAL PROGRESS',
+        conteggio: '{fatte} / {tutte} words unlocked',
+        azione: 'Back to the path',
+      },
+    },
+
+    4: {
+      incontra: [
+        {
+          occhiello: 'WORD 1 OF 2',
+          titolo: '{uno}',
+          metafora: 'A fist clenching and unclenching.',
+          descrizione: 'It comes in waves: grabs, lets go, grabs again.',
+          blocchi: [
+            {
+              testo:
+                'Your muscle grabbing on and forgetting to let go — then remembering, then forgetting again.',
+            },
+            {
+              pastiglia: 'Calibrate — stop, lengthen slowly, drink, eat, get warm',
+              testo: 'Does it pulse? Cramp pulses.',
+            },
+          ],
+          azione: 'Next word',
+        },
+        {
+          occhiello: 'WORD 2 OF 2',
+          titolo: '{due}',
+          metafora: "A hand that won't let go.",
+          descrizione:
+            'Same clench, but constant. One spot. It holds you in a position and you find yourself guarding it.',
+          blocchi: [{ etichetta: 'THE SPLIT', testo: '{uno} pulses. {due} holds.' }],
+          azione: "Let's practise",
+        },
+      ],
+
+      abbina: {
+        occhiello: 'MATCH',
+        titolo: 'Put the word on its picture.',
+        cesto: 'WORD BANK',
+        righe: [
+          'A fist clenching and unclenching',
+          "A hand that won't let go",
+          'A guitar string tuned too high',
+          'A stuck zip',
+        ],
+        esche: [],
+        azione: 'Check',
+      },
+
+      gemelle: {
+        occhiello: 'FALSE FRIENDS',
+        titolo: 'Which one is this?',
+        badge: 'SCENARIO',
+        scenario:
+          "One spot in your left glute has been clenched since the warm-up. It hasn't let go once.",
+        domanda: '',
+        glosse: [],
+        giusta: 1,
+        esito: "Has it let go even once in the last minute? If no, it's {due}.",
+        azione: 'Check',
+      },
+
+      storia: {
+        occhiello: 'REAL LIFE',
+        titolo: 'Name it.',
+        badge: 'CYCLE · TRAINING',
+        scenario:
+          "Day 1. Low belly. It grips, lets go, grips again, in waves — and you've got a session in two hours.",
+        domanda: '',
+        etichette: ['{uno} (in waves)', '{due} (one constant hold)'],
+        giusta: 0,
+        esito: 'It lets go and comes back. That rhythm is {uno}, not {due}.',
+        azione: 'Check',
+      },
+
+      mossa: {
+        occhiello: 'YOUR MOVE',
+        titolo: 'Same day. What do you do?',
+        badge: 'YOUR MOVE',
+        scenario: 'Day 1. Low belly. It grips, lets go, grips again. You called it {uno}.',
+        scelte: [
+          'Train it as planned',
+          'Adjust something, then check it again',
+          'Tell someone — coach, physio, parent, doctor',
+        ],
+        esito:
+          "It nags: it stays, it doesn't grow, you know the reason. Warm up longer, eat and drink first, keep the plan but drop the intensity a notch.",
+        azione: 'Check',
+      },
+
+      frase: {
+        occhiello: 'SAY IT OUT LOUD',
+        titolo: 'Build the sentence.',
+        intro: 'Knowing the word only counts if you can hand it to someone. Tap each gap.',
+        cesto: 'PICK A WORD',
+        modello: "My {0} feels {morsa} {2} {3}, it's 5/10, since this morning.",
+        esche: ['low belly', 'when', "I'm on day 1 of my period"],
+        azione: 'Finish lesson',
+      },
+
+      fatto: {
+        titolo: 'Lesson 4 done.',
+        etichetta: 'NOW AVAILABLE WHEN YOU CHECK IN',
+        sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
+        righe: ['A fist clenching and unclenching', "A hand that won't let go"],
         etichettaProgresso: 'TOTAL PROGRESS',
         conteggio: '{fatte} / {tutte} words unlocked',
         azione: 'Back to the path',

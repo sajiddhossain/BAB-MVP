@@ -27,10 +27,11 @@ const TINTE = ['#ffd1c1', '#e9d5ff']
  * `upsert`: rientrare in una lezione gia' fatta non rompe niente e non
  * sblocca niente due volte.
  *
- * ── TRE FORME, PERCHE' IL DISEGNO NE HA TRE ────────────────────────────────
+ * ── QUATTRO FORME, PERCHE' IL DISEGNO NE HA QUATTRO ────────────────────────
  * La medaglia grande con la scheda del progresso, la scintilla con le due
- * parole a pastiglia e la barra, la coppa piccola con gli otto pallini. Le
- * lezioni piu' avanti ne aggiungeranno altre.
+ * parole a pastiglia e la barra, la coppa piccola con gli otto pallini, la
+ * coppa in mezzo dentro a un alone con la percentuale accanto al conteggio.
+ * Le lezioni piu' avanti ne aggiungeranno altre.
  */
 export function Fatto({
   passo,
@@ -80,6 +81,17 @@ export function Fatto({
           <img src={coppa} alt="" aria-hidden className="size-8" />
         </span>
       )}
+      {passo.forma === 'trofeo' && (
+        <div className="relative mx-auto mt-[10px] flex size-[140px] items-center justify-center">
+          {/* l'alone: e' un cerchio sfumato che sta dietro alla coppa, non un bordo */}
+          <span
+            aria-hidden
+            className="absolute inset-0 rounded-full opacity-60 blur-[2px]"
+            style={{ background: 'radial-gradient(circle, #e9d5ff 0%, transparent 70%)' }}
+          />
+          <img src={coppa} alt="" aria-hidden className="relative size-[67px]" />
+        </div>
+      )}
 
       <h1
         className={`bab-display m-0 text-[28px] leading-[34px] font-bold tracking-[-0.56px] text-ink ${
@@ -89,17 +101,27 @@ export function Fatto({
         {t.titolo}
       </h1>
 
+      {/*
+        Nella forma `trofeo` l'etichetta sta sopra alla riga di sotto e non
+        sotto: li' non annuncia le due parole, dice che lezione si e' finita.
+      */}
+      {t.etichetta && passo.forma === 'trofeo' && (
+        <p className="m-0 mt-[30px] text-[10px] font-bold tracking-[1px] uppercase text-lilla">
+          {t.etichetta}
+        </p>
+      )}
+
       {t.sotto && (
         <p
-          className={`m-0 mt-4 text-[15px] leading-[1.4] text-ink-soft ${
-            passo.forma === 'coppa' ? '' : 'text-center'
+          className={`m-0 text-[15px] leading-[1.4] text-ink-soft ${
+            passo.forma === 'coppa' ? 'mt-4' : passo.forma === 'trofeo' ? 'mt-[6px]' : 'mt-4 text-center'
           }`}
         >
           {riempi(t.sotto, { ...numeri, uno: nome(incontri, 0, ts), due: nome(incontri, 1, ts) })}
         </p>
       )}
 
-      {t.etichetta && (
+      {t.etichetta && passo.forma !== 'trofeo' && (
         <p
           className={`m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla ${
             passo.forma === 'coppa' ? 'mt-[30px]' : 'mt-[26px] text-center'
@@ -110,7 +132,7 @@ export function Fatto({
       )}
 
       {/* le due parole appena sbloccate: schede, pastiglie, o righe con icona */}
-      {passo.forma === 'stat' && (
+      {(passo.forma === 'stat' || passo.forma === 'trofeo') && (
         <div className="mt-[19px] grid grid-cols-2 gap-3">
           {incontri.map((p, i) => (
             <div
@@ -174,7 +196,9 @@ export function Fatto({
         className={`relative overflow-hidden rounded-[20px] border px-5 py-[22px] ${
           passo.forma === 'stat'
             ? 'mt-5 flex items-center gap-3'
-            : 'mt-[26px] border-[0.5px] border-[rgba(209,201,196,0.5)] bg-surface pl-[30px] shadow-[0px_6px_20px_0px_rgba(0,0,0,0.04)]'
+            : `border-[0.5px] border-[rgba(209,201,196,0.5)] bg-surface pl-[30px] shadow-[0px_6px_20px_0px_rgba(0,0,0,0.04)] ${
+                passo.forma === 'trofeo' ? 'mt-[30px] flex items-center gap-3' : 'mt-[26px]'
+              }`
         }`}
         style={
           passo.forma === 'stat'
@@ -240,8 +264,12 @@ export function Fatto({
           )}
         </span>
 
-        {passo.forma === 'stat' && (
-          <span className="shrink-0 rounded-pill bg-surface px-3 py-[6px] text-[13px] font-bold text-[#2b662b]">
+        {(passo.forma === 'stat' || passo.forma === 'trofeo') && (
+          <span
+            className={`shrink-0 rounded-pill px-3 py-[6px] text-[13px] font-bold ${
+              passo.forma === 'stat' ? 'bg-surface text-[#2b662b]' : 'bg-chip text-lilla'
+            }`}
+          >
             +{quota}%
           </span>
         )}

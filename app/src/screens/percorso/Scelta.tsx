@@ -56,6 +56,14 @@ export function Scelta({
   const badge = <Badge>{t.badge}</Badge>
   const scenario = riempi(t.scenario, buchi)
 
+  /*
+   * La risposta giusta di solito sta nei dati. Dalla lezione 4 pero' le due
+   * lingue raccontano due scene diverse — e la scena decide la risposta —
+   * quindi dove i testi ne danno una, vince quella: e' la stessa scritta che
+   * l'atleta legge.
+   */
+  const giusta = t.giusta ?? passo.giusta
+
   return (
     <Guscio
       avanzamento={avanzamento}
@@ -67,7 +75,7 @@ export function Scelta({
           avanti()
           return
         }
-        setEsito(scelta === passo.giusta)
+        setEsito(scelta === giusta)
       }}
       esito={
         <Esito

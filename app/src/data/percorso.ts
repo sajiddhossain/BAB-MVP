@@ -37,6 +37,10 @@ export type IconaLezione =
   | 'onde'
   | 'frecce'
   | 'cerniera'
+  | 'pugno'
+  | 'mano'
+  | 'freccia-su-destra'
+  | 'lucchetto'
 
 /**
  * I due impaginati.
@@ -173,8 +177,10 @@ export type Passo =
    *             (lezione 2)
    * `coppa`     la coppa piccola in alto a sinistra e gli otto pallini
    *             U1..U8 (lezione 3)
+   * `trofeo`    la coppa in mezzo dentro a un alone, le due parole in due
+   *             schede alte, e la percentuale accanto al progresso (lezione 4)
    */
-  | { tipo: 'fatto'; forma: 'stat' | 'scintilla' | 'coppa' }
+  | { tipo: 'fatto'; forma: 'stat' | 'scintilla' | 'coppa' | 'trofeo' }
 
 /** Come si presenta lo scenario di uno schermo a scelta multipla. */
 export type FormaScenario =
@@ -313,6 +319,38 @@ export const PASSI: Record<number, Passo[]> = {
       cesto: [{ esca: 0 }, { parola: 'rigido' }, { esca: 1 }],
     },
     { tipo: 'fatto', forma: 'coppa' },
+  ],
+
+  4: [
+    { tipo: 'incontra', parola: 'crampo', icona: 'pugno', blocchi: ['nota', 'pastiglia'] },
+    { tipo: 'incontra', parola: 'morsa', icona: 'mano', blocchi: ['titolato'] },
+    {
+      /* si ripassano anche le due parole della lezione 3 */
+      tipo: 'abbina',
+      forma: 'icone',
+      righe: [
+        { icona: 'pugno', giusta: 0 },
+        { icona: 'mano', giusta: 1 },
+        { icona: 'freccia-su-destra', giusta: 2 },
+        { icona: 'lucchetto', giusta: 3 },
+      ],
+      parole: ['crampo', 'morsa', 'teso', 'rigido'],
+      esche: 0,
+    },
+    /*
+     * Qui `giusta` la scrivono i testi, una per lingua: le due scene sono
+     * diverse nelle due versioni del file e portano a risposte opposte.
+     * Il numero qui sotto e' quello che vale se i testi non dicono niente.
+     */
+    { tipo: 'gemelle', forma: 'testo', risposte: ['crampo', 'morsa'], giusta: 0 },
+    { tipo: 'storia', forma: 'testo', risposte: ['crampo', 'morsa'], giusta: 1 },
+    { tipo: 'mossa', giusta: 'calibra' },
+    {
+      tipo: 'frase',
+      forma: 'scheda',
+      cesto: [{ esca: 0 }, { parola: 'morsa' }, { esca: 1 }, { esca: 2 }],
+    },
+    { tipo: 'fatto', forma: 'trofeo' },
   ],
 }
 
