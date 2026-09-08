@@ -351,6 +351,24 @@ const it = {
       sottoFatto: '"acuto" è comparso oggi — scopri cosa significa',
     },
 
+    /*
+     * Cosa dice la home quando non e' ora.
+     *
+     * Il check-in si fa la mattina e il check-out dopo l'allenamento: fuori
+     * da quelle ore il bottone non c'e', e al suo posto c'e' una di queste
+     * righe. `{ora}` lo mette l'app dalle finestre in `lib/finestre.ts`, non
+     * si scrive a mano: se un giorno si spostano gli orari, una scritta a
+     * mano resterebbe indietro senza che nessuno se ne accorga.
+     */
+    finestra: {
+      checkinPresto: 'Il check-in apre alle {ora}.',
+      checkinRitardo: 'Il momento del check-in era stamattina, ma puoi ancora farlo.',
+      checkinChiuso: 'Il check-in di oggi si è chiuso. Riapre domani alle {ora}.',
+      checkoutPresto: 'Il check-out apre alle {ora}, dopo l’allenamento.',
+      checkoutRitardo: 'Il momento del check-out è passato, ma puoi ancora farlo.',
+      fatto: 'Fatto per oggi.',
+    },
+
     sezioni: {
       intanto: 'INTANTO CHE SEI QUI',
       nientaltro: "NIENT'ALTRO PER OGGI",
@@ -702,6 +720,24 @@ const en: typeof it = {
       sotto: '2 min · 2 words waiting in your check-in',
       sottoRiposo: '2 min',
       sottoFatto: '"sharp" came up today — find out what it means',
+    },
+
+    /*
+     * Cosa dice la home quando non e' ora.
+     *
+     * Il check-in si fa la mattina e il check-out dopo l'allenamento: fuori
+     * da quelle ore il bottone non c'e', e al suo posto c'e' una di queste
+     * righe. `{ora}` lo mette l'app dalle finestre in `lib/finestre.ts`, non
+     * si scrive a mano: se un giorno si spostano gli orari, una scritta a
+     * mano resterebbe indietro senza che nessuno se ne accorga.
+     */
+    finestra: {
+      checkinPresto: 'Check-in opens at {ora}.',
+      checkinRitardo: 'The morning check-in has passed, but you can still do it.',
+      checkinChiuso: 'Today’s check-in has closed. It opens again tomorrow at {ora}.',
+      checkoutPresto: 'Check-out opens at {ora}, after training.',
+      checkoutRitardo: 'The check-out window has passed, but you can still do it.',
+      fatto: 'Done for today.',
     },
 
     sezioni: {

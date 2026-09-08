@@ -232,6 +232,13 @@ alter table public.check_ins add column if not exists satisfaction text
     ('disappointed','frustrated','satisfied','confident','proud'));
 alter table public.check_ins add column if not exists on_period boolean;
 
+-- L'ora sull'orologio dell'atleta quando ha finito. `completed_at` da' l'istante
+-- assoluto in UTC; per il momento della SUA giornata servirebbe il fuso, e
+-- `athletes.timezone` non lo scrive nessuno — e' un default, non un dato. Si
+-- scrive quindi come si scrive `local_date`, e per la stessa ragione: il fuso
+-- lo conosce il telefono. Staccata in `migrazione-orari.sql`.
+alter table public.check_ins add column if not exists local_time time;
+
 
 -- ── SEGNALI CORPOREI ────────────────────────────────────────────────────────
 -- Una riga per sensazione toccata, non un JSON nel check-in: "quante volte

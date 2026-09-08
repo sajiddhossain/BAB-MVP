@@ -285,6 +285,12 @@ const RITMO_DB: Record<Tempo, string> = Object.fromEntries(
   RITMI.map((r) => [r.id, r.db]),
 ) as Record<Tempo, string>
 
+/** L'ora sull'orologio di casa sua: `07:12:00`. */
+function oraLocale(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
+}
+
 /**
  * Scrive un check-in o un check-out nel database.
  *
@@ -303,8 +309,9 @@ export async function salvaSessione(tipo: Tipo, d: Dati): Promise<Esito> {
   if (!atleta) return { ok: false, errore: 'nessuna sessione', scaduta: true }
 
   const kind = tipo === 'checkin' ? 'pre' : 'post'
-  const giorno = giornoAtleta()
-  const adesso = new Date().toISOString()
+  const ora = new Date()
+  const giorno = giornoAtleta(ora)
+  const adesso = ora.toISOString()
 
   /*
    * L'id della riga si riusa se ce n'e' gia' una per oggi.
@@ -334,6 +341,14 @@ export async function salvaSessione(tipo: Tipo, d: Dati): Promise<Esito> {
     local_date: giorno,
     started_at: d.iniziata || adesso,
     completed_at: adesso,
+    /*
+     * L'ora del SUO orologio. `completed_at` da' l'istante assoluto in UTC, e
+     * per tornare da quello al momento della sua giornata servirebbe il fuso:
+     * `athletes.timezone` c'e' ma non lo scrive nessuno, e' un default. Si
+     * scrive quindi qui, come si scrive gia' `local_date` e per la stessa
+     * ragione: il fuso lo conosce solo il telefono.
+     */
+    local_time: oraLocale(ora),
     // il ritmo va in due colonne diverse a seconda del giro: quella prima e'
     // una previsione, quella dopo e' un esito, e confonderle vorrebbe dire
     // perdere l'unica cosa che il confronto misura

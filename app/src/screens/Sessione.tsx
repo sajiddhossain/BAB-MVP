@@ -5,9 +5,8 @@ import { PERCORSI, percorsoSessione } from '../data/sessione'
 import type { CorpoSessione, Tipo } from '../data/sessione'
 import { datiSessione, salvaSessione, scriviSessione, useDatiSessione } from '../lib/sessione'
 import { segna } from '../lib/giornata'
-import { useLingua } from '../lib/lingua'
-import { riempi } from '../copy/riempi'
-import type { TestiSessione } from '../copy/sessione'
+import { siPuoFare } from '../lib/finestre'
+import { IN_ANTEPRIMA, SENZA_ACCESSO } from '../lib/sviluppo'
 import type { PropsSessione } from './tipi'
 import { CorpoRitmo } from './corpi/SessioneRitmo'
 import { CorpoSintonia } from './corpi/SessioneSintonia'
@@ -52,7 +51,26 @@ export function Sessione() {
   const passo = PERCORSI[buono].find((p) => p.id === id)
   const visibile = passo !== undefined && percorso.includes(passo)
 
-  const { ts } = useLingua()
+
+  /*
+   * Fuori orario si torna alla home.
+   *
+   * Il bottone la home non ce l'ha, ma l'indirizzo si scrive a mano e una
+   * notifica vecchia ci porta: senza questo, una finestra chiusa sarebbe una
+   * cortesia della home invece che una regola.
+   *
+   * Il controllo si fa solo entrando, non a ogni schermo: chi comincia alle
+   * 11:58 finisce in pace. La finestra decide quando si comincia, non quanto
+   * si puo' metterci — mettere fretta a una che sta ascoltando il proprio
+   * corpo sarebbe il contrario di quello che le stiamo chiedendo.
+   *
+   * L'anteprima dell'amministrazione e' fuori: li' gli schermi si guardano a
+   * qualunque ora, e non c'e' nessuna giornata vera da rovinare.
+   */
+  useEffect(() => {
+    if (IN_ANTEPRIMA || SENZA_ACCESSO) return
+    if (!siPuoFare(buono)) vai('/casa', { replace: true })
+  }, [buono, vai])
 
   // l'ora in cui ha cominciato: finisce in `started_at`, che e' come si
   // misura quanto tempo si prende — non per metterle fretta, per capire
@@ -125,12 +143,7 @@ export function Sessione() {
     if (buono === 'checkin') {
       segna({ fattoCheckin: true, previsto: adesso.ritmo })
     } else {
-      const previsto = datiSessione('checkin').ritmo
-      segna({
-        fattoCheckout: true,
-        sentito: adesso.ritmo,
-        riassunto: riassuntoDelGiorno(previsto, adesso.ritmo, ts),
-      })
+      segna({ fattoCheckout: true, sentito: adesso.ritmo })
     }
     vai('/casa')
   }
@@ -155,24 +168,4 @@ export function Sessione() {
       indietro={posizione > 0 ? () => vai(-1) : () => vai('/casa')}
     />
   )
-}
-
-/**
- * La frase che la home mostra a giornata finita.
- *
- * Il disegno della home non dice cosa ci vada dentro: qui si scrive il
- * confronto, che e' l'unica cosa che la giornata ha davvero prodotto.
- */
-function riassuntoDelGiorno(
-  previsto: string | null,
-  sentito: string | null,
-  ts: TestiSessione,
-): string {
-  const nomi = ts.comune.ritmi
-  if (!sentito) return ''
-  const dopo = nomi[sentito as keyof typeof nomi]
-  if (!previsto) return riempi(ts.giorno.soloDopo, { dopo: dopo.toLowerCase() })
-  const prima = nomi[previsto as keyof typeof nomi]
-  const modello = previsto === sentito ? ts.giorno.uguale : ts.giorno.diverso
-  return riempi(modello, { prima, dopo: dopo.toLowerCase() })
 }

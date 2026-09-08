@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Sfondo } from '../ui/Sfondo'
 import { riempi } from '../copy/riempi'
@@ -9,7 +11,15 @@ import { SchedaPercorso } from '../ui/casa/SchedaPercorso'
 import { useLingua } from '../lib/lingua'
 import { ora as formattaOra, oraDaTesto } from '../lib/ore'
 import { useRisposte } from '../lib/risposte'
-import { allenamentoDiOggi, statoDiOggi, useGiornata } from '../lib/giornata'
+import {
+  allenamentoDiOggi,
+  caricaGiornata,
+  riassuntoDelGiorno,
+  statoDiOggi,
+  useGiornata,
+} from '../lib/giornata'
+import { oraApertura, statoFinestra } from '../lib/finestre'
+import type { TipoSessione } from '../lib/finestre'
 import { TEMPI, CAMPI_RIPOSO } from '../data/casa'
 import type { StatoGiornata, Tempo } from '../data/casa'
 
@@ -37,6 +47,23 @@ const ICONA_CAMPO: Record<string, string> = {
   bodymap: campoBodymap,
   ciclo: campoCiclo,
   antidolorifici: campoAntidolorifici,
+}
+
+/**
+ * L'orologio finto di `?ora=`.
+ *
+ * Torna `null` per qualunque cosa non sia `HH:MM`, cosi' un indirizzo storto
+ * non manda la home in un giorno impossibile: si guarda l'ora vera e basta.
+ */
+function oraFinta(testo: string | null): Date | null {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(testo ?? '')
+  if (!m) return null
+  const ore = Number(m[1])
+  const minuti = Number(m[2])
+  if (ore > 23 || minuti > 59) return null
+  const d = new Date()
+  d.setHours(ore, minuti, 0, 0)
+  return d
 }
 
 /** L'etichetta della sezione fra la scheda grande e quella sotto. */
@@ -67,15 +94,34 @@ export function Casa() {
   const giornata = useGiornata()
   const [query] = useSearchParams()
 
+  /*
+   * Ogni volta che si torna qui si richiede al database cos'e' stato fatto
+   * oggi. E' la stessa query dell'avvio, e serve al caso piu' banale: la
+   * sessione l'ha finita da un altro telefono, o l'aveva finita ieri sera e
+   * l'app e' rimasta aperta in tasca fino a stamattina.
+   */
+  useEffect(() => {
+    void caricaGiornata()
+  }, [])
+
+  /*
+   * `?ora=07:30` sposta l'orologio, ma solo per questa schermata.
+   *
+   * Serve alla stessa cosa di `?stato=`: guardare come si vede la home alle
+   * sette di mattina senza aspettare le sette di mattina. Non apre niente —
+   * chi preme il bottone finisce comunque contro la finestra vera, che sta
+   * dentro al check-in e non guarda l'indirizzo.
+   */
+  const adesso = oraFinta(query.get('ora')) ?? new Date()
+
   const forzato = query.get('stato') as StatoGiornata | null
   const stato: StatoGiornata =
     forzato && ['checkin', 'checkout', 'fatto', 'riposo'].includes(forzato)
       ? forzato
-      : statoDiOggi(giornata)
+      : statoDiOggi(giornata, adesso)
 
-  const allenamento = allenamentoDiOggi()
+  const allenamento = allenamentoDiOggi(adesso)
   const nome = risposte.nome
-  const adesso = new Date()
   const orologio = formattaOra(adesso.getHours(), adesso.getMinutes(), lingua)
 
   return (
@@ -95,14 +141,16 @@ export function Casa() {
             giorno={adesso}
             ora={stato === 'checkout' || stato === 'fatto' ? orologio : undefined}
             nome={nome}
-            streak={giornata.streak}
+            streak={giornata.striscia}
           />
 
           <div className="mt-[15px]">
-            {stato === 'checkin' && <Checkin ora={oraDaTesto(allenamento.ora, lingua)} />}
-            {stato === 'checkout' && <Checkout previsto={giornata.previsto} />}
+            {stato === 'checkin' && (
+              <Checkin ora={oraDaTesto(allenamento.ora, lingua)} adesso={adesso} />
+            )}
+            {stato === 'checkout' && <Checkout previsto={giornata.previsto} adesso={adesso} />}
             {stato === 'fatto' && <Fatto />}
-            {stato === 'riposo' && <Riposo />}
+            {stato === 'riposo' && <Riposo adesso={adesso} />}
           </div>
 
           <Sezione>
@@ -153,8 +201,71 @@ export function Casa() {
   )
 }
 
+/**
+ * Il posto del bottone.
+ *
+ * Quando e' ora c'e' il bottone. Quando non e' ancora ora, o quando il
+ * momento e' passato per sempre, al suo posto c'e' una riga che dice quando.
+ * Il bottone non diventa grigio: un bottone grigio invita a premerlo e non
+ * spiega niente, e chi non capisce perche' non funziona pensa che sia rotta
+ * l'app, non che sia presto.
+ *
+ * Quando il momento e' passato ma si puo' ancora fare, il bottone resta e la
+ * riga si aggiunge sotto. Il tono conta: la riga dice che si puo' ancora
+ * fare, non che e' in ritardo. Un'app che rimprovera un'atleta di dodici anni
+ * per un'ora di ritardo si fa chiudere, e con lei si chiude il dato.
+ */
+function Azione({
+  tipo,
+  adesso,
+  children,
+}: {
+  tipo: TipoSessione
+  adesso: Date
+  children: ReactNode
+}) {
+  const { t } = useLingua()
+  const f = t.casa.finestra
+  const stato = statoFinestra(tipo, adesso)
+
+  if (stato === 'presto') {
+    const modello = tipo === 'checkin' ? f.checkinPresto : f.checkoutPresto
+    return <Riga>{riempi(modello, { ora: oraApertura(tipo) })}</Riga>
+  }
+
+  /*
+   * Chiusa capita solo al check-in: dopo le 15:30 la giornata e' passata al
+   * check-out. Il check-out invece non chiude mai davvero — alle quattro del
+   * mattino il giorno cambia, e con lui la scheda.
+   */
+  if (stato === 'chiusa') {
+    return <Riga>{riempi(f.checkinChiuso, { ora: oraApertura('checkin') })}</Riga>
+  }
+
+  return (
+    <>
+      {children}
+      {stato === 'ritardo' && (
+        <Riga sopra>{tipo === 'checkin' ? f.checkinRitardo : f.checkoutRitardo}</Riga>
+      )}
+    </>
+  )
+}
+
+function Riga({ children, sopra = false }: { children: ReactNode; sopra?: boolean }) {
+  return (
+    <p
+      className={`m-0 text-center text-[12.5px] leading-[1.45] font-medium text-ink-medio ${
+        sopra ? 'mt-[10px]' : ''
+      }`}
+    >
+      {children}
+    </p>
+  )
+}
+
 /* ── home-1: c'e' l'allenamento e il check-in e' da fare ─────────────────── */
-function Checkin({ ora }: { ora: string }) {
+function Checkin({ ora, adesso }: { ora: string; adesso: Date }) {
   const { t } = useLingua()
   const vai = useNavigate()
   return (
@@ -179,14 +290,16 @@ function Checkin({ ora }: { ora: string }) {
       </div>
 
       <div className="mt-[14px]">
-        <Bottone onClick={() => vai('/sessione/checkin')}>{t.casa.checkin.azione}</Bottone>
+        <Azione tipo="checkin" adesso={adesso}>
+          <Bottone onClick={() => vai('/sessione/checkin')}>{t.casa.checkin.azione}</Bottone>
+        </Azione>
       </div>
     </SchedaEroe>
   )
 }
 
 /* ── home-2: la sessione e' finita, manca il check-out ───────────────────── */
-function Checkout({ previsto }: { previsto: Tempo | null }) {
+function Checkout({ previsto, adesso }: { previsto: Tempo | null; adesso: Date }) {
   const { t } = useLingua()
   const vai = useNavigate()
   return (
@@ -205,7 +318,9 @@ function Checkout({ previsto }: { previsto: Tempo | null }) {
       )}
 
       <div className="mt-[14px]">
-        <Bottone onClick={() => vai('/sessione/checkout')}>{t.casa.checkout.azione}</Bottone>
+        <Azione tipo="checkout" adesso={adesso}>
+          <Bottone onClick={() => vai('/sessione/checkout')}>{t.casa.checkout.azione}</Bottone>
+        </Azione>
       </div>
     </SchedaEroe>
   )
@@ -213,14 +328,16 @@ function Checkout({ previsto }: { previsto: Tempo | null }) {
 
 /* ── home-3: fatto tutto, e c'e' qualcosa da segnalare ───────────────────── */
 function Fatto() {
-  const { t } = useLingua()
+  const { t, ts } = useLingua()
   const g = useGiornata()
+  // non si tiene da parte: cambierebbe lingua e resterebbe indietro
+  const riassunto = riassuntoDelGiorno(g.previsto, g.sentito, ts)
   return (
     <SchedaEroe
       stato="fatto"
       etichetta={t.casa.fatto.etichetta}
       titolo={t.casa.fatto.titolo}
-      corpo={g.riassunto || undefined}
+      corpo={riassunto || undefined}
     >
       <div className="mt-1 rounded-[16px] bg-white/75 p-3">
         {/* quello che aveva previsto, e quello che ha sentito davvero */}
@@ -256,9 +373,10 @@ function Pastiglia({ tempo }: { tempo: Tempo }) {
 }
 
 /* ── home-4: giorno senza allenamento ────────────────────────────────────── */
-function Riposo() {
+function Riposo({ adesso }: { adesso: Date }) {
   const { t } = useLingua()
   const vai = useNavigate()
+  const { fattoCheckin } = useGiornata()
   return (
     <SchedaEroe
       stato="riposo"
@@ -288,7 +406,19 @@ function Riposo() {
       </div>
 
       <div className="mt-[14px]">
-        <Bottone onClick={() => vai('/sessione/checkin')}>{t.casa.riposo.azione}</Bottone>
+        {/*
+          Nei giorni di riposo il giro e' uno solo, quello del mattino, con le
+          stesse ore degli altri giorni: una regola sola da imparare, e i dati
+          del mattino restano confrontabili fra i giorni con e senza
+          allenamento.
+        */}
+        {fattoCheckin ? (
+          <Riga>{t.casa.finestra.fatto}</Riga>
+        ) : (
+          <Azione tipo="checkin" adesso={adesso}>
+            <Bottone onClick={() => vai('/sessione/checkin')}>{t.casa.riposo.azione}</Bottone>
+          </Azione>
+        )}
       </div>
     </SchedaEroe>
   )

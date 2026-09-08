@@ -56,7 +56,9 @@ funziona tutta ma resta nel telefono, e la schermata finale lo dice.
    check-out si vedono ma non riescono a salvare. Con lo stesso criterio
    c'e' `supabase/migrazione-testi.sql`, che serve solo alla pagina
    `/admin` — senza, l'app funziona tutta e le scritte restano quelle
-   compilate.
+   compilate. **`supabase/migrazione-orari.sql` invece va lanciata**: aggiunge
+   `check_ins.local_time`, e senza quella colonna il check-in non riesce piu'
+   a salvare.
 2. Authentication → Sign In / Providers → Email: acceso, e in cima alla
    pagina "Allow new users to sign up" acceso. Email OTP length: 6.
 3. **Authentication → Emails**: nei due modelli `Magic Link` e
@@ -100,6 +102,7 @@ mandare. L'altra meta' e' il punto 3 qui sopra, che sta nel pannello.
 | ore dormite, ciclo, antidolorifici | `check_ins` |
 | lo sforzo (0–10, CR-10 di Foster) | `check_ins.effort` |
 | la faccia e cosa si è portata a casa | `check_ins.satisfaction`, `brought_home` |
+| l'ora sull'orologio di casa sua | `check_ins.local_time` |
 | la frase che scrive lei | `check_ins.note` — fuori dalla vista del coach |
 | "senti un dolore protettivo?" | `check_ins.protective_pain` |
 | ogni punto segnato sul corpo | `body_signals` (una riga per punto) |
@@ -109,6 +112,53 @@ Una riga per tipo per giorno, tenuta ferma da un indice unico su
 prima invece di aggiungerne un secondo. Il giorno dell'atleta finisce alle
 quattro del mattino, quindi un check-out dell'una di notte appartiene
 all'allenamento della sera prima.
+
+### Le due finestre della giornata
+
+    05:00 ─ 12:00   check-in
+    12:00 ─ 15:30   check-in in ritardo, si può ancora
+    15:30 ─ 23:30   check-out
+    23:30 ─ 04:00   check-out in ritardo, si può ancora
+
+Prima no, dopo sì. Non si anticipa — un check-out alle due del pomeriggio
+parlerebbe di un allenamento non ancora fatto — ma chi si dimentica recupera,
+perché l'alternativa è un buco nei dati e una ragazza che si sente in castigo
+per un'ora di ritardo. Fra le 4 e le 5 non è aperto niente: il giorno
+dell'atleta è cambiato ma la sua giornata non è cominciata.
+
+Il motivo non è disciplina, è misura: un "check-in del mattino" fatto alle
+undici di sera è un ricordo, e il confronto fra previsto e sentito — il dato
+per cui esiste l'app — smette di misurare qualcosa.
+
+Le finestre stanno in `src/lib/finestre.ts`, in minuti dall'inizio del giorno
+dell'atleta, così la giornata è un segmento crescente e la mezzanotte non è un
+caso a parte. La regola la applicano in due posti: la home, che al posto del
+bottone mette la riga che dice quando apre, e il check-in stesso, che rimanda
+alla home chi ci arriva scrivendo l'indirizzo a mano. Il controllo si fa solo
+entrando: chi comincia alle 11:58 finisce in pace.
+
+L'orologio è quello del telefono, e chi lo sposta apre una finestra chiusa.
+Non è una serratura e non vuole esserlo: è un ritmo. In `local_time` resta
+scritta l'ora vera in cui la cosa è stata fatta, quindi un check-in delle tre
+di notte in analisi si vede.
+
+Per guardare la home a un'ora qualsiasi senza aspettarla: `/casa?ora=07:30`.
+Come `?stato=`, cambia solo cosa si vede — il bottone porta comunque contro la
+finestra vera.
+
+### Cosa sa la home, e da dove
+
+Quello che è già stato fatto oggi lo tiene `src/lib/giornata.ts`: viene dal
+database con una copia nel telefono. La copia perché la home è la prima cosa
+che si apre e non può restare bianca ad aspettare la rete; il database perché
+altrimenti "l'ho già fatto oggi" vivrebbe in un telefono solo — e cambiando
+telefono, o svuotando i dati dell'app, un'atleta rifarebbe un check-in già
+fatto, sovrascrivendo quello vero.
+
+Nella stessa query ci sta la striscia: i giorni di fila con almeno un
+check-in. Se oggi non l'ha ancora fatto non si azzera, si conta da ieri — una
+striscia che cade alle quattro del mattino non premia niente, punisce il
+dormire.
 
 Il codice della zona porta il lato dentro (`front_quad_r`, `back_ham_l`):
 diciannove zone su trentatré hanno lo stesso nome davanti e dietro, e senza
