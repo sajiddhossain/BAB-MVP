@@ -255,46 +255,6 @@ const it = {
     ],
   },
 
-  indovina: {
-    occhiello: 'INDOVINA',
-    titolo: 'Come ti senti adesso?',
-    occhio: 'Non pensarci troppo: la prima sensazione è quella buona.',
-    fasce: [
-      { id: 'lento', emoji: '🐢', titolo: 'Lento', sotto: 'calmo' },
-      { id: 'medio', emoji: '🚶‍♀️', titolo: 'Medio', sotto: 'tiene il ritmo' },
-      { id: 'veloce', emoji: '🐇', titolo: 'Veloce', sotto: 'su di giri' },
-    ],
-  },
-
-  conta: {
-    occhiello: 'CONTA',
-    titolo: 'Conta i battiti',
-    occhio: 'Trova il polso e tocca a ogni battito per quindici secondi.',
-    tocca: 'TAP',
-    battiti: 'BATTITI',
-    secondi: 'SECONDI',
-  },
-
-  confronto: {
-    occhiello: 'CONFRONTATI',
-    titolo: 'Hai appena letto il tuo corpo.',
-    unita: 'BATTITI AL MINUTO',
-    ipotesi: 'LA TUA IPOTESI',
-    contato: 'HAI CONTATO',
-    vicino:
-      'La tua sensazione e il tuo conteggio sono vicini — bel fatto! Con la pratica diventerai ancora più brava a leggere il tuo corpo.',
-    lontano:
-      'La tua sensazione e il tuo conteggio sono finiti in fasce diverse. È del tutto normale il primo giorno, ed è proprio la distanza che imparerai a chiudere. Hai appena trovato il tuo punto di partenza.',
-    chiusura:
-      'Imparare a leggere rapidamente i segnali del corpo è come allenare un muscolo: hai appena fatto la tua prima rep.',
-  },
-
-  ritmi: {
-    scattante: 'Scattante',
-    stabile: 'Stabile',
-    tranquillo: 'Tranquillo',
-  },
-
   casa: {
     saluto: 'Ciao {nome}',
     giorni: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
@@ -659,46 +619,6 @@ const en: typeof it = {
           'Compare how you thought you felt with what your body told you: that is how you get better at reading its signals.',
       },
     ],
-  },
-
-  indovina: {
-    occhiello: 'GUESS',
-    titolo: 'How do you feel right now?',
-    occhio: "Don't overthink it: the first feeling is the right one.",
-    fasce: [
-      { id: 'lento', emoji: '🐢', titolo: 'Slow', sotto: 'Calm & settled' },
-      { id: 'medio', emoji: '🚶‍♀️', titolo: 'Medium', sotto: 'Ticking along' },
-      { id: 'veloce', emoji: '🐇', titolo: 'Fast', sotto: 'Up & going' },
-    ],
-  },
-
-  conta: {
-    occhiello: 'COUNT',
-    titolo: 'Count your beats',
-    occhio: 'Find your pulse and tap on every beat for fifteen seconds.',
-    tocca: 'START',
-    battiti: 'BEATS',
-    secondi: 'SECONDS',
-  },
-
-  confronto: {
-    occhiello: 'COMPARE',
-    titolo: 'You have just read your body.',
-    unita: 'BEATS PER MINUTE (YOU COUNTED)',
-    ipotesi: 'Your prediction',
-    contato: 'You counted',
-    vicino:
-      'Your feeling and your count landed close together — nice one! With practice you will get even better at reading your body.',
-    lontano:
-      'Your guess and your count landed in different bands. That is completely normal on day one, and it is exactly the gap you will get better at closing. You just found your starting point.',
-    chiusura:
-      'Learning to read your body’s signals quickly is like training a muscle: you have just done your first rep.',
-  },
-
-  ritmi: {
-    scattante: 'Upbeat',
-    stabile: 'Steady',
-    tranquillo: 'Gentle',
   },
 
   casa: {

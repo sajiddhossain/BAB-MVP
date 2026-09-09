@@ -2,65 +2,105 @@ import { useEffect, useState } from 'react'
 import { supabase } from './supabase'
 
 /**
- * Se questa persona ha gia' un profilo, cioe' se ha gia' fatto l'onboarding.
+ * A che punto è questa persona: ha un profilo? ha finito il tutorial?
  *
  * Serve a una cosa sola ma importante: chi rientra deve trovare la sua home,
- * non le domande a cui ha gia' risposto. Il fatto che ci sia una sessione non
+ * non le domande a cui ha già risposto. Il fatto che ci sia una sessione non
  * basta a saperlo — la sessione si apre col codice, il profilo si scrive alla
- * fine dell'onboarding, e fra le due cose c'e' tutto il percorso.
+ * fine dell'onboarding, e fra le due cose c'è tutto il percorso.
+ *
+ * ── PERCHÉ DUE DOMANDE E UNA RISPOSTA SOLA ─────────────────────────────────
+ * Il tutorial viene dopo il profilo, e la riga dell'atleta sa tutt'e due le
+ * cose: `athletes.tutorial_done`. Chiederle insieme è una richiesta invece di
+ * due, e soprattutto evita lo stato in cui si sa una cosa e non l'altra —
+ * quello in cui la guardia manderebbe a casa qualcuna che il tutorial non
+ * l'ha ancora visto.
  */
 /**
- * Tre risposte e non due. `boh` e' quando la domanda non ha avuto risposta —
- * rete caduta, server lento. Serve perche' con due sole risposte un problema
+ * Tre risposte e non due. `boh` è quando la domanda non ha avuto risposta —
+ * rete caduta, server lento. Serve perché con due sole risposte un problema
  * di rete diventerebbe una decisione: "non lo so" verrebbe letto come "non ce
  * l'ha", e chi rientra si ritroverebbe l'onboarding da rifare per colpa di un
  * secondo di linea storta.
  */
 export type Profilo = 'si' | 'no' | 'boh' | null
 
-let risposta: Profilo = null
-let inCorso: Promise<Profilo> | null = null
+type Risposta = { profilo: Profilo; tutorial: Profilo }
+
+let risposta: Risposta = { profilo: null, tutorial: null }
+let inCorso: Promise<Risposta> | null = null
 
 /** Da chiamare quando il profilo viene creato o cancellato. */
 export function dimenticaProfilo() {
-  risposta = null
+  risposta = { profilo: null, tutorial: null }
   inCorso = null
 }
 
-async function chiedi(): Promise<Profilo> {
-  if (!supabase) return 'no'
-  const { data } = await supabase.auth.getSession()
-  if (!data.session) return 'no'
-  const { data: righe, error } = await supabase.from('athletes').select('id').limit(1)
-  if (error) {
-    console.error('[profilo]', error.message)
-    return 'boh'
-  }
-  return righe.length > 0 ? 'si' : 'no'
+/**
+ * «Il tutorial è finito», detto senza richiederlo al database.
+ *
+ * Lo chiama chi l'ha appena finito. Senza, la guardia continuerebbe a
+ * rimandarla nel tutorial finché la risposta in cache non scade — cioè fino
+ * al prossimo avvio dell'app.
+ */
+export function segnaTutorialFatto() {
+  risposta = { ...risposta, tutorial: 'si' }
 }
 
-/** `null` finche' la domanda e' in volo: in quel momento non si decide niente. */
-export function useProfilo(attivo: boolean): Profilo {
-  const [esiste, setEsiste] = useState<Profilo>(risposta)
+async function chiedi(): Promise<Risposta> {
+  if (!supabase) return { profilo: 'no', tutorial: 'no' }
+  const { data } = await supabase.auth.getSession()
+  if (!data.session) return { profilo: 'no', tutorial: 'no' }
+
+  const { data: righe, error } = await supabase
+    .from('athletes')
+    .select('id,tutorial_done')
+    .limit(1)
+  if (error) {
+    console.error('[profilo]', error.message)
+    return { profilo: 'boh', tutorial: 'boh' }
+  }
+  const riga = righe[0] as { id: string; tutorial_done: string | null } | undefined
+  if (!riga) return { profilo: 'no', tutorial: 'no' }
+  return { profilo: 'si', tutorial: riga.tutorial_done ? 'si' : 'no' }
+}
+
+/**
+ * La risposta di adesso, chiedendola una volta sola.
+ *
+ * `null` finché la domanda è in volo: in quel momento non si decide niente.
+ */
+function useRisposta(attivo: boolean): Risposta {
+  const [vista, setVista] = useState<Risposta>(risposta)
 
   useEffect(() => {
     if (!attivo) return
-    if (risposta !== null) {
-      setEsiste(risposta)
+    if (risposta.profilo !== null) {
+      setVista(risposta)
       return
     }
     let vivo = true
     inCorso ??= chiedi()
     void inCorso.then((r) => {
       // un "boh" non si tiene: la prossima volta si richiede
-      risposta = r === 'boh' ? null : r
-      if (r === 'boh') inCorso = null
-      if (vivo) setEsiste(r)
+      risposta = r.profilo === 'boh' ? { profilo: null, tutorial: null } : r
+      if (r.profilo === 'boh') inCorso = null
+      if (vivo) setVista(r)
     })
     return () => {
       vivo = false
     }
   }, [attivo])
 
-  return attivo ? esiste : null
+  return attivo ? vista : { profilo: null, tutorial: null }
+}
+
+/** Se questa persona ha già un profilo, cioè se ha già fatto l'onboarding. */
+export function useProfilo(attivo: boolean): Profilo {
+  return useRisposta(attivo).profilo
+}
+
+/** Se ha già visto il tutorial fino in fondo. */
+export function useTutorialFatto(attivo: boolean): Profilo {
+  return useRisposta(attivo).tutorial
 }

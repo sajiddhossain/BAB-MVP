@@ -1,5 +1,6 @@
 import { LEZIONI, chiaviDi, passiDi } from './percorso'
 import { SEZIONI } from './sezioni'
+import { PASSI as PASSI_TUTORIAL } from './tutorial'
 import type { Passo } from './percorso'
 
 /**
@@ -29,6 +30,21 @@ export type SchermoScritte = {
 }
 
 export type GruppoScritte = { nome: string; schermi: SchermoScritte[] }
+
+/** L'id dello schermo come si chiama dentro a `copy/tutorial.ts`. */
+function ramoDi(id: string): string {
+  return id.replace(/-(.)/g, (_, c: string) => c.toUpperCase())
+}
+
+const NOMI_TUTORIAL: Record<string, string> = {
+  'come-funziona': 'Come funziona',
+  'prima-rep': 'La prima rep',
+  indovina: '1 · Indovina',
+  conta: '2 · Conta i battiti',
+  confronto: '3 · Il confronto',
+  ritmi: 'I tre ritmi',
+  andiamo: 'Andiamo!',
+}
 
 export const SCHERMI: GruppoScritte[] = [
   {
@@ -102,13 +118,27 @@ export const SCHERMI: GruppoScritte[] = [
     ],
   },
   {
+    /*
+     * Il tutorial subito dopo l'onboarding. Le chiavi dei testi seguono l'id
+     * dello schermo, tranne due che nel file dei testi si chiamano in
+     * italiano corrente invece che con l'id: `comeFunziona` e `primaRep`.
+     */
+    nome: 'Tutorial',
+    schermi: PASSI_TUTORIAL.map((p) => ({
+      id: `tut-${p.id}`,
+      nome: NOMI_TUTORIAL[p.id] ?? p.id,
+      rotta: `/tutorial/${p.id}`,
+      rami: [`tutorial.${ramoDi(p.id)}`],
+    })),
+  },
+  {
     nome: 'Home',
     schermi: [
       {
         id: 'casa',
         nome: 'La home',
         rotta: '/casa',
-        rami: ['testi.casa', 'testi.ritmi', 'testi.indovina', 'testi.conta', 'testi.confronto'],
+        rami: ['testi.casa'],
       },
     ],
   },

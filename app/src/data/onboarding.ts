@@ -73,7 +73,7 @@ const haCiclo = (r: Risposte) => r.ciclo !== 'si'
 export const PERCORSO: Passo[] = [
   { id: 'accesso', corpo: 'accesso', nodo: { it: '3771:2', en: '3958:461' }, fuoriPercorso: true },
   { id: 'link', corpo: 'link', nodo: { it: '3771:14', en: '3958:486' }, fuoriPercorso: true },
-  { id: 'intro', corpo: 'intro', nodo: { it: '3771:39', en: '3958:323' }, fuoriPercorso: true },
+  { id: 'intro', corpo: 'intro', nodo: { it: '3771:39', en: '3975:2524' }, fuoriPercorso: true },
 
   { id: 'nome', corpo: 'nome', nodo: { it: '3771:104', en: '3958:567' } },
   { id: 'compleanno', corpo: 'compleanno', nodo: { it: '3771:122', en: '3958:592' } },

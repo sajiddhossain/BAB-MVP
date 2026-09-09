@@ -13,6 +13,25 @@
 export type Macchia = { t: 'teal' | 'coral' | 'lime' | 'deco'; x: number; y: number; d: number }
 
 export const DECORO: Record<string, Macchia[]> = {
+  /*
+   * Il tutorial dopo l'onboarding.
+   *
+   * Le chiavi non sono node-id come le altre: un tutorial ha due frame per
+   * schermo, uno per lingua, e le macchie sono le stesse in tutt'e due —
+   * scriverle due volte vorrebbe dire poterle cambiare in una lingua sola.
+   *
+   * I quattro schermi del minigioco (indovina, conta, confronto, andiamo,
+   * ritmi) nel disegno hanno lo sfondo appiattito in un'immagine, quindi le
+   * macchie non si possono leggere dai metadati: li' valgono le due che
+   * l'app usa dappertutto.
+   */
+  "tut-come-funziona": [{t:"deco",x:-25,y:250,d:50}, {t:"deco",x:330,y:700,d:70}, {t:"teal",x:310,y:700,d:130}, {t:"coral",x:-30,y:-10,d:110}, {t:"lime",x:40,y:435,d:32}],
+  "tut-prima-rep": [{t:"deco",x:340,y:150,d:55}, {t:"deco",x:-20,y:680,d:65}, {t:"teal",x:-50,y:350,d:140}, {t:"coral",x:300,y:680,d:100}, {t:"lime",x:-260,y:490,d:32}],
+  "tut-indovina": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
+  "tut-conta": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
+  "tut-confronto": [{t:"deco",x:-20,y:300,d:45}, {t:"deco",x:330,y:700,d:75}, {t:"teal",x:300,y:650,d:140}, {t:"coral",x:-50,y:-20,d:110}, {t:"lime",x:-260,y:655,d:32}],
+  "tut-ritmi": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
+  "tut-andiamo": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
   "percorso": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
   /* tutti gli schermi delle lezioni hanno le stesse due macchie e nient'altro */
   "lezione": [{t:"teal",x:-50,y:724,d:160}, {t:"coral",x:310,y:24,d:110}],
@@ -20,6 +39,8 @@ export const DECORO: Record<string, Macchia[]> = {
   "3771:104": [{t:"deco",x:340,y:440,d:30}, {t:"deco",x:-20,y:500,d:40}, {t:"deco",x:320,y:680,d:80}, {t:"teal",x:310,y:-30,d:140}, {t:"coral",x:-50,y:700,d:120}, {t:"lime",x:340,y:580,d:32}],
   "3771:14": [{t:"teal",x:-40,y:700,d:140}, {t:"coral",x:320,y:-20,d:100}],
   "3771:39": [{t:"deco",x:-20,y:120,d:50}, {t:"deco",x:330,y:740,d:80}, {t:"teal",x:-50,y:660,d:150}, {t:"coral",x:320,y:-10,d:100}, {t:"lime",x:340,y:400,d:32}],
+  /* l'inglese di "cos'e' BAB": stesso schermo, stesse macchie */
+  "3975:2524": [{t:"deco",x:-20,y:120,d:50}, {t:"deco",x:330,y:740,d:80}, {t:"teal",x:-50,y:660,d:150}, {t:"coral",x:320,y:-10,d:100}, {t:"lime",x:340,y:400,d:32}],
   "3771:140": [{t:"deco",x:-25,y:400,d:55}, {t:"deco",x:330,y:700,d:70}, {t:"teal",x:300,y:650,d:120}, {t:"coral",x:-30,y:-10,d:100}, {t:"lime",x:-260,y:700,d:32}],
   "3771:122": [{t:"deco",x:340,y:200,d:50}, {t:"deco",x:-30,y:650,d:65}, {t:"teal",x:-40,y:500,d:130}, {t:"coral",x:320,y:30,d:100}, {t:"lime",x:40,y:640,d:32}],
   "3775:45": [{t:"deco",x:-30,y:200,d:50}, {t:"deco",x:330,y:710,d:70}, {t:"teal",x:-40,y:500,d:130}, {t:"coral",x:320,y:30,d:100}, {t:"lime",x:-260,y:490,d:32}],

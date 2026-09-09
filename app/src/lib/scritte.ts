@@ -4,6 +4,7 @@ import { TESTI } from '../copy/testi'
 import { TESTI_SESSIONE } from '../copy/sessione'
 import { TESTI_PAROLE } from '../copy/parole'
 import { TESTI_PERCORSO } from '../copy/percorso'
+import { TESTI_TUTORIAL } from '../copy/tutorial'
 import type { Lingua } from './lingua'
 
 /**
@@ -43,6 +44,7 @@ export const ALBERI = {
   sessione: TESTI_SESSIONE,
   parole: TESTI_PAROLE,
   percorso: TESTI_PERCORSO,
+  tutorial: TESTI_TUTORIAL,
 } as const
 
 export type Albero = keyof typeof ALBERI

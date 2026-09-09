@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Onboarding } from './screens/Onboarding'
+import { Tutorial } from './screens/Tutorial'
 import { Sessione } from './screens/Sessione'
 import { Parole } from './screens/Parole'
 import { Percorso } from './screens/Percorso'
@@ -16,6 +17,11 @@ export function App() {
     <Guardia>
       <Routes>
         <Route path="/onboarding/:id" element={<Onboarding />} />
+        {/* il tutorial che viene subito dopo l'onboarding: sette schermi, e
+            in mezzo il minigioco del battito. Chi l'ha gia' visto non ci
+            torna — a dirlo e' `athletes.tutorial_done`, non questo file */}
+        <Route path="/tutorial/:id" element={<Tutorial />} />
+        <Route path="/tutorial" element={<Navigate to="/tutorial/come-funziona" replace />} />
         <Route path="/casa" element={<Casa />} />
         {/* :tipo e' `checkin` o `checkout`; :id e' il passo dentro a quel giro */}
         <Route path="/sessione/:tipo/:id" element={<Sessione />} />
