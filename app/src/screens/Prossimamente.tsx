@@ -4,6 +4,7 @@ import { useLingua } from '../lib/lingua'
 import { azzera } from '../lib/risposte'
 import { esci } from '../lib/conto'
 import { useNavigate } from 'react-router-dom'
+import { BottoneTocco } from '../ui/tocco'
 
 /**
  * Le tre destinazioni della barra che non esistono ancora.
@@ -38,21 +39,19 @@ export function Prossimamente({ titolo, profilo = false }: { titolo: string; pro
             <>
               <div className="mt-8 flex gap-2">
                 {(['it', 'en'] as const).map((l) => (
-                  <button
+                  <BottoneTocco
                     key={l}
-                    type="button"
                     onClick={() => cambia(l)}
                     className={`h-11 flex-1 rounded-[12px] border-[1.5px] text-[13px] font-bold ${
                       lingua === l ? 'border-ink bg-lime' : 'border-line bg-surface'
                     }`}
                   >
                     {l.toUpperCase()}
-                  </button>
+                  </BottoneTocco>
                 ))}
               </div>
 
-              <button
-                type="button"
+              <BottoneTocco
                 onClick={() => {
                   azzera()
                   void esci().then(() => vai('/onboarding/accesso'))
@@ -60,7 +59,7 @@ export function Prossimamente({ titolo, profilo = false }: { titolo: string; pro
                 className="mt-4 h-11 w-full rounded-[12px] border-[1.5px] border-line bg-surface text-[13px] font-bold text-ink"
               >
                 {lingua === 'it' ? 'Ricomincia da capo' : 'Start over'}
-              </button>
+              </BottoneTocco>
             </>
           )}
         </div>

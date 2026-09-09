@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Sfondo } from '../ui/Sfondo'
 import { Barra } from '../ui/Barra'
 import { Bottone } from '../ui/Bottone'
+import { BottoneTocco } from '../ui/tocco'
 import { BarraSotto } from '../ui/casa/BarraSotto'
 import { riempi } from '../copy/riempi'
 import { useLingua } from '../lib/lingua'
@@ -109,8 +110,7 @@ export function Percorso() {
             </div>
 
             {/* la regola dei tre segnali: sta gia' nel glossario */}
-            <button
-              type="button"
+            <BottoneTocco
               onClick={() => vai('/parole')}
               className="relative mt-[16px] flex min-h-16 w-full items-center gap-3 overflow-hidden rounded-[20px] border-[1.5px] px-[14px] py-[10px] text-left"
               style={{
@@ -130,7 +130,7 @@ export function Percorso() {
                 <span className="block text-[11px] text-ink-medio">{tpe.regola.sotto}</span>
               </span>
               <img src={frecciaDestra} alt="" aria-hidden className="size-6 shrink-0" />
-            </button>
+            </BottoneTocco>
 
             {/* le quattro unita' */}
             <div className="relative mt-[24px] pl-4">
@@ -276,8 +276,8 @@ function Riga({
 
   if (!apribile) return <div className={vestito}>{children}</div>
   return (
-    <button type="button" onClick={onClick} className={vestito}>
+    <BottoneTocco onClick={onClick} className={vestito}>
       {children}
-    </button>
+    </BottoneTocco>
   )
 }

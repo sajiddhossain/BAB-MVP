@@ -1,4 +1,5 @@
 import { useLingua } from '../lib/lingua'
+import { BottoneTocco } from './tocco'
 
 /**
  * I sette giorni della settimana da accendere e spegnere.
@@ -23,19 +24,18 @@ export function Giorni({
       {t.giorni.map((nome, i) => {
         const acceso = scelti.includes(i)
         return (
-          <button
+          <BottoneTocco
             key={i}
-            type="button"
             aria-pressed={acceso}
             onClick={() =>
               onChange(acceso ? scelti.filter((x) => x !== i) : [...scelti, i].sort((a, b) => a - b))
             }
-            className={`h-11 min-w-0 flex-1 rounded-[12px] border-[1.5px] text-[13px] font-bold transition-colors duration-150 ${
+            className={`h-11 min-w-0 flex-1 rounded-[12px] border-[1.5px] text-[13px] font-bold ${
               acceso ? 'border-ink bg-lime text-ink' : 'border-line bg-surface text-ink'
             }`}
           >
             {nome}
-          </button>
+          </BottoneTocco>
         )
       })}
     </div>

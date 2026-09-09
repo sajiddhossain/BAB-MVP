@@ -546,3 +546,23 @@ export function paroleInOrdine(): Parola[] {
 export function lezioneDi(parola: Parola): number | null {
   return LEZIONI.find((l) => l.parole.includes(parola))?.numero ?? null
 }
+
+/**
+ * Il nome di ogni passo nell'indirizzo.
+ *
+ * E' il tipo dell'esercizio, e dove lo stesso tipo torna piu' volte — le due
+ * schede-parola — si numera: `incontra-1`, `incontra-2`. Numeri e basta
+ * sarebbero piu' corti, ma `/percorso/1/3` non dice niente a chi lo legge in
+ * un registro o in una segnalazione.
+ */
+export function chiaviDi(passi: Passo[]): string[] {
+  const quanti = new Map<string, number>()
+  for (const p of passi) quanti.set(p.tipo, (quanti.get(p.tipo) ?? 0) + 1)
+
+  const visti = new Map<string, number>()
+  return passi.map((p) => {
+    const n = (visti.get(p.tipo) ?? 0) + 1
+    visti.set(p.tipo, n)
+    return (quanti.get(p.tipo) ?? 1) > 1 ? `${p.tipo}-${n}` : p.tipo
+  })
+}

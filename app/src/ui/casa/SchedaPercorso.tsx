@@ -1,4 +1,5 @@
 import freccia from '../../assets/casa/percorso-tondo.svg'
+import { BottoneTocco } from '../tocco'
 
 /**
  * La scheda sotto: cosa c'e' da fare intanto che sei qui.
@@ -23,8 +24,7 @@ export function SchedaPercorso({
   onClick?: () => void
 }) {
   return (
-    <button
-      type="button"
+    <BottoneTocco
       onClick={onClick}
       className="flex w-full items-start gap-3 overflow-hidden rounded-[22px] border border-line pb-[18px] pl-[13px] pr-[13px] pt-[13px] text-left"
       style={{ background: tinta ?? 'var(--color-surface)' }}
@@ -44,6 +44,6 @@ export function SchedaPercorso({
       <span className="mt-[14px] text-[20px] font-bold leading-none text-ink-tenue" aria-hidden>
         ›
       </span>
-    </button>
+    </BottoneTocco>
   )
 }

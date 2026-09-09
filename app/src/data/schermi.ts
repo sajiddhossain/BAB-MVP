@@ -1,3 +1,6 @@
+import { LEZIONI, chiaviDi, passiDi } from './percorso'
+import type { Passo } from './percorso'
+
 /**
  * Gli schermi dell'app, per chi ne scrive le parole.
  *
@@ -212,7 +215,93 @@ export const SCHERMI: GruppoScritte[] = [
   },
 ]
 
+/**
+ * Gli schermi del percorso, uno per esercizio.
+ *
+ * Non sono scritti a mano come tutti gli altri: sono sessantasei, e una lista
+ * scritta a mano di sessantasei voci sarebbe sbagliata il giorno dopo — basta
+ * aggiungere un esercizio a una lezione. Qui si costruiscono dagli stessi
+ * dati con cui l'app costruisce le lezioni, quindi non possono divergere.
+ *
+ * Un gruppo per lezione, e dentro un esercizio per volta: e' il "pezzetto per
+ * pezzetto" che serve a chi scrive: si apre la lezione 5, si va sul suo
+ * scenario, e nell'anteprima c'e' proprio quello schermo.
+ */
+const NOMI_PASSO: Record<Passo['tipo'], string> = {
+  incontra: 'Incontra la parola',
+  abbina: 'Abbina',
+  gemelle: 'Falsi amici',
+  storia: 'Storia vera',
+  mossa: 'La mossa',
+  allarme: 'Bandiera rossa',
+  frase: 'Componi la frase',
+  fatto: 'Fine lezione',
+}
+
+function gruppiDelPercorso(): GruppoScritte[] {
+  const gruppi: GruppoScritte[] = [
+    {
+      nome: 'Percorso',
+      schermi: [
+        {
+          id: 'pe-mappa',
+          nome: 'La mappa',
+          rotta: '/percorso',
+          rami: [
+            'percorso.occhiello',
+            'percorso.titolo',
+            'percorso.intro',
+            'percorso.progresso',
+            'percorso.regola',
+            'percorso.unita',
+            'percorso.azione',
+            'percorso.nav',
+            'percorso.comune',
+          ],
+        },
+      ],
+    },
+  ]
+
+  for (const l of LEZIONI) {
+    const passi = passiDi(l.numero)
+    if (!passi) continue
+    const chiavi = chiaviDi(passi)
+    /* quale delle due schede-parola e': serve solo dove ce ne sono due */
+    let incontrati = 0
+    gruppi.push({
+      nome: `Lezione ${l.numero}`,
+      schermi: passi.map((passo, i) => {
+        const dentro = passo.tipo === 'incontra' ? incontrati++ : -1
+        return {
+          id: `pe-${l.numero}-${chiavi[i]}`,
+          nome:
+            passo.tipo === 'incontra'
+              ? `${NOMI_PASSO.incontra} ${dentro + 1}`
+              : NOMI_PASSO[passo.tipo],
+          rotta: `/percorso/${l.numero}/${chiavi[i]}`,
+          rami: [
+            passo.tipo === 'incontra'
+              ? `percorso.lezioni.${l.numero}.incontra.${dentro}`
+              : `percorso.lezioni.${l.numero}.${passo.tipo}`,
+            'percorso.comune',
+          ],
+        }
+      }),
+    })
+  }
+  return gruppi
+}
+
+/**
+ * Tutti i gruppi, quelli scritti a mano piu' quelli del percorso.
+ *
+ * Il percorso sta in fondo perche' e' il pezzo piu' lungo: chi cerca la home
+ * o il check-in non deve scorrere ottanta voci per arrivarci.
+ */
+export const GRUPPI: GruppoScritte[] = [...SCHERMI, ...gruppiDelPercorso()]
+
 /** Tutti i rami rivendicati da qualche schermo. */
 export function ramiConosciuti(): string[] {
-  return SCHERMI.flatMap((g) => g.schermi.flatMap((s) => s.rami))
+  return GRUPPI.flatMap((g) => g.schermi.flatMap((s) => s.rami))
 }

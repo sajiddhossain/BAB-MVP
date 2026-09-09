@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Apri } from '../Apri'
+import { useTocco } from '../tocco'
 import { riempi } from '../../copy/riempi'
 import type { Blocco as BloccoTipo } from '../../data/percorso'
 import type { BloccoTesto } from '../../copy/percorso'
@@ -118,12 +119,15 @@ export function CartaRisposta({
     },
   }[stato]
 
+  const tocco = useTocco()
+
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={stato !== 'ferma'}
-      className="relative flex min-h-[80px] w-full items-center gap-3 overflow-hidden rounded-[20px] border-2 px-4 text-left shadow-[0px_10px_24px_-10px_rgba(93,95,239,0.07),0px_6px_20px_0px_rgba(0,0,0,0.04)] transition-colors duration-150 motion-reduce:transition-none"
+      {...tocco}
+      className="bab-tocco relative flex min-h-[80px] w-full items-center gap-3 overflow-hidden rounded-[20px] border-2 px-4 text-left shadow-[0px_10px_24px_-10px_rgba(93,95,239,0.07),0px_6px_20px_0px_rgba(0,0,0,0.04)]"
       style={{ background: veste.fondo, borderColor: veste.bordo }}
     >
       <span aria-hidden className="absolute inset-y-0 left-0 w-[6px]" style={{ background: tinta }} />
@@ -257,7 +261,7 @@ export function Pastiglia({
           onTocco?.()
         }
       }}
-      className={`inline-flex items-center rounded-pill border-[1.5px] px-[14px] py-2 text-[12px] font-bold select-none ${
+      className={`bab-tocco inline-flex items-center rounded-pill border-[1.5px] px-[14px] py-2 text-[12px] font-bold select-none ${
         spenta ? 'opacity-35' : ''
       } ${presa ? 'ring-2 ring-ink ring-offset-1' : ''} ${fantasma ? 'shadow-lg' : ''}`}
       style={{

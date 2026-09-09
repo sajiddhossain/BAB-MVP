@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Apri } from '../ui/Apri'
 import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { useSessione } from '../lib/conto'
@@ -6,8 +7,11 @@ import { SENZA_ACCESSO } from '../lib/sviluppo'
 import { elencoChiavi, scrittePartenza } from '../lib/scritte'
 import type { Scritte, Valore } from '../lib/scritte'
 import type { Lingua } from '../lib/lingua'
-import { SCHERMI, ramiConosciuti } from '../data/schermi'
+import { GRUPPI, ramiConosciuti } from '../data/schermi'
 import type { SchermoScritte } from '../data/schermi'
+import { SEZIONI } from '../data/sezioni'
+import type { StatoSezione } from '../data/sezioni'
+import { cambiaSezione, caricaSezioni, statiDiAdesso } from '../lib/sezioni'
 
 /**
  * Le parole dell'app, per chi le scrive.
@@ -40,6 +44,10 @@ import type { SchermoScritte } from '../data/schermi'
  * del database, che rifiutano la scrittura a chiunque altro. Questa pagina
  * chiede al database "sono admin?" solo per non mostrare una scrivania a chi
  * non potra' salvarci niente.
+ *
+ * La porta e' `/admin/login`, ed e' diversa da quella dell'app: di la' si
+ * crea un account, di qua si entra e basta. Chi scrive i testi e' passato
+ * prima dall'app vera, come tutti.
  *
  * ── BOZZA E PUBBLICATO ─────────────────────────────────────────────────────
  * Due colonne. Si salva la bozza quante volte si vuole senza che nessuno se
@@ -80,10 +88,10 @@ export function Amministrazione() {
     return (
       <Schermata>
         Questa pagina è per chi scrive i testi di BAB.{' '}
-        <a className="underline" href="/onboarding/accesso">
-          Entra con la tua mail
+        <a className="underline" href="/admin/login">
+          Entra da qui
         </a>
-        , poi torna qui.
+        .
       </Schermata>
     )
   }
@@ -111,13 +119,15 @@ function Schermata({ children }: { children: ReactNode }) {
 function Scrivania() {
   const [lingua, setLingua] = useState<Lingua>('it')
   const [righe, setRighe] = useState<Righe>(VUOTE)
-  const [scelto, setScelto] = useState<SchermoScritte>(SCHERMI[3].schermi[0])
+  const [scelto, setScelto] = useState<SchermoScritte>(GRUPPI[3].schermi[0])
   const [modo, setModo] = useState<Modo>('correggi')
   const [aperta, setAperta] = useState<string | null>(null)
   /* quando un tocco prende una frase composta da piu' scritte, si sceglie */
   const [fraQuali, setFraQuali] = useState<string[]>([])
   const [cerca, setCerca] = useState('')
   const [stato, setStato] = useState('')
+  const [pannello, setPannello] = useState<'scritte' | 'sezioni'>('scritte')
+  const [apertiGruppi, setApertiGruppi] = useState<Record<string, boolean>>({})
   const cornice = useRef<HTMLIFrameElement>(null)
 
   const partenza = useMemo(() => ({ it: scrittePartenza('it'), en: scrittePartenza('en') }), [])
@@ -342,6 +352,7 @@ function Scrivania() {
   }
 
   function vaiA(s: SchermoScritte) {
+    setPannello('scritte')
     setCerca('')
     setAperta(null)
     setFraQuali([])
@@ -362,7 +373,7 @@ function Scrivania() {
                 setAperta(null)
                 setFraQuali([])
               }}
-              className={`flex-1 rounded-[8px] border px-2 py-1 text-[12px] font-bold ${
+              className={`bab-tocco flex-1 rounded-[8px] border px-2 py-1 text-[12px] font-bold ${
                 lingua === l ? 'border-verde-acceso bg-verde-chiaro' : 'border-line bg-chip'
               }`}
             >
@@ -370,34 +381,72 @@ function Scrivania() {
             </button>
           ))}
         </div>
-        {SCHERMI.map((g) => (
-          <div key={g.nome} className="mt-4">
-            <p className="m-0 text-[10px] font-bold tracking-[1px] text-ink-mute uppercase">
-              {g.nome}
-            </p>
-            <ul className="m-0 mt-1 flex list-none flex-col p-0">
-              {g.schermi.map((s) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    onClick={() => vaiA(s)}
-                    className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] ${
-                      scelto.id === s.id ? 'bg-verde-chiaro font-bold' : ''
-                    }`}
-                  >
-                    {s.nome}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        <button
+          type="button"
+          onClick={() => setPannello(pannello === 'sezioni' ? 'scritte' : 'sezioni')}
+          className={`mt-3 w-full rounded-[8px] border px-2 py-[6px] text-left text-[12.5px] font-bold transition-colors duration-150 motion-reduce:transition-none ${
+            pannello === 'sezioni'
+              ? 'border-verde-acceso bg-verde-chiaro'
+              : 'border-line bg-chip hover:bg-surface'
+          }`}
+        >
+          Sezioni dell’app
+        </button>
+
+        {/*
+          I gruppi si aprono e si chiudono. Con le otto lezioni del percorso
+          le voci sono novanta, e novanta voci tutte aperte non sono un elenco:
+          sono un muro. Aperto resta quello dove si sta.
+        */}
+        {GRUPPI.map((g) => {
+          const dentro = g.schermi.some((s) => s.id === scelto.id)
+          const apertoQui = apertiGruppi[g.nome] ?? dentro
+          return (
+            <div key={g.nome} className="mt-3">
+              <button
+                type="button"
+                onClick={() =>
+                  setApertiGruppi((a) => ({ ...a, [g.nome]: !(a[g.nome] ?? dentro) }))
+                }
+                className="flex w-full items-center gap-1 rounded-[6px] px-1 py-[3px] text-left text-[10px] font-bold tracking-[1px] text-ink-mute uppercase transition-colors duration-150 hover:text-ink motion-reduce:transition-none"
+              >
+                <span
+                  aria-hidden
+                  className="inline-block transition-transform duration-200 motion-reduce:transition-none"
+                  style={{ transform: apertoQui ? 'rotate(90deg)' : 'none' }}
+                >
+                  ›
+                </span>
+                {g.nome}
+              </button>
+              <Apri aperto={apertoQui}>
+                <ul className="m-0 mt-1 flex list-none flex-col p-0">
+                  {g.schermi.map((s) => (
+                    <li key={s.id}>
+                      <button
+                        type="button"
+                        onClick={() => vaiA(s)}
+                        className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] transition-colors duration-150 hover:bg-chip motion-reduce:transition-none ${
+                          scelto.id === s.id && pannello === 'scritte'
+                            ? 'bg-verde-chiaro font-bold'
+                            : ''
+                        }`}
+                      >
+                        {s.nome}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </Apri>
+            </div>
+          )
+        })}
         <div className="mt-4">
           <button
             type="button"
             onClick={() => vaiA(ALTRE)}
-            className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] ${
-              scelto.id === 'altre' ? 'bg-verde-chiaro font-bold' : ''
+            className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] transition-colors duration-150 hover:bg-chip motion-reduce:transition-none ${
+              scelto.id === 'altre' && pannello === 'scritte' ? 'bg-verde-chiaro font-bold' : ''
             }`}
           >
             Tutte le altre
@@ -405,6 +454,9 @@ function Scrivania() {
         </div>
       </aside>
 
+      {pannello === 'sezioni' ? (
+        <Sezioni />
+      ) : (
       <main className="flex min-w-0 flex-1 gap-6 overflow-y-auto p-6">
         <div className="shrink-0">
           <div className="mb-3 flex w-[402px] gap-1 rounded-pill bg-chip p-1">
@@ -418,7 +470,7 @@ function Scrivania() {
                 key={m}
                 type="button"
                 onClick={() => setModo(m)}
-                className={`flex-1 rounded-pill px-3 py-[6px] text-[12.5px] font-bold ${
+                className={`bab-tocco flex-1 rounded-pill px-3 py-[6px] text-[12.5px] font-bold ${
                   modo === m ? 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.10)]' : 'text-ink-medio'
                 }`}
               >
@@ -459,7 +511,7 @@ function Scrivania() {
               <button
                 type="button"
                 onClick={() => pubblica(daPubblicare)}
-                className="rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold"
+                className="bab-tocco rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold"
               >
                 Pubblica tutte le modifiche ({daPubblicare.length})
               </button>
@@ -480,7 +532,7 @@ function Scrivania() {
                       <button
                         type="button"
                         onClick={() => apri(k)}
-                        className="w-full rounded-[8px] border border-line bg-surface px-3 py-2 text-left"
+                        className="bab-tocco w-full rounded-[8px] border border-line bg-surface px-3 py-2 text-left"
                       >
                         <span className="block truncate text-[13px]">{testo(valore(k))}</span>
                         <code className="block text-[10.5px] text-ink-mute">{k}</code>
@@ -535,7 +587,7 @@ function Scrivania() {
                   <button
                     type="button"
                     onClick={() => apri(k)}
-                    className={`w-full rounded-[8px] border px-3 py-2 text-left ${
+                    className={`bab-tocco w-full rounded-[8px] border px-3 py-2 text-left ${
                       aperta === k
                         ? 'border-verde-acceso bg-verde-chiaro'
                         : 'border-line bg-surface'
@@ -553,7 +605,103 @@ function Scrivania() {
           </details>
         </div>
       </main>
+      )}
     </div>
+  )
+}
+
+/* ── le sezioni dell'app ──────────────────────────────────────────────────── */
+
+/**
+ * Accendere e spegnere i pezzi dell'app.
+ *
+ * Tre stati e non due, per il motivo scritto in `data/sezioni.ts`: fra
+ * "si usa" e "non esiste" c'e' "arriva presto", ed e' quello che serve quasi
+ * sempre — un'atleta che vede il nome di una cosa che sta arrivando e' in un
+ * posto diverso da una che non lo vede mai.
+ *
+ * Qui non c'e' la bozza. Le scritte hanno bozza e pubblicato perche' un
+ * refuso non deve arrivare a una ragazza di dodici anni; spegnere una sezione
+ * invece e' una decisione, e quando la si prende la si vuole subito.
+ */
+const STATI: { id: StatoSezione; nome: string; cosa: string }[] = [
+  { id: 'aperta', nome: 'Aperta', cosa: 'Si usa.' },
+  {
+    id: 'in-arrivo',
+    nome: 'In arrivo',
+    cosa: 'Si vede nella barra in fondo, si tocca, e dice che arriva presto.',
+  },
+  {
+    id: 'nascosta',
+    nome: 'Nascosta',
+    cosa: 'Sparisce dalla barra. Chi ci arriva scrivendo l’indirizzo torna alla home.',
+  },
+]
+
+function Sezioni() {
+  const [stati, setStati] = useState(statiDiAdesso)
+  const [stato, setStato] = useState('')
+
+  useEffect(() => {
+    void caricaSezioni().then(() => setStati(statiDiAdesso()))
+  }, [])
+
+  async function cambia(id: string, nuovo: StatoSezione) {
+    const prima = stati[id]
+    setStati((s) => ({ ...s, [id]: nuovo }))
+    setStato('salvo…')
+    const errore = await cambiaSezione(id, nuovo)
+    if (errore) {
+      setStati((s) => ({ ...s, [id]: prima }))
+      setStato(`non salvato: ${errore}`)
+      return
+    }
+    setStato('fatto — le atlete lo vedono al prossimo giro')
+  }
+
+  return (
+    <main className="min-w-0 flex-1 overflow-y-auto p-6">
+      <div className="max-w-[640px]">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="m-0 text-[17px] font-bold">Sezioni dell’app</p>
+          <span className="text-[12px] text-ink-medio">{stato}</span>
+        </div>
+        <p className="m-0 mt-2 text-[13px] leading-[1.6] text-ink-medio">
+          Cosa è acceso e cosa no. Non è una bozza: quello che scegli qui vale subito, senza
+          pubblicare. Nell’anteprima qui accanto le sezioni restano sempre aperte, se no
+          spegnendone una non potresti più correggerne le parole.
+        </p>
+
+        <ul className="m-0 mt-5 flex list-none flex-col gap-3 p-0">
+          {SEZIONI.map((s) => (
+            <li key={s.id} className="rounded-[14px] border border-line bg-surface p-4">
+              <p className="m-0 text-[14px] font-bold">{s.nome}</p>
+              <p className="m-0 mt-1 text-[12px] leading-[1.5] text-ink-medio">{s.cosa}</p>
+              <div className="mt-3 flex flex-wrap gap-1 rounded-pill bg-chip p-1">
+                {STATI.map((v) => (
+                  <button
+                    key={v.id}
+                    type="button"
+                    onClick={() => void cambia(s.id, v.id)}
+                    title={v.cosa}
+                    className={`bab-tocco flex-1 rounded-pill px-3 py-[6px] text-[12.5px] font-bold ${
+                      stati[s.id] === v.id
+                        ? 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.10)]'
+                        : 'text-ink-medio hover:text-ink'
+                    }`}
+                  >
+                    {v.nome}
+                  </button>
+                ))}
+              </div>
+              <p className="m-0 mt-2 text-[11.5px] leading-[1.5] text-ink-mute">
+                {STATI.find((v) => v.id === stati[s.id])?.cosa}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </main>
   )
 }
 
@@ -639,7 +787,7 @@ function Campo({
           type="button"
           disabled={!inBozza}
           onClick={onPubblica}
-          className="rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold disabled:bg-chip disabled:text-ink-mute"
+          className="bab-tocco rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold disabled:bg-chip disabled:text-ink-mute"
         >
           {inBozza ? 'Pubblica questa' : 'Niente da pubblicare'}
         </button>
@@ -647,7 +795,7 @@ function Campo({
           <button
             type="button"
             onClick={onRipristina}
-            className="rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold"
+            className="bab-tocco rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold"
           >
             Rimetti l’originale
           </button>

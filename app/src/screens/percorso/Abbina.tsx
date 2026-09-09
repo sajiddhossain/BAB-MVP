@@ -1,3 +1,4 @@
+import { BottoneTocco } from '../../ui/tocco'
 import { Guscio } from '../../ui/percorso/Guscio'
 import {
   Cesto,
@@ -144,8 +145,7 @@ export function Abbina({
                   <span aria-hidden className="mt-[6px] block border-t border-dashed border-line" />
                 )}
               </span>
-              <button
-                type="button"
+              <BottoneTocco
                 data-posa={String(i)}
                 onClick={() => g.toccaCasella(i)}
                 aria-label={t.righe[i]}
@@ -178,7 +178,7 @@ export function Abbina({
                     inerte
                   />
                 )}
-              </button>
+              </BottoneTocco>
             </div>
           )
         })}

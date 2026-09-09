@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTocco } from './tocco'
 
 /**
  * La carta-scelta: titolo, sottotitolo e una riga di colore in cima.
@@ -27,12 +28,14 @@ export function Carta({
   striscia?: 'sopra' | 'lato'
   onClick?: () => void
 }) {
+  const tocco = useTocco()
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={scelta}
-      className={`relative block w-full overflow-hidden rounded-[22px] border-[1.5px] px-4 pt-[14.5px] pb-4 text-left transition-colors duration-150 ${
+      {...tocco}
+      className={`bab-tocco relative block w-full overflow-hidden rounded-[22px] border-[1.5px] px-4 pt-[14.5px] pb-4 text-left ${
         scelta ? 'border-ink bg-[rgba(212,243,105,0.35)]' : 'border-line bg-surface'
       }`}
       style={{ boxShadow: '0px 4px 8px 0px rgba(0,0,0,0.06)' }}

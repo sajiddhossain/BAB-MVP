@@ -1,3 +1,4 @@
+import { BottoneTocco } from '../../ui/tocco'
 import { Guscio } from '../../ui/percorso/Guscio'
 import {
   Cesto,
@@ -229,8 +230,7 @@ function Buco({
   onClick: () => void
 }) {
   return (
-    <button
-      type="button"
+    <BottoneTocco
       data-posa={String(numero)}
       onClick={onClick}
       /* la larghezza minima e' quella del buco vuoto: da pieno stringe sulla
@@ -254,7 +254,7 @@ function Buco({
           inerte
         />
       )}
-    </button>
+    </BottoneTocco>
   )
 }
 

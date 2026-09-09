@@ -23,7 +23,15 @@ const VERSIONE_CONSENSI = '2026-09-draft'
 
 export type Esito =
   | { ok: true }
-  | { ok: false; errore: string; lento?: boolean; fraSecondi?: number; scaduta?: boolean }
+  | {
+      ok: false
+      errore: string
+      lento?: boolean
+      fraSecondi?: number
+      scaduta?: boolean
+      /** la mail non ha un account, e non ne abbiamo creato uno */
+      sconosciuta?: boolean
+    }
 
 /*
  * Quanto aspettare la mail prima di dire che non ce l'abbiamo fatta.
@@ -49,9 +57,18 @@ const ATTESA_MAX = 12_000
  * dispositivo: il link aprirebbe la sessione li' invece che sul telefono in
  * mano, e la ragazza si ritroverebbe fuori dalla app che stava usando.
  */
-export async function mandaCodice(email: string): Promise<Esito> {
+export async function mandaCodice(email: string, soloEsistenti = false): Promise<Esito> {
   if (!supabase) return { ok: true }
-  const invio = supabase.auth.signInWithOtp({ email: email.trim() })
+  /*
+   * `soloEsistenti` e' l'accesso del pannello: li' non si crea niente.
+   * Chi scrive i testi ha gia' un account, perche' un admin e' qualcuno che
+   * e' passato prima dall'app vera; e chi non ce l'ha non deve poterselo
+   * fare da una porta di servizio.
+   */
+  const invio = supabase.auth.signInWithOtp({
+    email: email.trim(),
+    options: soloEsistenti ? { shouldCreateUser: false } : undefined,
+  })
   const scaduto = new Promise<'scaduto'>((r) => setTimeout(() => r('scaduto'), ATTESA_MAX))
   const esito = await Promise.race([invio, scaduto])
   if (esito === 'scaduto') return { ok: false, errore: 'la posta non risponde', lento: true }
@@ -65,6 +82,15 @@ export async function mandaCodice(email: string): Promise<Esito> {
    */
   const attesa = /after (\d+) seconds?/i.exec(esito.error.message)
   if (attesa) return { ok: false, errore: esito.error.message, fraSecondi: Number(attesa[1]) }
+
+  /*
+   * "Questa mail non ha un account." Supabase lo dice in due modi diversi a
+   * seconda della versione, e tutt'e due arrivano solo quando abbiamo
+   * chiesto di non crearne uno: fuori di li' questo caso non esiste.
+   */
+  if (/signups not allowed|user not found/i.test(esito.error.message)) {
+    return { ok: false, errore: esito.error.message, sconosciuta: true }
+  }
 
   return { ok: false, errore: esito.error.message }
 }

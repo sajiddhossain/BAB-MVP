@@ -305,6 +305,47 @@ textarea {
 }
 
 /*
+ * Il tocco su tutto il resto: le carte, le righe, le caselle da riempire.
+ *
+ * Il bottone principale scende sulla sua ombra, e quello ha il codice suo.
+ * Qui c'e' cio' che un'ombra sotto non ce l'ha: si stringe appena e torna su
+ * con lo stesso rimbalzo del bottone, cosi' l'app risponde al dito dappertutto
+ * e non solo in fondo allo schermo.
+ *
+ * Lo stato lo dice un attributo e non una classe in piu': `data-giu` lo scrive
+ * `useTocco`, e chi legge il markup trova la superficie e il suo stato nello
+ * stesso posto.
+ *
+ * `:active` sarebbe una riga sola e non basterebbe: su iOS non si applica a un
+ * elemento qualsiasi finche' la pagina non ha un ascoltatore di tocchi — cioe'
+ * proprio dove serve.
+ *
+ * Senza quell'attributo resta il resto: colori e bordi che cambiano piano
+ * invece che di scatto. E' tutto quello che serve dove non c'e' un dito — il
+ * pannello di chi scrive i testi si usa col mouse.
+ */
+.bab-tocco {
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+.bab-tocco[data-giu='si'] {
+  transform: scale(0.97);
+  transition-duration: 90ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bab-tocco,
+  .bab-tocco[data-giu='si'] {
+    transition-duration: 1ms;
+  }
+}
+
+/*
  * Il cursore delle scale.
  *
  * Sotto e' un <input type="range"> vero, con la pista dipinta da un div

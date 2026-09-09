@@ -9,6 +9,7 @@ import { SchedaParola, TINTA_LIVELLO } from '../ui/sessione/SchedaParola'
 import { LIVELLI, paroleDi } from '../data/sessione'
 import type { Parola } from '../data/sessione'
 import { useLingua } from '../lib/lingua'
+import { BottoneTocco } from '../ui/tocco'
 
 /**
  * L'elenco delle sedici parole, raggruppate per livello.
@@ -85,8 +86,7 @@ export function Parole({ onChiudi }: { onChiudi?: () => void } = {}) {
                 <ul className="m-0 mt-[10px] flex list-none flex-col gap-[6px] p-0">
                   {paroleDi(livello).map((p) => (
                     <li key={p}>
-                      <button
-                        type="button"
+                      <BottoneTocco
                         onClick={() => setSpiega(p)}
                         className="flex w-full items-center gap-[10px] rounded-[10px] border border-nebbia-bordo bg-nebbia py-[3px] pr-3 pl-[14px] text-left"
                       >
@@ -106,7 +106,7 @@ export function Parole({ onChiudi }: { onChiudi?: () => void } = {}) {
                         <span aria-hidden className="text-[16px] font-bold text-ink-tenue">
                           ›
                         </span>
-                      </button>
+                      </BottoneTocco>
                     </li>
                   ))}
                 </ul>

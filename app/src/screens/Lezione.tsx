@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 import type { ComponentType } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { LEZIONI, lezionePronta, passiDi, vesteDi } from '../data/percorso'
+import { LEZIONI, chiaviDi, lezionePronta, passiDi, vesteDi } from '../data/percorso'
+import { IN_ANTEPRIMA } from '../lib/sviluppo'
 import type { Passo, Veste } from '../data/percorso'
 import { caricaProgresso, lezioneAperta, useProgresso } from '../lib/percorso'
 import { useLingua } from '../lib/lingua'
@@ -83,7 +84,13 @@ export function Lezione() {
   const chiavi = passi ? chiaviDi(passi) : []
   const posizione = chiavi.indexOf(passo ?? '')
 
-  const buona = !!lez && !!passi && lezionePronta(numero) && lezioneAperta(numero, progresso)
+  /*
+   * Dentro alla cornice dell'anteprima le lezioni sono tutte aperte: chi
+   * scrive i testi deve poter aprire lo schermo della lezione 7 senza aver
+   * fatto le sei prima. Fuori di li' vale il progresso, come sempre.
+   */
+  const buona =
+    !!lez && !!passi && lezionePronta(numero) && (IN_ANTEPRIMA || lezioneAperta(numero, progresso))
 
   useEffect(() => {
     void caricaProgresso()
@@ -129,24 +136,4 @@ export function Lezione() {
       }
     />
   )
-}
-
-/**
- * Il nome di ogni passo nell'indirizzo.
- *
- * E' il tipo dell'esercizio, e dove lo stesso tipo torna piu' volte — le due
- * schede-parola — si numera: `incontra-1`, `incontra-2`. Numeri e basta
- * sarebbero piu' corti, ma `/percorso/1/3` non dice niente a chi lo legge in
- * un registro o in una segnalazione.
- */
-function chiaviDi(passi: Passo[]): string[] {
-  const quanti = new Map<string, number>()
-  for (const p of passi) quanti.set(p.tipo, (quanti.get(p.tipo) ?? 0) + 1)
-
-  const visti = new Map<string, number>()
-  return passi.map((p) => {
-    const n = (visti.get(p.tipo) ?? 0) + 1
-    visti.set(p.tipo, n)
-    return (quanti.get(p.tipo) ?? 1) > 1 ? `${p.tipo}-${n}` : p.tipo
-  })
 }

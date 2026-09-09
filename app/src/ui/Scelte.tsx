@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { BottoneTocco } from './tocco'
 import giu from '../assets/chevron-down.svg'
 
 /**
@@ -19,17 +20,16 @@ export function Pillole<T extends string | number>({
       {voci.map((v) => {
         const acceso = v.id === scelta
         return (
-          <button
+          <BottoneTocco
             key={String(v.id)}
-            type="button"
             aria-pressed={acceso}
             onClick={() => onChange(v.id)}
-            className={`h-11 min-w-0 flex-1 rounded-[12px] border-[1.5px] px-2 text-[13px] font-bold transition-colors duration-150 ${
+            className={`h-11 min-w-0 flex-1 rounded-[12px] border-[1.5px] px-2 text-[13px] font-bold ${
               acceso ? 'border-ink bg-lime text-ink' : 'border-line bg-surface text-ink'
             }`}
           >
             {v.testo}
-          </button>
+          </BottoneTocco>
         )
       })}
     </div>
