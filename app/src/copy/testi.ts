@@ -276,11 +276,27 @@ const it = {
       azione: 'Check out',
     },
 
+    /*
+     * La nota della lampadina: quattro casi, uno solo per volta.
+     *
+     * Quale dei quattro lo sceglie `consiglioDelGiorno` guardando la
+     * settimana vera — dolore, carico, sonno, o niente da segnalare. Sono
+     * quattro frasi e non una perche' una sola frase, per andare bene a
+     * tutte, non direbbe niente a nessuna.
+     */
     fatto: {
       etichetta: 'Streak +1 · brava!',
-      titolo: 'Oggi, in una frase.',
-      segnalazione:
-        'Da segnalare: stesso punto, stesso gesto, più di una volta. Parlane col tuo coach o un genitore.',
+      titolo: 'Brava, hai ascoltato il tuo corpo!',
+      consigli: {
+        dolore:
+          'Hai segnalato un punto che ti fa cambiare il gesto. Parlane col tuo coach o con un genitore: non è una cosa da tenersi.',
+        carico:
+          'Scuola e allenamento sono stati più pesanti del solito questa settimana. Dormire bene stanotte e bere parecchia acqua ti aiutano a ricaricarti.',
+        sonno:
+          'Questa settimana hai dormito poco. Anche mezz’ora in più stanotte cambia come ti senti domani in allenamento.',
+        liscio:
+          'Questa settimana il tuo corpo non ti ha mandato segnali strani. Continua così: ascoltarsi anche quando va tutto bene è metà del lavoro.',
+      },
     },
 
     riposo: {
@@ -300,15 +316,18 @@ const it = {
       azione: 'Inizia body check-in',
     },
 
+    /*
+     * La scheda sotto alla grande. A giornata finita non porta al percorso ma
+     * al diario, e li' non ha titolo: e' un invito, non una lezione da
+     * riprendere, e un titolo in mezzo lo farebbe sembrare un compito.
+     */
     percorsoCard: {
-      occhiello: 'BODY LANGUAGE · LEZIONE 5',
-      occhielloRiposo: 'BODY LANGUAGE · 4/8 LEZIONI',
-      occhielloFatto: 'BODY LANGUAGE',
-      titolo: 'Sblocca "acuto" e "lancinante"',
-      titoloFatto: 'Continua Lezione 5',
-      sotto: '2 min · 2 parole ti aspettano nel check-in',
-      sottoRiposo: '2 min',
-      sottoFatto: '"acuto" è comparso oggi — scopri cosa significa',
+      occhiello: 'BODY LANGUAGE',
+      occhielloFatto: 'SCRIVI QUELLO CHE PENSI',
+      titolo: 'Continua il tuo percorso di scoperta',
+      sotto: '2 sensazioni da decifrare',
+      sottoFatto:
+        'Se ti frulla in testa o nel corpo qualcos’altro, BAB è sempre qui per farlo uscire.',
     },
 
     /*
@@ -337,15 +356,10 @@ const it = {
 
     settimana: {
       titolo: 'Questa settimana',
-      righe: {
-        checkin: 'Check-in',
-        tempo: 'Tempo più frequente',
-        parole: 'Parole registrate',
-      },
-      valori: {
-        checkin: '{fatti} su {su} giorni di allenamento',
-        nessuna: '—',
-      },
+      ascoltato: 'Hai ascoltato il tuo corpo',
+      giorni: '{fatti} su {su} giorni di allenamento',
+      sentita: 'Ti sei sentita soprattutto',
+      nessuna: '—',
     },
   },
 
@@ -645,9 +659,17 @@ const en: typeof it = {
 
     fatto: {
       etichetta: 'Streak +1 · nice work',
-      titolo: 'Today, in one line.',
-      segnalazione:
-        'Worth flagging: same spot, same movement, more than once. Talk to your coach or a parent.',
+      titolo: 'Well done reading your body!',
+      consigli: {
+        dolore:
+          'You flagged a spot that makes you change the way you move. Tell your coach or a parent — that one is not yours to carry alone.',
+        carico:
+          'School and training have been more intense than usual this week. Having a good night of sleep and drinking plenty of water can help you recharge.',
+        sonno:
+          'You have been sleeping little this week. Even half an hour more tonight changes how tomorrow’s session feels.',
+        liscio:
+          'Your body sent no odd signals this week. Keep going: listening when everything is fine is half the work.',
+      },
     },
 
     riposo: {
@@ -667,14 +689,12 @@ const en: typeof it = {
     },
 
     percorsoCard: {
-      occhiello: 'BODY LANGUAGE · LESSON 5',
-      occhielloRiposo: 'BODY LANGUAGE · 4/8 LESSONS',
-      occhielloFatto: 'BODY LANGUAGE',
-      titolo: 'Unlock "sharp" and "stabbing"',
-      titoloFatto: 'Continue Lesson 5',
-      sotto: '2 min · 2 words waiting in your check-in',
-      sottoRiposo: '2 min',
-      sottoFatto: '"sharp" came up today — find out what it means',
+      occhiello: 'BODY LANGUAGE',
+      occhielloFatto: 'JOURNAL YOUR THOUGHTS',
+      titolo: 'Continue Your Discovery Journey',
+      sotto: '2 sensations waiting to be decoded',
+      sottoFatto:
+        'If anything else comes up in your mind or body, BAB is always here for you to let it out.',
     },
 
     /*
@@ -703,15 +723,10 @@ const en: typeof it = {
 
     settimana: {
       titolo: 'This week',
-      righe: {
-        checkin: 'Check-ins',
-        tempo: 'Most frequent tempo',
-        parole: 'Words logged',
-      },
-      valori: {
-        checkin: '{fatti} of {su} training days',
-        nessuna: '—',
-      },
+      ascoltato: 'You listened to your body',
+      giorni: '{fatti} of {su} training days',
+      sentita: 'You felt mostly',
+      nessuna: '—',
     },
   },
 

@@ -15,6 +15,7 @@ import { svuotaCoda } from '../lib/sessione'
 import {
   allenamentoDiOggi,
   caricaGiornata,
+  consiglioDelGiorno,
   riassuntoDelGiorno,
   statoDiOggi,
   useGiornata,
@@ -28,9 +29,10 @@ import carica from '../assets/casa/tempo-carica.svg'
 import costante from '../assets/casa/tempo-costante.svg'
 import leggero from '../assets/casa/tempo-leggero.svg'
 import pallino from '../assets/casa/pallino-tempo.svg'
-import allarme from '../assets/casa/allarme.svg'
-import percorsoViola from '../assets/casa/percorso-viola.svg'
-import percorsoRiposo from '../assets/casa/percorso-riposo.svg'
+import lampadina from '../assets/casa/lampadina.svg'
+import calendario from '../assets/casa/calendario.svg'
+import spunta from '../assets/casa/spunta.svg'
+import sorriso from '../assets/casa/sorriso.svg'
 import campoSonno from '../assets/casa/campo-sonno.svg'
 import campoEnergia from '../assets/casa/campo-energia.svg'
 import campoScuola from '../assets/casa/campo-scuola.svg'
@@ -163,38 +165,28 @@ export function Casa() {
                 : t.casa.sezioni.intanto}
           </Sezione>
 
+          {/*
+            Nei giorni di riposo sotto non c'e' il percorso ma il riepilogo
+            della settimana: e' il giorno in cui guardarsi indietro ha senso,
+            e due schede una sopra l'altra in un giorno che dovrebbe essere
+            leggero sono una di troppo.
+          */}
           <div className="mt-[10px]">
-            {stato === 'fatto' ? (
+            {stato === 'riposo' ? (
+              <Settimana />
+            ) : stato === 'fatto' ? (
               <SchedaPercorso
                 occhiello={t.casa.percorsoCard.occhielloFatto}
-                titolo={t.casa.percorsoCard.titoloFatto}
                 sotto={t.casa.percorsoCard.sottoFatto}
-                icona={percorsoViola}
-                tinta="var(--color-viola-chiaro)"
               />
             ) : (
               <SchedaPercorso
-                occhiello={
-                  stato === 'riposo'
-                    ? t.casa.percorsoCard.occhielloRiposo
-                    : t.casa.percorsoCard.occhiello
-                }
+                occhiello={t.casa.percorsoCard.occhiello}
                 titolo={t.casa.percorsoCard.titolo}
-                sotto={
-                  stato === 'riposo'
-                    ? t.casa.percorsoCard.sottoRiposo
-                    : t.casa.percorsoCard.sotto
-                }
-                icona={stato === 'riposo' ? percorsoRiposo : undefined}
+                sotto={t.casa.percorsoCard.sotto}
               />
             )}
           </div>
-
-          {stato === 'riposo' && (
-            <div className="mt-[10px]">
-              <Settimana />
-            </div>
-          )}
         </div>
 
         <BarraSotto />
@@ -273,7 +265,13 @@ function Checkin({ ora, adesso }: { ora: string; adesso: Date }) {
   return (
     <SchedaEroe
       stato="checkin"
-      etichetta={riempi(t.casa.checkin.etichetta, { ora })}
+      /*
+        Senza l'ora dell'allenamento il puntino resterebbe appeso da solo in
+        fondo all'etichetta. Capita solo nell'anteprima, dove gli allenamenti
+        dell'onboarding non ci sono — ma un puntino appeso e' un difetto in
+        qualunque posto compaia.
+      */
+      etichetta={riempi(t.casa.checkin.etichetta, { ora }).replace(/\s*·\s*$/, '')}
       titolo={t.casa.checkin.titolo}
       corpo={t.casa.checkin.corpo}
     >
@@ -328,12 +326,23 @@ function Checkout({ previsto, adesso }: { previsto: Tempo | null; adesso: Date }
   )
 }
 
-/* ── home-3: fatto tutto, e c'e' qualcosa da segnalare ───────────────────── */
+/**
+ * home-3: la giornata e' chiusa.
+ *
+ * Sotto alla frase del riepilogo c'e' una nota sola, con la lampadina, e dice
+ * la cosa piu' utile che si possa dire guardando la settimana vera: vedi
+ * `consiglioDelGiorno`.
+ *
+ * Il confronto fra previsto e sentito resta nella frase sopra e non e' piu'
+ * anche due pastiglie: l'ha appena visto alla fine del check-out, e
+ * rifarglielo vedere dieci secondi dopo non gli aggiunge niente.
+ */
 function Fatto() {
   const { t, ts } = useLingua()
   const g = useGiornata()
   // non si tiene da parte: cambierebbe lingua e resterebbe indietro
   const riassunto = riassuntoDelGiorno(g.previsto, g.sentito, ts)
+  const consiglio = consiglioDelGiorno(g.settimana)
   return (
     <SchedaEroe
       stato="fatto"
@@ -341,36 +350,15 @@ function Fatto() {
       titolo={t.casa.fatto.titolo}
       corpo={riassunto || undefined}
     >
-      <div className="mt-1 rounded-[16px] bg-white/75 p-3">
-        {/* quello che aveva previsto, e quello che ha sentito davvero */}
-        <div className="flex items-center gap-3 px-1">
-          {g.previsto && <Pastiglia tempo={g.previsto} />}
-          <span className="text-[14px] font-bold text-ink-tenue" aria-hidden>
-            →
-          </span>
-          {g.sentito && <Pastiglia tempo={g.sentito} />}
+      <div className="mt-1 rounded-[16px] bg-white/75 p-1">
+        <div className="flex gap-3 rounded-[16px] bg-allarme-fondo px-3 py-[10px]">
+          <img src={lampadina} alt="" className="mt-[3px] size-4 shrink-0" aria-hidden />
+          <p className="m-0 text-[12px] leading-[1.4] text-allarme-testo">
+            {t.casa.fatto.consigli[consiglio]}
+          </p>
         </div>
-
-        {g.segnalata && (
-          <div className="mt-3 flex gap-3 rounded-[16px] bg-allarme-fondo p-3">
-            <img src={allarme} alt="" className="mt-[2px] size-[13px] shrink-0" aria-hidden />
-            <p className="m-0 text-[12px] font-bold leading-[1.4] text-allarme-testo">
-              {t.casa.fatto.segnalazione}
-            </p>
-          </div>
-        )}
       </div>
     </SchedaEroe>
-  )
-}
-
-function Pastiglia({ tempo }: { tempo: Tempo }) {
-  const { t } = useLingua()
-  return (
-    <span className="inline-flex h-8 flex-1 items-center gap-[6px] rounded-[99px] bg-chip pl-[9px] pr-3">
-      <img src={ICONA_TEMPO[tempo]} alt="" className="size-4" aria-hidden />
-      <span className="text-[12px] font-bold text-ink">{t.casa.tempi[tempo]}</span>
-    </span>
   )
 }
 
@@ -426,36 +414,85 @@ function Riposo({ adesso }: { adesso: Date }) {
   )
 }
 
-/* la scheda del riepilogo settimanale, sotto al percorso nei giorni di riposo */
+/**
+ * Il riepilogo della settimana, nei giorni di riposo.
+ *
+ * Due righe sole: quanti giorni di allenamento ha accompagnato con un
+ * check-in, e come si e' sentita piu' spesso alla fine. I numeri sono quelli
+ * veri (vedi `dellaSettimana`); il denominatore invece viene dall'onboarding,
+ * perche' i giorni in cui si allena li ha detti lei e nel database non ci
+ * sono — nessuno ci scrive gli allenamenti previsti.
+ *
+ * Il verde e' l'unico colore della scheda, e non e' un voto: e' lo stesso
+ * verde delle cose fatte in tutto il resto dell'app. Se la settimana e'
+ * andata male i numeri lo dicono da soli, senza bisogno del rosso.
+ */
 function Settimana() {
-  const { t } = useLingua()
+  const { t, ts } = useLingua()
   const r = useRisposte()
-  const giorniAllenamento = new Set(Object.values(r.allenamenti).flatMap((a) => a.giorni)).size
-
-  const righe: [string, string][] = [
-    [
-      t.casa.settimana.righe.checkin,
-      riempi(t.casa.settimana.valori.checkin, {
-        fatti: giorniAllenamento,
-        su: giorniAllenamento,
-      }),
-    ],
-    [t.casa.settimana.righe.tempo, t.casa.tempi.costante],
-    [t.casa.settimana.righe.parole, t.casa.settimana.valori.nessuna],
-  ]
+  const { settimana } = useGiornata()
+  const allenamenti = new Set(Object.values(r.allenamenti).flatMap((a) => a.giorni)).size
+  const facce = ts.soddisfazione.facce
+  const sentita = settimana.sentita
+  const faccia =
+    sentita && sentita in facce ? facce[sentita as keyof typeof facce] : t.casa.settimana.nessuna
 
   return (
-    <div className="overflow-hidden rounded-[22px] border border-line bg-surface px-[15px] py-[15px]">
-      <p className="m-0 text-[13px] font-bold text-ink">{t.casa.settimana.titolo}</p>
-      {righe.map(([nome, valore], i) => (
-        <div key={nome}>
-          {i > 0 && <div className="my-[9px] h-px bg-riga" />}
-          <div className={`flex items-baseline justify-between gap-3 ${i === 0 ? 'mt-[19px]' : ''}`}>
-            <span className="text-[13px] font-medium text-ink-medio">{nome}</span>
-            <span className="text-right text-[13px] font-bold text-ink">{valore}</span>
-          </div>
-        </div>
-      ))}
+    <div
+      className="overflow-hidden rounded-[22px] border border-riga p-4"
+      style={{
+        background:
+          'linear-gradient(90deg, rgba(16,185,129,0.09) 0%, rgba(16,185,129,0) 100%), #faf9f5',
+      }}
+    >
+      <div className="flex items-center gap-[10px]">
+        <span className="flex size-7 items-center justify-center rounded-[14px] bg-verde-vivo/10">
+          <img src={calendario} alt="" className="size-4" aria-hidden />
+        </span>
+        <span className="text-[13px] font-bold text-ink">{t.casa.settimana.titolo}</span>
+      </div>
+
+      <RigaSettimana icona={spunta} nome={t.casa.settimana.ascoltato}>
+        <span className="text-[13px] font-bold text-ink">
+          {riempi(t.casa.settimana.giorni, { fatti: settimana.fatti, su: allenamenti })}
+        </span>
+      </RigaSettimana>
+
+      <div className="my-[10px] h-px bg-riga" />
+
+      <RigaSettimana icona={sorriso} nome={t.casa.settimana.sentita}>
+        <span className="rounded-pill bg-verde-vivo/10 px-[10px] py-1 text-[13px] font-bold text-ink">
+          {faccia}
+        </span>
+      </RigaSettimana>
+    </div>
+  )
+}
+
+/**
+ * Una riga del riepilogo: a sinistra cosa si misura, a destra quanto.
+ *
+ * Le due meta' vanno a capo invece di stringersi: su uno schermo stretto
+ * "Hai ascoltato il tuo corpo" tagliato a meta' non dice piu' niente, mentre
+ * su due righe dice ancora tutto.
+ */
+function RigaSettimana({
+  icona,
+  nome,
+  children,
+}: {
+  icona: string
+  nome: string
+  children: ReactNode
+}) {
+  return (
+    <div className="mt-[10px] flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+      <span className="flex items-center gap-2">
+        <img src={icona} alt="" className="size-4 shrink-0" aria-hidden />
+        <span className="text-[13px] font-medium text-ink-medio">{nome}</span>
+      </span>
+      {/* `ml-auto` per quando la riga va a capo: il valore resta a destra */}
+      <span className="ml-auto">{children}</span>
     </div>
   )
 }

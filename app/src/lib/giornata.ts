@@ -38,17 +38,41 @@ export type Giornata = {
   previsto: Tempo | null
   /** il ritmo che ha sentito al check-out */
   sentito: Tempo | null
-  /**
-   * Vero quando lo stesso punto e lo stesso gesto tornano piu' di una volta.
-   *
-   * Non lo scrive ancora nessuno: per dirlo servirebbe leggere la storia dei
-   * segnali e decidere quando due giorni sono "lo stesso punto", che e' un
-   * giudizio, non un conto. Finche' non lo si e' deciso, la scheda d'allarme
-   * non compare — meglio muta che sbagliata.
-   */
-  segnalata: boolean
   /** giorni di fila con almeno un check-in */
   striscia: number
+  /** com'e' andata la settimana, da lunedi' a oggi */
+  settimana: Settimana
+}
+
+/**
+ * La settimana, ridotta a quello che la home mostra.
+ *
+ * Serve a due cose sole: il riepilogo del giorno di riposo, e la nota della
+ * lampadina a giornata finita. Le medie sono medie di quello che c'e' — una
+ * settimana con due check-in fa media su due — e `null` quando non c'e'
+ * niente: senza il `null` una settimana vuota avrebbe sonno zero, cioe' il
+ * peggiore possibile, e la nota le direbbe di dormire di piu' senza avere
+ * la minima idea di quanto abbia dormito.
+ */
+export type Settimana = {
+  /** giorni con almeno un check-in, da lunedi' a oggi */
+  fatti: number
+  /** come si e' sentita piu' spesso alla fine, fra le cinque facce */
+  sentita: string | null
+  sonno: number | null
+  scuola: number | null
+  sforzo: number | null
+  /** almeno una volta ha detto che il dolore le cambia il gesto */
+  dolore: boolean
+}
+
+const SETTIMANA_VUOTA: Settimana = {
+  fatti: 0,
+  sentita: null,
+  sonno: null,
+  scuola: null,
+  sforzo: null,
+  dolore: false,
 }
 
 /** Dall'enum del database ai nomi di qui: `upbeat` -> `carica`. */
@@ -62,8 +86,8 @@ const VUOTA: Giornata = {
   fattoCheckout: false,
   previsto: null,
   sentito: null,
-  segnalata: false,
   striscia: 0,
+  settimana: SETTIMANA_VUOTA,
 }
 
 const CHIAVE = 'bab.giornata'
@@ -77,7 +101,9 @@ function dallaCopia(): Giornata {
      * attraversa i giorni per definizione, quindi sopravvive — e comunque il
      * database la ricalcola appena risponde.
      */
-    if (g.data !== giornoAtleta()) return { ...VUOTA, striscia: g.striscia ?? 0 }
+    if (g.data !== giornoAtleta()) {
+      return { ...VUOTA, striscia: g.striscia ?? 0, settimana: g.settimana ?? SETTIMANA_VUOTA }
+    }
     return { ...VUOTA, ...g }
   } catch {
     return VUOTA
@@ -125,6 +151,11 @@ type RigaGiorno = {
   local_date: string
   tempo_predicted: string | null
   tempo_chosen: string | null
+  sleep: number | null
+  school_load: number | null
+  effort: number | null
+  satisfaction: string | null
+  protective_pain: boolean | null
 }
 
 /**
@@ -149,7 +180,9 @@ export async function caricaGiornata(): Promise<void> {
 
   const { data, error } = await supabase
     .from('check_ins')
-    .select('kind,local_date,tempo_predicted,tempo_chosen')
+    .select(
+      'kind,local_date,tempo_predicted,tempo_chosen,sleep,school_load,effort,satisfaction,protective_pain',
+    )
     .eq('athlete_id', atleta)
     .gte('local_date', giornoAtleta(mezzogiorno(da)))
     .order('local_date', { ascending: false })
@@ -179,6 +212,7 @@ export async function caricaGiornata(): Promise<void> {
     previsto: pre?.tempo_predicted ? (RITMO_DA_DB[pre.tempo_predicted] ?? null) : null,
     sentito: post?.tempo_chosen ? (RITMO_DA_DB[post.tempo_chosen] ?? null) : null,
     striscia: striscia(giorniConCheckin, oggi),
+    settimana: dellaSettimana(righe, oggi),
   })
 }
 
@@ -210,6 +244,67 @@ function striscia(giorni: Set<string>, oggi: string): number {
     d.setDate(d.getDate() - 1)
   }
   return quanti
+}
+
+/**
+ * Da lunedi' a oggi, ridotto ai numeri che servono.
+ *
+ * La settimana comincia di lunedi' e non "sette giorni fa": e' la settimana
+ * di scuola e degli allenamenti, quella che un'atleta ha in testa quando
+ * legge "questa settimana". Di domenica sera guarda indietro sei giorni, di
+ * lunedi' mattina ricomincia da capo, ed e' giusto cosi'.
+ */
+function dellaSettimana(righe: RigaGiorno[], oggi: string): Settimana {
+  const primo = giornoAtleta(lunedi(new Date(`${oggi}T12:00:00`)))
+  const dentro = righe.filter((r) => r.local_date >= primo && r.local_date <= oggi)
+  if (dentro.length === 0) return SETTIMANA_VUOTA
+
+  const pre = dentro.filter((r) => r.kind === 'pre')
+  const post = dentro.filter((r) => r.kind === 'post')
+
+  return {
+    fatti: new Set(pre.map((r) => r.local_date)).size,
+    sentita: piuFrequente(post.map((r) => r.satisfaction)),
+    sonno: media(pre.map((r) => r.sleep)),
+    scuola: media(pre.map((r) => r.school_load)),
+    sforzo: media(post.map((r) => r.effort)),
+    dolore: post.some((r) => r.protective_pain === true),
+  }
+}
+
+/** Il lunedi' della settimana di quella data. */
+function lunedi(d: Date): Date {
+  const m = mezzogiorno(d)
+  /* getDay() mette domenica a 0: qui la domenica e' il settimo giorno */
+  const quanti = (m.getDay() + 6) % 7
+  m.setDate(m.getDate() - quanti)
+  return m
+}
+
+function media(numeri: (number | null)[]): number | null {
+  const veri = numeri.filter((n): n is number => typeof n === 'number')
+  if (veri.length === 0) return null
+  return veri.reduce((a, b) => a + b, 0) / veri.length
+}
+
+/**
+ * Quello che torna piu' spesso. A pari merito vince l'ultimo in ordine di
+ * tempo, che e' il primo dell'elenco: le righe arrivano dalla piu' recente.
+ */
+function piuFrequente(voci: (string | null)[]): string | null {
+  const conto = new Map<string, number>()
+  for (const v of voci) {
+    if (v) conto.set(v, (conto.get(v) ?? 0) + 1)
+  }
+  let vinta: string | null = null
+  let quante = 0
+  for (const [v, n] of conto) {
+    if (n > quante) {
+      vinta = v
+      quante = n
+    }
+  }
+  return vinta
 }
 
 /**
@@ -283,6 +378,34 @@ export function statoDiOggi(g: Giornata, quando = new Date()): StatoGiornata {
  * Il disegno della home non dice cosa ci vada dentro: qui si scrive il
  * confronto, che e' l'unica cosa che la giornata ha davvero prodotto.
  */
+/**
+ * Quale delle quattro note mostrare a giornata finita.
+ *
+ * ── PERCHE' QUATTRO REGOLE E NON UN CONSIGLIO VERO ─────────────────────────
+ * Un consiglio vero vorrebbe dire leggere una settimana di dati e dire
+ * qualcosa che nessuno le ha ancora detto. Qui invece sono quattro casi
+ * scritti a mano, scelti guardando i numeri che ci sono davvero: dolore che
+ * le cambia il gesto, scuola e allenamento tutti e due pesanti, poco sonno,
+ * e tutto il resto. Poche, e per questo mai fuori posto.
+ *
+ * L'ordine conta: il dolore viene prima di tutto, perche' e' l'unico dei
+ * quattro che puo' voler dire "parlane con qualcuno" e non "bevi un po'
+ * d'acqua". Il caso `liscio` non e' un ripiego — una settimana in cui non
+ * c'e' niente da segnalare merita di sentirselo dire.
+ */
+export type Consiglio = 'dolore' | 'carico' | 'sonno' | 'liscio'
+
+/** Le soglie: le risposte vanno da 1 a 5, quindi 4 e' "parecchio". */
+const PARECCHIO = 4
+const POCO = 2.5
+
+export function consiglioDelGiorno(s: Settimana): Consiglio {
+  if (s.dolore) return 'dolore'
+  if ((s.scuola ?? 0) >= PARECCHIO && (s.sforzo ?? 0) >= PARECCHIO) return 'carico'
+  if (s.sonno !== null && s.sonno <= POCO) return 'sonno'
+  return 'liscio'
+}
+
 export function riassuntoDelGiorno(
   previsto: string | null,
   sentito: string | null,

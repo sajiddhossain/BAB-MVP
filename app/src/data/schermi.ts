@@ -46,6 +46,9 @@ const NOMI_TUTORIAL: Record<string, string> = {
   andiamo: 'Andiamo!',
 }
 
+/** Quello che sta in cima e in fondo alla home, uguale in tutti e quattro. */
+const TESTATA_CASA = ['testi.casa.saluto', 'testi.casa.giorni', 'testi.casa.nav']
+
 export const SCHERMI: GruppoScritte[] = [
   {
     nome: 'Accesso',
@@ -141,13 +144,69 @@ export const SCHERMI: GruppoScritte[] = [
     })),
   },
   {
+    /*
+     * La home non e' uno schermo: sono quattro.
+     *
+     * Quello che cambia e' la scheda grande — c'e' l'allenamento e il
+     * check-in e' da fare, la sessione e' finita e manca il check-out, e'
+     * tutto fatto, oggi non ci si allena — e ognuno dei quattro ha le sue
+     * scritte. Con un solo schermo nel pannello se ne poteva correggere uno
+     * e gli altri tre restavano invisibili.
+     *
+     * `?ora=` ferma l'orologio dentro alla cornice, se no chi corregge alle
+     * cinque del pomeriggio vedrebbe "il check-in di oggi si e' chiuso" al
+     * posto del bottone. `?stato=` sceglie quale dei quattro.
+     */
     nome: 'Home',
     schermi: [
       {
-        id: 'casa',
-        nome: 'La home',
-        rotta: '/casa',
-        rami: ['testi.casa'],
+        id: 'casa-checkin',
+        nome: '1 · Check-in da fare',
+        rotta: '/casa?stato=checkin&ora=07:30',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.tempi',
+          'testi.casa.checkin',
+          'testi.casa.finestra',
+          'testi.casa.sezioni.intanto',
+          'testi.casa.percorsoCard',
+        ],
+      },
+      {
+        id: 'casa-checkout',
+        nome: '2 · Check-out da fare',
+        rotta: '/casa?stato=checkout&ora=19:10',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.tempi',
+          'testi.casa.checkout',
+          'testi.casa.finestra',
+          'testi.casa.sezioni.intanto',
+          'testi.casa.percorsoCard',
+        ],
+      },
+      {
+        id: 'casa-fatto',
+        nome: '3 · Giornata finita',
+        rotta: '/casa?stato=fatto&ora=20:02',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.fatto',
+          'testi.casa.sezioni.nientaltro',
+          'testi.casa.percorsoCard',
+        ],
+      },
+      {
+        id: 'casa-riposo',
+        nome: '4 · Giorno di riposo',
+        rotta: '/casa?stato=riposo&ora=08:00',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.riposo',
+          'testi.casa.finestra',
+          'testi.casa.sezioni.percorso',
+          'testi.casa.settimana',
+        ],
       },
     ],
   },
