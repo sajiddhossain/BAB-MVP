@@ -310,6 +310,17 @@ export function useScritte(): Scritte {
   )
 }
 
+/*
+ * Quando le abbiamo lette l'ultima volta.
+ *
+ * Zero e non `Date.now()`: al primo avvio non le abbiamo lette per niente —
+ * quelle che si vedono vengono dalla copia locale, che puo' essere di ieri.
+ */
+let letteA = 0
+
+/** Quanto puo' restare vecchia una scritta prima che valga la pena richiederla. */
+const ABBASTANZA_VECCHIE = 60_000
+
 /**
  * Le scritte in onda, dal database.
  *
@@ -320,6 +331,15 @@ export function useScritte(): Scritte {
  */
 export async function caricaScritte(): Promise<void> {
   if (!supabase) return
+  /*
+   * Il momento si segna PRIMA di chiedere, non quando la risposta arriva.
+   *
+   * Tornando sull'app partono due segnali quasi insieme — `visibilitychange`
+   * e `focus` — e segnandolo dopo passavano tutt'e due il controllo prima che
+   * la prima risposta tornasse: due richieste identiche a ogni ripresa. Se la
+   * rete non risponde si riprova al giro dopo, che e' fra un minuto.
+   */
+  letteA = Date.now()
   const { data, error } = await supabase.from('copy_vivo').select('chiave,lingua,valore')
   if (error || !data) return
 
@@ -335,6 +355,23 @@ export async function caricaScritte(): Promise<void> {
     /* niente spazio: si riparte dal codice al prossimo avvio, e va bene */
   }
   if (!forzate) annuncia()
+}
+
+/**
+ * Rileggi, ma solo se e' passato abbastanza tempo.
+ *
+ * Serve a chi torna sull'app dopo un po': le scritte si chiedono una volta
+ * all'avvio, e un'app installata sul telefono resta aperta per giorni. Senza
+ * questo, una correzione pubblicata la mattina arriva solo a chi ha chiuso e
+ * riaperto — cioe' a nessuno.
+ *
+ * Il minuto di attesa e' perche' `visibilitychange` scatta a ogni cambio di
+ * finestra: chi passa dalla posta all'app e ritorno farebbe una richiesta a
+ * ogni giro, e le scritte cambiano due volte a settimana.
+ */
+export function rileggiScritte(): void {
+  if (Date.now() - letteA < ABBASTANZA_VECCHIE) return
+  void caricaScritte()
 }
 
 /**

@@ -4,7 +4,14 @@ import { TESTI } from '../copy/testi'
 import { TESTI_SESSIONE } from '../copy/sessione'
 import { TESTI_PAROLE } from '../copy/parole'
 import { TESTI_PERCORSO } from '../copy/percorso'
-import { caricaScritte, conMarcatori, conScritte, elencoChiavi, useScritte } from './scritte'
+import {
+  caricaScritte,
+  conMarcatori,
+  conScritte,
+  elencoChiavi,
+  rileggiScritte,
+  useScritte,
+} from './scritte'
 import { IN_ANTEPRIMA } from './sviluppo'
 
 export type Lingua = 'it' | 'en'
@@ -64,10 +71,29 @@ export function LinguaProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = lingua
   }, [lingua])
 
-  // una volta sola all'avvio: le sovrascritture cambiano di rado, e chi le
-  // cambia ha la sua anteprima
+  /*
+   * All'avvio, e ogni volta che l'app torna davanti agli occhi.
+   *
+   * Le sovrascritture cambiano di rado, ma un'app installata sul telefono non
+   * si chiude quasi mai: leggendole solo all'avvio, una correzione pubblicata
+   * stamattina arriverebbe a chi ha spento e riacceso — cioe' quasi a nessuna.
+   * `rileggiScritte` si ferma da solo se le ha gia' lette da poco.
+   *
+   * Due ascoltatori e non uno: `visibilitychange` copre l'app messa via e
+   * ripresa, `focus` la finestra del computer tornata davanti. Su un telefono
+   * scatta il primo, sul portatile spesso solo il secondo.
+   */
   useEffect(() => {
     void caricaScritte()
+    const tornata = () => {
+      if (document.visibilityState === 'visible') rileggiScritte()
+    }
+    document.addEventListener('visibilitychange', tornata)
+    window.addEventListener('focus', tornata)
+    return () => {
+      document.removeEventListener('visibilitychange', tornata)
+      window.removeEventListener('focus', tornata)
+    }
   }, [])
 
   const valore = useMemo(() => {

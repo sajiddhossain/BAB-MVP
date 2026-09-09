@@ -301,13 +301,24 @@ function Scrivania() {
     })
   }
 
-  /** bozza → pubblicato: da qui in poi la scritta e' quella che leggono loro */
-  function pubblica(quali: string[]) {
+  /**
+   * bozza → pubblicato: da qui in poi la scritta e' quella che leggono loro.
+   *
+   * La lingua e' un argomento e non `lingua` di fuori: le bozze in attesa
+   * possono stare anche nell'altra, e da qui si pubblicano senza dover prima
+   * cambiare lingua e ritrovare lo schermo giusto.
+   */
+  function pubblica(quali: string[], qualeLingua: Lingua = lingua) {
     if (!supabase) return
     inFila(async () => {
       const daFare = quali
-        .map((k) => ({ k, r: righe[lingua][k] }))
-        .filter(({ k, r }) => r && r.bozza !== null && testo(r.bozza) !== testo(pubblicato(k)))
+        .map((k) => ({ k, r: righe[qualeLingua][k] }))
+        .filter(
+          ({ k, r }) =>
+            r &&
+            r.bozza !== null &&
+            testo(r.bozza) !== testo(righe[qualeLingua][k]?.vivo ?? partenza[qualeLingua][k]),
+        )
       if (daFare.length === 0) {
         setStato('niente da pubblicare')
         return
@@ -316,7 +327,7 @@ function Scrivania() {
       const { error } = await supabase!.from('copy_overrides').upsert(
         daFare.map(({ k, r }) => ({
           chiave: k,
-          lingua,
+          lingua: qualeLingua,
           bozza: r!.bozza,
           vivo: r!.bozza,
           aggiornato: new Date().toISOString(),
@@ -333,18 +344,28 @@ function Scrivania() {
   }
 
   /*
-   * Le bozze in attesa si contano su TUTTE le scritte, non su quelle dello
-   * schermo aperto: correggendo si cammina, e una bozza lasciata indietro
-   * tre schermi fa non deve sparire dal conto.
+   * Le bozze in attesa, per lingua.
+   *
+   * Si contano su TUTTE le scritte e non su quelle dello schermo aperto:
+   * correggendo si cammina, e una bozza lasciata indietro tre schermi fa non
+   * deve sparire dal conto.
+   *
+   * E si contano in tutt'e due le lingue, non solo in quella aperta. Prima
+   * guardavano solo quella: si correggevano tre scritte in italiano e una in
+   * inglese, il bottone diceva «3», e la quarta restava bozza per sempre senza
+   * che nessuno lo dicesse. Il conto che non vedi e' quello che ti frega.
    */
-  const daPubblicare = useMemo(
-    () =>
-      Object.keys(partenza[lingua]).filter((k) => {
-        const r = righe[lingua][k]
-        return r && r.bozza !== null && testo(r.bozza) !== testo(r.vivo ?? partenza[lingua][k])
-      }),
-    [partenza, lingua, righe],
-  )
+  const sospese = useMemo(() => {
+    const conta = (l: Lingua) =>
+      Object.keys(partenza[l]).filter((k) => {
+        const r = righe[l][k]
+        return r && r.bozza !== null && testo(r.bozza) !== testo(r.vivo ?? partenza[l][k])
+      })
+    return { it: conta('it'), en: conta('en') } as Record<Lingua, string[]>
+  }, [partenza, righe])
+
+  const daPubblicare = sospese[lingua]
+  const altra: Lingua = lingua === 'it' ? 'en' : 'it'
 
   function apri(k: string) {
     setAperta(k)
@@ -506,15 +527,33 @@ function Scrivania() {
             <span className="text-[12px] text-ink-medio">{stato}</span>
           </div>
 
-          {daPubblicare.length > 0 && (
+          {(daPubblicare.length > 0 || sospese[altra].length > 0) && (
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => pubblica(daPubblicare)}
-                className="bab-tocco rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold"
-              >
-                Pubblica tutte le modifiche ({daPubblicare.length})
-              </button>
+              {daPubblicare.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => pubblica(daPubblicare)}
+                  className="bab-tocco rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold"
+                >
+                  {quante(daPubblicare.length, lingua)}
+                </button>
+              )}
+
+              {/*
+                L'altra lingua non e' una nota a margine: e' il posto dove le
+                bozze si dimenticano. Il bottone la pubblica di qui, senza
+                dover cambiare lingua e ritrovare lo schermo.
+              */}
+              {sospese[altra].length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => pubblica(sospese[altra], altra)}
+                  className="bab-tocco rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold text-ambra-testo"
+                >
+                  E {quante(sospese[altra].length, altra, true)}
+                </button>
+              )}
+
               <span className="text-[11.5px] text-ink-medio">
                 finché non pubblichi, le atlete vedono quello di prima
               </span>
@@ -810,4 +849,16 @@ function Campo({
 function testo(v: Valore | null): string {
   if (v === null || v === undefined) return ''
   return Array.isArray(v) ? v.join('\n') : v
+}
+
+/**
+ * «la modifica in italiano», «le 3 in inglese».
+ *
+ * Una riga per non far dire al pannello «le 1 in inglese». Il numero si scrive
+ * solo da due in su: con uno il conto non serve, serve sapere quale lingua.
+ */
+function quante(n: number, lingua: Lingua, seguito = false): string {
+  const nome = lingua === 'it' ? 'italiano' : 'inglese'
+  if (n === 1) return seguito ? `quella in ${nome}` : `Pubblica la modifica in ${nome}`
+  return seguito ? `le ${n} in ${nome}` : `Pubblica le ${n} in ${nome}`
 }
