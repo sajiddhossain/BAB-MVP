@@ -5,7 +5,7 @@
  * (`16-how-it-works` … `training-overview`). Dove i due frame di una lingua
  * dicevano cose diverse, la differenza è annotata qui sotto.
  *
- * ── QUATTRO COSE CHE ABBIAMO SCRITTO NOI ───────────────────────────────────
+ * ── CINQUE COSE CHE ABBIAMO SCRITTO NOI ────────────────────────────────────
  * Vanno rilette da chi scrive i testi prima del pilota. Sono tutte visibili
  * nel pannello, gruppo «Tutorial».
  *
@@ -24,10 +24,15 @@
  *    che lo rifà. Se tocca due volte in quindici secondi non le si può dire
  *    che il suo cuore fa otto battiti al minuto: si rifà, e basta.
  *
- * 4. Nella scheda del confronto, a destra, il frame italiano ripete il numero
+ * 5. Nella scheda del confronto, a destra, il frame italiano ripete il numero
  *    («72 BPM») e quello inglese scrive la banda («Slow»). Abbiamo tenuto la
  *    banda in tutt'e due: il numero grande sta già sopra, e quello che va
  *    confrontato con la sua ipotesi è la banda, non la cifra.
+ *
+ * 4. Le tre frasi che spiegano i ritmi non stanno qui: sono in
+ *    `copy/sessione.ts`, sotto `comune.spiegaRitmi`, perché la stessa fila
+ *    compare anche nel check-in e nel check-out. Qui non ci sono nemmeno i
+ *    tre nomi, per lo stesso motivo.
  */
 
 const it = {
@@ -112,7 +117,6 @@ const it = {
     forte: 'È il messaggio speciale che il tuo corpo ti manda.',
     corpo:
       "Non c'è un ritmo giusto o sbagliato: ascoltalo, rispettalo e allenati a lavorarci insieme, un check-in alla volta.",
-    carte: ['Scattante', 'Stabile', 'Tranquillo'],
     azione: 'Capito',
   },
 
@@ -220,7 +224,6 @@ const en: typeof it = {
     forte: "It’s your body's unique message for you.",
     corpo:
       'No tempo is good or bad: you notice it, honour it, and learn to work with it through each check.',
-    carte: ['Upbeat', 'Steady', 'Gentle'],
     azione: 'Got it',
   },
 

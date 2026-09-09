@@ -35,7 +35,23 @@ const it = {
     si: 'Sì',
     no: 'No',
     avanti: 'Avanti',
-    ritmi: { carica: 'Carica', costante: 'Costante', leggero: 'Leggero' } as Record<Tempo, string>,
+    ritmi: { carica: 'Scattante', costante: 'Stabile', leggero: 'Tranquillo' } as Record<
+      Tempo,
+      string
+    >,
+    /*
+     * Cosa vuol dire ognuno dei tre.
+     *
+     * Compaiono sotto alla fila: col mouse passandoci sopra, col dito
+     * scegliendo. Stanno qui e non nei tre schermi che li mostrano — il
+     * tutorial, il check-in, il check-out — perche' sono la stessa frase in
+     * tre posti, e la stessa frase in tre posti si cambia in uno solo.
+     */
+    spiegaRitmi: {
+      carica: 'Ti senti fresca e pronta a spingere.',
+      costante: 'Ti senti bene, senza essere né particolarmente carica né stanca.',
+      leggero: 'Ti senti fiacca o appesantita.',
+    } as Record<Tempo, string>,
   },
 
   // ── CHECK-IN ──────────────────────────────────────────────────────────────
@@ -421,6 +437,11 @@ const en: typeof it = {
     no: 'No',
     avanti: 'Next',
     ritmi: { carica: 'Upbeat', costante: 'Steady', leggero: 'Gentle' } as Record<Tempo, string>,
+    spiegaRitmi: {
+      carica: 'You feel fresh and ready to push.',
+      costante: 'You feel good — neither especially charged nor tired.',
+      leggero: 'You feel sluggish or heavy.',
+    } as Record<Tempo, string>,
   },
 
   // ── CHECK-IN ──────────────────────────────────────────────────────────────

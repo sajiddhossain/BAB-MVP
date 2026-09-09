@@ -128,7 +128,16 @@ export const SCHERMI: GruppoScritte[] = [
       id: `tut-${p.id}`,
       nome: NOMI_TUTORIAL[p.id] ?? p.id,
       rotta: `/tutorial/${p.id}`,
-      rami: [`tutorial.${ramoDi(p.id)}`],
+      /*
+       * Lo schermo dei ritmi mostra la stessa fila del check-in, e quella fila
+       * legge i tre nomi e le tre spiegazioni da `sessione.comune`: senza
+       * questo ramo il pannello direbbe che li' non c'e' niente da cambiare,
+       * mentre meta' di quello che si vede viene da li'.
+       */
+      rami:
+        p.id === 'ritmi'
+          ? [`tutorial.${ramoDi(p.id)}`, 'sessione.comune']
+          : [`tutorial.${ramoDi(p.id)}`],
     })),
   },
   {
@@ -208,7 +217,7 @@ export const SCHERMI: GruppoScritte[] = [
         id: 'co-ritmo',
         nome: '1 · Il confronto',
         rotta: '/sessione/checkout/ritmo',
-        rami: ['sessione.ritmoDopo'],
+        rami: ['sessione.ritmoDopo', 'sessione.comune'],
       },
       {
         id: 'co-sforzo',

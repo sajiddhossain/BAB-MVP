@@ -1,6 +1,8 @@
 import { Schermo } from '../../ui/Schermo'
 import { Bottone } from '../../ui/Bottone'
-import { Corpo, Nota, Occhiello, Scheda, Titolo, icona } from '../../ui/tutorial/pezzi'
+import { Corpo, Nota, Occhiello, Scheda, Titolo } from '../../ui/tutorial/pezzi'
+import { Ritmi as FilaRitmi } from '../../ui/sessione/Ritmi'
+import { RITMI } from '../../data/sessione'
 import { useLingua } from '../../lib/lingua'
 import type { PropsTutorial } from './tipi'
 
@@ -80,15 +82,6 @@ export function Ritmi({ passo, nodo, verso, avanzamento, avanti, indietro }: Pro
   const { tt } = useLingua()
   const t = tt.ritmi
 
-  /*
-   * Le tre carte non si toccano: qui il ritmo si spiega, non si sceglie —
-   * sceglierlo è la prima domanda del check-in, e questo schermo esiste
-   * proprio per farle sapere cosa le verrà chiesto. Sono `div`, non bottoni:
-   * un bottone che non fa niente resta raggiungibile con la tastiera e col
-   * lettore di schermo si annuncia come una cosa da premere.
-   */
-  const SEGNI = ['fulmine', 'onde', 'foglia']
-
   return (
     <Schermo
       nodo={nodo}
@@ -105,31 +98,22 @@ export function Ritmi({ passo, nodo, verso, avanzamento, avanti, indietro }: Pro
         <span className="font-bold">{t.forte}</span> {t.corpo}
       </p>
 
-      <div className="mt-[40px] flex gap-3">
-        {t.carte.map((nome, i) => (
-          <div key={nome} className="relative min-w-0 flex-1">
-            <div
-              aria-hidden
-              className="absolute inset-0 translate-x-[4px] translate-y-[4px] rounded-[16px]"
-              style={{ background: i === 0 ? 'rgba(212,178,111,0.12)' : 'rgba(0,0,0,0.04)' }}
-            />
-            {/*
-              La prima carta è accesa nel disegno: è l'esempio, quello che
-              fa capire che sono tre pastiglie fra cui si sceglie. Non è una
-              risposta già data — qui non si risponde.
-            */}
-            <div
-              className={`relative flex h-[62px] flex-col items-center justify-center gap-1 rounded-[16px] ${
-                i === 0
-                  ? 'border-2 border-ritmo-bordo bg-ritmo-fondo'
-                  : 'border-[1.5px] border-line bg-surface'
-              }`}
-            >
-              <img src={icona(SEGNI[i])} alt="" aria-hidden className="size-4" />
-              <span className="text-[13px] font-bold text-ink">{nome}</span>
-            </div>
-          </div>
-        ))}
+      {/*
+        La stessa fila del check-in, ma qui non si sceglie: si legge. Toccare
+        una carta ne mostra il significato sotto, e basta — il ritmo di oggi
+        si sceglie al check-in, non qui.
+
+        E' lo stesso componente e non una copia: i tre nomi e le tre
+        spiegazioni sono scritti una volta sola, e una seconda fila fatta qui
+        vorrebbe dire poterli cambiare in un posto e non nell'altro.
+
+        Il primo e' acceso in partenza come nel disegno: e' l'esempio, e serve
+        a due cose insieme — far vedere che sono tre pastiglie fra cui si
+        sceglie, e non lasciare vuota la riga che spiega, che vuota non
+        direbbe a nessuno che le carte si toccano.
+      */}
+      <div className="mt-[40px]">
+        <FilaRitmi scelto={RITMI[0].id} />
       </div>
     </Schermo>
   )

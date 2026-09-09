@@ -259,7 +259,7 @@ const it = {
     saluto: 'Ciao {nome}',
     giorni: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
     nav: { home: 'Home', percorso: 'Percorso', storico: 'Storico', profilo: 'Profilo' },
-    tempi: { carica: 'Carica', costante: 'Costante', leggero: 'Leggero' },
+    tempi: { carica: 'Scattante', costante: 'Stabile', leggero: 'Tranquillo' },
 
     checkin: {
       etichetta: 'Allenamento oggi · {ora}',
