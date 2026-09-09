@@ -3,7 +3,7 @@ import { Badge, CartaRisposta, Esito, Occhiello, Testa, Titolo } from '../../ui/
 import { Guscio } from '../../ui/percorso/Guscio'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
-import { TINTE_RISPOSTA, vesteDi } from '../../data/percorso'
+import { TINTE_RISPOSTA, segnoDi, vesteDi } from '../../data/percorso'
 import { LIVELLI } from '../../data/sessione'
 import type { Passo } from '../../data/percorso'
 import type { StatoCarta } from '../../ui/percorso/pezzi'
@@ -39,7 +39,9 @@ export function Mossa({
 
   const [scelta, setScelta] = useState<number | null>(null)
   const [esito, setEsito] = useState<boolean | null>(null)
-  const giusta = LIVELLI.indexOf(passo.giusta)
+  /* la mossa giusta la possono dire i testi, dove le due lingue non scelgono
+     la stessa: vedi il commento su `gemelle.giusta` nei testi */
+  const giusta = LIVELLI.indexOf(t.giusta ?? passo.giusta)
 
   function stato(i: number): StatoCarta {
     if (esito === null) return scelta === i ? 'scelta' : 'ferma'
@@ -71,7 +73,12 @@ export function Mossa({
       }
     >
       {classico ? (
-        <Testa sopra={t.sopra} occhiello={t.occhiello} titolo={riempi(t.titolo, buchi)} />
+        <Testa
+          sopra={t.sopra}
+          occhiello={t.occhiello}
+          titolo={riempi(t.titolo, buchi)}
+          segno={segnoDi(lezione)}
+        />
       ) : (
         <>
           <Occhiello nome="scudo-mossa">{t.occhiello}</Occhiello>

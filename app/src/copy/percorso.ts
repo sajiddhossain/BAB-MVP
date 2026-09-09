@@ -1,3 +1,4 @@
+import type { Livello } from '../data/sessione'
 /**
  * Le parole del percorso.
  *
@@ -163,6 +164,8 @@ export type ContenutoLezione = {
     scelte: string[]
     /** cosa c'e' scritto sulle carte, quando non e' il nome del livello */
     etichette?: string[]
+    /** la mossa giusta, dove le due lingue non scelgono la stessa — vedi `gemelle.giusta` */
+    giusta?: Livello
     esito: string
     /** la riga sotto alle tre carte, dove c'e' */
     nota?: string
@@ -187,6 +190,8 @@ export type ContenutoLezione = {
     titolo: string
     /** l'etichetta dentro alla scheda, dove c'e' */
     etichetta?: string
+    /** un'intestazione per buco: ce l'ha solo la forma `schema` */
+    etichette?: string[]
     /** la riga sopra alla scheda, dove la nota non sta dentro */
     intro?: string
     cesto: string
@@ -202,6 +207,8 @@ export type ContenutoLezione = {
   }
 
   fatto: {
+    /** l'occhiello sopra al titolo: ce l'ha solo la forma `nudo` */
+    occhiello?: string
     titolo: string
     /** la riga sotto al titolo: ce l'ha solo la veste classica */
     sotto?: string
@@ -211,6 +218,10 @@ export type ContenutoLezione = {
     righe?: string[]
     etichettaProgresso: string
     conteggio: string
+    /** la riga sotto al conteggio, dentro alla stessa scheda */
+    extra?: string
+    /** la riga in fondo allo schermo */
+    nota?: string
     azione: string
   }
 }
@@ -853,6 +864,140 @@ const it = {
         azione: 'Torna al percorso',
       },
     },
+
+    6: {
+      incontra: [
+        {
+          occhiello: 'PAROLA 1 DI 2',
+          titolo: 'Incontra «{uno}»',
+          metafora: 'Un fiammifero, non un incendio.',
+          descrizione:
+            'È una sensazione di calore intenso, come se la pelle andasse a fuoco o toccasse una fonte di calore.',
+          blocchi: [
+            {
+              testo:
+                'Di solito lo scatena qualcosa da fuori — lo sfregamento — oppure è un’infiammazione in corso.',
+            },
+            {
+              testo:
+                'Non ignorarlo se dura per tutto l’esercizio. È il corpo che chiede protezione, acqua, o una barriera.',
+            },
+          ],
+          azione: 'Prossima parola',
+        },
+        {
+          occhiello: 'PAROLA 2 DI 2',
+          titolo: 'Incontra «{due}»',
+          metafora: 'Bibita frizzante sotto la pelle.',
+          descrizione:
+            'È una sensazione elettrica, come spilli, che spesso segnala un nervo schiacciato per un po’ o poco sangue che arriva.',
+          blocchi: [
+            {
+              testo:
+                'Comune quando resti nella stessa posizione troppo a lungo, o quando la circolazione si risveglia.',
+            },
+            {
+              pastiglia: 'CONFRONTO',
+              testo:
+                '«{uno}» è calore e attrito. «{due}» è elettrico, ed è questione di nervi e di circolazione.',
+            },
+          ],
+          azione: 'Facciamo pratica',
+        },
+      ],
+
+      abbina: {
+        occhiello: 'ATTIVITÀ',
+        titolo: 'Collega i segnali',
+        intro: 'Trascina ogni parola sulla descrizione che le somiglia.',
+        cesto: 'TRASCINA LE PAROLE',
+        righe: [
+          'Calore intenso, come la pelle che va a fuoco',
+          'Spilli elettrici sotto la pelle',
+          'Una puntura di spillo, breve e precisa',
+          'Una lama profonda che trafigge',
+        ],
+        esche: [],
+        azione: 'Verifica',
+      },
+
+      gemelle: {
+        occhiello: 'FALSI AMICI',
+        titolo: 'Attenta a non confonderli',
+        badge: 'Scenario',
+        scenario:
+          'Ti sei seduta a terra a gambe incrociate troppo a lungo. Appena ti alzi senti i piedi frizzare, pieni di piccoli aghi. Cos’è?',
+        domanda: '',
+        glosse: [],
+        etichette: ['Sento un segnale «{uno}»', 'Sento un segnale «{due}»'],
+        giusta: 1,
+        esito:
+          'È «{due}»: una sensazione elettrica, perché i nervi della gamba si stanno liberando.',
+        azione: 'Verifica',
+      },
+
+      storia: {
+        occhiello: 'SCENARIO',
+        titolo: 'Storie di corsa',
+        badge: 'SCENARIO',
+        scenario:
+          'Durante una lunga sessione di corsa d’estate l’interno coscia diventa rosso e senti la pelle andare a fuoco per lo sfregamento dei pantaloncini.',
+        domanda: '',
+        etichette: ['Sì, si tratta di «{uno}»', 'No, si tratta di «{due}»', 'Altro'],
+        esito:
+          'L’attrito e la pelle irritata fanno calore e bruciore: è «{uno}».',
+        azione: 'Verifica',
+      },
+
+      mossa: {
+        occhiello: 'COME REAGISCI?',
+        titolo: 'Cosa fai adesso?',
+        badge: 'YOUR MOVE',
+        scenario:
+          'Sei a metà allenamento e l’interno coscia brucia forte («{uno}»). Cosa decidi di fare?',
+        etichette: [
+          'Continua e aumenta il carico',
+          'Fermati e metti una crema barriera',
+          'Cambia esercizio',
+        ],
+        scelte: [
+          'Cerchi di superare il bruciore e finire la sessione con più intensità.',
+          'Una pausa breve per mettere una crema lenitiva o barriera, prima che l’irritazione peggiori.',
+          'Sostituisci l’esercizio con uno che non stressi l’interno coscia.',
+        ],
+        esito:
+          'Il segnale «{uno}» ti avvisa di intervenire prima che la pelle si rovini. Ottimo ascolto del tuo corpo.',
+        azione: 'Verifica',
+      },
+
+      frase: {
+        occhiello: 'LA TUA REGOLA',
+        titolo: 'Crea la tua frase',
+        intro: 'Completa lo schema con quello che hai visto, e la lezione finisce nel tuo diario.',
+        cesto: 'TRASCINA LE PAROLE',
+        etichette: ['QUANDO SENTO:', 'IL MIO CORPO RIFERISCE:', 'DECIDO QUINDI DI:'],
+        modello: '{0}{bruciante}{2}',
+        esche: [
+          'sfregamento all’interno coscia',
+          'mettere la crema barriera',
+          'rigido',
+        ],
+        azione: 'Salva & finisci',
+      },
+
+      fatto: {
+        occhiello: 'COMPLETATA',
+        titolo: 'Lezione 6 completata!',
+        sotto:
+          'Hai sbloccato altre 2 parole importanti per raccontare bene i segnali del tuo corpo.',
+        etichettaProgresso: 'IL TUO PROGRESSO',
+        conteggio: '{fatte} / {tutte} sbloccate',
+        extra: '+{nuove} parole sbloccate oggi 🎉',
+        nota:
+          'Ora sei pronta a metterle alla prova nei prossimi check-in.',
+        azione: 'Torna al percorso',
+      },
+    },
   } as Record<number, ContenutoLezione>,
 }
 
@@ -1436,6 +1581,126 @@ const en: typeof it = {
         righe: ['A paper cut, not a bruise.', 'Sharp with force behind it.'],
         etichettaProgresso: 'YOUR PROGRESS',
         conteggio: '{fatte} / {tutte} words unlocked',
+        azione: 'Back to the path',
+      },
+    },
+
+    6: {
+      incontra: [
+        {
+          occhiello: 'WORD 1 OF 2',
+          titolo: '{uno}',
+          metafora: 'A match, not a fire.',
+          descrizione:
+            'A hot sting inside a muscle that builds through hard reps and leaves within a couple of minutes of stopping.',
+          blocchi: [
+            {
+              testo:
+                'It’s the hot sting in your thighs when you run up a long flight of stairs. It builds while you’re climbing, and it’s gone a minute after you stop at the top.',
+            },
+            {
+              pastiglia: 'Push — if it fades',
+              testo: 'This is the honest burn. The muscle working near its limit — a green light.',
+            },
+          ],
+          azione: 'Next word',
+        },
+        {
+          occhiello: 'WORD 2 OF 2',
+          titolo: '{due}',
+          metafora: 'Fizzy drink under the skin.',
+          descrizione: 'Pins and needles. A nerve signal, not a muscle one.',
+          blocchi: [
+            {
+              testo:
+                'Exactly what your foot feels like after you’ve sat on it too long — turning up in training for no reason.',
+            },
+            {
+              pastiglia: 'The split',
+              testo:
+                'Burning stays put and fades. Tingling travels and fizzes. Nerves do not respond to pushing through: effort fixes muscle problems and makes nerve problems worse.',
+            },
+          ],
+          azione: "Let's practise",
+        },
+      ],
+
+      abbina: {
+        occhiello: 'MATCH',
+        titolo: 'Put the word on its picture.',
+        intro: 'Tap a word, then tap where it belongs.',
+        cesto: 'WORD BANK',
+        righe: [
+          'A match, not a fire',
+          'Fizzy drink under the skin',
+          'A paper cut, not a bruise',
+          'Sharp with force behind it',
+        ],
+        esche: [],
+        azione: 'Check',
+      },
+
+      gemelle: {
+        occhiello: 'FALSE FRIENDS',
+        titolo: 'Which one is this?',
+        badge: 'SCENARIO',
+        scenario:
+          'You sprint up four flights of stairs. At the top your thighs are on fire. Two minutes later it’s gone.',
+        domanda: '',
+        glosse: [],
+        giusta: 0,
+        esito: 'Gone within about two minutes of stopping? Green — that’s {uno}.',
+        azione: 'Check',
+      },
+
+      storia: {
+        occhiello: 'REAL LIFE',
+        titolo: 'Name it.',
+        badge: 'TRAINING',
+        scenario:
+          'Doing deadlifts, a fizzy pins-and-needles feeling runs from your left glute down the back of your leg into your foot.',
+        domanda: '',
+        giusta: 1,
+        esito: 'Does it travel, fizz, or follow a line? Nerve — that’s {due}.',
+        azione: 'Check',
+      },
+
+      mossa: {
+        occhiello: 'YOUR MOVE',
+        titolo: 'Same day. What do you do?',
+        badge: 'YOUR MOVE',
+        scenario:
+          'Doing deadlifts, a fizzy pins-and-needles feeling runs from your left glute down the back of your leg into your foot. You called it {due}.',
+        scelte: [
+          'Train it as planned',
+          'Adjust something, then check it again',
+          'Tell someone — coach, physio, parent, doctor',
+        ],
+        giusta: 'sostegno',
+        esito:
+          'It travels in a line and it fizzes. That’s a nerve, not a muscle — and nerves don’t respond to pushing through. Stop that movement and tell someone.',
+        azione: 'Check',
+      },
+
+      frase: {
+        occhiello: 'SAY IT OUT LOUD',
+        titolo: 'Build the sentence.',
+        intro: 'Knowing the word only counts if you can hand it to someone. Tap each gap.',
+        cesto: 'PICK A WORD',
+        etichette: ['WHEN I FEEL:', 'MY BODY REPORTS:', 'SO I DECIDE TO:'],
+        modello: '{0}{bruciante}{2}',
+        esche: ['I sprint up four flights of stairs', 'keep going — it fades', 'stiff'],
+        azione: 'Finish lesson',
+      },
+
+      fatto: {
+        occhiello: 'COMPLETED',
+        titolo: 'Lesson 6 done.',
+        sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
+        etichettaProgresso: 'YOUR PROGRESS',
+        conteggio: '{fatte} / {tutte} words unlocked',
+        extra: '+{nuove} words unlocked today 🎉',
+        nota: 'Now available when you check in.',
         azione: 'Back to the path',
       },
     },

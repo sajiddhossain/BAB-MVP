@@ -12,6 +12,7 @@ import {
 } from '../../ui/percorso/pezzi'
 import { useIncastri } from './incastri'
 import { useLingua } from '../../lib/lingua'
+import { segnoDi } from '../../data/percorso'
 import type { Passo } from '../../data/percorso'
 import type { PropsEsercizio } from './tipi'
 
@@ -38,6 +39,8 @@ import type { PropsEsercizio } from './tipi'
  */
 export function Abbina({
   passo,
+  lezione,
+
   testi,
   avanzamento,
   indietro,
@@ -94,7 +97,7 @@ export function Abbina({
       {icone && !t.occhiello ? (
         <Titolo>{t.titolo}</Titolo>
       ) : (
-        <Testa sopra={t.sopra} occhiello={t.occhiello ?? ''} titolo={t.titolo} />
+        <Testa sopra={t.sopra} occhiello={t.occhiello ?? ''} titolo={t.titolo} segno={segnoDi(lezione)} />
       )}
 
       {t.intro && (

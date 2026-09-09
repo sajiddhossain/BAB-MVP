@@ -298,11 +298,14 @@ export function Testa({
   sopra,
   occhiello,
   titolo,
+  segno,
 }: {
   /** la riga sopra all'occhiello, dove il disegno la mette */
   sopra?: string
   occhiello: string
   titolo: string
+  /** l'icona accanto all'occhiello: ce l'ha solo la lezione che la disegna */
+  segno?: string
 }) {
   return (
     <>
@@ -311,7 +314,10 @@ export function Testa({
           {sopra}
         </p>
       )}
-      <p className="m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla">{occhiello}</p>
+      <p className="m-0 flex items-center gap-2 text-[10px] font-bold tracking-[1px] uppercase text-lilla">
+        {segno && <img src={icona(segno)} alt="" aria-hidden className="size-4" />}
+        {occhiello}
+      </p>
       <h1 className="bab-display m-0 mt-[6px] text-[28px] leading-[34px] font-bold tracking-[-0.56px] text-ink">
         {titolo}
       </h1>

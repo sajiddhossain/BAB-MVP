@@ -4,6 +4,7 @@ import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
 import { LIVELLO_DI } from '../../data/sessione'
 import { TINTE_PASTIGLIA } from '../../ui/percorso/pezzi'
+import { segnoDi } from '../../data/percorso'
 import type { Passo } from '../../data/percorso'
 import type { PropsEsercizio } from './tipi'
 
@@ -18,6 +19,8 @@ import type { PropsEsercizio } from './tipi'
  */
 export function IncontraClassico({
   passo,
+  lezione,
+
   testi,
   quale,
   parole,
@@ -34,7 +37,12 @@ export function IncontraClassico({
 
   return (
     <Guscio avanzamento={avanzamento} indietro={indietro} azione={t.azione} onAzione={avanti}>
-      <Testa sopra={t.sopra} occhiello={t.occhiello} titolo={riempi(t.titolo ?? nome, buchi)} />
+      <Testa
+        sopra={t.sopra}
+        occhiello={t.occhiello}
+        titolo={riempi(t.titolo ?? nome, buchi)}
+        segno={segnoDi(lezione)}
+      />
 
       <div className="mt-[30px]">
         <Scheda riga={`linear-gradient(to bottom, ${tinta}, var(--color-lime))`}>

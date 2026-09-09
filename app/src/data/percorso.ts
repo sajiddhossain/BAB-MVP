@@ -42,6 +42,9 @@ export type IconaLezione =
   | 'freccia-su-destra'
   | 'lucchetto'
   | 'cerchio-allarme'
+  | 'estintore'
+  | 'scintille'
+  | 'cervello'
 
 /**
  * I due impaginati.
@@ -156,8 +159,11 @@ export type Passo =
       /**
        * `scheda` la frase e la nota dentro alla stessa scheda (lezioni 1 e 2)
        * `intro`  una riga sopra alla scheda, e dentro solo la frase (lezione 3)
+       * `schema` non una frase ma tre righe intestate — "quando sento", "il
+       *          mio corpo riferisce", "decido quindi di" — col cesto sopra
+       *          invece che sotto (lezione 6)
        */
-      forma: 'scheda' | 'intro'
+      forma: 'scheda' | 'intro' | 'schema'
       /**
        * Le pastiglie, nell'ordine in cui stanno nel disegno.
        *
@@ -182,8 +188,11 @@ export type Passo =
    *             schede alte, e la percentuale accanto al progresso (lezione 4)
    * `spunta`    la spunta grande in mezzo e le due parole in righe dentro a
    *             una scheda sola, col pallino e la descrizione (lezione 5)
+   * `nudo`      senza nessun disegno in cima: occhiello, titolo, la scheda
+   *             del progresso, e le due parole come pastiglie con l'icona
+   *             (lezione 6)
    */
-  | { tipo: 'fatto'; forma: 'stat' | 'scintilla' | 'coppa' | 'trofeo' | 'spunta' }
+  | { tipo: 'fatto'; forma: 'stat' | 'scintilla' | 'coppa' | 'trofeo' | 'spunta' | 'nudo' }
 
 /** Come si presenta lo scenario di uno schermo a scelta multipla. */
 export type FormaScenario =
@@ -203,6 +212,14 @@ export type Lezione = {
   parole: [Parola, Parola]
   /** quale dei due impaginati usa */
   veste: Veste
+  /**
+   * L'icona accanto all'occhiello, in cima a ogni schermo della lezione.
+   *
+   * Ce l'ha solo la sesta, dove il disegno la mette su tutti e otto i frame.
+   * Sta qui e non nei testi perche' e' forma, e sta sulla lezione e non sul
+   * passo perche' nel file e' la stessa su tutti.
+   */
+  segno?: IconaLezione
 }
 
 /**
@@ -219,7 +236,7 @@ export const LEZIONI: Lezione[] = [
   { numero: 3, parole: ['teso', 'rigido'], veste: 'classico' },
   { numero: 4, parole: ['crampo', 'morsa'], veste: 'classico' },
   { numero: 5, parole: ['pungente', 'trafittivo'], veste: 'classico' },
-  { numero: 6, parole: ['bruciante', 'formicolante'], veste: 'classico' },
+  { numero: 6, parole: ['bruciante', 'formicolante'], veste: 'classico', segno: 'cervello' },
   { numero: 7, parole: ['intorpidito', 'instabile'], veste: 'classico' },
   { numero: 8, parole: ['gonfio', 'caldo'], veste: 'classico' },
 ]
@@ -227,6 +244,11 @@ export const LEZIONI: Lezione[] = [
 /** L'impaginato di una lezione. */
 export function vesteDi(numero: number): Veste {
   return LEZIONI.find((l) => l.numero === numero)?.veste ?? 'classico'
+}
+
+/** L'icona accanto all'occhiello di una lezione, dove ce n'e' una. */
+export function segnoDi(numero: number): IconaLezione | undefined {
+  return LEZIONI.find((l) => l.numero === numero)?.segno
 }
 
 /**
@@ -383,6 +405,29 @@ export const PASSI: Record<number, Passo[]> = {
       cesto: [{ esca: 0 }, { parola: 'trafittivo' }, { esca: 1 }],
     },
     { tipo: 'fatto', forma: 'spunta' },
+  ],
+
+  6: [
+    { tipo: 'incontra', parola: 'bruciante', icona: 'estintore', blocchi: ['nota', 'pastiglia'] },
+    { tipo: 'incontra', parola: 'formicolante', icona: 'scintille', blocchi: ['nota', 'pastiglia'] },
+    {
+      tipo: 'abbina',
+      forma: 'largo',
+      righe: [{ giusta: 0 }, { giusta: 1 }, { giusta: 2 }, { giusta: 3 }],
+      parole: ['bruciante', 'formicolante', 'pungente', 'trafittivo'],
+      esche: 0,
+    },
+    { tipo: 'gemelle', forma: 'testo', risposte: ['bruciante', 'formicolante'], giusta: 0 },
+    /* tre carte, non due: la terza cambia da una lingua all'altra, e la dicono
+       i testi con `etichette` */
+    { tipo: 'storia', forma: 'testo', risposte: ['bruciante', 'formicolante', 'pungente'], giusta: 0 },
+    { tipo: 'mossa', giusta: 'calibra' },
+    {
+      tipo: 'frase',
+      forma: 'schema',
+      cesto: [{ esca: 0 }, { parola: 'bruciante' }, { esca: 1 }, { esca: 2 }],
+    },
+    { tipo: 'fatto', forma: 'nudo' },
   ],
 }
 

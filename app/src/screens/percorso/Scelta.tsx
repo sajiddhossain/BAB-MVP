@@ -3,7 +3,7 @@ import { Badge, CartaRisposta, Esito, Occhiello, Scheda, Testa, Titolo } from '.
 import { Guscio } from '../../ui/percorso/Guscio'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
-import { TINTE_RISPOSTA } from '../../data/percorso'
+import { TINTE_RISPOSTA, segnoDi } from '../../data/percorso'
 import type { Passo } from '../../data/percorso'
 import type { StatoCarta } from '../../ui/percorso/pezzi'
 import type { PropsEsercizio } from './tipi'
@@ -31,6 +31,8 @@ const LETTERE = ['A', 'B', 'C', 'D', 'E']
  */
 export function Scelta({
   passo,
+  lezione,
+
   testi,
   parole,
   avanzamento,
@@ -88,7 +90,12 @@ export function Scelta({
       }
     >
       {conTesta ? (
-        <Testa sopra={t.sopra} occhiello={t.occhiello} titolo={t.titolo ?? ''} />
+        <Testa
+          sopra={t.sopra}
+          occhiello={t.occhiello}
+          titolo={t.titolo ?? ''}
+          segno={segnoDi(lezione)}
+        />
       ) : (
         <Occhiello nome={gemelle ? 'domanda' : 'libro-aperto'}>{t.occhiello}</Occhiello>
       )}

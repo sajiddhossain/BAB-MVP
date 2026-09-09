@@ -4,7 +4,7 @@ import { Riga, Scheda, icona } from '../../ui/percorso/pezzi'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
 import { finisciLezione, useProgresso } from '../../lib/percorso'
-import { LEZIONI, TINTE_LEZIONE, passiDi } from '../../data/percorso'
+import { LEZIONI, TINTE_LEZIONE, passiDi, segnoDi } from '../../data/percorso'
 import type { Passo } from '../../data/percorso'
 import type { PropsEsercizio } from './tipi'
 import medaglia from '../../assets/percorso/medaglia.svg'
@@ -53,7 +53,8 @@ export function Fatto({
   const incontri = (passiDi(lezione) ?? []).filter((p) => p.tipo === 'incontra')
   const tutte = LEZIONI.length * 2
   const sbloccate = progresso.fatte.length * 2
-  const numeri = { fatte: sbloccate, tutte, restano: tutte - sbloccate }
+  const numeri = { fatte: sbloccate, tutte, restano: tutte - sbloccate, nuove: incontri.length }
+  const segno = segnoDi(lezione)
   /* quanto ha aggiunto questa lezione: due parole su sedici, cioe' il 12% */
   const quota = Math.floor((2 / tutte) * 100)
 
@@ -99,9 +100,20 @@ export function Fatto({
         </div>
       )}
 
+      {t.occhiello && (
+        <p className="m-0 mt-[20px] flex items-center gap-2 text-[10px] font-bold tracking-[1px] uppercase text-lilla">
+          {segno && <img src={icona(segno)} alt="" aria-hidden className="size-4" />}
+          {t.occhiello}
+        </p>
+      )}
+
       <h1
         className={`bab-display m-0 text-[28px] leading-[34px] font-bold tracking-[-0.56px] text-ink ${
-          passo.forma === 'coppa' || passo.forma === 'spunta' ? 'mt-[26px]' : 'mt-5 text-center'
+          passo.forma === 'nudo'
+            ? 'mt-[6px]'
+            : passo.forma === 'coppa' || passo.forma === 'spunta'
+              ? 'mt-[26px]'
+              : 'mt-5 text-center'
         }`}
       >
         {t.titolo}
@@ -120,7 +132,7 @@ export function Fatto({
       {t.sotto && (
         <p
           className={`m-0 text-[15px] leading-[1.4] text-ink-soft ${
-            passo.forma === 'coppa' || passo.forma === 'spunta'
+            passo.forma === 'coppa' || passo.forma === 'spunta' || passo.forma === 'nudo'
               ? 'mt-4'
               : passo.forma === 'trofeo'
                 ? 'mt-[6px]'
@@ -196,6 +208,22 @@ export function Fatto({
               ))}
             </div>
           </Scheda>
+        </div>
+      )}
+
+      {/* le due parole come pastiglie con l'icona: la forma `nudo` */}
+      {passo.forma === 'nudo' && (
+        <div className="mt-[18px] flex flex-wrap gap-[10px]">
+          {incontri.map((p, i) => (
+            <span
+              key={p.parola}
+              className="flex items-center gap-2 rounded-pill px-4 py-[10px] text-[15px] font-bold text-ink"
+              style={{ background: TINTE[i % TINTE.length] }}
+            >
+              <img src={icona(p.icona)} alt="" aria-hidden className="size-4" />
+              {ts.foglio.parole[p.parola] ?? p.parola}
+            </span>
+          ))}
         </div>
       )}
 
@@ -289,6 +317,12 @@ export function Fatto({
             </span>
           )}
 
+          {t.extra && (
+            <span className="mt-[10px] block text-[13px] font-bold text-ink-soft">
+              {riempi(t.extra, numeri)}
+            </span>
+          )}
+
           {/* gli otto pallini: uno per lezione, accesi quelle finite */}
           {passo.forma === 'coppa' && (
             <span className="mt-4 flex gap-[6px]">
@@ -319,6 +353,10 @@ export function Fatto({
           </span>
         )}
       </div>
+
+      {t.nota && (
+        <p className="m-0 mt-[24px] text-[14px] leading-[1.5] text-ink-soft">{t.nota}</p>
+      )}
     </Guscio>
   )
 }

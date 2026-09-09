@@ -2,6 +2,7 @@ import { Guscio } from '../../ui/percorso/Guscio'
 import { Testa } from '../../ui/percorso/pezzi'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
+import { segnoDi } from '../../data/percorso'
 import type { Passo } from '../../data/percorso'
 import type { PropsEsercizio } from './tipi'
 import triangolo from '../../assets/percorso/triangolo.svg'
@@ -23,6 +24,8 @@ import triangolo from '../../assets/percorso/triangolo.svg'
  * davvero.
  */
 export function Allarme({
+  lezione,
+
   testi,
   parole,
   avanzamento,
@@ -41,7 +44,7 @@ export function Allarme({
       azione={t.azione || tpe.comune.continua}
       onAzione={avanti}
     >
-      <Testa occhiello={t.occhiello} titolo={t.titolo} />
+      <Testa occhiello={t.occhiello} titolo={t.titolo} segno={segnoDi(lezione)} />
 
       <div
         className="relative mt-[38px] overflow-hidden rounded-[20px] border px-6 py-6 pl-[30px]"
