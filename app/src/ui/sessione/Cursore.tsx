@@ -34,6 +34,8 @@ export function Cursore({
   // dove sta il centro del pallino, in frazione: e' la stessa formula che usa
   // il range di sistema, ed e' quella che tiene i numeri sotto al pallino
   const posizione = (v: number) => (v - min) / (max - min)
+  /** quanto spazio c'e' fra un numero e il suo vicino */
+  const passo = `calc((100% - 24px) / ${max - min})`
 
   return (
     <div>
@@ -78,12 +80,26 @@ export function Cursore({
       {/*
         Le due parole agli estremi sono 7px nel disegno — troppo piccole per
         essere lette davvero. Qui sono 9: e' il piu' piccolo che resta
-        leggibile su un telefono, e "Peggio non si puo'" ci sta lo stesso
-        perche' va a capo su due righe come nel disegno.
+        leggibile su un telefono.
+        ── PERCHE' CENTRATE E NON APPOGGIATE AI BORDI ──────────────────────
+        Appoggiate al bordo, "Ben riposata" finiva a meta' strada fra il 6 e
+        il 7 e sembrava riferirsi al 6. Ognuna delle due sta centrata sotto al
+        suo numero — il margine di 12px e' mezzo pallino, la stessa distanza
+        che tiene i numeri sotto al cursore — e piu' larga del passo fra due
+        numeri non puo' essere: cosi' va a capo prima di finire sotto al
+        numero del vicino, e "Ben riposata" diventa "Ben" e "riposata", una
+        sopra all'altra e tutt'e due centrate sul 7.
+
+        Che una parola lunghissima sbordi di qualche pixel oltre alla pista va
+        bene: la scheda intorno ha diciotto pixel di margine e non taglia.
       */}
-      <div className="mt-[6px] flex justify-between gap-4 text-[9px] font-bold leading-[1.15] text-ink-mute">
-        <span className="max-w-[32%]">{sinistra}</span>
-        <span className="max-w-[32%] text-right">{destra}</span>
+      <div className="mt-[6px] flex justify-between gap-2 text-[9px] font-bold leading-[1.15] text-ink-mute">
+        <span className="ml-3 -translate-x-1/2 text-center" style={{ maxWidth: passo }}>
+          {sinistra}
+        </span>
+        <span className="mr-3 translate-x-1/2 text-center" style={{ maxWidth: passo }}>
+          {destra}
+        </span>
       </div>
     </div>
   )
