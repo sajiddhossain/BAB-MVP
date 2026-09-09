@@ -45,6 +45,8 @@ export type IconaLezione =
   | 'estintore'
   | 'scintille'
   | 'cervello'
+  | 'ghiaccio'
+  | 'bilancia'
 
 /**
  * I due impaginati.
@@ -428,6 +430,29 @@ export const PASSI: Record<number, Passo[]> = {
       cesto: [{ esca: 0 }, { parola: 'bruciante' }, { esca: 1 }, { esca: 2 }],
     },
     { tipo: 'fatto', forma: 'nudo' },
+  ],
+
+  7: [
+    { tipo: 'incontra', parola: 'intorpidito', icona: 'ghiaccio', blocchi: ['nota', 'pastiglia'] },
+    { tipo: 'incontra', parola: 'instabile', icona: 'bilancia', blocchi: ['accento'] },
+    {
+      /* le righe non seguono l'ordine del cesto: lo dice il disegno */
+      tipo: 'abbina',
+      forma: 'largo',
+      righe: [{ giusta: 1 }, { giusta: 3 }, { giusta: 0 }, { giusta: 2 }],
+      parole: ['intorpidito', 'instabile', 'bruciante', 'formicolante'],
+      esche: 0,
+    },
+    { tipo: 'gemelle', forma: 'testo', risposte: ['intorpidito', 'instabile'], giusta: 1 },
+    { tipo: 'allarme', parola: 'intorpidito' },
+    { tipo: 'storia', forma: 'zona', risposte: ['intorpidito', 'instabile'], giusta: 1 },
+    { tipo: 'mossa', giusta: 'sostegno' },
+    {
+      tipo: 'frase',
+      forma: 'intro',
+      cesto: [{ esca: 0 }, { parola: 'instabile' }, { esca: 1 }],
+    },
+    { tipo: 'fatto', forma: 'trofeo' },
   ],
 }
 

@@ -180,7 +180,8 @@ export type ContenutoLezione = {
     testo: string
     /** il riquadro con dentro cosa fare adesso */
     dafare: string
-    nota: string
+    /** la riga sotto alla scheda rossa, dove c'e' */
+    nota?: string
     azione: string
   }
 
@@ -998,6 +999,134 @@ const it = {
         azione: 'Torna al percorso',
       },
     },
+
+    7: {
+      incontra: [
+        {
+          occhiello: 'PAROLA 1 DI 2',
+          titolo: 'Incontra «{uno}»',
+          metafora: 'Il volume a zero.',
+          descrizione:
+            'È la sensibilità che si perde, in parte o del tutto. Come quando ti addormenti su un braccio e per un po’ non lo controlli.',
+          blocchi: [
+            {
+              testo:
+                'Nello sport può venire da un nervo schiacciato per poco, ma se arriva all’improvviso merita attenzione.',
+            },
+            {
+              testo:
+                'Non ignorare mai un intorpidimento completo che non se ne va muovendo piano l’arto per qualche minuto.',
+            },
+          ],
+          azione: 'Prossima parola',
+        },
+        {
+          occhiello: 'PAROLA 2 DI 2',
+          titolo: 'Incontra «{due}»',
+          metafora: 'Un tavolo che traballa.',
+          descrizione:
+            'È la sensazione che un’articolazione sia debole, che dondoli, o che stia per cedere sotto sforzo.',
+          blocchi: [
+            {
+              etichetta: 'LA DIFFERENZA CHIAVE',
+              testo:
+                '«{uno}» = nessuna sensibilità. Non senti il contatto, la pelle è come anestetizzata.\n«{due}» = nessun controllo. L’articolazione cede, dondola, o non regge il carico.',
+            },
+          ],
+          azione: 'Facciamo pratica',
+        },
+      ],
+
+      abbina: {
+        occhiello: 'ESERCIZIO 1',
+        titolo: 'Associa le sensazioni',
+        cesto: 'TRASCINA LE PAROLE',
+        righe: [
+          'La caviglia oscilla e sembra cedere',
+          'Pizzicore diffuso come aghi sulla pelle',
+          'Nessun calore e nessun tocco sentito sul braccio',
+          'Calore intenso e interno, come fuoco',
+        ],
+        esche: [],
+        azione: 'Verifica',
+      },
+
+      gemelle: {
+        occhiello: 'FALSI AMICI',
+        titolo: 'Cosa succede qui?',
+        badge: 'Scenario',
+        scenario:
+          'Durante uno scatto laterale il ginocchio si piega di colpo all’interno e ti lascia senza appoggio. È un caso di:',
+        domanda: '',
+        glosse: [],
+        esito:
+          'Il ginocchio che cede o non tiene l’allineamento è la definizione esatta di «{due}».',
+        azione: 'Verifica',
+      },
+
+      allarme: {
+        occhiello: 'ATTENZIONE',
+        titolo: 'Segnale d’allarme',
+        intestazione: 'Bandiera rossa: «{uno}»',
+        testo:
+          'Se una parte del corpo diventa completamente insensibile durante o dopo l’allenamento, e non torna normale in pochi minuti…',
+        dafare: 'Fermati e avvisa subito il tuo allenatore o un genitore.',
+        nota:
+          'Un intorpidimento improvviso che non passa può voler dire un nervo molto compresso, o un problema di circolazione: va guardato.',
+        azione: 'Ho capito',
+      },
+
+      storia: {
+        occhiello: 'STORIA REALE',
+        titolo: 'La spalla di Katia',
+        badge: 'PALLAVOLO',
+        scenario:
+          '«Durante il servizio a pallavolo sento che la spalla destra fa uno scatto strano e per un attimo dondola, come se fosse fuori posto.»',
+        domanda: 'COME DEFINIRESTI QUESTA SENSAZIONE?',
+        esito:
+          'Quando un’articolazione cede o dondola sotto sforzo è «{due}». La cosa giusta è fermarsi e avvisare lo staff.',
+        azione: 'Verifica',
+      },
+
+      mossa: {
+        occhiello: 'COSA FARE ADESSO?',
+        titolo: 'Spalla instabile',
+        badge: 'YOUR MOVE',
+        scenario:
+          'Katia sente la spalla «{due}» durante i servizi alti. Qual è l’azione giusta da proporre?',
+        etichette: [
+          'Continuare a forzare per rinforzarla',
+          'Continuare camminando velocemente senza fermarsi',
+          'Evitare i servizi alti e avvisare lo staff',
+        ],
+        scelte: [],
+        esito:
+          'Evitare i servizi alti e avvisare lo staff è l’azione più sicura per non farsi male.',
+        azione: 'Verifica',
+      },
+
+      frase: {
+        occhiello: 'RIASSUNTO LEZIONE',
+        titolo: 'Crea la tua regola',
+        etichetta: 'REGOLA DI AUTOTUTELA',
+        cesto: 'TRASCINA LE PAROLE',
+        modello:
+          'Se sento la mia {0} diventare particolarmente «{instabile}», preferisco {2} per oggi.',
+        esche: ['spalla destra', 'saltare i servizi alti'],
+        azione: 'Salva & finisci',
+      },
+
+      fatto: {
+        titolo: 'Lezione 7 completata!',
+        etichetta: 'PAROLE SBLOCCATE',
+        righe: ['Perdita di sensibilità', 'Perdita di stabilità articolare'],
+        etichettaProgresso: 'IL TUO PROGRESSO',
+        conteggio: '{fatte} / {tutte} sbloccate',
+        nota:
+          'Ora hai gli strumenti per riconoscere e raccontare sia la perdita di sensibilità sia quella di stabilità.',
+        azione: 'Torna al percorso',
+      },
+    },
   } as Record<number, ContenutoLezione>,
 }
 
@@ -1700,6 +1829,129 @@ const en: typeof it = {
         etichettaProgresso: 'YOUR PROGRESS',
         conteggio: '{fatte} / {tutte} words unlocked',
         extra: '+{nuove} words unlocked today 🎉',
+        nota: 'Now available when you check in.',
+        azione: 'Back to the path',
+      },
+    },
+
+    7: {
+      incontra: [
+        {
+          occhiello: 'WORD 1 OF 2',
+          titolo: '{uno}',
+          metafora: 'The volume turned to zero.',
+          descrizione:
+            "Not pain — absence. The skin feels like it's behind a glove or a layer of clothing.",
+          blocchi: [
+            { testo: 'Tingling is a bad phone signal. Numb is no signal.' },
+            {
+              pastiglia: 'Support — same day',
+              testo:
+                'A nerve that has gone from shouting to silent. Quieter is worse, not better.',
+            },
+          ],
+          azione: 'Next word',
+        },
+        {
+          occhiello: 'WORD 2 OF 2',
+          titolo: '{due}',
+          metafora: 'A wobbly table leg.',
+          descrizione:
+            'The joint feels like it might give way, shift, or go. You don’t trust it under load — and often nothing hurts at all.',
+          blocchi: [
+            {
+              etichetta: 'THE SPLIT',
+              testo:
+                '{uno} is a loss of feeling.\n{due} is a loss of trust. Like stepping onto a chair with one loose leg: nothing has broken yet, you just don’t trust it.\nNeither one hurts much. Both are red.',
+            },
+          ],
+          azione: "Let's practise",
+        },
+      ],
+
+      abbina: {
+        occhiello: 'MATCH',
+        titolo: 'Put the word on its picture.',
+        cesto: 'WORD BANK',
+        righe: [
+          'A wobbly table leg',
+          'Fizzy drink under the skin',
+          'The volume turned to zero',
+          'A match, not a fire',
+        ],
+        esche: [],
+        azione: 'Check',
+      },
+
+      gemelle: {
+        occhiello: 'FALSE FRIENDS',
+        titolo: 'Which one is this?',
+        badge: 'SCENARIO',
+        scenario:
+          "Your knee doesn't hurt. But you wouldn't land on it one-legged at full speed, and you know it.",
+        domanda: '',
+        glosse: [],
+        esito:
+          'Would you land on one leg on it right now, at full speed, without thinking? If you hesitated, that’s {due}.',
+        azione: 'Check',
+      },
+
+      allarme: {
+        occhiello: 'FLAG',
+        titolo: 'Tell someone today.',
+        intestazione: 'Red flag: {uno}',
+        testo:
+          'The outside of your thigh has lost feeling. That’s a {uno} signal — a nerve that has gone from shouting to silent. Quieter is worse, not better.',
+        dafare:
+          "This isn't a diagnosis and it isn't drama. It's a signal that needs a second pair of eyes — and you noticing it is the skill working.",
+        azione: 'Got it',
+      },
+
+      storia: {
+        occhiello: 'REAL LIFE',
+        titolo: 'Name it.',
+        badge: 'TRAINING',
+        scenario:
+          "The outside of your thigh feels like it's behind a layer of clothing. It doesn't hurt at all.",
+        domanda: 'Which word?',
+        giusta: 0,
+        esito:
+          'Run your fingertip over the same patch of skin on one side, then the other. {uno} is when one side feels like you’re touching it through your leggings.',
+        azione: 'Check',
+      },
+
+      mossa: {
+        occhiello: 'YOUR MOVE',
+        titolo: 'Same day. What do you do?',
+        badge: 'YOUR MOVE',
+        scenario:
+          "The outside of your thigh feels like it's behind a layer of clothing. It doesn't hurt at all. You called it {uno}.",
+        scelte: [
+          'Train it as planned',
+          'Adjust something, then check it again',
+          'Tell someone — coach, physio, parent, doctor',
+        ],
+        esito:
+          'Nothing hurts — and that’s the point. A nerve going quiet is more serious than a nerve shouting. Support, same day.',
+        azione: 'Check',
+      },
+
+      frase: {
+        occhiello: 'SAY IT OUT LOUD',
+        titolo: 'Build the sentence.',
+        etichetta: 'YOUR SENTENCE',
+        cesto: 'PICK A WORD',
+        modello: "My {0} feels {instabile} when {2}, it's 3/10, since this morning.",
+        esche: ['right knee', 'I land on one leg'],
+        azione: 'Finish lesson',
+      },
+
+      fatto: {
+        titolo: 'Lesson 7 done.',
+        etichetta: 'WORDS UNLOCKED',
+        righe: ['The volume turned to zero.', 'A wobbly table leg.'],
+        etichettaProgresso: 'YOUR PROGRESS',
+        conteggio: '{fatte} / {tutte} words unlocked',
         nota: 'Now available when you check in.',
         azione: 'Back to the path',
       },
