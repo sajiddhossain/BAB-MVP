@@ -282,6 +282,16 @@ export function Foglio({
                 {t.aggiungi}
               </button>
             </div>
+            {/*
+              Un bottone spento senza una ragione scritta e' un bottone rotto,
+              per chi lo guarda. Qui la ragione c'e' sempre e sola: manca il
+              come, e con "Altrove" anche il dove.
+            */}
+            {!puoSalvare && (
+              <p className="m-0 mt-2 text-center text-[12.5px] leading-[1.4] text-ink-medio">
+                {altrove && bozza.zonaLibera.trim().length === 0 ? t.mancaDove : t.manca}
+              </p>
+            )}
             {!nuova && (
               <button
                 type="button"

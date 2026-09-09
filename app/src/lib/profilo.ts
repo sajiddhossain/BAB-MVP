@@ -56,6 +56,29 @@ async function chiedi(): Promise<Risposta> {
     .from('athletes')
     .select('id,tutorial_done')
     .limit(1)
+
+  /*
+   * La colonna puo' non esserci ancora.
+   *
+   * `tutorial_done` arriva con `migrazione-tutorial.sql`, e fra il momento in
+   * cui l'app va online e quello in cui qualcuno incolla quella migrazione
+   * passa del tempo. Senza questo ripiego la richiesta fallisce INTERA — 400,
+   * "column does not exist" — e allora non si sa piu' nemmeno se questa
+   * persona ha un profilo: la guardia va in 'boh' e non manda piu' nessuno da
+   * nessuna parte.
+   *
+   * Il ripiego chiede solo cio' che c'era prima, e sul tutorial non decide:
+   * 'boh' vuol dire "non lo so", e chi non lo sa non spedisce nessuna dentro
+   * a un tutorial ne' fuori. Torna tutto al suo posto appena la migrazione
+   * viene lanciata.
+   */
+  if (error?.code === '42703' || /tutorial_done/.test(error?.message ?? '')) {
+    console.warn('[profilo] manca athletes.tutorial_done: lancia migrazione-tutorial.sql')
+    const { data: solo, error: errore2 } = await supabase.from('athletes').select('id').limit(1)
+    if (errore2 || !solo) return { profilo: 'boh', tutorial: 'boh' }
+    return { profilo: solo.length > 0 ? 'si' : 'no', tutorial: 'boh' }
+  }
+
   if (error) {
     console.error('[profilo]', error.message)
     return { profilo: 'boh', tutorial: 'boh' }

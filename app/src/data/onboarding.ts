@@ -45,14 +45,25 @@ export type Passo = {
   nodoAperto?: { it: string; en: string }
 }
 
-/** Meno di 18 anni compiuti oggi. Se la data non c'e' ancora, si assume di si'. */
-export function minorenne(nascita: string): boolean {
+/**
+ * Ha compiuto `anni` anni, oggi?
+ *
+ * Compiuti davvero: chi li fa domani non li ha. `null` quando la data non
+ * c'e' o non si legge — e' diverso da "no", e chi chiama decide cosa farne.
+ * Prima erano due funzioni con dentro lo stesso conto e due numeri diversi.
+ */
+export function haCompiuto(nascita: string, anni: number): boolean | null {
   const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(nascita.trim())
-  if (!m) return true
+  if (!m) return null
   const [, g, me, a] = m
   const nato = new Date(Number(a), Number(me) - 1, Number(g))
-  const diciotto = new Date(nato.getFullYear() + 18, nato.getMonth(), nato.getDate())
-  return diciotto > new Date()
+  const compleanno = new Date(nato.getFullYear() + anni, nato.getMonth(), nato.getDate())
+  return compleanno <= new Date()
+}
+
+/** Meno di 18 anni compiuti oggi. Se la data non c'e' ancora, si assume di si'. */
+export function minorenne(nascita: string): boolean {
+  return haCompiuto(nascita, 18) !== true
 }
 
 /**
@@ -61,14 +72,25 @@ export function minorenne(nascita: string): boolean {
  * vuol dire niente per chi lo legge.
  */
 export function abbastanzaGrande(nascita: string): boolean {
-  const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(nascita.trim())
-  if (!m) return false
-  const [, g, me, a] = m
-  const dodici = new Date(Number(a) + 12, Number(me) - 1, Number(g))
-  return dodici <= new Date()
+  return haCompiuto(nascita, 12) === true
 }
 
 const haCiclo = (r: Risposte) => r.ciclo !== 'si'
+
+/*
+ * Il contraccettivo si chiede solo da 16 anni compiuti in su.
+ *
+ * Non e' pudore: e' che sotto quell'eta' la domanda arriva prima che serva, a
+ * qualcuna che nella maggior parte dei casi non ha niente da rispondere, e
+ * una domanda sanitaria a cui non si sa rispondere fa venire voglia di
+ * chiudere l'app. Chi li compie dopo la trovera' quando sara' il momento.
+ *
+ * `!== true` e non `=== false`: con la data mancante o scritta storta
+ * `haCompiuto` dice `null`, e in quel caso la domanda si salta. Chiederla a
+ * una dodicenne per colpa di una data che non si legge e' l'errore peggiore
+ * dei due.
+ */
+const troppoGiovane = (r: Risposte) => haCompiuto(r.nascita, 16) !== true
 
 export const PERCORSO: Passo[] = [
   { id: 'accesso', corpo: 'accesso', nodo: { it: '3771:2', en: '3958:461' }, fuoriPercorso: true },
@@ -108,7 +130,7 @@ export const PERCORSO: Passo[] = [
     id: 'contraccettivo',
     corpo: 'contraccettivo',
     nodo: { it: '3772:287', en: '3958:1437' },
-    salta: haCiclo,
+    salta: (r) => haCiclo(r) || troppoGiovane(r),
   },
 
   { id: 'riepilogo', corpo: 'riepilogo', nodo: { it: '3772:308', en: '3958:853' } },

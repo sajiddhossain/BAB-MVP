@@ -345,6 +345,12 @@ const it = {
     lieve: 'Lieve',
     atroce: 'Atroce',
     aggiungi: 'Aggiungi questa sensazione',
+    /*
+     * Perche' il bottone e' spento. Non c'era: il bottone diventava grigio e
+     * basta, e chi lo toccava non capiva se era rotto o se mancava qualcosa.
+     */
+    manca: 'Scegli una parola, o scrivi con parole tue.',
+    mancaDove: 'Scrivi dov’è, e scegli una parola o scrivi con parole tue.',
     chiudi: 'Chiudi',
     togli: 'Togli questa sensazione',
   },
@@ -675,6 +681,8 @@ const en: typeof it = {
     lieve: 'No pain',
     atroce: 'Worst possible pain',
     aggiungi: 'Add this sensation',
+    manca: 'Pick a word, or write it in your own words.',
+    mancaDove: 'Say where it is, and pick a word or write it in your own words.',
     chiudi: 'Close',
     togli: 'Remove this sensation',
   },
