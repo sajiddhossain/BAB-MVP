@@ -47,6 +47,8 @@ export type IconaLezione =
   | 'cervello'
   | 'ghiaccio'
   | 'bilancia'
+  | 'palloncino'
+  | 'fiamma'
 
 /**
  * I due impaginati.
@@ -451,6 +453,28 @@ export const PASSI: Record<number, Passo[]> = {
       tipo: 'frase',
       forma: 'intro',
       cesto: [{ esca: 0 }, { parola: 'instabile' }, { esca: 1 }],
+    },
+    { tipo: 'fatto', forma: 'trofeo' },
+  ],
+
+  8: [
+    { tipo: 'incontra', parola: 'gonfio', icona: 'palloncino', blocchi: ['nota', 'pastiglia'] },
+    { tipo: 'incontra', parola: 'caldo', icona: 'fiamma', blocchi: ['nota', 'pastiglia'] },
+    {
+      /* l'ultimo ripasso: le due parole di oggi e le due della lezione 7 */
+      tipo: 'abbina',
+      forma: 'largo',
+      righe: [{ giusta: 0 }, { giusta: 1 }, { giusta: 2 }, { giusta: 3 }],
+      parole: ['gonfio', 'caldo', 'intorpidito', 'instabile'],
+      esche: 0,
+    },
+    { tipo: 'gemelle', forma: 'testo', risposte: ['gonfio', 'caldo'], giusta: 0 },
+    { tipo: 'storia', forma: 'testo', risposte: ['gonfio', 'caldo'], giusta: 0 },
+    { tipo: 'mossa', giusta: 'calibra' },
+    {
+      tipo: 'frase',
+      forma: 'intro',
+      cesto: [{ esca: 0 }, { parola: 'gonfio' }, { esca: 1 }, { esca: 2 }],
     },
     { tipo: 'fatto', forma: 'trofeo' },
   ],

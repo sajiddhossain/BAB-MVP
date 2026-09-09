@@ -32,10 +32,19 @@ import type { Livello } from '../data/sessione'
  *    Riscritta sul modello di quella inglese.
  * 5. Le note sotto alle mosse in italiano, dove Figma ripeteva due volte la
  *    stessa frase.
- * 6. La frase da comporre della lezione 3, in tutte e due le lingue. Il
- *    tassello e' la parola dell'app, che non si piega: "sento entrambe le
- *    caviglie rigido" e "my both ankles" non stanno in piedi. Riscritte
- *    perche' il buco cada dove la parola ci entra com'e'.
+ * 6. Le frasi da comporre delle lezioni 3, 4 e 8, in tutte e due le lingue.
+ *    Il tassello e' la parola dell'app, che non si piega: "sento entrambe le
+ *    caviglie rigido", "my both ankles" e "le caviglie gonfie" col tassello
+ *    che dice "gonfio" non stanno in piedi. Riscritte perche' il buco cada
+ *    dove la parola ci entra com'e'.
+ * 7. Il riscontro della storia della lezione 8 in italiano. Nel frame dice
+ *    due cose opposte: prima spiega che il gonfiore da tutte e due le parti
+ *    prima del ciclo e' normale, e subito dopo che la risposta giusta e'
+ *    "trauma articolare unilaterale". La scena raccontata e' bilaterale e
+ *    ciclica, quindi la risposta giusta e' «gonfio»: insegnare il contrario
+ *    manderebbe un'atleta dal medico per una cosa che le succede ogni mese,
+ *    e le farebbe ignorare la cosa da guardare davvero — una caviglia sola,
+ *    dopo un colpo. VA RILETTO DA CHI SCRIVE I CONTENUTI PRIMA DEL PILOTA.
  *
  * ── I NOMI DELLE UNITA' NON DICONO LE PAROLE ───────────────────────────────
  * Sotto a ogni unita' il disegno elenca le sue quattro parole
@@ -724,7 +733,7 @@ const it = {
 
       fatto: {
         titolo: 'Ottimo lavoro! 🎉',
-        etichetta: 'LEZIONE 4 COMPLETATA',
+        occhiello: 'LEZIONE 4 COMPLETATA',
         sotto:
           'Hai sbloccato 2 nuove parole per descrivere i segnali della pancia e della schiena.',
         righe: ['Contrazione forte e improvvisa', 'Come se qualcosa stringesse forte'],
@@ -1124,6 +1133,133 @@ const it = {
         conteggio: '{fatte} / {tutte} sbloccate',
         nota:
           'Ora hai gli strumenti per riconoscere e raccontare sia la perdita di sensibilità sia quella di stabilità.',
+        azione: 'Torna al percorso',
+      },
+    },
+
+    8: {
+      incontra: [
+        {
+          occhiello: 'PAROLA 1 DI 2',
+          titolo: 'Incontra «{uno}»',
+          metafora: 'Un palloncino che si riempie.',
+          descrizione:
+            'È la sensazione di una parte che si riempie e si tende, spesso perché il liquido si ferma li’ per un po’.',
+          blocchi: [
+            {
+              testo:
+                'Può toccare le articolazioni dopo uno sforzo forte, oppure farsi vivo in certi giorni del ciclo.',
+            },
+            {
+              testo:
+                'Se non c’è dolore acuto e non c’è stato un colpo, il gonfiore da tutte e due le parti si gestisce muovendosi piano.',
+            },
+          ],
+          azione: 'Prossima parola',
+        },
+        {
+          occhiello: 'PAROLA 2 DI 2',
+          titolo: 'Incontra «{due}»',
+          metafora: 'Un termosifone acceso.',
+          descrizione:
+            'È il calore che senti uscire da dentro un’articolazione o da un muscolo, anche quando la pelle non è rossa.',
+          blocchi: [
+            {
+              testo:
+                'Spesso vuol dire più sangue che arriva li’, per riparare i tessuti dopo l’allenamento.',
+            },
+            {
+              pastiglia: 'CONFRONTA',
+              testo:
+                'La differenza è semplice: «{uno}» è quanto è grosso, «{due}» è quanto scotta.',
+            },
+          ],
+          azione: 'Facciamo pratica',
+        },
+      ],
+
+      abbina: {
+        occhiello: 'ESERCIZIO 1',
+        titolo: 'Associa i segnali',
+        intro: 'Trascina ogni parola sulla sensazione che le corrisponde:',
+        cesto: 'TRASCINA LE PAROLE',
+        righe: [
+          'Tessuti gonfi o tesi',
+          'Percezione di calore interno',
+          'Mancanza di sensibilità al tatto',
+          'La caviglia che oscilla o cede',
+        ],
+        esche: [],
+        azione: 'Verifica',
+      },
+
+      gemelle: {
+        occhiello: 'FALSI AMICI',
+        titolo: 'Amici falsi?',
+        badge: 'SCENARIO',
+        scenario:
+          'Il caso del lungo volo ✈️ — dopo 6 ore in aereo togli le scarpe e rimetterle è un’impresa. Le caviglie sembrano il doppio, e pesanti. Come lo chiami?',
+        domanda: '',
+        glosse: ['Liquidi in più, si vede il volume.', 'Rosso, che scotta, dolente.'],
+        etichette: ['È «{uno}» (liquidi che si fermano)', 'È «{due}» (infiammazione da sforzo)'],
+        esito:
+          '«{uno}» è un cambiamento di volume, quello che si vede o si sente crescere. «{due}» è un cambiamento di temperatura.',
+        azione: 'Verifica',
+      },
+
+      storia: {
+        occhiello: 'STORIA REALE',
+        titolo: 'La storia di Marta',
+        badge: 'SCENARIO',
+        scenario:
+          'Marta nota che due giorni prima del ciclo le scarpe la stringono, e sente tutte e due le caviglie insolitamente piene e tese.',
+        domanda: '',
+        etichette: ['{uno}, da tutte e due le parti', 'Un colpo a una sola caviglia'],
+        esito:
+          'Da tutte e due le parti, prima del ciclo, uguale ogni mese: è «{uno}» e basta. Da una parte sola, dopo un momento che sai raccontare, sarebbe un’altra risposta.',
+        azione: 'Verifica',
+      },
+
+      mossa: {
+        occhiello: 'COSA FARE ADESSO?',
+        titolo: 'Cosa deve fare Marta?',
+        badge: 'YOUR MOVE',
+        scenario:
+          'Le caviglie sono «{uno}» per via del ciclo, ma non sente dolore alle articolazioni. Come dovrebbe comportarsi oggi?',
+        scelte: [
+          'Aumenta il carico o spingi di più',
+          'Tieni l’intensità di adesso e segnalo',
+          'Chiedi aiuto o cambia il piano',
+        ],
+        esito:
+          'Il gonfiore da tutte e due le parti legato al ciclo è normale. Allenarsi con misura aiuta la circolazione.',
+        azione: 'Verifica',
+      },
+
+      frase: {
+        occhiello: 'LA REGOLA D’ORO',
+        titolo: 'Costruisci la sintesi',
+        intro: 'Metti i blocchi al posto giusto e la lezione finisce nel tuo diario:',
+        etichetta: 'SINTESI',
+        cesto: 'TRASCINA LE PAROLE',
+        modello: 'Prima del ciclo, {0}: segnale {gonfio}. Posso {2} {3}.',
+        esche: [
+          'entrambe le caviglie',
+          'allentare i lacci e continuare',
+          'l’attività senza timore',
+        ],
+        azione: 'Salva & finisci',
+      },
+
+      fatto: {
+        titolo: 'Lezione 8 completata!',
+        sotto: 'Hai sbloccato tutte le {tutte} parole del percorso Body Language.',
+        etichetta: 'PAROLE SBLOCCATE',
+        righe: ['Volume che cresce', 'Temperatura che sale'],
+        etichettaProgresso: 'PROGRESSO TOTALE',
+        conteggio: '{fatte} / {tutte} parole sbloccate',
+        nota:
+          'Da oggi il tuo check-in parla tutta la tua lingua: sedici parole, e sai quando usarle.',
         azione: 'Torna al percorso',
       },
     },
@@ -1583,7 +1719,7 @@ const en: typeof it = {
 
       fatto: {
         titolo: 'Lesson 4 done.',
-        etichetta: 'NOW AVAILABLE WHEN YOU CHECK IN',
+        occhiello: 'NOW AVAILABLE WHEN YOU CHECK IN',
         sotto: '{fatte} words down, {restano} to go. You just added two to your check-in.',
         righe: ['A fist clenching and unclenching', "A hand that won't let go"],
         etichettaProgresso: 'TOTAL PROGRESS',
@@ -1953,6 +2089,122 @@ const en: typeof it = {
         etichettaProgresso: 'YOUR PROGRESS',
         conteggio: '{fatte} / {tutte} words unlocked',
         nota: 'Now available when you check in.',
+        azione: 'Back to the path',
+      },
+    },
+
+    8: {
+      incontra: [
+        {
+          occhiello: 'WORD 1 OF 2',
+          titolo: '{uno}',
+          metafora: 'A water balloon under the skin.',
+          descrizione:
+            'The part has puffed up: it looks and feels bigger than the same part on your other side.',
+          blocchi: [
+            {
+              testo:
+                "A sock line on one ankle and not the other. A ring that won't turn. A shin pad that leaves a mark on one leg only.",
+            },
+            {
+              pastiglia: 'One side → support · both sides → log it',
+              testo: 'Compare to the same spot on the other side, in the same light.',
+            },
+          ],
+          azione: 'Next word',
+        },
+        {
+          occhiello: 'WORD 2 OF 2',
+          titolo: '{due}',
+          metafora: "The back of a laptop that's been running too long.",
+          descrizione:
+            'One area genuinely warmer to touch than the same spot on the other side.',
+          blocchi: [
+            { testo: 'Back of your hand, one side then the other, five seconds each.' },
+            {
+              pastiglia: 'The split',
+              testo:
+                '{uno} is about size. {due} is about temperature. Both are answered by touching the other side — the rule this whole journey has been building to.',
+            },
+          ],
+          azione: "Let's practise",
+        },
+      ],
+
+      abbina: {
+        occhiello: 'MATCH',
+        titolo: 'Put the word on its picture.',
+        intro: 'Tap a word, then tap where it belongs.',
+        cesto: 'WORD BANK',
+        righe: [
+          'A water balloon under the skin',
+          "The back of a laptop that's been running too long",
+          'The volume turned to zero',
+          'A wobbly table leg',
+        ],
+        esche: [],
+        azione: 'Check',
+      },
+
+      gemelle: {
+        occhiello: 'FALSE FRIENDS',
+        titolo: 'Which one is this?',
+        badge: 'SCENARIO',
+        scenario:
+          "Your shin is warm to the back of your hand, and the other shin isn't. It's also red and it's getting worse.",
+        domanda: '',
+        glosse: ['a water balloon under the skin', "the back of a laptop that's been running too long"],
+        giusta: 1,
+        esito: 'Back of your hand, one side then the other, five seconds each. That’s {due}.',
+        azione: 'Check',
+      },
+
+      storia: {
+        occhiello: 'REAL LIFE',
+        titolo: 'Name it.',
+        badge: 'CYCLE · TRAINING',
+        scenario:
+          'Three days before your period your rings are tight and your hands, belly and legs all feel puffy. Same as every month.',
+        domanda: '',
+        esito: 'Compare to the same spot on the other side, in the same light. That’s {uno}.',
+        azione: 'Check',
+      },
+
+      mossa: {
+        occhiello: 'YOUR MOVE',
+        titolo: 'Same day. What do you do?',
+        badge: 'YOUR MOVE',
+        scenario:
+          'Three days before your period your rings are tight and your hands, belly and legs all feel puffy. Same as every month. You called it {uno}.',
+        scelte: [
+          'Train it as planned',
+          'Adjust something, then check it again',
+          'Tell someone — coach, physio, parent, doctor',
+        ],
+        esito:
+          "Both sides, comes and goes with your cycle, same as every month. That's normal fluid — log it and train. The split is everything: one spot, one side, hours after a moment you can name would be a different answer.",
+        azione: 'Check',
+      },
+
+      frase: {
+        occhiello: 'SAY IT OUT LOUD',
+        titolo: 'Build the sentence.',
+        intro: 'Knowing the word only counts if you can hand it to someone. Tap each gap.',
+        etichetta: 'YOUR SENTENCE',
+        cesto: 'PICK A WORD',
+        modello: "Both my {0} feel {gonfio} when {2}, it's 4/10, {3}.",
+        esche: ['hands', "I'm three days before my period", 'every month'],
+        azione: 'Finish lesson',
+      },
+
+      fatto: {
+        titolo: 'Lesson 8 done.',
+        sotto:
+          "{fatte} words down, {restano} to go. That's all of them — your check-in speaks your whole language now.",
+        etichetta: 'WORDS UNLOCKED',
+        righe: ['A water balloon under the skin.', 'The back of a laptop left running.'],
+        etichettaProgresso: 'YOUR PROGRESS',
+        conteggio: '{fatte} / {tutte} words unlocked',
         azione: 'Back to the path',
       },
     },

@@ -100,7 +100,11 @@ export function Fatto({
         </div>
       )}
 
-      {t.occhiello && (
+      {/*
+        L'occhiello sta sopra al titolo dove il titolo e' una riga di schermo
+        (`nudo`), e sotto dove il titolo sta dentro all'eroe (`trofeo`).
+      */}
+      {t.occhiello && passo.forma !== 'trofeo' && (
         <p className="m-0 mt-[20px] flex items-center gap-2 text-[10px] font-bold tracking-[1px] uppercase text-lilla">
           {segno && <img src={icona(segno)} alt="" aria-hidden className="size-4" />}
           {t.occhiello}
@@ -119,13 +123,9 @@ export function Fatto({
         {t.titolo}
       </h1>
 
-      {/*
-        Nella forma `trofeo` l'etichetta sta sopra alla riga di sotto e non
-        sotto: li' non annuncia le due parole, dice che lezione si e' finita.
-      */}
-      {t.etichetta && passo.forma === 'trofeo' && (
+      {t.occhiello && passo.forma === 'trofeo' && (
         <p className="m-0 mt-[30px] text-[10px] font-bold tracking-[1px] uppercase text-lilla">
-          {t.etichetta}
+          {t.occhiello}
         </p>
       )}
 
@@ -143,10 +143,10 @@ export function Fatto({
         </p>
       )}
 
-      {t.etichetta && passo.forma !== 'trofeo' && (
+      {t.etichetta && (
         <p
           className={`m-0 text-[10px] font-bold tracking-[1px] uppercase text-lilla ${
-            passo.forma === 'coppa' || passo.forma === 'spunta'
+            passo.forma === 'coppa' || passo.forma === 'spunta' || passo.forma === 'trofeo'
               ? 'mt-[30px]'
               : 'mt-[26px] text-center'
           }`}
