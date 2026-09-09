@@ -53,6 +53,19 @@ export function statiDiAdesso(): Stati {
 }
 
 /**
+ * La sezione che l'anteprima vuole vedere spenta.
+ *
+ * Dentro alla cornice le sezioni sono tutte aperte, se no la prima cosa che si
+ * fa spegnendone una e' non poter piu' correggere le sue parole. Ma allora lo
+ * schermo "arriva presto" non si vedrebbe mai — e anche quello ha delle parole
+ * da correggere. `?arrivo=percorso` chiede proprio quello schermo li'.
+ */
+const ARRIVO =
+  typeof window === 'undefined'
+    ? null
+    : new URLSearchParams(window.location.search).get('arrivo')
+
+/**
  * Com'e' messa una sezione, adesso.
  *
  * Dentro alla cornice dell'anteprima sono tutte aperte: chi scrive i testi
@@ -69,7 +82,7 @@ export function useStatoSezione(id: string): StatoSezione {
     adesso,
     () => ({}) as Stati,
   )
-  if (IN_ANTEPRIMA) return 'aperta'
+  if (IN_ANTEPRIMA) return id === ARRIVO ? 'in-arrivo' : 'aperta'
   return stati[id] ?? predefinitoDi(id)
 }
 

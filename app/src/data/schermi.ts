@@ -1,4 +1,5 @@
 import { LEZIONI, chiaviDi, passiDi } from './percorso'
+import { SEZIONI } from './sezioni'
 import type { Passo } from './percorso'
 
 /**
@@ -110,6 +111,29 @@ export const SCHERMI: GruppoScritte[] = [
         rami: ['testi.casa', 'testi.ritmi', 'testi.indovina', 'testi.conta', 'testi.confronto'],
       },
     ],
+  },
+  {
+    /*
+     * Le sezioni spente.
+     *
+     * L'indirizzo porta con se' `arrivo=<sezione>`: dentro alla cornice le
+     * sezioni sono tutte accese — se no chi scrive non potrebbe piu' correggere
+     * le parole di quella che ha appena spento — e senza quella richiesta
+     * esplicita questo schermo non si vedrebbe mai.
+     */
+    nome: 'In arrivo',
+    schermi: SEZIONI.map((sez) => ({
+      id: `arrivo-${sez.id}`,
+      nome: sez.nome,
+      rotta: `${sez.rotte[0]}?arrivo=${sez.id}`,
+      rami: [
+        `testi.prossimamente.sezioni.${sez.id}`,
+        'testi.prossimamente.occhiello',
+        'testi.prossimamente.etichettaCosa',
+        'testi.prossimamente.etichettaQuando',
+        'testi.prossimamente.azione',
+      ],
+    })),
   },
   {
     nome: 'Check-in',

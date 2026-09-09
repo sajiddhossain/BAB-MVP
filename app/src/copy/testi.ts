@@ -404,6 +404,41 @@ const it = {
     'Novembre',
     'Dicembre',
   ],
+
+  /*
+   * Lo schermo di una sezione che c'e' ma non e' ancora aperta.
+   *
+   * Il nome della sezione non sta qui: e' quello della barra in fondo, cioe'
+   * la parola che ha appena toccato. Scriverlo una seconda volta vorrebbe dire
+   * poterlo cambiare in un posto e non nell'altro.
+   *
+   * `quando` non promette una data. Dice l'unica cosa che le serve davvero
+   * sapere: che non deve fare niente per averla.
+   */
+  prossimamente: {
+    occhiello: 'IN ARRIVO',
+    etichettaCosa: 'CHE COS’È',
+    etichettaQuando: 'QUANDO',
+    azione: 'Torna alla home',
+    sezioni: {
+      percorso: {
+        cosa: 'Otto lezioni brevi che ti mettono in mano sedici parole per dire cosa senti: quali segnali vogliono dire che il corpo sta lavorando, quali vogliono dire che ti sta avvisando, e cosa fare in tutti e due i casi.',
+        quando: 'Lo stiamo provando con le prime atlete. Quando è pronto lo trovi qui: non devi aggiornare niente, non devi fare niente.',
+      },
+      parole: {
+        cosa: 'Le sedici parole in un posto solo: cosa vuol dire ognuna, quando usarla, e cosa dice del tuo corpo.',
+        quando: 'Si apre insieme al percorso.',
+      },
+      storico: {
+        cosa: 'I tuoi check-in messi in fila: come cambia la tua energia settimana dopo settimana, quali zone del corpo tornano più spesso, cosa succede intorno al ciclo.',
+        quando: 'Prima serve un po’ di storia da mostrare. I check-in che fai adesso li stiamo già tenendo da parte: quando lo storico si apre, ci trovi dentro anche questi.',
+      },
+      profilo: {
+        cosa: 'I tuoi sport, i tuoi allenamenti, la lingua — e cosa BAB sa di te, con il modo per cambiarlo o per portartelo via.',
+        quando: 'Arriva insieme allo storico.',
+      },
+    },
+  },
 }
 
 /**
@@ -775,6 +810,31 @@ const en: typeof it = {
     'November',
     'December',
   ],
+
+  prossimamente: {
+    occhiello: 'COMING SOON',
+    etichettaCosa: 'WHAT IT IS',
+    etichettaQuando: 'WHEN',
+    azione: 'Back to home',
+    sezioni: {
+      percorso: {
+        cosa: 'Eight short lessons that hand you sixteen words for what you feel: which signals mean your body is working, which ones mean it is warning you, and what to do in either case.',
+        quando: 'We are trying it out with the first athletes. When it is ready you will find it here: nothing to update, nothing to do.',
+      },
+      parole: {
+        cosa: 'The sixteen words in one place: what each one means, when to use it, and what it tells you about your body.',
+        quando: 'It opens together with the path.',
+      },
+      storico: {
+        cosa: 'Your check-ins in a row: how your energy shifts week after week, which parts of your body come back most often, what happens around your period.',
+        quando: 'It needs some history to show first. The check-ins you do now are already being kept: when your history opens, these will be in it.',
+      },
+      profilo: {
+        cosa: 'Your sports, your training, your language — and what BAB knows about you, with the way to change it or to take it with you.',
+        quando: 'It arrives together with your history.',
+      },
+    },
+  },
 }
 
 export const TESTI = { it, en }

@@ -69,7 +69,7 @@ export function App() {
           path="/storico"
           element={
             <Sezione id="storico">
-              <Prossimamente titolo="Storico" />
+              <Prossimamente id="storico" />
             </Sezione>
           }
         />
@@ -77,7 +77,7 @@ export function App() {
           path="/profilo"
           element={
             <Sezione id="profilo">
-              <Prossimamente titolo="Profilo" profilo />
+              <Prossimamente id="profilo" profilo />
             </Sezione>
           }
         />

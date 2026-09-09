@@ -489,7 +489,7 @@ function Scrivania() {
               key={lingua}
               ref={cornice}
               title="anteprima"
-              src={`${scelto.rotta}?anteprima=1&lingua=${lingua}`}
+              src={`${scelto.rotta}${scelto.rotta.includes('?') ? '&' : '?'}anteprima=1&lingua=${lingua}`}
               className="block h-[874px] w-[402px] border-0"
             />
           </div>

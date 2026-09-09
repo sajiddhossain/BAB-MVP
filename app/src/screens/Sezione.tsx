@@ -3,8 +3,6 @@ import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { caricaSezioni, useStatoSezione } from '../lib/sezioni'
 import { Prossimamente } from './Prossimamente'
-import { useLingua } from '../lib/lingua'
-import { SEZIONI } from '../data/sezioni'
 
 /**
  * Il cancello di una sezione.
@@ -20,7 +18,6 @@ import { SEZIONI } from '../data/sezioni'
  */
 export function Sezione({ id, children }: { id: string; children: ReactNode }) {
   const stato = useStatoSezione(id)
-  const { t } = useLingua()
 
   /*
    * Si rilegge entrando: chi ha l'app aperta da ieri deve accorgersi che una
@@ -31,17 +28,6 @@ export function Sezione({ id, children }: { id: string; children: ReactNode }) {
   }, [])
 
   if (stato === 'nascosta') return <Navigate to="/casa" replace />
-  if (stato === 'in-arrivo') return <Prossimamente titolo={nome(id, t)} />
+  if (stato === 'in-arrivo') return <Prossimamente id={id} />
   return <>{children}</>
-}
-
-/**
- * Il titolo dello schermo "arriva presto".
- *
- * Prima e' la voce della barra in fondo — e' la parola che l'atleta ha appena
- * toccato, quindi e' quella che si aspetta di rileggere in cima. Dove non c'e'
- * (le sedici parole non stanno nella barra) vale il nome del pannello.
- */
-function nome(id: string, t: { casa: { nav: Record<string, string> } }): string {
-  return t.casa.nav[id] ?? SEZIONI.find((s) => s.id === id)?.nome ?? ''
 }
