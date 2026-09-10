@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Schermo } from '../../ui/Schermo'
 import { Occhiello, Titolo, Occhio, Gruppo, Errore } from '../../ui/Testo'
 import { Campo, CampoData, dataValida } from '../../ui/Campo'
+import { Tendina } from '../../ui/Tendina'
 import { Bottone } from '../../ui/Bottone'
 import { Giorni } from '../../ui/Giorni'
 import { Pillole } from '../../ui/Scelte'
@@ -86,22 +87,50 @@ export function CorpoCompleanno({ nodo, verso, avanzamento, avanti, indietro }: 
   )
 }
 
+/** L'ultima voce della tendina: non e' uno sport, apre il campo per scriverlo. */
+const ALTRO = '__altro'
+
 /* 07-sport — 3771:140 / 3958:616 */
 export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: PropsSchermo) {
   const { t } = useLingua()
   const { sport, sportPrincipale } = useRisposte()
-  const [cerca, setCerca] = useState('')
+  const [suo, setSuo] = useState<string | null>(null)
 
-  const q = normalizza(cerca)
-  const trovati = q
-    ? SPORT.filter(
-        (id) => normalizza(nomeSport(t.sport.nomi, id)).includes(q) && !sport.includes(id),
-      ).slice(0, 6)
-    : []
+  /*
+   * Nella tendina ci sono gli sport che non ha ancora scelto, e in fondo
+   * "Altro". Quelli gia' scelti spariscono: stanno gia' nelle pastiglie qui
+   * sotto, e lasciarli nell'elenco vorrebbe dire offrirle di sceglierli due
+   * volte per poi non farglielo fare.
+   */
+  const voci = [
+    ...SPORT.filter((id) => !sport.includes(id)).map((id) => ({
+      id,
+      nome: nomeSport(t.sport.nomi, id),
+    })),
+    { id: ALTRO, nome: t.sport.altro },
+  ]
 
   function aggiungi(id: string) {
+    if (sport.includes(id)) return
     scrivi((r) => ({ sport: [...r.sport, id], sportPrincipale: r.sportPrincipale || id }))
-    setCerca('')
+  }
+
+  /*
+   * Lo sport scritto a mano.
+   *
+   * Se quello che ha scritto e' uno dei nostri — "Calcio", "calcio", "Càlcio"
+   * — si aggiunge quello, non una copia: due pastiglie con lo stesso sport
+   * dentro sarebbero due righe diverse nel database, e da li' in poi due
+   * sport diversi per sempre.
+   */
+  function aggiungiSuo() {
+    const scritto = (suo ?? '').trim().slice(0, 40)
+    if (!scritto) return
+    const q = normalizza(scritto)
+    const noto = SPORT.find((id) => normalizza(nomeSport(t.sport.nomi, id)) === q)
+    const gia = sport.find((id) => normalizza(nomeSport(t.sport.nomi, id)) === q)
+    if (!gia) aggiungi(noto ?? scritto)
+    setSuo(null)
   }
 
   function togli(id: string) {
@@ -133,32 +162,47 @@ export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: Props
 
       <div className={STACCO}>
         <Gruppo etichetta={t.sport.etichetta}>
-          <Campo
-            autoComplete="off"
-            placeholder={t.sport.segnaposto}
-            value={cerca}
-            onChange={(e) => setCerca(e.target.value)}
+          <Tendina
+            voci={voci}
+            segnaposto={t.sport.segnaposto}
+            etichetta={t.sport.etichetta}
+            onScegli={(id) => (id === ALTRO ? setSuo('') : aggiungi(id))}
           />
         </Gruppo>
       </div>
 
-      {/* i risultati: solo mentre si scrive, e mai piu' di sei */}
-      {q !== '' && (
-        <div className="mt-2 overflow-hidden rounded-field border-[1.5px] border-line bg-surface">
-          {trovati.length === 0 ? (
-            <p className="m-0 px-[14.5px] py-3 text-[15px] text-ink-mute">{t.sport.nessuno}</p>
-          ) : (
-            trovati.map((id) => (
+      {/*
+        L'unico posto di questo schermo dove si scrive, e compare solo se l'ha
+        chiesto scegliendo "Altro". Prima si scriveva sempre, per cercare: chi
+        non azzeccava il nome esatto non trovava il suo sport e non sapeva
+        perche'.
+      */}
+      {suo !== null && (
+        <div className="mt-4">
+          <Gruppo etichetta={t.sport.altroEtichetta}>
+            <div className="flex gap-2">
+              <Campo
+                autoFocus
+                autoComplete="off"
+                maxLength={40}
+                placeholder={t.sport.altroSegnaposto}
+                value={suo}
+                onChange={(e) => setSuo(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') aggiungiSuo()
+                  if (e.key === 'Escape') setSuo(null)
+                }}
+              />
               <button
-                key={id}
                 type="button"
-                onClick={() => aggiungi(id)}
-                className="block w-full border-b border-line/50 px-[14.5px] py-3 text-left text-[15px] text-ink last:border-b-0"
+                disabled={suo.trim() === ''}
+                onClick={aggiungiSuo}
+                className="bab-tocco h-12 shrink-0 rounded-field border-[1.5px] border-line bg-lime px-4 text-[15px] font-bold text-ink disabled:opacity-45"
               >
-                {nomeSport(t.sport.nomi, id)}
+                {t.sport.altroAggiungi}
               </button>
-            ))
-          )}
+            </div>
+          </Gruppo>
         </div>
       )}
 

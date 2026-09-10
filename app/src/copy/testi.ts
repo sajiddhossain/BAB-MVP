@@ -116,11 +116,20 @@ const it = {
     occhiello: 'IL TUO PROFILO',
     titolo: 'Quali sport fai?',
     occhio: 'Aggiungili tutti e poi seleziona quello principale',
-    etichetta: 'CERCA UNO SPORT',
-    segnaposto: 'Cerca uno sport',
+    etichetta: 'SCEGLI UNO SPORT',
+    segnaposto: 'Scegli uno sport',
     principale: 'PRINCIPALE',
-    nessuno: 'Nessun risultato',
-    /* i nomi che si vedono nella ricerca e nelle pastiglie */
+    /*
+     * L'ultima voce della tendina, e le tre scritte del campo che apre.
+     * Nessun elenco di sport e' completo: senza "Altro" chi fa pattinaggio o
+     * pallanuoto dovrebbe scegliere lo sport sbagliato o non sceglierne
+     * nessuno, e in tutt'e due i casi il dato che arriva e' falso.
+     */
+    altro: 'Altro…',
+    altroEtichetta: 'QUALE SPORT?',
+    altroSegnaposto: 'Scrivi il nome dello sport',
+    altroAggiungi: 'Aggiungi',
+    /* i nomi che si vedono nella tendina e nelle pastiglie */
     nomi: {
       atletica: 'Atletica',
       basket: 'Basket',
@@ -498,11 +507,14 @@ const en: typeof it = {
     occhiello: 'YOUR PROFILE',
     titolo: 'What sports do you play?',
     occhio: 'Add them all and then select the main one',
-    etichetta: 'SEARCH FOR A SPORT',
-    segnaposto: 'Search for a sport',
+    etichetta: 'CHOOSE A SPORT',
+    segnaposto: 'Choose a sport',
     principale: 'MAIN',
-    nessuno: 'No results',
-    /* i nomi che si vedono nella ricerca e nelle pastiglie */
+    altro: 'Other…',
+    altroEtichetta: 'WHICH SPORT?',
+    altroSegnaposto: 'Type the sport name',
+    altroAggiungi: 'Add',
+    /* i nomi che si vedono nella tendina e nelle pastiglie */
     nomi: {
       atletica: 'Athletics',
       basket: 'Basketball',
