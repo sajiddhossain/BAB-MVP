@@ -143,17 +143,6 @@ export function Foglio({
               className="mt-[10px] block h-14 w-full resize-none rounded-chip border-[1.5px] border-line bg-surface px-[12px] py-[9px] text-[14px] leading-[1.35] text-ink outline-none placeholder:text-ink-soft focus:border-verde-tenue"
             />
 
-            {/*
-              La riga di aiuto viene dal disegno ed e' il modo in cui una
-              ragazza scopre che le pastiglie si possono aprire: senza,
-              nessuna toccherebbe mai una ⓘ grande sei pixel.
-            */}
-            {aiuto && (
-              <p className="mt-[14px] mb-0 text-[12.5px] font-bold text-lilla-vivo">
-                ⓘ {tp.aiuto}
-              </p>
-            )}
-
             <button
               type="button"
               onClick={() => setAiuto((a) => !a)}
@@ -171,6 +160,28 @@ export function Foglio({
             </button>
 
             <Apri aperto={aiuto}>
+              {/*
+                La riga che spiega la ⓘ. E' il modo in cui una ragazza scopre
+                che le pastiglie si aprono: senza, nessuna toccherebbe mai una
+                ⓘ grande ventidue pixel in mezzo a sedici parole.
+                ── PERCHE' QUI E NON SOPRA AL TITOLO ────────────────────────
+                Perche' parla delle ⓘ, e le ⓘ sono qui dentro. Sopra al titolo
+                stava appiccicata al campo di testo, che con le ⓘ non c'entra,
+                e a sezione chiusa avrebbe indicato una cosa che sullo schermo
+                non c'era.
+
+                La sua ⓘ e' scritta come quelle sulle pastiglie — stessa
+                misura, stesso grigio — perche' e' quella che indica. La frase
+                invece non urla: il titolo verde sopra e' l'invito, questa e'
+                l'istruzione, e due grassetti di fila non si guardano.
+              */}
+              <p className="mt-[10px] mb-0 flex items-baseline gap-[6px] text-[12.5px] leading-[1.35] text-ink-medio">
+                <span aria-hidden className="shrink-0 text-[13px] leading-none text-ink-mute">
+                  ⓘ
+                </span>
+                {tp.aiuto}
+              </p>
+
               <div className="flex flex-wrap gap-[6px] pt-[10px]">
                 {PAROLE.map((p) => (
                   <Pastiglia
