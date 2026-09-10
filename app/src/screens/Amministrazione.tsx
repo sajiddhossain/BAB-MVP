@@ -12,6 +12,10 @@ import type { SchermoScritte } from '../data/schermi'
 import { SEZIONI } from '../data/sezioni'
 import type { StatoSezione } from '../data/sezioni'
 import { cambiaSezione, caricaSezioni, statiDiAdesso } from '../lib/sezioni'
+import { Barra } from './admin/Barra'
+import { Bozze } from './admin/Bozze'
+import type { Bozza } from './admin/Bozze'
+import { normalizza, schermoDi, testo } from './admin/comune'
 
 /**
  * Le parole dell'app, per chi le scrive.
@@ -59,6 +63,8 @@ import { cambiaSezione, caricaSezioni, statiDiAdesso } from '../lib/sezioni'
 type Riga = { bozza: Valore | null; vivo: Valore | null }
 type Righe = Record<Lingua, Record<string, Riga>>
 type Modo = 'correggi' | 'prova'
+/** Cosa sta succedendo, e di che tono: sta in cima alla colonna destra. */
+type Avviso = { tono: 'lavoro' | 'fatto' | 'male'; testo: string }
 
 const VUOTE: Righe = { it: {}, en: {} }
 
@@ -125,14 +131,36 @@ function Scrivania() {
   /* quando un tocco prende una frase composta da piu' scritte, si sceglie */
   const [fraQuali, setFraQuali] = useState<string[]>([])
   const [cerca, setCerca] = useState('')
-  const [stato, setStato] = useState('')
+  /* il filtro dell'elenco a sinistra: novanta schermi non si scorrono a mano */
+  const [filtro, setFiltro] = useState('')
+  const [avviso, setAvviso] = useState<Avviso | null>(null)
   const [pannello, setPannello] = useState<'scritte' | 'sezioni'>('scritte')
+  const [cassetto, setCassetto] = useState(false)
   const [apertiGruppi, setApertiGruppi] = useState<Record<string, boolean>>({})
   const cornice = useRef<HTMLIFrameElement>(null)
 
   const partenza = useMemo(() => ({ it: scrittePartenza('it'), en: scrittePartenza('en') }), [])
   /* lo stesso ordine che la cornice usa per numerare: e' il ponte fra i due */
   const perNumero = useMemo(() => elencoChiavi(lingua), [lingua])
+
+  /*
+   * Quello che il pannello ha da dire, e per quanto.
+   *
+   * Prima era una stringa che compariva in un angolo e non se ne andava piu':
+   * dopo dieci minuti diceva ancora «bozza salvata» di dieci minuti prima, e
+   * uno non sapeva se stesse parlando dell'ultima cosa fatta o della prima.
+   * Adesso quello che e' andato bene sparisce da solo; quello che e' andato
+   * male resta, perche' quello va letto.
+   */
+  const dillo = useCallback((tono: Avviso['tono'], testo: string) => {
+    setAvviso({ tono, testo })
+  }, [])
+
+  useEffect(() => {
+    if (avviso?.tono !== 'fatto') return
+    const t = setTimeout(() => setAvviso(null), 2600)
+    return () => clearTimeout(t)
+  }, [avviso])
 
   /* le righe del database, bozza compresa */
   const carica = useCallback(async () => {
@@ -168,12 +196,32 @@ function Scrivania() {
     return fuori
   }, [righe])
 
+  /*
+   * I numeri delle scritte da sottolineare nell'anteprima: ambra quelle con
+   * una bozza in attesa, verde quelle gia' pubblicate e diverse dal disegno.
+   */
+  const segni = useMemo(() => {
+    const posto = new Map(perNumero.map((k, i) => [k, i]))
+    const bozza: number[] = []
+    const viva: number[] = []
+    for (const [k, r] of Object.entries(righe[lingua])) {
+      const n = posto.get(k)
+      if (n === undefined) continue
+      const base = testo(partenza[lingua][k])
+      const online = testo(r.vivo ?? partenza[lingua][k])
+      if (r.bozza !== null && testo(r.bozza) !== online) bozza.push(n)
+      else if (r.vivo !== null && online !== base) viva.push(n)
+    }
+    return { bozza, viva }
+  }, [righe, lingua, partenza, perNumero])
+
   const manda = useCallback(() => {
     const f = cornice.current?.contentWindow
     if (!f) return
     f.postMessage({ tipo: 'bab:scritte', scritte: bozze }, window.location.origin)
     f.postMessage({ tipo: 'bab:modo', modo }, window.location.origin)
-  }, [bozze, modo])
+    f.postMessage({ tipo: 'bab:segna', ...segni }, window.location.origin)
+  }, [bozze, modo, segni])
 
   useEffect(manda, [manda])
 
@@ -207,7 +255,7 @@ function Scrivania() {
     return () => window.removeEventListener('message', ascolta)
   }, [manda, perNumero])
 
-  /* le chiavi dell'elenco in fondo: quelle di questo schermo, o la ricerca */
+  /* le chiavi da mostrare: quelle dello schermo aperto, o quelle cercate */
   const chiavi = useMemo(() => {
     const tutte = Object.keys(partenza[lingua]).sort()
     if (cerca.trim()) {
@@ -224,13 +272,13 @@ function Scrivania() {
     return tutte.filter((k) => scelto.rami.some((r) => k === r || k.startsWith(`${r}.`)))
   }, [partenza, lingua, scelto, cerca, righe])
 
-  function valore(k: string): Valore {
-    return righe[lingua][k]?.bozza ?? righe[lingua][k]?.vivo ?? partenza[lingua][k]
+  function valore(k: string, l: Lingua = lingua): Valore {
+    return righe[l][k]?.bozza ?? righe[l][k]?.vivo ?? partenza[l][k]
   }
 
   /** Quello che le atlete leggono adesso: la riga pubblicata, o il codice. */
-  function pubblicato(k: string): Valore {
-    return righe[lingua][k]?.vivo ?? partenza[lingua][k]
+  function pubblicato(k: string, l: Lingua = lingua): Valore {
+    return righe[l][k]?.vivo ?? partenza[l][k]
   }
 
   /*
@@ -251,7 +299,22 @@ function Scrivania() {
     }))
   }
 
+  /**
+   * Il pannello senza database.
+   *
+   * Capita nel banco di prova, che gira apposta senza chiavi per non poter
+   * scrivere sulle scritte vere. Senza questo, «Pubblica» sembrava rotto: il
+   * bottone si premeva e non succedeva niente, senza una riga che lo dicesse.
+   */
+  function staccato() {
+    if (supabase) return false
+    dillo('male', 'non collegato al database: qui si guarda e basta')
+    return true
+  }
+
   function salva(k: string) {
+    // questo non passa da `staccato()`: parte da solo quando il campo si
+    // chiude, e un cartello rosso a ogni click fuori sarebbe solo rumore
     if (!supabase) return
     inFila(async () => {
       const riga = righe[lingua][k]
@@ -263,7 +326,7 @@ function Scrivania() {
        * dice gia'.
        */
       if (riga.vivo === null && testo(riga.bozza) === testo(partenza[lingua][k])) return
-      setStato('salvo…')
+      dillo('lavoro', 'salvo…')
       const { error } = await supabase!.from('copy_overrides').upsert(
         {
           chiave: k,
@@ -274,72 +337,95 @@ function Scrivania() {
         },
         { onConflict: 'chiave,lingua' },
       )
-      setStato(error ? `non salvato: ${error.message}` : 'bozza salvata')
+      if (error) dillo('male', `non salvato: ${error.message}`)
+      else dillo('fatto', 'bozza salvata')
     })
   }
 
   /** torna al testo del codice: la riga sparisce, e con lei la sovrascrittura */
-  function ripristina(k: string) {
-    if (!supabase) return
+  function ripristina(k: string, l: Lingua = lingua) {
+    if (staccato()) return
     inFila(async () => {
-      setStato('ripristino…')
+      dillo('lavoro', 'ripristino…')
       const { error } = await supabase!
         .from('copy_overrides')
         .delete()
         .eq('chiave', k)
-        .eq('lingua', lingua)
+        .eq('lingua', l)
       if (error) {
-        setStato(`non riuscito: ${error.message}`)
+        dillo('male', `non riuscito: ${error.message}`)
         return
       }
       setRighe((r) => {
-        const l = { ...r[lingua] }
-        delete l[k]
-        return { ...r, [lingua]: l }
+        const dentro = { ...r[l] }
+        delete dentro[k]
+        return { ...r, [l]: dentro }
       })
-      setStato('tornata all’originale')
+      dillo('fatto', 'tornata all’originale')
     })
   }
 
   /**
+   * Butta la bozza e torna a quello che si legge adesso.
+   *
+   * Non e' «rimetti l'originale», che torna al disegno e cancella anche
+   * quello che era gia' stato pubblicato mesi fa. Questo annulla solo l'ultima
+   * scrittura, ed e' quello che serve quando una correzione non convince
+   * piu': senza, l'unico modo di disfarla era riscrivere a mano quella di
+   * prima, cercando di ricordarsela.
+   */
+  function scarta(k: string, l: Lingua = lingua) {
+    if (staccato()) return
+    const riga = righe[l][k]
+    if (!riga) return
+    if (riga.vivo === null) {
+      ripristina(k, l)
+      return
+    }
+    inFila(async () => {
+      dillo('lavoro', 'scarto…')
+      const { error } = await supabase!
+        .from('copy_overrides')
+        .update({ bozza: riga.vivo, aggiornato: new Date().toISOString() })
+        .eq('chiave', k)
+        .eq('lingua', l)
+      if (error) {
+        dillo('male', `non riuscito: ${error.message}`)
+        return
+      }
+      setRighe((r) => ({ ...r, [l]: { ...r[l], [k]: { bozza: riga.vivo, vivo: riga.vivo } } }))
+      dillo('fatto', 'bozza scartata')
+    })
+  }
+
+  /*
    * bozza → pubblicato: da qui in poi la scritta e' quella che leggono loro.
    *
    * La lingua e' un argomento e non `lingua` di fuori: le bozze in attesa
-   * possono stare anche nell'altra, e da qui si pubblicano senza dover prima
-   * cambiare lingua e ritrovare lo schermo giusto.
+   * si pubblicano anche dal cassetto, dove le due lingue stanno insieme.
    */
   function pubblica(quali: string[], qualeLingua: Lingua = lingua) {
-    if (!supabase) return
+    if (staccato() || quali.length === 0) return
     inFila(async () => {
-      const daFare = quali
-        .map((k) => ({ k, r: righe[qualeLingua][k] }))
-        .filter(
-          ({ k, r }) =>
-            r &&
-            r.bozza !== null &&
-            testo(r.bozza) !== testo(righe[qualeLingua][k]?.vivo ?? partenza[qualeLingua][k]),
-        )
-      if (daFare.length === 0) {
-        setStato('niente da pubblicare')
-        return
-      }
-      setStato(`pubblico ${daFare.length}…`)
+      const daFare = quali.filter((k) => righe[qualeLingua][k]?.bozza !== undefined)
+      if (daFare.length === 0) return
+      dillo('lavoro', 'pubblico…')
       const { error } = await supabase!.from('copy_overrides').upsert(
-        daFare.map(({ k, r }) => ({
+        daFare.map((k) => ({
           chiave: k,
           lingua: qualeLingua,
-          bozza: r!.bozza,
-          vivo: r!.bozza,
+          bozza: righe[qualeLingua][k]!.bozza,
+          vivo: righe[qualeLingua][k]!.bozza,
           aggiornato: new Date().toISOString(),
         })),
         { onConflict: 'chiave,lingua' },
       )
       if (error) {
-        setStato(`non pubblicato: ${error.message}`)
+        dillo('male', `non pubblicato: ${error.message}`)
         return
       }
       await carica()
-      setStato(daFare.length === 1 ? 'pubblicata' : `pubblicate ${daFare.length}`)
+      dillo('fatto', daFare.length === 1 ? 'pubblicata' : `pubblicate ${daFare.length}`)
     })
   }
 
@@ -364,10 +450,31 @@ function Scrivania() {
     return { it: conta('it'), en: conta('en') } as Record<Lingua, string[]>
   }, [partenza, righe])
 
-  const daPubblicare = sospese[lingua]
-  const altra: Lingua = lingua === 'it' ? 'en' : 'it'
+  /* le stesse bozze, pronte da leggere: dove stanno, prima e dopo */
+  const inAttesa: Bozza[] = useMemo(
+    () =>
+      (['it', 'en'] as const).flatMap((l) =>
+        sospese[l].map((k) => ({
+          chiave: k,
+          lingua: l,
+          prima: testo(righe[l][k]?.vivo ?? partenza[l][k]),
+          dopo: testo(righe[l][k]?.bozza ?? null),
+        })),
+      ),
+    [sospese, righe, partenza],
+  )
 
+  /**
+   * Apre una scritta, e ci porta lo schermo dietro se non e' quello.
+   *
+   * Toccandola nell'anteprima o nell'elenco dello schermo aperto lo spostamento
+   * non c'e', perche' lo schermo e' gia' quello. Serve alla ricerca, che pesca
+   * in tutta la app: senza, si sceglieva «Preso antidolorifici?» e a sinistra
+   * restava la home, e la si correggeva senza vederla.
+   */
   function apri(k: string) {
+    const dove = schermoDi(k)
+    if (dove && dove.id !== scelto.id) setScelto(dove)
     setAperta(k)
     setFraQuali([])
   }
@@ -380,272 +487,338 @@ function Scrivania() {
     setScelto(s)
   }
 
+  /* gli schermi che il filtro lascia passare, gruppo per gruppo */
+  const q = normalizza(filtro)
+  const gruppiVisti = GRUPPI.map((g) => ({
+    nome: g.nome,
+    schermi: q === '' ? g.schermi : g.schermi.filter((s) => normalizza(`${g.nome} ${s.nome}`).includes(q)),
+  })).filter((g) => g.schermi.length > 0)
+
   return (
-    <div className="flex min-h-dvh bg-paper text-ink">
-      <aside className="w-[210px] shrink-0 overflow-y-auto border-r border-line bg-surface p-4">
-        <p className="m-0 text-[15px] font-bold">Le parole di BAB</p>
-        <div className="mt-3 flex gap-1">
-          {(['it', 'en'] as const).map((l) => (
-            <button
-              key={l}
-              type="button"
-              onClick={() => {
-                setLingua(l)
-                setAperta(null)
-                setFraQuali([])
-              }}
-              className={`bab-tocco flex-1 rounded-[8px] border px-2 py-1 text-[12px] font-bold ${
-                lingua === l ? 'border-verde-acceso bg-verde-chiaro' : 'border-line bg-chip'
-              }`}
-            >
-              {l === 'it' ? 'Italiano' : 'English'}
-            </button>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={() => setPannello(pannello === 'sezioni' ? 'scritte' : 'sezioni')}
-          className={`mt-3 w-full rounded-[8px] border px-2 py-[6px] text-left text-[12.5px] font-bold transition-colors duration-150 motion-reduce:transition-none ${
-            pannello === 'sezioni'
-              ? 'border-verde-acceso bg-verde-chiaro'
-              : 'border-line bg-chip hover:bg-surface'
-          }`}
-        >
-          Sezioni dell’app
-        </button>
+    <div className="flex h-dvh flex-col bg-paper text-ink">
+      <Barra
+        lingua={lingua}
+        onLingua={(l) => {
+          setLingua(l)
+          setAperta(null)
+          setFraQuali([])
+        }}
+        cerca={cerca}
+        onCerca={(v) => {
+          setCerca(v)
+          if (v !== '') setPannello('scritte')
+        }}
+        quanteBozze={inAttesa.length}
+        onBozze={() => setCassetto(true)}
+        sezioni={pannello === 'sezioni'}
+        onSezioni={() => setPannello(pannello === 'sezioni' ? 'scritte' : 'sezioni')}
+      />
 
-        {/*
-          I gruppi si aprono e si chiudono. Con le otto lezioni del percorso
-          le voci sono novanta, e novanta voci tutte aperte non sono un elenco:
-          sono un muro. Aperto resta quello dove si sta.
-        */}
-        {GRUPPI.map((g) => {
-          const dentro = g.schermi.some((s) => s.id === scelto.id)
-          const apertoQui = apertiGruppi[g.nome] ?? dentro
-          return (
-            <div key={g.nome} className="mt-3">
-              <button
-                type="button"
-                onClick={() =>
-                  setApertiGruppi((a) => ({ ...a, [g.nome]: !(a[g.nome] ?? dentro) }))
-                }
-                className="flex w-full items-center gap-1 rounded-[6px] px-1 py-[3px] text-left text-[10px] font-bold tracking-[1px] text-ink-mute uppercase transition-colors duration-150 hover:text-ink motion-reduce:transition-none"
-              >
-                <span
-                  aria-hidden
-                  className="inline-block transition-transform duration-200 motion-reduce:transition-none"
-                  style={{ transform: apertoQui ? 'rotate(90deg)' : 'none' }}
-                >
-                  ›
-                </span>
-                {g.nome}
-              </button>
-              <Apri aperto={apertoQui}>
-                <ul className="m-0 mt-1 flex list-none flex-col p-0">
-                  {g.schermi.map((s) => (
-                    <li key={s.id}>
-                      <button
-                        type="button"
-                        onClick={() => vaiA(s)}
-                        className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] transition-colors duration-150 hover:bg-chip motion-reduce:transition-none ${
-                          scelto.id === s.id && pannello === 'scritte'
-                            ? 'bg-verde-chiaro font-bold'
-                            : ''
-                        }`}
-                      >
-                        {s.nome}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </Apri>
-            </div>
-          )
-        })}
-        <div className="mt-4">
-          <button
-            type="button"
-            onClick={() => vaiA(ALTRE)}
-            className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] transition-colors duration-150 hover:bg-chip motion-reduce:transition-none ${
-              scelto.id === 'altre' && pannello === 'scritte' ? 'bg-verde-chiaro font-bold' : ''
-            }`}
-          >
-            Tutte le altre
-          </button>
-        </div>
-      </aside>
-
-      {pannello === 'sezioni' ? (
-        <Sezioni />
-      ) : (
-      <main className="flex min-w-0 flex-1 gap-6 overflow-y-auto p-6">
-        <div className="shrink-0">
-          <div className="mb-3 flex w-[402px] gap-1 rounded-pill bg-chip p-1">
-            {(
-              [
-                ['correggi', 'Correggi le scritte'],
-                ['prova', 'Prova lo schermo'],
-              ] as const
-            ).map(([m, etichetta]) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setModo(m)}
-                className={`bab-tocco flex-1 rounded-pill px-3 py-[6px] text-[12.5px] font-bold ${
-                  modo === m ? 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.10)]' : 'text-ink-medio'
-                }`}
-              >
-                {etichetta}
-              </button>
-            ))}
-          </div>
-          <div className="overflow-hidden rounded-[28px] border-[1.5px] border-line bg-surface shadow-[6px_6px_0_rgba(0,0,0,0.06)]">
-            <iframe
-              /*
-                La chiave e' la lingua: cambiandola la cornice si ricarica,
-                perche' la lingua dell'anteprima sta nell'indirizzo e non
-                nella memoria del telefono — se no cambiarla qui cambierebbe
-                anche la lingua dell'app di chi sta scrivendo.
-              */
-              key={lingua}
-              ref={cornice}
-              title="anteprima"
-              src={`${scelto.rotta}${scelto.rotta.includes('?') ? '&' : '?'}anteprima=1&lingua=${lingua}`}
-              className="block h-[874px] w-[402px] border-0"
-            />
-          </div>
-          <p className="m-0 mt-2 w-[402px] text-[11.5px] leading-[1.5] text-ink-medio">
-            {modo === 'correggi'
-              ? 'Passa sopra a una scritta e toccala: si apre qui a destra. Così i bottoni non partono, e non cambi schermo mentre correggi.'
-              : `Adesso lo schermo funziona davvero e ci puoi camminare dentro. ${scelto.come ?? ''}`}
-          </p>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex items-baseline justify-between gap-3">
-            <p className="m-0 text-[17px] font-bold">{scelto.nome}</p>
-            <span className="text-[12px] text-ink-medio">{stato}</span>
-          </div>
-
-          {(daPubblicare.length > 0 || sospese[altra].length > 0) && (
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              {daPubblicare.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => pubblica(daPubblicare)}
-                  className="bab-tocco rounded-pill border-[1.5px] border-line bg-lime px-4 py-[6px] text-[12.5px] font-bold"
-                >
-                  {quante(daPubblicare.length, lingua)}
-                </button>
-              )}
-
-              {/*
-                L'altra lingua non e' una nota a margine: e' il posto dove le
-                bozze si dimenticano. Il bottone la pubblica di qui, senza
-                dover cambiare lingua e ritrovare lo schermo.
-              */}
-              {sospese[altra].length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => pubblica(sospese[altra], altra)}
-                  className="bab-tocco rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold text-ambra-testo"
-                >
-                  E {quante(sospese[altra].length, altra, true)}
-                </button>
-              )}
-
-              <span className="text-[11.5px] text-ink-medio">
-                finché non pubblichi, le atlete vedono quello di prima
-              </span>
-            </div>
-          )}
-
-          <div className="mt-4">
-            {fraQuali.length > 0 && (
-              <Riquadro>
-                <p className="m-0 text-[13.5px] font-bold">Lì ci sono più scritte insieme.</p>
-                <p className="m-0 mt-1 text-[12px] text-ink-medio">Quale vuoi cambiare?</p>
-                <ul className="m-0 mt-3 flex list-none flex-col gap-1 p-0">
-                  {fraQuali.map((k) => (
-                    <li key={k}>
-                      <button
-                        type="button"
-                        onClick={() => apri(k)}
-                        className="bab-tocco w-full rounded-[8px] border border-line bg-surface px-3 py-2 text-left"
-                      >
-                        <span className="block truncate text-[13px]">{testo(valore(k))}</span>
-                        <code className="block text-[10.5px] text-ink-mute">{k}</code>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </Riquadro>
-            )}
-
-            {aperta && (
-              <Campo
-                key={aperta}
-                chiave={aperta}
-                valore={valore(aperta)}
-                originale={partenza[lingua][aperta]}
-                pubblicato={pubblicato(aperta)}
-                onCambia={(v) => scrivi(aperta, v)}
-                onEsce={() => salva(aperta)}
-                onRipristina={() => ripristina(aperta)}
-                onPubblica={() => pubblica([aperta])}
-                onChiudi={() => setAperta(null)}
-              />
-            )}
-
-            {!aperta && fraQuali.length === 0 && (
-              <Riquadro>
-                <p className="m-0 text-[14px] leading-[1.6]">
-                  Tocca una scritta nello schermo qui accanto per cambiarla.
-                </p>
-                <p className="m-0 mt-2 text-[12px] leading-[1.6] text-ink-medio">
-                  Vale per tutto quello che si legge: titoli, bottoni, etichette, il grigino dentro
-                  ai campi da riempire. Non serve sapere come si chiama.
-                </p>
-              </Riquadro>
-            )}
-          </div>
-
-          <details className="mt-6">
-            <summary className="cursor-pointer text-[12.5px] font-bold text-ink-medio">
-              Tutte le scritte, in elenco
-            </summary>
+      <div className="flex min-h-0 flex-1">
+        <aside className="flex w-[214px] shrink-0 flex-col border-r border-line bg-surface">
+          <div className="shrink-0 p-3">
             <input
-              value={cerca}
-              onChange={(e) => setCerca(e.target.value)}
-              placeholder="Cerca una parola o una frase, in tutta l’app…"
-              className="mt-3 w-full rounded-[8px] border border-line bg-surface px-2 py-[6px] text-[12.5px]"
+              type="search"
+              value={filtro}
+              onChange={(e) => setFiltro(e.target.value)}
+              placeholder="Filtra gli schermi…"
+              aria-label="Filtra gli schermi"
+              className="h-8 w-full rounded-[8px] border border-line bg-chip px-3 text-[12px] outline-none placeholder:text-ink-mute focus:border-verde-acceso focus:bg-surface"
             />
-            <ul className="m-0 mt-3 flex list-none flex-col gap-1 p-0">
-              {chiavi.map((k) => (
-                <li key={k}>
+          </div>
+
+          <nav className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+            {/*
+              I gruppi si aprono e si chiudono. Con le otto lezioni del percorso
+              le voci sono novanta, e novanta voci tutte aperte non sono un elenco:
+              sono un muro. Aperto resta quello dove si sta — e mentre si filtra
+              sono aperti tutti, perche' li' l'elenco e' gia' corto.
+            */}
+            {gruppiVisti.map((g) => {
+              const dentro = g.schermi.some((s) => s.id === scelto.id)
+              const apertoQui = q !== '' || (apertiGruppi[g.nome] ?? dentro)
+              return (
+                <div key={g.nome} className="mt-3 first:mt-0">
                   <button
                     type="button"
-                    onClick={() => apri(k)}
-                    className={`bab-tocco w-full rounded-[8px] border px-3 py-2 text-left ${
-                      aperta === k
-                        ? 'border-verde-acceso bg-verde-chiaro'
-                        : 'border-line bg-surface'
+                    onClick={() =>
+                      setApertiGruppi((a) => ({ ...a, [g.nome]: !(a[g.nome] ?? dentro) }))
+                    }
+                    className="flex w-full items-center gap-1 rounded-[6px] px-1 py-[3px] text-left text-[10px] font-bold tracking-[1px] text-ink-mute uppercase transition-colors duration-150 hover:text-ink motion-reduce:transition-none"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block transition-transform duration-200 motion-reduce:transition-none"
+                      style={{ transform: apertoQui ? 'rotate(90deg)' : 'none' }}
+                    >
+                      ›
+                    </span>
+                    {g.nome}
+                  </button>
+                  <Apri aperto={apertoQui}>
+                    <ul className="m-0 mt-1 flex list-none flex-col p-0">
+                      {g.schermi.map((s) => (
+                        <li key={s.id}>
+                          <button
+                            type="button"
+                            onClick={() => vaiA(s)}
+                            className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] transition-colors duration-150 hover:bg-chip motion-reduce:transition-none ${
+                              scelto.id === s.id && pannello === 'scritte'
+                                ? 'bg-verde-chiaro font-bold'
+                                : ''
+                            }`}
+                          >
+                            {s.nome}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </Apri>
+                </div>
+              )
+            })}
+
+            {q === '' && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => vaiA(ALTRE)}
+                  className={`w-full rounded-[6px] px-2 py-[5px] text-left text-[12.5px] transition-colors duration-150 hover:bg-chip motion-reduce:transition-none ${
+                    scelto.id === 'altre' && pannello === 'scritte'
+                      ? 'bg-verde-chiaro font-bold'
+                      : ''
+                  }`}
+                >
+                  Tutte le altre
+                </button>
+              </div>
+            )}
+            {gruppiVisti.length === 0 && (
+              <p className="m-0 mt-3 text-[12px] text-ink-medio">Nessuno schermo con questo nome.</p>
+            )}
+          </nav>
+        </aside>
+
+        {pannello === 'sezioni' ? (
+          <Sezioni />
+        ) : (
+          <main className="flex min-w-0 flex-1 gap-6 overflow-y-auto p-6">
+            <div className="shrink-0">
+              <div className="mb-3 flex w-[402px] gap-1 rounded-pill bg-chip p-1">
+                {(
+                  [
+                    ['correggi', 'Correggi le scritte'],
+                    ['prova', 'Prova lo schermo'],
+                  ] as const
+                ).map(([m, etichetta]) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setModo(m)}
+                    className={`bab-tocco flex-1 rounded-pill px-3 py-[6px] text-[12.5px] font-bold ${
+                      modo === m
+                        ? 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.10)]'
+                        : 'text-ink-medio'
                     }`}
                   >
-                    <span className="block truncate text-[13px]">{testo(valore(k))}</span>
-                    <code className="block text-[10.5px] text-ink-mute">{k}</code>
+                    {etichetta}
                   </button>
-                </li>
-              ))}
-              {chiavi.length === 0 && (
-                <li className="mt-2 text-[13px] text-ink-medio">Nessuna scritta qui.</li>
-              )}
-            </ul>
-          </details>
-        </div>
-      </main>
+                ))}
+              </div>
+              <div className="overflow-hidden rounded-[28px] border-[1.5px] border-line bg-surface shadow-[6px_6px_0_rgba(0,0,0,0.06)]">
+                <iframe
+                  /*
+                    La chiave e' la lingua: cambiandola la cornice si ricarica,
+                    perche' la lingua dell'anteprima sta nell'indirizzo e non
+                    nella memoria del telefono — se no cambiarla qui cambierebbe
+                    anche la lingua dell'app di chi sta scrivendo.
+                  */
+                  key={lingua}
+                  ref={cornice}
+                  title="anteprima"
+                  src={`${scelto.rotta}${scelto.rotta.includes('?') ? '&' : '?'}anteprima=1&lingua=${lingua}`}
+                  className="block h-[874px] w-[402px] border-0"
+                />
+              </div>
+              <p className="m-0 mt-2 w-[402px] text-[11.5px] leading-[1.5] text-ink-medio">
+                {modo === 'correggi'
+                  ? 'Passa sopra a una scritta e toccala: si apre qui a destra. Così i bottoni non partono, e non cambi schermo mentre correggi.'
+                  : `Adesso lo schermo funziona davvero e ci puoi camminare dentro. ${scelto.come ?? ''}`}
+              </p>
+              <Legenda />
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col">
+              <div className="flex shrink-0 items-baseline justify-between gap-3">
+                <p className="m-0 text-[17px] font-bold">
+                  {cerca.trim() ? `Cerchi «${cerca.trim()}»` : scelto.nome}
+                </p>
+                {avviso && (
+                  <span
+                    role="status"
+                    className={`shrink-0 text-[12px] font-bold ${
+                      avviso.tono === 'male'
+                        ? 'text-[#ef545e]'
+                        : avviso.tono === 'fatto'
+                          ? 'text-verde-scuro'
+                          : 'text-ink-medio'
+                    }`}
+                  >
+                    {avviso.testo}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+                {fraQuali.length > 0 && (
+                  <Riquadro>
+                    <p className="m-0 text-[13.5px] font-bold">Lì ci sono più scritte insieme.</p>
+                    <p className="m-0 mt-1 text-[12px] text-ink-medio">Quale vuoi cambiare?</p>
+                    <ul className="m-0 mt-3 flex list-none flex-col gap-1 p-0">
+                      {fraQuali.map((k) => (
+                        <li key={k}>
+                          <button
+                            type="button"
+                            onClick={() => apri(k)}
+                            className="bab-tocco w-full rounded-[8px] border border-line bg-surface px-3 py-2 text-left"
+                          >
+                            <span className="block truncate text-[13px]">{testo(valore(k))}</span>
+                            <code className="block text-[10.5px] text-ink-mute">{k}</code>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </Riquadro>
+                )}
+
+                {aperta && (
+                  <div className={fraQuali.length > 0 ? 'mt-3' : ''}>
+                    <Campo
+                      key={aperta}
+                      chiave={aperta}
+                      valore={valore(aperta)}
+                      originale={partenza[lingua][aperta]}
+                      pubblicato={pubblicato(aperta)}
+                      onCambia={(v) => scrivi(aperta, v)}
+                      onEsce={() => salva(aperta)}
+                      onRipristina={() => ripristina(aperta)}
+                      onScarta={() => scarta(aperta)}
+                      onPubblica={() => pubblica([aperta])}
+                      onChiudi={() => setAperta(null)}
+                    />
+                  </div>
+                )}
+
+                {!aperta && fraQuali.length === 0 && !cerca.trim() && (
+                  <Riquadro>
+                    <p className="m-0 text-[13.5px] leading-[1.6]">
+                      Tocca una scritta nello schermo qui accanto per cambiarla.
+                    </p>
+                    <p className="m-0 mt-2 text-[12px] leading-[1.6] text-ink-medio">
+                      Vale per tutto quello che si legge: titoli, bottoni, etichette, il grigino
+                      dentro ai campi da riempire. Non serve sapere come si chiama.
+                    </p>
+                  </Riquadro>
+                )}
+
+                {/*
+                  L'elenco delle scritte di questo schermo. Prima era chiuso in
+                  fondo dentro a un "dettaglio" da aprire, insieme alla ricerca:
+                  cioe' la mezza pagina vuota qui accanto stava sopra a tutto
+                  quello che si poteva fare.
+                */}
+                <div className="mt-5">
+                  <p className="m-0 mb-2 text-[11px] font-bold tracking-[1px] text-ink-mute uppercase">
+                    {cerca.trim()
+                      ? `${chiavi.length} ${chiavi.length === 1 ? 'scritta trovata' : 'scritte trovate'}`
+                      : `Le scritte di questo schermo · ${chiavi.length}`}
+                  </p>
+                  <ul className="m-0 flex list-none flex-col gap-1 p-0">
+                    {chiavi.map((k) => {
+                      const r = righe[lingua][k]
+                      const online = testo(r?.vivo ?? partenza[lingua][k])
+                      const segno =
+                        r?.bozza != null && testo(r.bozza) !== online
+                          ? 'bozza'
+                          : online !== testo(partenza[lingua][k])
+                            ? 'pubblicata'
+                            : null
+                      return (
+                        <li key={k}>
+                          <button
+                            type="button"
+                            onClick={() => apri(k)}
+                            className={`bab-tocco flex w-full items-start gap-2 rounded-[8px] border px-3 py-2 text-left ${
+                              aperta === k
+                                ? 'border-verde-acceso bg-verde-chiaro'
+                                : 'border-line bg-surface'
+                            }`}
+                          >
+                            <span
+                              aria-hidden
+                              className={`mt-[6px] size-[7px] shrink-0 rounded-full ${
+                                segno === 'bozza'
+                                  ? 'bg-ritmo-bordo'
+                                  : segno === 'pubblicata'
+                                    ? 'bg-verde-acceso'
+                                    : 'bg-transparent'
+                              }`}
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-[13px]">{testo(valore(k))}</span>
+                              <code className="block text-[10.5px] text-ink-mute">{k}</code>
+                            </span>
+                          </button>
+                        </li>
+                      )
+                    })}
+                    {chiavi.length === 0 && (
+                      <li className="text-[13px] text-ink-medio">
+                        {cerca.trim() ? 'Nessuna scritta con queste parole.' : 'Nessuna scritta qui.'}
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </main>
+        )}
+      </div>
+
+      {cassetto && (
+        <Bozze
+          bozze={inAttesa}
+          onVai={(b, schermo) => {
+            setCassetto(false)
+            setLingua(b.lingua)
+            if (schermo) setScelto(schermo)
+            setCerca('')
+            setPannello('scritte')
+            setFraQuali([])
+            setAperta(b.chiave)
+          }}
+          onPubblica={(quali, l) => pubblica(quali, l)}
+          onScarta={(b) => scarta(b.chiave, b.lingua)}
+          onChiudi={() => setCassetto(false)}
+        />
       )}
     </div>
+  )
+}
+
+/** Cosa vogliono dire le due sottolineature dentro all'anteprima. */
+function Legenda() {
+  return (
+    <p className="m-0 mt-2 flex w-[402px] flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-medio">
+      <span className="flex items-center gap-[6px]">
+        <span aria-hidden className="size-[7px] rounded-full bg-ritmo-bordo" />
+        bozza, non ancora pubblicata
+      </span>
+      <span className="flex items-center gap-[6px]">
+        <span aria-hidden className="size-[7px] rounded-full bg-verde-acceso" />
+        cambiata e pubblicata
+      </span>
+    </p>
   )
 }
 
@@ -766,6 +939,7 @@ function Campo({
   onCambia,
   onEsce,
   onRipristina,
+  onScarta,
   onPubblica,
   onChiudi,
 }: {
@@ -776,6 +950,7 @@ function Campo({
   onCambia: (v: Valore) => void
   onEsce: () => void
   onRipristina: () => void
+  onScarta: () => void
   onPubblica: () => void
   onChiudi: () => void
 }) {
@@ -830,11 +1005,28 @@ function Campo({
         >
           {inBozza ? 'Pubblica questa' : 'Niente da pubblicare'}
         </button>
+        {/*
+          Due modi di tornare indietro, e non sono lo stesso.
+          «Scarta» butta solo l'ultima scrittura e rimette quello che le
+          atlete leggono adesso; «rimetti l'originale» torna al disegno e
+          cancella anche quello che era stato pubblicato mesi fa. Prima c'era
+          solo il secondo, e per disfare una correzione appena fatta bisognava
+          riscrivere a mano quella di prima.
+        */}
+        {inBozza && (
+          <button
+            type="button"
+            onClick={onScarta}
+            className="bab-tocco rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold"
+          >
+            Scarta la bozza
+          </button>
+        )}
         {cambiata && (
           <button
             type="button"
             onClick={onRipristina}
-            className="bab-tocco rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold"
+            className="bab-tocco rounded-pill border-[1.5px] border-line bg-surface px-4 py-[6px] text-[12.5px] font-bold text-ink-medio"
           >
             Rimetti l’originale
           </button>
@@ -843,22 +1035,4 @@ function Campo({
       </div>
     </Riquadro>
   )
-}
-
-/** Per confrontare due valori senza pensare se sono stringhe o liste. */
-function testo(v: Valore | null): string {
-  if (v === null || v === undefined) return ''
-  return Array.isArray(v) ? v.join('\n') : v
-}
-
-/**
- * «la modifica in italiano», «le 3 in inglese».
- *
- * Una riga per non far dire al pannello «le 1 in inglese». Il numero si scrive
- * solo da due in su: con uno il conto non serve, serve sapere quale lingua.
- */
-function quante(n: number, lingua: Lingua, seguito = false): string {
-  const nome = lingua === 'it' ? 'italiano' : 'inglese'
-  if (n === 1) return seguito ? `quella in ${nome}` : `Pubblica la modifica in ${nome}`
-  return seguito ? `le ${n} in ${nome}` : `Pubblica le ${n} in ${nome}`
 }

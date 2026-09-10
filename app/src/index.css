@@ -417,3 +417,35 @@ textarea {
     animation-duration: 1ms;
   }
 }
+
+/*
+ * Le scritte gia' cambiate, dentro all'anteprima del pannello.
+ *
+ * Ambra: c'e' una bozza che le atlete non vedono ancora. Verde: e' gia'
+ * pubblicata, e quello che si legge qui e' quello che leggono loro. Niente:
+ * e' com'e' nel disegno. Vale solo dentro alla cornice — nell'app che usano
+ * le atlete questi attributi non li mette nessuno.
+ */
+[data-bab-segno] {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+[data-bab-segno='bozza'] {
+  text-decoration-color: var(--color-ritmo-bordo);
+}
+[data-bab-segno='pubblicata'] {
+  text-decoration-color: var(--color-verde-acceso);
+}
+
+/* i campi da riempire non hanno testo da sottolineare: si segna il bordo */
+input[data-bab-segno],
+textarea[data-bab-segno] {
+  text-decoration-line: none;
+  border-color: var(--color-ritmo-bordo);
+}
+input[data-bab-segno='pubblicata'],
+textarea[data-bab-segno='pubblicata'] {
+  border-color: var(--color-verde-acceso);
+}
