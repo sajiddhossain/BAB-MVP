@@ -1212,7 +1212,8 @@ alter table public.body_signals add constraint body_signals_onset_check
 alter table public.body_signals add column if not exists session_effect text;
 alter table public.body_signals drop constraint if exists body_signals_session_effect_check;
 alter table public.body_signals add constraint body_signals_session_effect_check
-  check (session_effect is null or session_effect in ('warmed_out','unchanged','worse'));
+  check (session_effect is null
+         or session_effect in ('warmed_out','unchanged','worse','appeared_after'));
 
 create or replace view public.coach_body_signals as
   select id, athlete_id, check_in_id, created_at,

@@ -50,15 +50,22 @@ Le risposte finiscono in Supabase solo se ci sono le chiavi. Senza, l'app
 funziona tutta ma resta nel telefono, e la schermata finale lo dice.
 
 1. Nel progetto Supabase, SQL Editor → incolla e lancia `supabase/schema.sql`.
-   È idempotente: si può rilanciare. Su un database già acceso prima di
-   settembre 2026 basta l'ultimo blocco, staccato in
-   `supabase/migrazione-sessione.sql`: senza quello il check-in e il
-   check-out si vedono ma non riescono a salvare. Con lo stesso criterio
-   c'e' `supabase/migrazione-testi.sql`, che serve solo alla pagina
-   `/admin` — senza, l'app funziona tutta e le scritte restano quelle
-   compilate. **`supabase/migrazione-orari.sql` invece va lanciata**: aggiunge
-   `check_ins.local_time`, e senza quella colonna il check-in non riesce piu'
-   a salvare.
+   È idempotente: si può rilanciare.
+
+   Poi ci sono i pezzi staccati. Sono idempotenti anche loro e l'ordine fra
+   di essi non conta. I primi due servono **anche a un database nuovo**,
+   perché in `schema.sql` non ci sono ancora; gli altri servono solo a un
+   database acceso prima che quel pezzo esistesse.
+
+   | file | anche su un DB nuovo | cosa succede senza |
+   | --- | --- | --- |
+   | `migrazione-tutorial.sql` | **sì** | il tutorial dopo l'onboarding non compare a nessuno |
+   | `migrazione-sezioni.sql` | **sì** | le sezioni non si possono spegnere da `/admin` |
+   | `migrazione-sessione.sql` | no | check-in e check-out si vedono ma non salvano |
+   | `migrazione-orari.sql` | no | il check-in non salva più: manca `check_ins.local_time` |
+   | `migrazione-effetto.sql` | no | scegliendo «È comparsa dopo» il check-out non salva i segnali e resta in coda a riprovare |
+   | `migrazione-percorso.sql` | no | il percorso non si ricorda a che punto è |
+   | `migrazione-testi.sql` | no | `/admin` non salva: le scritte restano quelle compilate |
 2. Authentication → Sign In / Providers → Email: acceso, e in cima alla
    pagina "Allow new users to sign up" acceso. Email OTP length: 6.
 3. **Authentication → Emails**: nei due modelli `Magic Link` e

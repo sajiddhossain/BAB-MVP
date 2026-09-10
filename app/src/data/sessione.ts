@@ -207,12 +207,25 @@ export const COMPARSA_DB: Record<Comparsa, string> = {
   dopo: 'after_stopping',
 }
 
-export const EFFETTO = ['scaldata', 'uguale', 'peggio'] as const
+/*
+ * La quarta risposta: prima della sessione quella sensazione non c'era.
+ *
+ * Le altre tre raccontano cos'e' successo a una cosa che c'era gia'. Se e'
+ * nata durante l'allenamento nessuna delle tre e' vera, e prima di questa
+ * quarta l'unico modo di dirlo era non rispondere — cioe' perdere il dato
+ * proprio nel caso in cui e' piu' interessante.
+ *
+ * Non e' un doppione di `COMPARSA`, che chiede quando l'ha notata: li' la
+ * risposta e' un momento, qui e' cos'ha fatto la sessione, e "l'ha fatta
+ * nascere" e' una risposta a questa domanda, non a quella.
+ */
+export const EFFETTO = ['scaldata', 'uguale', 'peggio', 'nuova'] as const
 export type Effetto = (typeof EFFETTO)[number]
 export const EFFETTO_DB: Record<Effetto, string> = {
   scaldata: 'warmed_out',
   uguale: 'unchanged',
   peggio: 'worse',
+  nuova: 'appeared_after',
 }
 
 /** Le fasce di ore dormite, come stanno sul disegno. */
