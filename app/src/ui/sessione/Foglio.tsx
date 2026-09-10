@@ -170,13 +170,12 @@ export function Foglio({
                 e a sezione chiusa avrebbe indicato una cosa che sullo schermo
                 non c'era.
 
-                La sua ⓘ e' scritta come quelle sulle pastiglie — stessa
-                misura, stesso grigio — perche' e' quella che indica. La frase
-                invece non urla: il titolo verde sopra e' l'invito, questa e'
-                l'istruzione, e due grassetti di fila non si guardano.
+                Resta lilla e in grassetto com'era: e' l'unica riga del foglio
+                che spiega come si usa il foglio, e il lilla qui dentro vuol
+                dire esattamente quello — informazione, non domanda.
               */}
-              <p className="mt-[10px] mb-0 flex items-baseline gap-[6px] text-[12.5px] leading-[1.35] text-ink-medio">
-                <span aria-hidden className="shrink-0 text-[13px] leading-none text-ink-mute">
+              <p className="mt-[10px] mb-0 flex items-baseline gap-[6px] text-[12.5px] leading-[1.35] font-bold text-lilla-vivo">
+                <span aria-hidden className="shrink-0 text-[13px] leading-none">
                   ⓘ
                 </span>
                 {tp.aiuto}
