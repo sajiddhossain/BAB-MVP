@@ -112,9 +112,16 @@ export function CorpoSintonia({ tipo, passo, verso, avanzamento, avanti, indietr
           Le due domande di contesto stanno affiancate. Non hanno l'ombra:
           nel disegno sono piatte, ed e' giusto — sono le uniche due che si
           rispondono con un sì o un no invece che con una posizione.
+
+          Una griglia e non due schede in fila: `Scheda` mette il `className`
+          sulla carta di dentro, e un `flex-1` scritto li' non arriva alla
+          cosa che va allargata. Le due colonne invece sono larghe uguali per
+          conto loro, e le due carte si prendono tutta la riga — prima erano
+          larghe quanto la domanda che avevano dentro, quindi diverse fra loro
+          e tutt'e due piu' strette della scheda sopra.
         */}
-        <div className="flex gap-[10px]">
-          <Scheda piatta className="flex min-w-0 flex-1 flex-col justify-between p-[12px]">
+        <div className="grid grid-cols-2 gap-[10px]">
+          <Scheda piatta className="flex h-full flex-col justify-between p-[12px]">
             <p className="m-0 text-[13px] leading-[18px] font-bold text-ink">{t.ciclo}</p>
             <SiNo
               className="mt-3"
@@ -123,7 +130,7 @@ export function CorpoSintonia({ tipo, passo, verso, avanzamento, avanti, indietr
               etichetta={t.ciclo}
             />
           </Scheda>
-          <Scheda piatta className="flex min-w-0 flex-1 flex-col justify-between p-[12px]">
+          <Scheda piatta className="flex h-full flex-col justify-between p-[12px]">
             <p className="m-0 text-[13px] leading-[18px] font-bold text-ink">{t.antidolorifici}</p>
             <SiNo
               className="mt-3"

@@ -10,6 +10,14 @@ import type { ReactNode } from 'react'
  * `piatta` toglie l'ombra: nel disegno alcune schede ce l'hanno e altre no,
  * e la regola e' che ce l'ha chi si puo' toccare. Quelle che spiegano e
  * basta stanno appoggiate.
+*
+ * ── DOVE FINISCE `className` ───────────────────────────────────────────────
+ * Sulla carta di dentro, non sul contenitore. Quindi serve per il contorno e
+ * per quello che c'e' dentro — bordi, colori, imbottitura — ma non per dire
+ * quanto dev'essere larga la scheda dentro a una riga: un `flex-1` scritto
+ * li' non arriva al `div` che fa da elemento della riga, e la scheda resta
+ * larga quanto quello che ha dentro. La larghezza la deve dare chi la mette
+ * in riga, con una griglia a colonne larghe uguali.
  */
 export function Scheda({
   children,
