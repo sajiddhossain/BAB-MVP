@@ -68,7 +68,7 @@ type Lingua = {
     nota: string
     azione: string
   }
-  usa: string
+  chiudi: string
   aiuto: string
   schede: Record<Parola, SchedaParola>
 }
@@ -126,7 +126,7 @@ const it: Lingua = {
     azione:
       "Torna al mio check-in",
   },
-  usa: "Usa questa parola",
+  chiudi: 'Chiudi',
   aiuto: "Non sai quale parola? Tocca una i.",
   schede: {
     forte: {
@@ -350,7 +350,7 @@ const en: Lingua = {
     azione:
       "Back to my check-in",
   },
-  usa: "Use this word",
+  chiudi: 'Close',
   aiuto: "Not sure which word? Tap any i.",
   schede: {
     forte: {

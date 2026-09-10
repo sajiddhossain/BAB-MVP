@@ -120,17 +120,7 @@ export function Parole({ onChiudi }: { onChiudi?: () => void } = {}) {
         </div>
       </Schermo>
 
-      {spiega && (
-        /*
-          Da qui "usa questa parola" non ha niente da accendere: si sta
-          leggendo il glossario, non compilando un check-in. Chiude e basta.
-        */
-        <SchedaParola
-          parola={spiega}
-          onUsa={() => setSpiega(null)}
-          onChiudi={() => setSpiega(null)}
-        />
-      )}
+      {spiega && <SchedaParola parola={spiega} onChiudi={() => setSpiega(null)} />}
     </>
   )
 

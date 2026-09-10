@@ -307,21 +307,12 @@ export function Foglio({
 
       {/*
         La scheda della parola sta SOPRA al foglio, non al posto suo: chi la
-        chiude ritrova il foglio com'era, con quello che aveva gia' scelto.
-        "Usa questa parola" la accende e torna indietro in un gesto solo.
+        chiude ritrova il foglio com'era, con quello che aveva gia' scelto —
+        e la parola la sceglie dalla fila qui dietro, che e' rimasta dov'era.
       */}
       {elenco && <Parole onChiudi={() => setElenco(false)} />}
 
-      {spiega && (
-        <SchedaParola
-          parola={spiega}
-          onUsa={() => {
-            if (!bozza.parole.includes(spiega)) commuta(spiega)
-            setSpiega(null)
-          }}
-          onChiudi={() => setSpiega(null)}
-        />
-      )}
+      {spiega && <SchedaParola parola={spiega} onChiudi={() => setSpiega(null)} />}
     </div>
   )
 }

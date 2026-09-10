@@ -330,7 +330,7 @@ export const SCHERMI: GruppoScritte[] = [
         id: 'schede',
         nome: 'Le schede',
         rotta: '/parole',
-        rami: ['parole.schede', 'parole.usa', 'parole.aiuto'],
+        rami: ['parole.schede', 'parole.chiudi', 'parole.aiuto'],
         come: 'Tocca una parola nell’elenco per aprirne la scheda.',
       },
     ],

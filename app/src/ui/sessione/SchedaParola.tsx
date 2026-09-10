@@ -48,16 +48,21 @@ const RIQUADRO: Record<Tono, { fondo: string; bordo: string; etichetta: string; 
  * per una scheda sola si paga in byte a ogni apertura, e la differenza fra i
  * due a queste misure non si vede.
  *
- * `onUsa` la chiude accendendo la parola nel foglio: e' il gesto per cui la
- * scheda esiste — non e' un glossario, e' un modo di scegliere.
+ * ── NON HA UN BOTTONE IN FONDO ─────────────────────────────────────────────
+ * C'era "Usa questa parola", e accendeva la parola chiudendo la scheda. Era
+ * una seconda strada per fare una cosa che si fa gia' toccando la parola
+ * nella fila dietro, e in questo posto era anche una spinta: si apre la
+ * scheda per capire se una parola e' quella giusta, e chiuderla con un
+ * bottone verde che dice "usala" e' un modo di rispondere al posto suo.
+ *
+ * Adesso la scheda spiega e basta. Si chiude dalla ✕, trascinandola giu', o
+ * toccando fuori — e la parola si sceglie dov'e' sempre stata.
  */
 export function SchedaParola({
   parola,
-  onUsa,
   onChiudi,
 }: {
   parola: Parola
-  onUsa: () => void
   onChiudi: () => void
 }) {
   const { ts, tp } = useLingua()
@@ -82,7 +87,7 @@ export function SchedaParola({
       <div className="relative flex w-full max-w-[402px] flex-col justify-end">
         <button
           type="button"
-          aria-label={t.usa}
+          aria-label={t.chiudi}
           onClick={onChiudi}
           className="bab-affiora absolute inset-0 bg-black/60"
         />
@@ -98,14 +103,24 @@ export function SchedaParola({
             <div className="mx-auto h-[5px] w-11 rounded-[10px] bg-grigio-tenue" aria-hidden />
           </div>
 
-          <div className="flex-1 overflow-y-auto px-6 pt-[26px]">
+          {/*
+            L'aria in fondo la mette lo scorrevole, adesso che sotto non c'e'
+            piu' il bottone: se no l'ultimo riquadro finirebbe appiccicato al
+            bordo dello schermo.
+          */}
+          <div className="flex-1 overflow-y-auto px-6 pt-[26px] pb-[calc(26px+env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between gap-3">
               <h2 className="m-0 text-[24px] leading-none font-bold text-ink">{nome}</h2>
+              {/*
+                Il cerchietto resta di trenta, ma quello che si tocca e' piu'
+                grande: senza il bottone in fondo questa e' la via d'uscita
+                principale, e trenta pixel sono meno di un polpastrello.
+              */}
               <button
                 type="button"
                 onClick={onChiudi}
-                aria-label={t.usa}
-                className="flex size-[30px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-grigio-tenue text-[14px] leading-none text-ink-mute"
+                aria-label={t.chiudi}
+                className="relative flex size-[30px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-grigio-tenue text-[14px] leading-none text-ink-mute after:absolute after:-inset-[7px] after:content-['']"
               >
                 ✕
               </button>
@@ -153,19 +168,6 @@ export function SchedaParola({
                   </div>
                 )
               })}
-            </div>
-          </div>
-
-          <div className="shrink-0 px-6 pt-[21px] pb-[calc(24px+env(safe-area-inset-bottom))]">
-            <div className="relative h-[62px] w-full">
-              <div className="absolute inset-x-0 top-[6px] h-14 rounded-pill bg-black/8" />
-              <button
-                type="button"
-                onClick={onUsa}
-                className="absolute inset-x-0 top-0 h-14 rounded-pill border-[1.5px] border-line bg-lime text-[16px] font-bold text-ink"
-              >
-                {t.usa}
-              </button>
             </div>
           </div>
         </div>
