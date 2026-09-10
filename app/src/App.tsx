@@ -10,6 +10,8 @@ import { Prossimamente } from './screens/Prossimamente'
 import { Amministrazione } from './screens/Amministrazione'
 import { Atrio } from './screens/admin/Atrio'
 import { Scritte } from './screens/admin/Scritte'
+import { Atlete } from './screens/admin/Atlete'
+import { Atleta } from './screens/admin/Atleta'
 import { Sezioni } from './screens/admin/Sezioni'
 import { Guardia } from './screens/Guardia'
 import { Sezione } from './screens/Sezione'
@@ -51,6 +53,8 @@ export function App() {
         <Route path="/admin" element={<Amministrazione />}>
           <Route index element={<Atrio />} />
           <Route path="scritte" element={<Scritte />} />
+          <Route path="atlete" element={<Atlete />} />
+          <Route path="atlete/:id" element={<Atleta />} />
           <Route path="sezioni" element={<Sezioni />} />
         </Route>
         {/*

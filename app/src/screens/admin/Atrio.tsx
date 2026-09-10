@@ -13,10 +13,10 @@ import type { Polso } from '../../lib/admin'
  * dove andare.
  *
  * ── LE STANZE CHE NON CI SONO ANCORA ───────────────────────────────────────
- * Le atlete e i numeri si vedono, ma non si aprono. E' voluto: un riquadro
- * che dice "in arrivo" dice due cose vere insieme — che quella cosa e'
- * prevista, e che oggi non c'e'. Un riquadro che si apre su una pagina vuota
- * non dice niente e fa perdere un click ogni volta.
+ * I numeri si vedono, ma non si aprono. E' voluto: un riquadro che dice "in
+ * arrivo" dice due cose vere insieme — che quella cosa e' prevista, e che
+ * oggi non c'e'. Un riquadro che si apre su una pagina vuota non dice niente
+ * e fa perdere un click ogni volta.
  *
  * ── I NUMERI IN CIMA ───────────────────────────────────────────────────────
  * Sono quelli veri, letti da `admin_pulse`, e sono pochi perche' pochi ne
@@ -59,10 +59,10 @@ export function Atrio() {
             segno="◑"
           />
           <Stanza
+            a="/admin/atlete"
             nome="Le atlete"
             cosa="Chi c’è, cosa ha scritto, il suo corpo giorno per giorno. Una scheda per persona."
             segno="◍"
-            arrivo="Serve prima una migrazione: oggi il database non lascia leggere a nessuno i check-in di un’altra."
           />
           <Stanza
             nome="I numeri"
