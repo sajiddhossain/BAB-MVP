@@ -1,16 +1,22 @@
+import { Link } from 'react-router-dom'
 import type { Lingua } from '../../lib/lingua'
 
 /**
  * La barra in cima alla scrivania.
  *
- * Ci sono le quattro cose che valgono per tutto il pannello e non per lo
- * schermo aperto: in che lingua stai scrivendo, cosa stai cercando, quante
- * bozze aspettano di essere pubblicate, e il passaggio alle sezioni.
+ * Ci sono le tre cose che valgono per tutte le scritte e non per lo schermo
+ * aperto: in che lingua stai scrivendo, cosa stai cercando, e quante bozze
+ * aspettano di essere pubblicate.
  *
  * Prima erano sparse: la lingua in un angolo della barra laterale, la ricerca
  * chiusa dentro a un elenco in fondo alla colonna destra, e le bozze in
  * attesa solo come numero su un bottone che compariva e spariva. Tre cose che
  * riguardano tutto, in tre posti che riguardavano una parte.
+ *
+ * Le sezioni dell'app stavano qui dentro, dietro a un interruttore che
+ * scambiava mezza pagina. Adesso sono una stanza a se' nell'atrio: non hanno
+ * niente a che vedere con le parole, e tenerle qui voleva dire che per
+ * accendere il percorso bisognava prima entrare nei testi.
  */
 export function Barra({
   lingua,
@@ -19,8 +25,6 @@ export function Barra({
   onCerca,
   quanteBozze,
   onBozze,
-  sezioni,
-  onSezioni,
 }: {
   lingua: Lingua
   onLingua: (l: Lingua) => void
@@ -28,12 +32,16 @@ export function Barra({
   onCerca: (v: string) => void
   quanteBozze: number
   onBozze: () => void
-  sezioni: boolean
-  onSezioni: () => void
 }) {
   return (
     <header className="flex shrink-0 items-center gap-4 border-b border-line bg-surface px-4 py-[10px]">
-      <p className="m-0 shrink-0 text-[14px] font-bold">Le parole di BAB</p>
+      <Link
+        to="/admin"
+        className="bab-tocco shrink-0 rounded-pill border border-line bg-chip px-3 py-[5px] text-[12px] font-bold text-ink-medio no-underline"
+      >
+        ← Pannello
+      </Link>
+      <p className="m-0 shrink-0 text-[14px] font-bold">Le parole</p>
 
       <div className="flex shrink-0 gap-1 rounded-pill bg-chip p-[3px]">
         {(['it', 'en'] as const).map((l) => (
@@ -76,17 +84,6 @@ export function Barra({
           </button>
         )}
       </div>
-
-      <button
-        type="button"
-        onClick={onSezioni}
-        aria-pressed={sezioni}
-        className={`bab-tocco shrink-0 rounded-pill border px-3 py-[6px] text-[12px] font-bold ${
-          sezioni ? 'border-verde-acceso bg-verde-chiaro' : 'border-line bg-chip'
-        }`}
-      >
-        Sezioni dell’app
-      </button>
 
       {/*
         Il conto delle bozze c'e' sempre, anche a zero. Un bottone che compare

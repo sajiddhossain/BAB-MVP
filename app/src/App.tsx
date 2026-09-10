@@ -8,6 +8,9 @@ import { Lezione } from './screens/Lezione'
 import { Casa } from './screens/Casa'
 import { Prossimamente } from './screens/Prossimamente'
 import { Amministrazione } from './screens/Amministrazione'
+import { Atrio } from './screens/admin/Atrio'
+import { Scritte } from './screens/admin/Scritte'
+import { Sezioni } from './screens/admin/Sezioni'
 import { Guardia } from './screens/Guardia'
 import { Sezione } from './screens/Sezione'
 import { AccessoAdmin } from './screens/AccessoAdmin'
@@ -36,11 +39,20 @@ export function App() {
             </Sezione>
           }
         />
-        {/* i testi dell'app, per chi li scrive: entra solo chi sta in
+        {/* il pannello di amministrazione: entra solo chi sta in
             `platform_admins`, e a dirlo e' il database. L'accesso e' suo e
-            non passa dall'onboarding: chi scrive i testi non e' un'atleta */}
+            non passa dall'onboarding: chi amministra non e' un'atleta */}
         <Route path="/admin/login" element={<AccessoAdmin />} />
-        <Route path="/admin" element={<Amministrazione />} />
+        {/*
+          Il pannello e' un atrio con delle stanze: `/admin` chiede solo chi
+          sei e poi lascia passare, e ogni stanza sta sotto. Prima era una
+          rotta sola e tutto quello che serviva doveva entrare li' dentro.
+        */}
+        <Route path="/admin" element={<Amministrazione />}>
+          <Route index element={<Atrio />} />
+          <Route path="scritte" element={<Scritte />} />
+          <Route path="sezioni" element={<Sezioni />} />
+        </Route>
         {/*
           Il percorso, la sua mappa e le sue lezioni stanno tutti dentro alla
           stessa sezione: spegnendola si spegne anche quello che c'e' dentro.
