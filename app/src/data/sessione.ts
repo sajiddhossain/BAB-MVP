@@ -1,6 +1,7 @@
 import type { Tempo } from './casa'
 import type { Dati } from '../lib/sessione'
 import { FRONT_ZONES, BACK_ZONES } from '../ui/bodyZones'
+import type { BodyZone } from '../ui/bodyZones'
 
 /**
  * Il check-in e il check-out, come dati.
@@ -250,7 +251,51 @@ export function codiceZona(lato: Lato, id: string): string {
   return `${lato}_${id.replace(/-/g, '_')}`
 }
 
-export const ZONE = { front: FRONT_ZONES, back: BACK_ZONES } as const
+/**
+ * La figura di davanti sta come in uno specchio.
+ *
+ * Il disegno arriva con la convenzione delle tavole mediche: la figura ti sta
+ * di fronte, quindi il suo fianco destro cade a sinistra dello schermo. E'
+ * giusta per chi guarda il corpo di un'altra — e sbagliata per chi guarda il
+ * proprio, che e' tutto quello che si fa qui.
+ *
+ * ── PERCHE' NON E' SOLO UNA PREFERENZA ─────────────────────────────────────
+ * Perche' le due figure non dicevano la stessa cosa. Davanti il ginocchio
+ * destro stava a sinistra dello schermo; dietro stava a destra — che per una
+ * figura vista di schiena e' corretto. Stessa sessione, stesso ginocchio, due
+ * regole opposte: chi tocca "il lato che sembra il mio" ne indovinava una su
+ * due, e senza accorgersene.
+ *
+ * Adesso valgono tutte e due la stessa: si tocca il lato che corrisponde al
+ * proprio, come davanti allo specchio. Dietro era gia' cosi' e non si tocca.
+ *
+ * ── COSA CAMBIA E COSA NO ──────────────────────────────────────────────────
+ * Non cambia cosa vuol dire `front_knee_r`: e' il ginocchio destro, prima e
+ * adesso. Cambia da che parte dello schermo si tocca per dirlo. Le
+ * segnalazioni gia' salvate restano quello che sono; quello che non si puo'
+ * sapere e' se chi le ha fatte intendeva quel lato o l'altro.
+ *
+ * Il disegno non lo giro davvero — `bodyZones.ts` e' generato e non si tocca
+ * a mano, e girare la grafica romperebbe il tocco, che cerca la zona sotto al
+ * dito nello spazio del disegno. Si scambiano i nomi dei lati: la sagoma e'
+ * simmetrica, e da fuori e' esattamente la stessa cosa.
+ */
+const ALTRO_LATO: Record<string, string> = { l: 'r', r: 'l' }
+const ALTRA_PAROLA: Record<string, string> = { Left: 'Right', Right: 'Left' }
+
+function specchia(zone: readonly BodyZone[]): BodyZone[] {
+  return zone.map((z) => {
+    const lato = ALTRO_LATO[z.id.slice(-1)]
+    if (!lato || z.id.at(-2) !== '-') return z
+    return {
+      ...z,
+      id: `${z.id.slice(0, -1)}${lato}`,
+      label: z.label.replace(/^(Left|Right)\b/, (p) => ALTRA_PAROLA[p]),
+    }
+  })
+}
+
+export const ZONE = { front: specchia(FRONT_ZONES), back: BACK_ZONES } as const
 
 /*
  * Il nome visibile di una zona.
@@ -265,7 +310,7 @@ export const ZONE = { front: FRONT_ZONES, back: BACK_ZONES } as const
  * "Right quad" in mezzo all'italiano che `front_quad_r`.
  */
 const ETICHETTE: Record<string, string> = Object.fromEntries(
-  [...FRONT_ZONES, ...BACK_ZONES].map((z) => [z.id, z.label]),
+  [...ZONE.front, ...ZONE.back].map((z) => [z.id, z.label]),
 )
 
 /** "Quadricipite destro", dal codice zona: `front_quad_r`. */
