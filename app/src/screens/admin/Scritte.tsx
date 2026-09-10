@@ -68,6 +68,8 @@ export function Scritte() {
   const [filtro, setFiltro] = useState('')
   const [avviso, setAvviso] = useState<Avviso | null>(null)
   const [cassetto, setCassetto] = useState(false)
+  /* i numeri delle scritte che l'anteprima ha addosso adesso: li manda lei */
+  const [sopra, setSopra] = useState<number[]>([])
   const [apertiGruppi, setApertiGruppi] = useState<Record<string, boolean>>({})
   const cornice = useRef<HTMLIFrameElement>(null)
 
@@ -166,6 +168,10 @@ export function Scritte() {
         manda()
         return
       }
+      if (m?.tipo === 'bab:visibili') {
+        setSopra(m.numeri ?? [])
+        return
+      }
       if (m?.tipo !== 'bab:tocca' || !m.numeri) return
       const chiavi = m.numeri.map((n) => perNumero[n]).filter(Boolean)
       if (chiavi.length === 0) return
@@ -187,7 +193,23 @@ export function Scritte() {
     return () => window.removeEventListener('message', ascolta)
   }, [manda, perNumero])
 
-  /* le chiavi da mostrare: quelle dello schermo aperto, o quelle cercate */
+  /**
+   * Le chiavi da mostrare: quelle cercate, o quelle di questo schermo.
+   *
+   * "Di questo schermo" sono due cose messe insieme, e ci vogliono tutt'e due.
+   *
+   * I RAMI (`data/schermi.ts`) dicono cosa appartiene a questo schermo: ci
+   * stanno dentro anche le scritte che adesso non si vedono — quelle di un
+   * pannello chiuso, di un messaggio d'errore, di un caso che oggi non
+   * capita. Senza, si potrebbe correggere solo quello che e' sotto gli occhi.
+   *
+   * QUELLO CHE L'ANTEPRIMA HA ADDOSSO (`bab:visibili`) dice cosa si legge
+   * davvero li' dentro, e prende le scritte che stanno sullo schermo senza
+   * appartenergli. E' il caso delle sedici parole: i loro nomi vivono sotto
+   * al check-in, dove si scelgono, ma si leggono anche nel glossario, dove
+   * sono l'unica cosa che c'e'. Con i soli rami, in quello schermo l'elenco
+   * non aveva nemmeno una delle sedici parole che l'atleta ci legge.
+   */
   const chiavi = useMemo(() => {
     const tutte = Object.keys(partenza[lingua]).sort()
     if (cerca.trim()) {
@@ -201,8 +223,11 @@ export function Scritte() {
       const noti = ramiConosciuti()
       return tutte.filter((k) => !noti.some((r) => k === r || k.startsWith(`${r}.`)))
     }
-    return tutte.filter((k) => scelto.rami.some((r) => k === r || k.startsWith(`${r}.`)))
-  }, [partenza, lingua, scelto, cerca, righe])
+    const inVista = new Set(sopra.map((n) => perNumero[n]).filter(Boolean))
+    return tutte.filter(
+      (k) => inVista.has(k) || scelto.rami.some((r) => k === r || k.startsWith(`${r}.`)),
+    )
+  }, [partenza, lingua, scelto, cerca, righe, sopra, perNumero])
 
   function valore(k: string, l: Lingua = lingua): Valore {
     return righe[l][k]?.bozza ?? righe[l][k]?.vivo ?? partenza[l][k]
