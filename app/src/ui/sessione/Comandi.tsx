@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { useLingua } from '../../lib/lingua'
 
-/** Il filo d'aria fra le due meta'. Vedi `attesa`, qui sotto. */
-const ARIA = 5
+/** Lo spazio fra le due meta'. Vedi `attesa`, qui sotto. */
+const ARIA = 10
 
 /**
  * L'interruttore a due posizioni: Davanti/Dietro, Sì/No.
@@ -13,19 +13,28 @@ const ARIA = 5
  * invece di accendersi e spegnersi, che e' quello che fa capire che le due
  * scelte sono due posizioni della stessa cosa.
  *
- * ── E PRIMA DI RISPONDERE ──────────────────────────────────────────────────
- * Prima non c'era niente: la pastiglia nasce con la risposta, quindi finche'
- * non si rispondeva restava una barra piatta color carta con due parole
- * sopra. Non si capiva che ci fosse qualcosa da toccare, ne' quale meta'
- * fosse quale — sembrava una riga scritta, non una domanda.
+ * ── E PRIMA DI RISPONDERE NON E' UN INTERRUTTORE ───────────────────────────
+ * La pastiglia nasce con la risposta, quindi finche' non si rispondeva
+ * restava una barra piatta color carta con due parole sopra: non si capiva
+ * che ci fosse qualcosa da toccare, ne' quale meta' fosse quale. Sembrava una
+ * riga scritta, non una domanda.
  *
- * Adesso in attesa le due meta' sono gia' due pastiglie, chiare ma senza
- * ombra, divise da un filo d'aria. Cosi' la forma della pastiglia si vede
- * prima di toccarla, e quando si tocca quella scelta diventa bianca piena e
- * si prende l'ombra mentre l'altra si spegne: il gesto ha un prima e un dopo.
- * Il filo d'aria resta sempre, anche dopo — li' non si vede, perche' la meta'
- * spenta non ha piu' fondo — se no le due meta' cambierebbero larghezza nel
- * momento della scelta e si vedrebbe un salto.
+ * Il primo tentativo — le due meta' appena piu' chiare della scanalatura — non
+ * bastava: bianco al sessanta per cento sopra alla carta fa tre toni quasi
+ * uguali, e restava una macchia pallida.
+ *
+ * Cosi' in attesa l'interruttore non si finge un interruttore: la scanalatura
+ * sparisce e restano due pastiglie bianche col bordo, staccate. Sono due
+ * bottoni e si vede. Ed e' la stessa forma di tutto il resto che si tocca in
+ * quel foglio — le parole, le risposte di "Quando la senti?" — quindi non c'e'
+ * niente da imparare. Alla risposta la scanalatura torna e la pastiglia
+ * scorre: il comando si compone, e il gesto ha un prima e un dopo.
+ *
+ * Due misure servono a non far saltare niente in quel momento. Lo spazio fra
+ * le meta' e' lo stesso nei due stati (dopo non si vede, perche' la meta'
+ * spenta non ha piu' fondo), se no le due meta' cambierebbero larghezza. E in
+ * attesa il padding verticale cala di quanto cresce il bordo — 7.5 piu' 1.5
+ * fanno i 9 di sempre — se no il comando si alzerebbe di tre pixel.
  */
 export function Interruttore<T extends string | boolean>({
   voci,
@@ -46,17 +55,17 @@ export function Interruttore<T extends string | boolean>({
     <div
       role="radiogroup"
       aria-label={etichetta}
-      className={`relative flex rounded-pill bg-paper p-[3px] ${className}`}
+      className={`relative flex rounded-pill p-[3px] ${attesa ? '' : 'bg-paper'} ${className}`}
       style={{ gap: ARIA }}
     >
       {/*
         La pastiglia bianca sta sotto ai due bottoni ed e' una sola: cosi'
         scorre da una parte all'altra. Quando non ha ancora scelto non c'e',
-        e al suo posto ci sono le due meta' chiare — vedi sopra.
+        e al suo posto ci sono i due bottoni col bordo — vedi sopra.
 
-        Le misure tengono conto del filo d'aria: larga quanto una meta', e il
-        salto e' una meta' piu' il filo. Il `100%` del `translateX` e' la
-        larghezza della pastiglia stessa, non della scanalatura.
+        Le misure tengono conto dello spazio in mezzo: larga quanto una meta',
+        e il salto e' una meta' piu' lo spazio. Il `100%` del `translateX` e'
+        la larghezza della pastiglia stessa, non della scanalatura.
       */}
       {indice >= 0 && (
         <span
@@ -83,9 +92,9 @@ export function Interruttore<T extends string | boolean>({
               inchiostro pieno: con quella spenta di default l'interruttore
               sembrava disattivato invece che in attesa di una risposta.
             */
-            className={`relative z-1 min-w-0 flex-1 rounded-pill px-4 py-[9px] text-[13px] font-bold transition-colors duration-150 ${
+            className={`relative z-1 min-w-0 flex-1 rounded-pill px-4 text-[13px] font-bold transition-colors duration-150 ${
               acceso ? 'text-lilla' : attesa ? 'text-ink' : 'text-spento'
-            } ${attesa ? 'bg-white/60' : ''}`}
+            } ${attesa ? 'border-[1.5px] border-line bg-surface py-[7.5px]' : 'py-[9px]'}`}
           >
             {v.testo}
           </button>
