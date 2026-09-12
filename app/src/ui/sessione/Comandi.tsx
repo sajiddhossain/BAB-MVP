@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react'
 import { useLingua } from '../../lib/lingua'
 
+/** Il filo d'aria fra le due meta'. Vedi `attesa`, qui sotto. */
+const ARIA = 5
+
 /**
  * L'interruttore a due posizioni: Davanti/Dietro, Sì/No.
  *
@@ -9,6 +12,20 @@ import { useLingua } from '../../lib/lingua'
  * premuto: e' una cosa che scorre, e infatti scorre — la pastiglia si sposta
  * invece di accendersi e spegnersi, che e' quello che fa capire che le due
  * scelte sono due posizioni della stessa cosa.
+ *
+ * ── E PRIMA DI RISPONDERE ──────────────────────────────────────────────────
+ * Prima non c'era niente: la pastiglia nasce con la risposta, quindi finche'
+ * non si rispondeva restava una barra piatta color carta con due parole
+ * sopra. Non si capiva che ci fosse qualcosa da toccare, ne' quale meta'
+ * fosse quale — sembrava una riga scritta, non una domanda.
+ *
+ * Adesso in attesa le due meta' sono gia' due pastiglie, chiare ma senza
+ * ombra, divise da un filo d'aria. Cosi' la forma della pastiglia si vede
+ * prima di toccarla, e quando si tocca quella scelta diventa bianca piena e
+ * si prende l'ombra mentre l'altra si spegne: il gesto ha un prima e un dopo.
+ * Il filo d'aria resta sempre, anche dopo — li' non si vede, perche' la meta'
+ * spenta non ha piu' fondo — se no le due meta' cambierebbero larghezza nel
+ * momento della scelta e si vedrebbe un salto.
  */
 export function Interruttore<T extends string | boolean>({
   voci,
@@ -24,23 +41,30 @@ export function Interruttore<T extends string | boolean>({
   className?: string
 }) {
   const indice = voci.findIndex((v) => v.id === scelta)
+  const attesa = scelta === null
   return (
     <div
       role="radiogroup"
       aria-label={etichetta}
       className={`relative flex rounded-pill bg-paper p-[3px] ${className}`}
+      style={{ gap: ARIA }}
     >
       {/*
         La pastiglia bianca sta sotto ai due bottoni ed e' una sola: cosi'
-        scorre da una parte all'altra. Quando non ha ancora scelto non c'e'.
+        scorre da una parte all'altra. Quando non ha ancora scelto non c'e',
+        e al suo posto ci sono le due meta' chiare — vedi sopra.
+
+        Le misure tengono conto del filo d'aria: larga quanto una meta', e il
+        salto e' una meta' piu' il filo. Il `100%` del `translateX` e' la
+        larghezza della pastiglia stessa, non della scanalatura.
       */}
       {indice >= 0 && (
         <span
           aria-hidden
           className="absolute inset-y-[3px] left-[3px] rounded-pill bg-surface transition-transform duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
           style={{
-            width: 'calc(50% - 3px)',
-            transform: `translateX(${indice * 100}%)`,
+            width: `calc((100% - ${6 + ARIA}px) / 2)`,
+            transform: `translateX(calc(${indice} * (100% + ${ARIA}px)))`,
             filter: 'drop-shadow(0px 2px 3px rgba(0,0,0,0.08))',
           }}
         />
@@ -60,8 +84,8 @@ export function Interruttore<T extends string | boolean>({
               sembrava disattivato invece che in attesa di una risposta.
             */
             className={`relative z-1 min-w-0 flex-1 rounded-pill px-4 py-[9px] text-[13px] font-bold transition-colors duration-150 ${
-              acceso ? 'text-lilla' : scelta === null ? 'text-ink' : 'text-spento'
-            }`}
+              acceso ? 'text-lilla' : attesa ? 'text-ink' : 'text-spento'
+            } ${attesa ? 'bg-white/60' : ''}`}
           >
             {v.testo}
           </button>
