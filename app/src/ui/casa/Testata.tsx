@@ -25,7 +25,15 @@ export function Testata({ giorno, ora, nome, streak }: { giorno: Date; ora?: str
         </p>
       </div>
 
-      <div className="mr-[9px] mt-1 flex h-9 shrink-0 items-center gap-[5px] rounded-[99px] border border-line bg-surface pl-2 pr-3">
+      {/*
+        Nel disegno questo distintivo si ferma nove pixel prima del bordo
+        destro, mentre tutto il resto della schermata — la scheda grande,
+        l'etichetta, la scheda sotto — arriva fino in fondo. E' l'unico pezzo
+        fuori squadra di tutta la home, ed e' un pezzo che galleggia da solo
+        in alto a destra, dove uno storto si vede subito. Qui sta in riga con
+        gli altri.
+      */}
+      <div className="mt-1 flex h-9 shrink-0 items-center gap-[5px] rounded-[99px] border border-line bg-surface pl-[9px] pr-3">
         <img src={fuoco} alt="" className="size-4" aria-hidden />
         <span className="text-[14px] font-bold text-ink">{streak}</span>
       </div>

@@ -339,7 +339,15 @@ function Fatto() {
       titolo={t.casa.fatto.titolo}
       corpo={riassunto || undefined}
     >
-      <div className="mt-1 rounded-[16px] bg-white/75 p-1">
+      {/*
+        Quattro pixel quando sopra c'e' la frase del riepilogo: la nota le sta
+        attaccata perche' la continua, ed e' lo stesso stacco che la frase ha
+        dal titolo. Ma la frase puo' mancare — si costruisce da previsto e
+        sentito, e se uno dei due non c'e' resta vuota — e allora quei quattro
+        pixel incollano la nota al titolo. Senza frase si torna ai quattordici
+        che hanno tutte le altre schede della home.
+      */}
+      <div className={`${riassunto ? 'mt-1' : 'mt-[14px]'} rounded-[16px] bg-white/75 p-1`}>
         <div className="flex gap-3 rounded-[16px] bg-allarme-fondo px-3 py-[10px]">
           <img src={lampadina} alt="" className="mt-[3px] size-4 shrink-0" aria-hidden />
           <p className="m-0 text-[12px] leading-[1.4] text-allarme-testo">
