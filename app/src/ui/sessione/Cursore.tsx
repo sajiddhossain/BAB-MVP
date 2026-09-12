@@ -1,11 +1,4 @@
 /**
- * Fin dove un'etichetta di estremo si lascia portare fuori dalla pista per
- * restare centrata sotto al suo numero. Oltre, si ferma qui. Il perche' sta
- * nel commento accanto alle due etichette, in fondo al file.
- */
-const RIENTRO = 12
-
-/**
  * Una scala da toccare: sonno, energia, umore, scuola, sforzo, intensita'.
  *
  * `verso` non e' un dettaglio grafico. Il colore della pista dice da che
@@ -43,6 +36,18 @@ export function Cursore({
   const posizione = (v: number) => (v - min) / (max - min)
   /** quanto spazio c'e' fra un numero e il suo vicino */
   const passo = `calc((100% - 24px) / ${max - min})`
+  /**
+   * Quanto puo' essere larga una delle due parole agli estremi.
+   *
+   * Di solito e' il passo: cosi' una parola non finisce sotto al numero del
+   * vicino. Ma sulle scale da zero a dieci il passo e' ventotto pixel, e
+   * ventotto sono pochi per qualunque parola: li' l'etichetta e' l'unica cosa
+   * sulla sua riga e non ha nessuno addosso, mentre stringerla a ventotto la
+   * farebbe a pezzi. Sotto ai quarantacinque non si scende — che sono quelli
+   * che stanno dentro alla scheda: meta' parola, ventidue, piu' i dodici che
+   * il numero ha dal fondo della pista, lasciano ancora nove pixel di bordo.
+   */
+  const larghezza = `max(${passo}, 45px)`
 
   return (
     <div>
@@ -92,38 +97,35 @@ export function Cursore({
         Appoggiate al bordo, "Ben riposata" finiva a meta' strada fra il 6 e
         il 7 e sembrava riferirsi al 6. Ognuna delle due sta centrata sotto al
         suo numero — il margine di 12px e' mezzo pallino, la stessa distanza
-        che tiene i numeri sotto al cursore — e piu' larga del passo fra due
-        numeri non puo' essere: cosi' va a capo prima di finire sotto al
-        numero del vicino, e "Ben riposata" diventa "Ben" e "riposata", una
-        sopra all'altra e tutt'e due centrate sul 7.
+        che tiene i numeri sotto al cursore — e non e' larga a piacere: oltre
+        una certa misura (vedi `larghezza`) va a capo, cosi' "Ben riposata"
+        diventa "Ben" e "riposata", una sopra all'altra e tutt'e due centrate
+        sul 7.
 
-        ── E PERCHE' A UN CERTO PUNTO SMETTONO DI CENTRARSI ────────────────
-        Perche' il numero agli estremi sta a dodici pixel dalla fine della
-        pista, e centrarci sopra una parola larga cinquantacinque ne manda
-        ventisette oltre — piu' dei diciannove che la scheda ha di margine.
-        Quasi tutte le etichette vanno a capo e restano strette, ma una parola
-        sola non si spezza: "Carichissima" finiva appoggiata al bordo della
-        scheda, zero pixel.
+        ── E PERCHE' VANNO A CAPO ANCHE DENTRO UNA PAROLA ──────────────────
+        Restare centrate ha un prezzo: una parola sporge di meta' della sua
+        larghezza oltre al numero, e oltre al numero c'e' poco. Chi ha uno
+        spazio dentro se la cava andando a capo li'. Ma "Carichissima" e' una
+        parola sola e larga cinquantacinque: sporgeva di ventisette e finiva
+        appoggiata al bordo della scheda, zero pixel.
 
-        Da qui l'etichetta si centra fin dove puo' e poi si ferma: al massimo
-        dodici pixel oltre la fine della pista, che sono esattamente quelli
-        che il numero ha di rincorsa. Chi e' piu' stretta di ventiquattro
-        pixel — "Relax" — non si sposta affatto; le altre rientrano di qualche
-        pixel e restano comunque sotto al loro numero. Misurato dopo:
-        "Carichissima" ha undici pixel d'aria dal bordo, e la piu' stretta di
-        tutta l'app — "Massimo", sulla scala da zero a dieci, dove i passi
-        sono la meta' — ne ha nove.
+        Allora si spezza anche lei. `hyphens` taglia dove si taglierebbe a
+        mano, col trattino — "Carichissi-ma" — perche' la lingua del documento
+        e' dichiarata: `lingua.tsx` scrive `lang` sull'html a ogni cambio.
+        `overflow-wrap` e' la rete sotto: se un giorno arriva una lingua di cui
+        il browser non ha le sillabe, la parola va a capo lo stesso invece di
+        uscire dalla scheda.
       */}
       <div className="mt-[6px] flex justify-between gap-2 text-[9px] font-bold leading-[1.15] text-ink-mute">
         <span
-          className="ml-3 text-center"
-          style={{ maxWidth: passo, translate: `max(-50%, -${RIENTRO}px)` }}
+          className="ml-3 -translate-x-1/2 text-center"
+          style={{ maxWidth: larghezza, hyphens: 'auto', overflowWrap: 'break-word' }}
         >
           {sinistra}
         </span>
         <span
-          className="mr-3 text-center"
-          style={{ maxWidth: passo, translate: `min(50%, ${RIENTRO}px)` }}
+          className="mr-3 translate-x-1/2 text-center"
+          style={{ maxWidth: larghezza, hyphens: 'auto', overflowWrap: 'break-word' }}
         >
           {destra}
         </span>
