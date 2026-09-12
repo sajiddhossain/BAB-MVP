@@ -3,8 +3,9 @@ import { BottoneTocco } from './tocco'
 import giu from '../assets/chevron-down.svg'
 
 /**
- * Una fila di pastiglie di cui se ne accende una: le fasce orarie, il si'/no.
- * Stessa forma dei giorni ma larghe quanto serve invece che quadrate.
+ * Una fila di pastiglie di cui se ne accende una: nell'onboarding e' rimasto
+ * il si'/no del contraccettivo. Stessa forma dei giorni ma larghe quanto
+ * serve invece che quadrate.
  */
 export function Pillole<T extends string | number>({
   voci,

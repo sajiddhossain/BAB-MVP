@@ -157,8 +157,12 @@ const it = {
     titolo: 'Quando ti alleni?',
     occhio: "Imposta i giorni e l'orario per ogni sport. Puoi sempre cambiarli dopo.",
     giorni: 'I TUOI GIORNI',
-    orario: 'A CHE ORA DI SOLITO?',
-    fasce: ['Mattina', 'Pomeriggio', 'Sera'],
+    orario: 'A CHE ORA',
+    dalle: 'Dalle',
+    alle: 'Alle',
+    diversi: 'I miei orari cambiano da un giorno all’altro',
+    uguali: 'Uso lo stesso orario tutti i giorni',
+    primaIGiorni: 'Scegli prima i giorni.',
   },
 
   edFisica: {
@@ -542,8 +546,12 @@ const en: typeof it = {
     titolo: 'When do you train?',
     occhio: 'Set the days and times for each sport. You can always change them later.',
     giorni: 'YOUR DAYS',
-    orario: 'AT WHAT TIME USUALLY?',
-    fasce: ['Morning', 'Afternoon', 'Evening'],
+    orario: 'AT WHAT TIME',
+    dalle: 'From',
+    alle: 'To',
+    diversi: 'My times change from day to day',
+    uguali: 'I use the same time every day',
+    primaIGiorni: 'Pick your days first.',
   },
 
   edFisica: {

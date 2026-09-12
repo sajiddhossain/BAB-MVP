@@ -1,5 +1,38 @@
 import { useCallback, useSyncExternalStore } from 'react'
 
+/**
+ * Quando ci si allena, per uno sport.
+ *
+ * `inizio` e `fine` sono `HH:MM` e valgono per tutti i giorni accesi. Quasi
+ * sempre e' cosi': si nuota il lunedi' e il mercoledi' e si comincia sempre
+ * alla stessa ora.
+ *
+ * `perGiorno` c'e' solo per chi ha detto che no, i suoi orari cambiano. Allora
+ * comanda lui, giorno per giorno, e `inizio`/`fine` restano come punto di
+ * partenza — sono gli orari con cui ogni riga nasce, prima che li corregga.
+ *
+ * Le due cose non convivono per scelta: o un orario per lo sport, o uno per
+ * ogni giorno. Un misto — un orario di base con qualche giorno diverso — e'
+ * piu' vero ma richiede di capire, guardando, quali giorni seguono la base e
+ * quali no. A dodici anni, nell'onboarding, non e' un buon affare.
+ */
+export type Allenamento = {
+  giorni: number[]
+  inizio: string
+  fine: string
+  perGiorno?: Record<number, { inizio: string; fine: string }>
+}
+
+/**
+ * Gli orari con cui nasce uno sport nuovo.
+ *
+ * Un default c'era anche prima — la fascia partiva su "Pomeriggio" — e serve:
+ * due campi ora vuoti su iOS si vedono come `--:--`, che sembra un campo
+ * rotto. Questo e' il pomeriggio dopo la scuola, che e' quando si allena la
+ * maggior parte di loro.
+ */
+export const ORARIO_PREDEFINITO = { inizio: '17:00', fine: '18:30' }
+
 /** Tutto quello che l'onboarding raccoglie. Una cosa sola, non uno stato per schermo. */
 export type Risposte = {
   email: string
@@ -7,8 +40,8 @@ export type Risposte = {
   nascita: string
   sport: string[]
   sportPrincipale: string
-  /** per ogni sport: i giorni (0 = lunedi') e la fascia oraria (indice di `fasce`) */
-  allenamenti: Record<string, { giorni: number[]; fascia: number }>
+  /** per ogni sport: i giorni (0 = lunedi') e gli orari. Vedi `Allenamento`. */
+  allenamenti: Record<string, Allenamento>
   edFisica: number[]
   prossimaGara: string
   ciclo: '' | 'si' | 'non-ancora' | 'preferisco-non-dirlo'

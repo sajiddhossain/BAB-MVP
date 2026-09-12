@@ -2,6 +2,7 @@ import { useCallback, useSyncExternalStore } from 'react'
 import { supabase } from './supabase'
 import { giornoAtleta } from './sessione'
 import { statoFinestra } from './finestre'
+import { minutiDaOra } from './ore'
 import { fattoInCoda } from './coda'
 import { riempi } from '../copy/riempi'
 import { tutte } from './risposte'
@@ -338,11 +339,24 @@ export function allenamentoDiOggi(quando = new Date()): { ce: boolean; ora: stri
   const sePalestra = r.edFisica.includes(giorno)
   if (!seAllena && !sePalestra) return { ce: false, ora: '' }
 
-  // la fascia scelta nell'onboarding non e' un orario: e' mattina, pomeriggio
-  // o sera. Finche' non chiediamo l'ora vera, questa e' l'ora al centro della
-  // fascia — si vede sull'etichetta, quindi va detto che e' una nostra scelta
-  const fascia = Object.values(r.allenamenti).find((a) => a.giorni.includes(giorno))?.fascia ?? 1
-  return { ce: true, ora: ['08:00', '17:30', '20:00'][fascia] ?? '17:30' }
+  /*
+   * L'ora e' quella vera, quella che ha scritto lei. Prima era l'ora al
+   * centro della fascia — le 17:30 per "Pomeriggio" — e finiva sull'etichetta
+   * della home come se gliel'avesse detta lei.
+   *
+   * Se oggi si allena per due sport si prende il primo che comincia: e'
+   * l'allenamento a cui il check-in del mattino serve.
+   *
+   * Nei giorni di sola educazione fisica l'ora non c'e', e torna vuota invece
+   * che inventata: l'etichetta della home sa gia' cavarsela senza — vedi il
+   * puntino che si toglie da solo, in `Casa.tsx`.
+   */
+  const orari = Object.values(r.allenamenti)
+    .filter((a) => a.giorni.includes(giorno))
+    .map((a) => (a.perGiorno?.[giorno] ?? a).inizio)
+    .filter((o) => minutiDaOra(o) !== null)
+    .sort((a, b) => (minutiDaOra(a) as number) - (minutiDaOra(b) as number))
+  return { ce: true, ora: orari[0] ?? '' }
 }
 
 /**

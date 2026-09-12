@@ -5,9 +5,10 @@ import { Campo, CampoData, dataValida } from '../../ui/Campo'
 import { Tendina } from '../../ui/Tendina'
 import { Bottone } from '../../ui/Bottone'
 import { Giorni } from '../../ui/Giorni'
-import { Pillole } from '../../ui/Scelte'
+import { BottoneTocco } from '../../ui/tocco'
 import { useLingua } from '../../lib/lingua'
-import { scrivi, useRisposte } from '../../lib/risposte'
+import { scrivi, useRisposte, ORARIO_PREDEFINITO } from '../../lib/risposte'
+import type { Allenamento } from '../../lib/risposte'
 import { SPORT, nomeSport, normalizza } from '../../data/sport'
 import { abbastanzaGrande } from '../../data/onboarding'
 import type { PropsSchermo } from '../tipi'
@@ -248,11 +249,27 @@ export function CorpoAllenamenti({ nodo, verso, avanzamento, avanti, indietro }:
   const { t } = useLingua()
   const { sport, allenamenti } = useRisposte()
 
-  function cambia(id: string, campi: Partial<{ giorni: number[]; fascia: number }>) {
+  function cambia(id: string, campi: Partial<Allenamento>) {
     scrivi((r) => {
-      const attuale = r.allenamenti[id] ?? { giorni: [], fascia: 1 }
+      const attuale = r.allenamenti[id] ?? { giorni: [], ...ORARIO_PREDEFINITO }
       return { allenamenti: { ...r.allenamenti, [id]: { ...attuale, ...campi } } }
     })
+  }
+
+  /*
+   * Cambiando i giorni, gli orari dei giorni spenti se ne vanno con loro: se
+   * no chi spegne il giovedi' e lo riaccende dopo si ritrova un orario che
+   * non ricorda di aver messo. E sotto ai due giorni il giorno per giorno non
+   * ha senso — un giorno solo ha gia' il suo orario — quindi si richiude.
+   */
+  function cambiaGiorni(id: string, val: Allenamento, giorni: number[]) {
+    if (!val.perGiorno || giorni.length < 2) {
+      cambia(id, { giorni, perGiorno: undefined })
+      return
+    }
+    const potato: Record<number, { inizio: string; fine: string }> = {}
+    for (const g of giorni) if (val.perGiorno[g]) potato[g] = val.perGiorno[g]
+    cambia(id, { giorni, perGiorno: potato })
   }
 
   return (
@@ -270,27 +287,143 @@ export function CorpoAllenamenti({ nodo, verso, avanzamento, avanti, indietro }:
       {/* un blocco per sport: nel disegno sono due, qui sono quanti ne ha scelti */}
       <div className="mt-9 flex flex-col gap-7">
         {sport.map((id) => {
-          const val = allenamenti[id] ?? { giorni: [], fascia: 1 }
+          const val: Allenamento = allenamenti[id] ?? { giorni: [], ...ORARIO_PREDEFINITO }
+          const perGiorno = val.perGiorno
           return (
             <div key={id}>
               <p className="m-0 mb-3 text-[17px] font-bold text-ink">{nomeSport(t.sport.nomi, id)}</p>
               <Gruppo etichetta={t.allenamenti.giorni}>
-                <Giorni scelti={val.giorni} onChange={(g) => cambia(id, { giorni: g })} />
+                <Giorni
+                  scelti={val.giorni}
+                  onChange={(g) => cambiaGiorni(id, val, g)}
+                />
               </Gruppo>
+
               <div className="mt-4">
                 <Gruppo etichetta={t.allenamenti.orario}>
-                  <Pillole
-                    voci={t.allenamenti.fasce.map((testo, i) => ({ id: i, testo }))}
-                    scelta={val.fascia}
-                    onChange={(f) => cambia(id, { fascia: f })}
-                  />
+                  {perGiorno ? (
+                    <div className="flex flex-col gap-2">
+                      {val.giorni.map((g) => (
+                        <div key={g} className="flex items-center gap-[10px]">
+                          {/* larghezza fissa: se no le tre lettere di "Mer" e
+                              le tre di "Gio" non mettono i campi in colonna */}
+                          <span className="w-[30px] shrink-0 text-[13px] font-bold text-ink">
+                            {t.giorni[g]}
+                          </span>
+                          <Orario
+                            inizio={perGiorno[g]?.inizio ?? val.inizio}
+                            fine={perGiorno[g]?.fine ?? val.fine}
+                            onChange={(o) =>
+                              cambia(id, {
+                                perGiorno: {
+                                  ...perGiorno,
+                                  [g]: {
+                                    inizio: perGiorno[g]?.inizio ?? val.inizio,
+                                    fine: perGiorno[g]?.fine ?? val.fine,
+                                    ...o,
+                                  },
+                                },
+                              })
+                            }
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <Orario
+                      inizio={val.inizio}
+                      fine={val.fine}
+                      onChange={(o) => cambia(id, o)}
+                    />
+                  )}
                 </Gruppo>
+
+                {/*
+                  La via d'uscita per chi ha orari diversi nei vari giorni, e
+                  che chi non ce li ha non vede mai aperta. Compare da due
+                  giorni in su: con uno solo non c'e' niente da distinguere.
+                */}
+                {val.giorni.length >= 2 && (
+                  <BottoneTocco
+                    onClick={() => cambia(id, { perGiorno: perGiorno ? undefined : {} })}
+                    className="mt-[10px] text-left text-[12px] font-bold text-lilla underline underline-offset-2"
+                  >
+                    {perGiorno ? t.allenamenti.uguali : t.allenamenti.diversi}
+                  </BottoneTocco>
+                )}
               </div>
             </div>
           )
         })}
       </div>
     </Schermo>
+  )
+}
+
+/**
+ * Dalle, alle.
+ *
+ * Due campi `time` veri e non una lista di pastiglie: sul telefono aprono la
+ * rotella dell'orologio, che e' un gesto che sa gia' fare, non si puo'
+ * scrivere un orario che non esiste, e la tastiera non compare mai.
+ */
+function Orario({
+  inizio,
+  fine,
+  onChange,
+}: {
+  inizio: string
+  fine: string
+  onChange: (o: Partial<{ inizio: string; fine: string }>) => void
+}) {
+  const { t } = useLingua()
+  return (
+    <div className="flex min-w-0 items-center gap-[10px]">
+      <CampoOra
+        etichetta={t.allenamenti.dalle}
+        valore={inizio}
+        onChange={(v) => onChange({ inizio: v })}
+      />
+      <CampoOra
+        etichetta={t.allenamenti.alle}
+        valore={fine}
+        onChange={(v) => onChange({ fine: v })}
+      />
+    </div>
+  )
+}
+
+function CampoOra({
+  etichetta,
+  valore,
+  onChange,
+}: {
+  etichetta: string
+  valore: string
+  onChange: (v: string) => void
+}) {
+  return (
+    /*
+      Tutta la casella e' l'etichetta del campo: cosi' il tocco apre la
+      rotella anche se cade sulla parola "Dalle", che e' meta' della casella.
+    */
+    <label className="flex h-11 min-w-0 flex-1 items-center gap-[6px] rounded-[12px] border-[1.5px] border-line bg-surface px-3">
+      <span className="shrink-0 text-[11px] font-bold tracking-[0.5px] text-ink-mute uppercase">
+        {etichetta}
+      </span>
+      <input
+        type="time"
+        value={valore}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label={etichetta}
+        /*
+          Via la lancetta che Chrome mette da solo in fondo al campo: mangia
+          lo spazio dell'ora e non somiglia a niente altro nell'app. Toccare
+          il campo apre la rotella lo stesso, sul telefono come sul computer.
+        */
+        className="min-w-0 flex-1 appearance-none bg-transparent text-[13px] font-bold text-ink outline-none [&::-webkit-calendar-picker-indicator]:hidden"
+      />
+    </label>
   )
 }
 

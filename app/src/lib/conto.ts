@@ -3,7 +3,8 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 import { dimenticaProfilo } from './profilo'
 import type { Risposte } from './risposte'
-import { azzera, scrivi, tutte } from './risposte'
+import { azzera, scrivi, tutte, ORARIO_PREDEFINITO } from './risposte'
+import { durataInMinuti, minutiDaOra, oraDaMinuti } from './ore'
 import { dimenticaSessione } from './sessione'
 import type { Lingua } from './lingua'
 
@@ -267,9 +268,26 @@ export async function salvaOnboarding(r: Risposte, lingua: Lingua): Promise<Esit
   const pulizia = await supabase.from('athlete_schedule').delete().eq('athlete_id', id)
   if (pulizia.error) return { ok: false, errore: `settimana: ${pulizia.error.message}` }
 
+  /*
+   * Gli orari vanno giu' riga per riga, perche' e' riga per riga che lo
+   * schema li tiene: `start_time` e `duration_min` stanno su ogni giorno, non
+   * sullo sport. Chi ha lo stesso orario tutti i giorni li scrive uguali su
+   * ogni riga, e va bene cosi' — e' il database a essere fatto per la verita'
+   * piu' fine, e l'onboarding a chiedere solo quello che serve chiedere.
+   */
   const settimana = [
     ...Object.entries(r.allenamenti).flatMap(([sport, a]) =>
-      a.giorni.map((g) => ({ athlete_id: id, weekday: g + 1, kind: 'training', sport })),
+      a.giorni.map((g) => {
+        const o = a.perGiorno?.[g] ?? a
+        return {
+          athlete_id: id,
+          weekday: g + 1,
+          kind: 'training',
+          sport,
+          start_time: o.inizio,
+          duration_min: durataInMinuti(o.inizio, o.fine),
+        }
+      }),
     ),
     ...r.edFisica.map((g) => ({ athlete_id: id, weekday: g + 1, kind: 'pe', sport: null })),
   ]
@@ -361,7 +379,7 @@ export async function caricaProfilo(): Promise<boolean> {
   const [atleta, sport, settimana, cicli] = await Promise.all([
     supabase.from('athletes').select('*').eq('id', id).maybeSingle(),
     supabase.from('athlete_sports').select('sport'),
-    supabase.from('athlete_schedule').select('weekday,kind,sport'),
+    supabase.from('athlete_schedule').select('weekday,kind,sport,start_time,duration_min'),
     supabase.from('cycle_events').select('event_date').eq('kind', 'period_start'),
   ])
   if (atleta.error || !atleta.data) return false
@@ -377,8 +395,24 @@ export async function caricaProfilo(): Promise<boolean> {
       continue
     }
     const nome = riga.sport ?? ''
-    allenamenti[nome] ??= { giorni: [], fascia: 1 }
-    allenamenti[nome].giorni.push(giorno)
+    /*
+       Gli orari tornano su per riga, e uno sport puo' averne di diversi. Il
+       primo giorno detta l'orario dello sport; i giorni che non gli
+       assomigliano finiscono in `perGiorno`, e se ce n'e' almeno uno lo
+       schermo si apre gia' aperto sul giorno per giorno — che e' come l'aveva
+       lasciato.
+    */
+    const inizio = String(riga.start_time ?? '').slice(0, 5) || ORARIO_PREDEFINITO.inizio
+    const durata = riga.duration_min == null ? null : Number(riga.duration_min)
+    const min = minutiDaOra(inizio)
+    const fine = min === null || durata === null ? ORARIO_PREDEFINITO.fine : oraDaMinuti(min + durata)
+
+    allenamenti[nome] ??= { giorni: [], inizio, fine }
+    const a = allenamenti[nome]
+    a.giorni.push(giorno)
+    if (inizio !== a.inizio || fine !== a.fine) {
+      a.perGiorno = { ...(a.perGiorno ?? {}), [giorno]: { inizio, fine } }
+    }
   }
   for (const v of Object.values(allenamenti)) v.giorni.sort((x, y) => x - y)
   edFisica.sort((x, y) => x - y)
