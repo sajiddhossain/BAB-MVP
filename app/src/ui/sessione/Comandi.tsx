@@ -1,40 +1,39 @@
 import type { ReactNode } from 'react'
 import { useLingua } from '../../lib/lingua'
 
-/** Lo spazio fra le due meta'. Vedi `attesa`, qui sotto. */
+/** Lo spazio fra i due bottoni, nella forma `bottoni`. */
 const ARIA = 10
 
 /**
  * L'interruttore a due posizioni: Davanti/Dietro, Sì/No.
  *
- * Nel disegno la parte accesa e' una pastiglia bianca che sta dentro a una
- * scanalatura color carta, con un'ombra morbida sotto. Non e' un bottone
- * premuto: e' una cosa che scorre, e infatti scorre — la pastiglia si sposta
- * invece di accendersi e spegnersi, che e' quello che fa capire che le due
- * scelte sono due posizioni della stessa cosa.
+ * Ha due forme, e non e' un gusto: e' se una risposta c'e' gia' oppure no.
  *
- * ── E PRIMA DI RISPONDERE NON E' UN INTERRUTTORE ───────────────────────────
- * La pastiglia nasce con la risposta, quindi finche' non si rispondeva
- * restava una barra piatta color carta con due parole sopra: non si capiva
- * che ci fosse qualcosa da toccare, ne' quale meta' fosse quale. Sembrava una
- * riga scritta, non una domanda.
+ * ── `barra` ────────────────────────────────────────────────────────────────
+ * L'interruttore del disegno: una scanalatura color carta con dentro una
+ * pastiglia bianca e un'ombra morbida. Non e' un bottone premuto, e' una cosa
+ * che scorre — e infatti scorre, invece di accendersi e spegnersi, ed e'
+ * quello che fa capire che le due scelte sono due posizioni della stessa
+ * cosa. Va bene dove una risposta c'e' sempre: Davanti/Dietro sono le due
+ * facce della stessa figura, e la pastiglia c'e' dal primo istante.
  *
- * Il primo tentativo — le due meta' appena piu' chiare della scanalatura — non
- * bastava: bianco al sessanta per cento sopra alla carta fa tre toni quasi
- * uguali, e restava una macchia pallida.
+ * ── `bottoni` ──────────────────────────────────────────────────────────────
+ * Dove invece si parte senza risposta, la barra non funziona. La pastiglia
+ * nasce con la risposta, quindi prima restava una barra piatta color carta
+ * con due parole sopra: non si capiva che ci fosse qualcosa da toccare, ne'
+ * quale meta' fosse quale. Sembrava una riga scritta, non una domanda.
  *
- * Cosi' in attesa l'interruttore non si finge un interruttore: la scanalatura
- * sparisce e restano due pastiglie bianche col bordo, staccate. Sono due
- * bottoni e si vede. Ed e' la stessa forma di tutto il resto che si tocca in
- * quel foglio — le parole, le risposte di "Quando la senti?" — quindi non c'e'
- * niente da imparare. Alla risposta la scanalatura torna e la pastiglia
- * scorre: il comando si compone, e il gesto ha un prima e un dopo.
+ * Schiarire appena le due meta' non bastava — bianco sopra carta fa tre toni
+ * quasi uguali. E farle diventare barra al momento della risposta era peggio:
+ * due bottoni che si fondono in un oggetto diverso e' un movimento che nessuno
+ * si aspetta, e per capire cos'e' successo bisogna rileggere il comando.
  *
- * Due misure servono a non far saltare niente in quel momento. Lo spazio fra
- * le meta' e' lo stesso nei due stati (dopo non si vede, perche' la meta'
- * spenta non ha piu' fondo), se no le due meta' cambierebbero larghezza. E in
- * attesa il padding verticale cala di quanto cresce il bordo — 7.5 piu' 1.5
- * fanno i 9 di sempre — se no il comando si alzerebbe di tre pixel.
+ * Quindi qui non c'e' nessun interruttore: sono due pastiglie staccate, prima
+ * e dopo. Si toccano come tutto il resto del foglio — le parole, le risposte
+ * di "Quando la senti?" — e rispondere accende quella scelta senza spostare
+ * niente. Il lilla e non il verde perche' il verde delle parole vuol dire
+ * "questa l'hai scelta ed e' una cosa tua", mentre qui "Hai il ciclo? Si" non
+ * deve leggersi ne' bene ne' male: e' un fatto.
  */
 export function Interruttore<T extends string | boolean>({
   voci,
@@ -42,38 +41,71 @@ export function Interruttore<T extends string | boolean>({
   onChange,
   etichetta,
   className = '',
+  forma = 'barra',
 }: {
   voci: [{ id: T; testo: string }, { id: T; testo: string }]
   scelta: T | null
   onChange: (id: T) => void
   etichetta: string
   className?: string
+  /** vedi sopra: `barra` dove la risposta c'e' sempre, `bottoni` dove manca */
+  forma?: 'barra' | 'bottoni'
 }) {
   const indice = voci.findIndex((v) => v.id === scelta)
   const attesa = scelta === null
+
+  if (forma === 'bottoni') {
+    return (
+      <div
+        role="radiogroup"
+        aria-label={etichetta}
+        className={`flex ${className}`}
+        style={{ gap: ARIA }}
+      >
+        {voci.map((v) => {
+          const acceso = v.id === scelta
+          return (
+            <button
+              key={String(v.id)}
+              type="button"
+              role="radio"
+              aria-checked={acceso}
+              onClick={() => onChange(v.id)}
+              /*
+                Alti quanto era alta la barra, ombra compresa: cosi' cambiando
+                forma non si e' mosso niente di quello che ci sta intorno.
+              */
+              className={`min-w-0 flex-1 rounded-pill border-[1.5px] px-4 py-[10.5px] text-[13px] font-bold transition-colors duration-150 ${
+                acceso
+                  ? 'border-lilla bg-lilla-fondo text-lilla-testo'
+                  : `border-line bg-surface ${attesa ? 'text-ink' : 'text-spento'}`
+              }`}
+            >
+              {v.testo}
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div
       role="radiogroup"
       aria-label={etichetta}
-      className={`relative flex rounded-pill p-[3px] ${attesa ? '' : 'bg-paper'} ${className}`}
-      style={{ gap: ARIA }}
+      className={`relative flex rounded-pill bg-paper p-[3px] ${className}`}
     >
       {/*
         La pastiglia bianca sta sotto ai due bottoni ed e' una sola: cosi'
-        scorre da una parte all'altra. Quando non ha ancora scelto non c'e',
-        e al suo posto ci sono i due bottoni col bordo — vedi sopra.
-
-        Le misure tengono conto dello spazio in mezzo: larga quanto una meta',
-        e il salto e' una meta' piu' lo spazio. Il `100%` del `translateX` e'
-        la larghezza della pastiglia stessa, non della scanalatura.
+        scorre da una parte all'altra.
       */}
       {indice >= 0 && (
         <span
           aria-hidden
           className="absolute inset-y-[3px] left-[3px] rounded-pill bg-surface transition-transform duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
           style={{
-            width: `calc((100% - ${6 + ARIA}px) / 2)`,
-            transform: `translateX(calc(${indice} * (100% + ${ARIA}px)))`,
+            width: 'calc(50% - 3px)',
+            transform: `translateX(${indice * 100}%)`,
             filter: 'drop-shadow(0px 2px 3px rgba(0,0,0,0.08))',
           }}
         />
@@ -87,14 +119,9 @@ export function Interruttore<T extends string | boolean>({
             role="radio"
             aria-checked={acceso}
             onClick={() => onChange(v.id)}
-            /*
-              Finche' non ha scelto, tutte e due le scritte restano in
-              inchiostro pieno: con quella spenta di default l'interruttore
-              sembrava disattivato invece che in attesa di una risposta.
-            */
-            className={`relative z-1 min-w-0 flex-1 rounded-pill px-4 text-[13px] font-bold transition-colors duration-150 ${
+            className={`relative z-1 min-w-0 flex-1 rounded-pill px-4 py-[9px] text-[13px] font-bold transition-colors duration-150 ${
               acceso ? 'text-lilla' : attesa ? 'text-ink' : 'text-spento'
-            } ${attesa ? 'border-[1.5px] border-line bg-surface py-[7.5px]' : 'py-[9px]'}`}
+            }`}
           >
             {v.testo}
           </button>
@@ -104,7 +131,12 @@ export function Interruttore<T extends string | boolean>({
   )
 }
 
-/** L'interruttore già fatto per le domande da sì o no. */
+/**
+ * L'interruttore già fatto per le domande da sì o no.
+ *
+ * Sempre a bottoni: una domanda da sì o no parte senza risposta — e' questo
+ * che la rende una domanda — quindi la barra qui non ci va mai.
+ */
 export function SiNo({
   scelta,
   onChange,
@@ -128,6 +160,7 @@ export function SiNo({
       onChange={onChange}
       etichetta={etichetta}
       className={className}
+      forma="bottoni"
     />
   )
 }
