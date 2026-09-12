@@ -1,9 +1,5 @@
-<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Frame">
-<path id="Vector" d="M8 5.33333C9.10457 5.33333 10 4.4379 10 3.33333C10 2.22876 9.10457 1.33333 8 1.33333C6.89543 1.33333 6 2.22876 6 3.33333C6 4.4379 6.89543 5.33333 8 5.33333Z" stroke="#5B564C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Vector_2" d="M8 5.33333V10.6667" stroke="#5B564C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Vector_3" d="M5.33333 8H10.6667" stroke="#5B564C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Vector_4" d="M8 10.6667L5.33333 14.6667" stroke="#5B564C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
-<path id="Vector_5" d="M8 10.6667L10.6667 14.6667" stroke="#5B564C" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="gps-svgrepo-com 1">
+<path id="Vector" d="M8.71947 1.36285C7.10013 1.36447 5.54767 2.00889 4.40319 3.1545C3.25872 4.30012 2.61586 5.85323 2.61586 7.47257C2.59651 9.43615 3.16823 11.3602 4.25673 12.9945C5.34523 14.6289 6.90017 15.8981 8.71947 16.6371C10.5382 15.8976 12.0925 14.6282 13.1804 12.9939C14.2683 11.3596 14.8396 9.4358 14.82 7.47257C14.82 5.85376 14.1776 4.30111 13.0338 3.15558C11.89 2.01005 10.3383 1.36528 8.71947 1.36285ZM8.71947 9.76371C8.26632 9.76371 7.82335 9.62934 7.44658 9.37759C7.0698 9.12583 6.77614 8.76801 6.60273 8.34935C6.42932 7.9307 6.38394 7.47003 6.47235 7.02559C6.56075 6.58115 6.77896 6.17291 7.09939 5.85249C7.41981 5.53206 7.82805 5.31385 8.27249 5.22545C8.71693 5.13704 9.1776 5.18242 9.59625 5.35583C10.0149 5.52924 10.3727 5.8229 10.6245 6.19968C10.8762 6.57645 11.0106 7.01942 11.0106 7.47257C11.0106 8.08022 10.7692 8.66298 10.3396 9.09265C9.90988 9.52233 9.32712 9.76371 8.71947 9.76371Z" fill="#5B564C"/>
 </g>
 </svg>

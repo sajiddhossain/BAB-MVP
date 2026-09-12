@@ -68,7 +68,14 @@ function oraFinta(testo: string | null): Date | null {
 /** L'etichetta della sezione fra la scheda grande e quella sotto. */
 function Sezione({ children }: { children: string }) {
   return (
-    <p className="m-0 mt-2 text-[11px] font-bold leading-[14px] tracking-[1.2px] text-ink-mute">
+    /*
+     * L'aria non e' uguale sopra e sotto, e non e' una svista: l'etichetta
+     * appartiene alla scheda che introduce, non a quella che la precede. Nel
+     * disegno sono 19 sopra e 8 sotto, e sono proprio quegli 11 pixel di
+     * differenza a farla leggere come un titoletto invece che come una riga
+     * caduta fuori dalla scheda grande.
+     */
+    <p className="m-0 mt-[19px] text-[11px] font-bold leading-[14px] tracking-[1.2px] text-ink-mute">
       {children}
     </p>
   )
@@ -167,7 +174,7 @@ export function Casa() {
             e due schede una sopra l'altra in un giorno che dovrebbe essere
             leggero sono una di troppo.
           */}
-          <div className="mt-[10px]">
+          <div className="mt-2">
             {stato === 'riposo' ? (
               <Settimana />
             ) : stato === 'fatto' ? (
@@ -365,7 +372,7 @@ function Riposo({ adesso }: { adesso: Date }) {
         {CAMPI_RIPOSO.map((campo) => (
           <div
             key={campo}
-            className={`flex h-[38px] items-center gap-2 rounded-[13px] bg-white/70 px-[7px] ${
+            className={`flex h-[38px] items-center gap-[9px] rounded-[13px] bg-white/70 px-[7px] ${
               campo === 'antidolorifici' ? 'col-span-2' : ''
             }`}
           >
@@ -377,7 +384,7 @@ function Riposo({ adesso }: { adesso: Date }) {
         ))}
       </div>
 
-      <div className="mt-[14px]">
+      <div className="mt-4">
         {/*
           Nei giorni di riposo il giro e' uno solo, quello del mattino, con le
           stesse ore degli altri giorni: una regola sola da imparare, e i dati

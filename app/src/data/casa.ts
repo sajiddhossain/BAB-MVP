@@ -49,7 +49,7 @@ export const TINTE: Record<StatoGiornata, Tinta> = {
     fondo: 'linear-gradient(33.35deg, #efedfd 12.41%, #e4e1fb 85.4%)',
     etichetta: 'var(--color-viola-scuro)',
     testo: '#524e66',
-    icona: 'viola',
+    icona: 'luna',
   },
 }
 

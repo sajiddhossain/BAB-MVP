@@ -4,8 +4,14 @@ import { TINTE } from '../../data/casa'
 import ambra from '../../assets/casa/tag-ambra.svg'
 import verde from '../../assets/casa/tag-verde.svg'
 import viola from '../../assets/casa/tag-viola.svg'
+import luna from '../../assets/casa/tag-luna.svg'
 
-const ICONE: Record<string, string> = { ambra, verde, viola }
+/*
+ * Due stati hanno la stessa tinta viola ma non la stessa icona: a giornata
+ * finita c'e' la stella, nel giorno di riposo la luna. Per questo l'icona sta
+ * nella tinta di ogni stato e non nel nome del colore.
+ */
+const ICONE: Record<string, string> = { ambra, verde, viola, luna }
 
 /**
  * La scheda grande in cima alla home.
