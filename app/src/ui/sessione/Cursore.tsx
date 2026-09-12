@@ -1,4 +1,11 @@
 /**
+ * Fin dove un'etichetta di estremo si lascia portare fuori dalla pista per
+ * restare centrata sotto al suo numero. Oltre, si ferma qui. Il perche' sta
+ * nel commento accanto alle due etichette, in fondo al file.
+ */
+const RIENTRO = 12
+
+/**
  * Una scala da toccare: sonno, energia, umore, scuola, sforzo, intensita'.
  *
  * `verso` non e' un dettaglio grafico. Il colore della pista dice da che
@@ -90,14 +97,34 @@ export function Cursore({
         numero del vicino, e "Ben riposata" diventa "Ben" e "riposata", una
         sopra all'altra e tutt'e due centrate sul 7.
 
-        Che una parola lunghissima sbordi di qualche pixel oltre alla pista va
-        bene: la scheda intorno ha diciotto pixel di margine e non taglia.
+        ── E PERCHE' A UN CERTO PUNTO SMETTONO DI CENTRARSI ────────────────
+        Perche' il numero agli estremi sta a dodici pixel dalla fine della
+        pista, e centrarci sopra una parola larga cinquantacinque ne manda
+        ventisette oltre — piu' dei diciannove che la scheda ha di margine.
+        Quasi tutte le etichette vanno a capo e restano strette, ma una parola
+        sola non si spezza: "Carichissima" finiva appoggiata al bordo della
+        scheda, zero pixel.
+
+        Da qui l'etichetta si centra fin dove puo' e poi si ferma: al massimo
+        dodici pixel oltre la fine della pista, che sono esattamente quelli
+        che il numero ha di rincorsa. Chi e' piu' stretta di ventiquattro
+        pixel — "Relax" — non si sposta affatto; le altre rientrano di qualche
+        pixel e restano comunque sotto al loro numero. Misurato dopo:
+        "Carichissima" ha undici pixel d'aria dal bordo, e la piu' stretta di
+        tutta l'app — "Massimo", sulla scala da zero a dieci, dove i passi
+        sono la meta' — ne ha nove.
       */}
       <div className="mt-[6px] flex justify-between gap-2 text-[9px] font-bold leading-[1.15] text-ink-mute">
-        <span className="ml-3 -translate-x-1/2 text-center" style={{ maxWidth: passo }}>
+        <span
+          className="ml-3 text-center"
+          style={{ maxWidth: passo, translate: `max(-50%, -${RIENTRO}px)` }}
+        >
           {sinistra}
         </span>
-        <span className="mr-3 translate-x-1/2 text-center" style={{ maxWidth: passo }}>
+        <span
+          className="mr-3 text-center"
+          style={{ maxWidth: passo, translate: `min(50%, ${RIENTRO}px)` }}
+        >
           {destra}
         </span>
       </div>
