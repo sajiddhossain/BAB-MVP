@@ -22,12 +22,9 @@ import {
 } from '../lib/giornata'
 import { oraApertura, statoFinestra } from '../lib/finestre'
 import type { TipoSessione } from '../lib/finestre'
-import { TEMPI, CAMPI_RIPOSO } from '../data/casa'
+import { CAMPI_RIPOSO } from '../data/casa'
 import type { StatoGiornata, Tempo } from '../data/casa'
 
-import carica from '../assets/casa/tempo-carica.svg'
-import costante from '../assets/casa/tempo-costante.svg'
-import leggero from '../assets/casa/tempo-leggero.svg'
 import pallino from '../assets/casa/pallino-tempo.svg'
 import lampadina from '../assets/casa/lampadina.svg'
 import calendario from '../assets/casa/calendario.svg'
@@ -41,7 +38,6 @@ import campoBodymap from '../assets/casa/campo-bodymap.svg'
 import campoCiclo from '../assets/casa/campo-ciclo.svg'
 import campoAntidolorifici from '../assets/casa/campo-antidolorifici.svg'
 
-const ICONA_TEMPO: Record<Tempo, string> = { carica, costante, leggero }
 const ICONA_CAMPO: Record<string, string> = {
   sonno: campoSonno,
   energia: campoEnergia,
@@ -275,20 +271,6 @@ function Checkin({ ora, adesso }: { ora: string; adesso: Date }) {
       titolo={t.casa.checkin.titolo}
       corpo={t.casa.checkin.corpo}
     >
-      {/* le tre anteprime del tempo: si vedono, non si toccano — il tempo si
-          sceglie dentro al check-in, qui sono un assaggio di cosa chiedera' */}
-      <div className="mt-3 flex gap-2">
-        {TEMPI.map((tempo) => (
-          <div
-            key={tempo}
-            className="flex h-[52px] flex-1 flex-col items-center justify-center gap-[2px] rounded-[14px] bg-white/65"
-          >
-            <img src={ICONA_TEMPO[tempo]} alt="" className="size-4" aria-hidden />
-            <span className="text-[11px] font-bold text-ink">{t.casa.tempi[tempo]}</span>
-          </div>
-        ))}
-      </div>
-
       <div className="mt-[14px]">
         <Azione tipo="checkin" adesso={adesso}>
           <Bottone onClick={() => vai('/sessione/checkin')}>{t.casa.checkin.azione}</Bottone>
