@@ -1,12 +1,14 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Sfondo } from '../ui/Sfondo'
 import { Bottone } from '../ui/Bottone'
+import { Errore } from '../ui/Testo'
+import { useModale } from '../ui/modale'
 import { BottoneTocco } from '../ui/tocco'
 import { BarraSotto } from '../ui/casa/BarraSotto'
 import { Riga, Scheda } from '../ui/percorso/pezzi'
 import { useLingua } from '../lib/lingua'
-import { azzera } from '../lib/risposte'
-import { esci } from '../lib/conto'
+import { cancellaAccount } from '../lib/conto'
 import { SEZIONI } from '../data/sezioni'
 import scintille from '../assets/icon-sparkles.svg'
 
@@ -29,6 +31,7 @@ import scintille from '../assets/icon-sparkles.svg'
 export function Prossimamente({ id, profilo = false }: { id: string; profilo?: boolean }) {
   const { t, lingua, cambia } = useLingua()
   const vai = useNavigate()
+  const [conferma, setConferma] = useState(false)
 
   const tp = t.prossimamente
   const detto = (tp.sezioni as Record<string, { cosa: string; quando: string }>)[id]
@@ -117,11 +120,9 @@ export function Prossimamente({ id, profilo = false }: { id: string; profilo?: b
                 ))}
               </div>
 
+              {/* cancella davvero, quindi prima chiede: vedi `ConfermaRicomincia` */}
               <BottoneTocco
-                onClick={() => {
-                  azzera()
-                  void esci().then(() => vai('/onboarding/accesso'))
-                }}
+                onClick={() => setConferma(true)}
                 className="mt-4 h-11 w-full rounded-[12px] border-[1.5px] border-line bg-surface text-[13px] font-bold text-ink"
               >
                 {lingua === 'it' ? 'Ricomincia da capo' : 'Start over'}
@@ -131,6 +132,104 @@ export function Prossimamente({ id, profilo = false }: { id: string; profilo?: b
         </div>
 
         <BarraSotto />
+      </div>
+
+      {conferma && <ConfermaRicomincia onChiudi={() => setConferma(false)} />}
+    </div>
+  )
+}
+
+/**
+ * «Ricominciare da capo?» — il foglio che chiede prima di cancellare.
+ *
+ * E' fatto come il foglio delle sensazioni: sale dal basso, dietro lo schermo
+ * si scurisce, e il resto non si tocca finche' e' aperto. Cancellare non si
+ * annulla, e un tocco per sbaglio sul bottone del profilo non deve bastare.
+ *
+ * Mentre cancella non si chiude: ne' col fondo, ne' con Annulla, ne' con Esc.
+ * Chiuderlo a meta' non fermerebbe il database, e lascerebbe credere che non
+ * sia successo niente.
+ *
+ * Finito, la pagina si ricarica da capo invece di cambiare indirizzo: le copie
+ * in memoria — risposte, tutorial, percorso — ripartono vuote tutte insieme,
+ * senza doverle dimenticare una per una.
+ */
+function ConfermaRicomincia({ onChiudi }: { onChiudi: () => void }) {
+  const { t } = useLingua()
+  const c = t.prossimamente.ricomincia
+  const modale = useModale<HTMLDivElement>()
+  const [inCorso, setInCorso] = useState(false)
+  const [errore, setErrore] = useState(false)
+
+  useEffect(() => {
+    const f = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !inCorso) onChiudi()
+    }
+    window.addEventListener('keydown', f)
+    return () => window.removeEventListener('keydown', f)
+  }, [onChiudi, inCorso])
+
+  async function cancella() {
+    if (inCorso) return
+    setInCorso(true)
+    setErrore(false)
+    const esito = await cancellaAccount()
+    if (!esito.ok) {
+      console.error('[ricomincia]', esito.errore)
+      setInCorso(false)
+      setErrore(true)
+      return
+    }
+    window.location.replace('/onboarding/accesso')
+  }
+
+  return (
+    <div ref={modale} className="fixed inset-0 z-50 flex justify-center">
+      <div className="relative flex w-full max-w-[402px] flex-col justify-end">
+        <button
+          type="button"
+          aria-label={c.annulla}
+          onClick={() => {
+            if (!inCorso) onChiudi()
+          }}
+          className="bab-affiora absolute inset-0 bg-black/40"
+        />
+
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ricomincia-titolo"
+          tabIndex={-1}
+          className="bab-sale relative rounded-t-[20px] bg-surface px-6 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] outline-none"
+          style={{ boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)' }}
+        >
+          <div className="mx-auto h-1 w-9 rounded-sm bg-line/60" aria-hidden />
+
+          <h2
+            id="ricomincia-titolo"
+            className="bab-display m-0 mt-[18px] text-[26px] leading-[1.12] font-bold text-ink"
+          >
+            {c.titolo}
+          </h2>
+          <p className="m-0 mt-3 text-[14px] leading-[1.5] text-ink-soft">{c.testo}</p>
+
+          <div className="mt-6">
+            <Bottone attivo={!inCorso} onClick={() => void cancella()}>
+              {inCorso ? c.inCorso : c.conferma}
+            </Bottone>
+            {errore && <Errore>{c.errore}</Errore>}
+          </div>
+
+          {/* secondario come il "togli" del foglio: la cosa da fare di solito e' tornare indietro */}
+          <button
+            type="button"
+            disabled={inCorso}
+            onClick={onChiudi}
+            className="mt-3 h-12 w-full rounded-pill border-[1.5px] border-line bg-surface text-[15px] font-bold text-ink disabled:opacity-45"
+          >
+            {c.annulla}
+          </button>
+        </div>
       </div>
     </div>
   )

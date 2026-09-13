@@ -439,6 +439,16 @@ const it = {
         quando: 'Arriva insieme allo storico.',
       },
     },
+    /* il foglio che chiede prima di "Ricomincia da capo": cancella davvero */
+    ricomincia: {
+      titolo: 'Ricominciare da capo?',
+      testo:
+        "Cancelliamo il tuo account e tutto quello che hai salvato: check-in, sensazioni, percorso. Non si può annullare. Poi rientri con la tua email e rifai l'inizio.",
+      conferma: 'Sì, cancella tutto',
+      annulla: 'Annulla',
+      inCorso: 'Cancello…',
+      errore: 'Non siamo riusciti a cancellare. Riprova.',
+    },
   },
 }
 
@@ -811,6 +821,15 @@ const en: typeof it = {
         cosa: 'Your sports, your training, your language — and what BAB knows about you, with the way to change it or to take it with you.',
         quando: 'It arrives together with your history.',
       },
+    },
+    ricomincia: {
+      titolo: 'Start over?',
+      testo:
+        "We'll delete your account and everything you've saved — check-ins, sensations, journey. This can't be undone. Then you sign back in with your email and start fresh.",
+      conferma: 'Yes, delete everything',
+      annulla: 'Cancel',
+      inCorso: 'Deleting…',
+      errore: "We couldn't delete it. Try again.",
     },
   },
 }

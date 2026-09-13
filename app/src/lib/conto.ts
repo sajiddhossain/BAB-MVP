@@ -128,6 +128,58 @@ export async function esci() {
   await supabase?.auth.signOut()
 }
 
+/**
+ * Ricominciare da capo: l'account e tutto quello che c'e' dentro se ne vanno.
+ *
+ * Cancella davvero, nel database e su questo telefono. Nel database lo fa
+ * `delete_my_account`, che toglie l'utente e con lui, a cascata, profilo e
+ * dati. Prima "Ricomincia da capo" svuotava solo il telefono: rientrando con
+ * la stessa email il profilo era ancora li', e la guardia rimandava a casa
+ * invece che all'onboarding. Adesso chi rientra e' un'atleta nuova.
+ *
+ * Un account admin non si cancella: senza, nessuno entra piu' nel pannello.
+ * Li' se ne va solo il profilo da atleta, con tutti i suoi dati, e l'account
+ * resta.
+ *
+ * Se il database dice di no non si tocca niente, nemmeno il telefono: una
+ * cancellazione a meta' lascerebbe dati sul telefono di un account sparito, o
+ * un account vivo convinto di essere vuoto.
+ */
+export async function cancellaAccount(): Promise<Esito> {
+  if (supabase) {
+    const { data: sessione } = await supabase.auth.getSession()
+    const id = sessione.session?.user.id
+    if (id) {
+      // la lista degli admin la legge solo un admin: una riga vuol dire "sono io"
+      const { data: admin } = await supabase
+        .from('platform_admins')
+        .select('user_id')
+        .eq('user_id', id)
+        .limit(1)
+      const { error } =
+        admin && admin.length > 0
+          ? await supabase.from('athletes').delete().eq('id', id)
+          : await supabase.rpc('delete_my_account')
+      if (error) return { ok: false, errore: error.message }
+    }
+    // l'utente nel database non c'e' piu': si chiude solo la sessione di questo telefono
+    await supabase.auth.signOut({ scope: 'local' })
+  }
+
+  dimenticaProfilo()
+  try {
+    // come l'azzeramento: via tutte le copie di BAB e l'accesso, resta la lingua
+    for (const chiave of Object.keys(localStorage)) {
+      const nostra =
+        chiave.startsWith('bab.') && chiave !== 'bab.lingua' && chiave !== 'bab.azzeramento'
+      if (nostra || /^sb-.+-auth-token/.test(chiave)) localStorage.removeItem(chiave)
+    }
+  } catch {
+    // navigazione privata: il database e' gia' vuoto, e al ricarico non resta niente
+  }
+  return { ok: true }
+}
+
 /** La sessione di adesso, e null finche' non si sa. */
 export function useSessione(): { sessione: Session | null; caricata: boolean } {
   const [sessione, setSessione] = useState<Session | null>(null)
