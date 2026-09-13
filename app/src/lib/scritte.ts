@@ -2,7 +2,8 @@ import { useSyncExternalStore } from 'react'
 import { supabase } from './supabase'
 import { TESTI } from '../copy/testi'
 import { TESTI_SESSIONE } from '../copy/sessione'
-import { TESTI_PAROLE } from '../copy/parole'
+import { TESTI_PAROLE, TONI_NASCOSTI } from '../copy/parole'
+import type { Tono } from '../copy/parole'
 import { TESTI_PERCORSO } from '../copy/percorso'
 import { TESTI_TUTORIAL } from '../copy/tutorial'
 import type { Lingua } from './lingua'
@@ -87,6 +88,8 @@ export function foglie(nodo: unknown, prefisso: string, dentro: Mappa = {}): Map
     return dentro
   }
   if (nodo && typeof nodo === 'object') {
+    // un riquadro di scheda-parola che non si mostra: niente caselle per lui
+    if (TONI_NASCOSTI.has((nodo as { tono?: Tono }).tono as Tono)) return dentro
     for (const [k, v] of Object.entries(nodo)) {
       if (NON_SCRITTE.has(k)) continue
       foglie(v, prefisso ? `${prefisso}.${k}` : k, dentro)

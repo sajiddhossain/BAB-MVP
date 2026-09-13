@@ -5,7 +5,8 @@ import type { Livello, Parola } from '../data/sessione'
  *
  * Sono il cuore editoriale del check-in: ogni parola ha una metafora, una
  * descrizione, e da uno a tre riquadri — la prova che puoi fare adesso, quando
- * la cosa diventa rossa, e con cosa e' facile confonderla.
+ * la cosa diventa rossa, e con cosa e' facile confonderla. Oggi se ne vede
+ * solo il terzo: vedi `TONI_NASCOSTI`.
  *
  * ── DUE COSE DA SAPERE ──────────────────────────────────────────────────────
  *
@@ -27,6 +28,21 @@ import type { Livello, Parola } from '../data/sessione'
 
 /** Il tono di un riquadro: la prova da fare, la bandiera rossa, il confronto. */
 export type Tono = 'prova' | 'rosso' | 'viola'
+
+/**
+ * I riquadri che non si mostrano piu': "La prova" e "Diventa rosso quando".
+ *
+ * Sulla scheda resta solo quello viola — com'e' fatta, cosa si sente. Gli
+ * altri due restano scritti qui sotto, ma nessuno li disegna e il pannello
+ * dei testi non li elenca.
+ *
+ * Perche' non sono stati cancellati: le modifiche salvate dal pannello si
+ * ritrovano per posizione (`riquadri.2.testo`). Togliere i primi due di
+ * "rigido" avrebbe fatto scivolare il viola da 2 a 0, e al suo posto sarebbe
+ * comparso il testo salvato mesi fa per la prova — mentre quello scritto per
+ * il viola sarebbe sparito.
+ */
+export const TONI_NASCOSTI: ReadonlySet<Tono> = new Set<Tono>(['prova', 'rosso'])
 
 export type Riquadro = { etichetta: string; testo: string; tono: Tono }
 

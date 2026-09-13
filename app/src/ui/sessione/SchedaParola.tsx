@@ -3,6 +3,7 @@ import type { Parola } from '../../data/sessione'
 import { LIVELLO_DI } from '../../data/sessione'
 import type { Livello } from '../../data/sessione'
 import type { Tono } from '../../copy/parole'
+import { TONI_NASCOSTI } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
 
 /**
@@ -152,7 +153,7 @@ export function SchedaParola({
             </div>
 
             <div className="mt-[21px] flex flex-col gap-3">
-              {scheda.riquadri.map((r) => {
+              {scheda.riquadri.filter((r) => !TONI_NASCOSTI.has(r.tono)).map((r) => {
                 const c = RIQUADRO[r.tono]
                 return (
                   <div
