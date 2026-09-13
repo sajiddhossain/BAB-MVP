@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import type { ReactNode } from 'react'
 
@@ -23,20 +24,55 @@ const STANZE: { a: string; nome: string; segno: string; fine?: boolean }[] = [
   { a: '/admin/sezioni', nome: 'Le sezioni dell’app', segno: '◑' },
 ]
 
+/**
+ * Aperta o compressa la decide chi guarda, e la barra se lo ricorda su questo
+ * browser. La prima volta parte aperta sugli schermi larghi e compressa su
+ * quelli stretti, dove le parole hanno bisogno di tutta la larghezza.
+ */
+const CHIAVE_BARRA = 'bab.adminBarra'
+
+function compressaAllInizio(): boolean {
+  try {
+    const salvata = localStorage.getItem(CHIAVE_BARRA)
+    if (salvata === 'compressa') return true
+    if (salvata === 'aperta') return false
+  } catch {
+    // senza memoria del browser si decide dalla larghezza
+  }
+  return !window.matchMedia('(min-width: 1280px)').matches
+}
+
 export function Stanze() {
+  const [compressa, setCompressa] = useState(compressaAllInizio)
+
+  function cambia() {
+    setCompressa((c) => {
+      try {
+        localStorage.setItem(CHIAVE_BARRA, c ? 'aperta' : 'compressa')
+      } catch {
+        // resta com'e' fino a che la pagina e' aperta
+      }
+      return !c
+    })
+  }
+
   return (
     <div className="flex h-dvh bg-paper text-ink">
       <nav
         aria-label="Stanze del pannello"
-        className="flex w-[64px] shrink-0 flex-col gap-1 border-r-[1.5px] border-ink bg-surface px-2 py-3 xl:w-[204px] xl:px-3"
+        className={`flex shrink-0 flex-col gap-1 overflow-hidden border-r-[1.5px] border-ink bg-surface py-3 transition-[width] duration-200 motion-reduce:transition-none ${
+          compressa ? 'w-[64px] px-2' : 'w-[204px] px-3'
+        }`}
       >
         <Link to="/admin" aria-label="BAB · amministrazione" className="mb-4 flex items-center gap-[10px] px-[3px] text-ink no-underline">
           <span className="bab-display flex h-9 w-[42px] shrink-0 items-center justify-center rounded-[10px] border-[1.5px] border-ink bg-ink text-[13px] font-bold text-lime">
             BAB
           </span>
-          <span className="hidden text-[10px] leading-[1.25] font-bold tracking-[1px] text-ink-mute uppercase xl:block">
-            amministrazione
-          </span>
+          {!compressa && (
+            <span className="text-[10px] leading-[1.25] font-bold tracking-[1px] whitespace-nowrap text-ink-mute uppercase">
+              amministrazione
+            </span>
+          )}
         </Link>
         {STANZE.map((s) => (
           <NavLink
@@ -56,9 +92,21 @@ export function Stanze() {
             <span aria-hidden className="flex w-[18px] shrink-0 justify-center text-[14px]">
               {s.segno}
             </span>
-            <span className="hidden truncate xl:inline">{s.nome}</span>
+            {!compressa && <span className="truncate whitespace-nowrap">{s.nome}</span>}
           </NavLink>
         ))}
+        <button
+          type="button"
+          onClick={cambia}
+          aria-expanded={!compressa}
+          aria-label={compressa ? 'Espandi la barra' : 'Comprimi la barra'}
+          title={compressa ? 'Espandi la barra' : 'Comprimi la barra'}
+          className={`bab-tocco mt-auto flex h-10 cursor-pointer items-center rounded-[10px] border-[1.5px] border-ink bg-surface text-[16px] font-bold text-ink hover:bg-chip ${
+            compressa ? 'justify-center' : 'justify-end px-[12px]'
+          }`}
+        >
+          <span aria-hidden>{compressa ? '»' : '«'}</span>
+        </button>
       </nav>
       <div className="min-w-0 flex-1 overflow-y-auto">
         <Outlet />
