@@ -61,6 +61,15 @@ export function Ritmi({
    * li' la cosa da fare e' scegliere, non leggere.
    */
   const [mostrato, setMostrato] = useState<Tempo | null>(sceglibile ? null : scelto)
+  /*
+   * Dove si legge e basta, l'ultima carta toccata resta accesa.
+   *
+   * Prima, uscendo dalla carta col mouse o toccando altrove, la fila tornava
+   * sempre alla prima — quella accesa in partenza — e toccare "Stabile"
+   * sembrava non servire a niente: dopo un attimo era di nuovo "Scattante".
+   * Il passaggio del mouse resta un'anteprima, ma torna alla carta toccata.
+   */
+  const [toccato, setToccato] = useState<Tempo | null>(scelto)
   const orologio = useRef<number | null>(null)
 
   function ferma() {
@@ -78,7 +87,7 @@ export function Ritmi({
 
   function nascondi() {
     ferma()
-    setMostrato(sceglibile ? null : scelto)
+    setMostrato(sceglibile ? null : toccato)
   }
 
   useEffect(() => ferma, [])
@@ -107,6 +116,7 @@ export function Ritmi({
               role={sceglibile ? 'radio' : undefined}
               aria-checked={sceglibile ? acceso : undefined}
               onClick={() => {
+                if (!sceglibile) setToccato(r.id)
                 mostra(r.id, sceglibile)
                 onChange?.(r.id)
               }}
