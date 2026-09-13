@@ -123,7 +123,9 @@ const it = {
      */
     corpo: {
       titolo: 'Cosa comunica il tuo corpo',
-      intensita: '{intensita} su 10',
+      // la scritta piccola sopra ai numeri, perche' "4 / 10" da solo non dice di cosa
+      etichettaIntensita: 'INTENSITÀ',
+      intensita: '{intensita} / 10',
     },
     prova: {
       titolo: 'Prova questo oggi',
@@ -243,7 +245,8 @@ const it = {
       titolo: 'Cosa comunica il tuo corpo',
       prima: 'PRIMA',
       dopo: 'DOPO',
-      intensita: '{intensita} su 10',
+      etichettaIntensita: 'INTENSITÀ',
+      intensita: '{intensita} / 10',
       nonSegnata: 'non segnata',
     },
     nota: 'Leggere il segnale è la bravura. Ignorarlo è da principianti. Sostegno non vuol mai dire una diagnosi: vuol dire dirlo a chi ti allena, a un fisioterapista, a un genitore o a un medico.',
@@ -511,7 +514,8 @@ const en: typeof it = {
     titoloPiu: 'About what you flagged.',
     corpo: {
       titolo: 'What your body is telling you',
-      intensita: '{intensita} out of 10',
+      etichettaIntensita: 'INTENSITY',
+      intensita: '{intensita} / 10',
     },
     prova: {
       titolo: 'Try this today',
@@ -616,7 +620,8 @@ const en: typeof it = {
       titolo: 'What your body is telling you',
       prima: 'BEFORE',
       dopo: 'AFTER',
-      intensita: '{intensita} out of 10',
+      etichettaIntensita: 'INTENSITY',
+      intensita: '{intensita} / 10',
       nonSegnata: 'not marked',
     },
     nota: 'Reading the signal is the skill. Ignoring it is the amateur move. Support never means a diagnosis — it means tell a coach, a physio, a parent or a doctor.',

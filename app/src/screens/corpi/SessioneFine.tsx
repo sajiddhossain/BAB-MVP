@@ -175,12 +175,20 @@ export function CorpoSegnali({
           <ul className="m-0 mt-1 list-none p-0">
             {righe.map((r, i) => (
               <li key={r.chiave} className={`py-[10px] ${i > 0 ? 'border-t border-riga' : ''}`}>
+                {/*
+                  "INTENSITÀ" sta sulla riga del nome, piccola come PRIMA e
+                  DOPO nel check-out, e il numero subito sotto: "4 / 10" da
+                  solo non diceva di cosa fosse il quattro.
+                */}
                 <div className="flex items-baseline justify-between gap-3">
                   <span className="min-w-0 text-[14px] font-bold text-ink">{r.nome}</span>
-                  <span className="shrink-0 text-[12px] font-bold text-ink-medio">
-                    {riempi(t.corpo.intensita, { intensita: r.intensita })}
+                  <span className="shrink-0 text-[10px] font-bold tracking-[1px] text-ink-medio">
+                    {t.corpo.etichettaIntensita}
                   </span>
                 </div>
+                <p className="m-0 mt-[2px] text-right text-[12px] font-bold text-ink-medio">
+                  {riempi(t.corpo.intensita, { intensita: r.intensita })}
+                </p>
                 <div className="mt-[6px]">
                   <ParoleScelte parole={r.parole} sue={r.sue} />
                 </div>
@@ -387,7 +395,13 @@ export function CorpoRendiconto({
             <ul className="m-0 mt-1 list-none p-0">
               {righe.map((r, i) => (
                 <li key={r.chiave} className={`py-[10px] ${i > 0 ? 'border-t border-riga' : ''}`}>
-                  <p className="m-0 text-[14px] font-bold text-ink">{r.nome}</p>
+                  {/* la scritta piccola sta sopra alla colonna dei numeri di PRIMA e DOPO */}
+                  <div className="flex items-baseline justify-between gap-3">
+                    <p className="m-0 min-w-0 text-[14px] font-bold text-ink">{r.nome}</p>
+                    <span className="shrink-0 text-[10px] font-bold tracking-[1px] text-ink-medio">
+                      {t.confronto.etichettaIntensita}
+                    </span>
+                  </div>
                   <RigaMomento etichetta={t.confronto.prima} s={r.prima} />
                   <RigaMomento etichetta={t.confronto.dopo} s={r.dopo} />
                 </li>
@@ -404,7 +418,7 @@ export function CorpoRendiconto({
   )
 }
 
-/** "PRIMA   [teso] [indolenzito]        4 su 10", oppure "DOPO   non segnata". */
+/** "PRIMA   [teso] [indolenzito]        4 / 10", oppure "DOPO   non segnata". */
 function RigaMomento({ etichetta, s }: { etichetta: string; s: Sensazione | null }) {
   const { ts } = useLingua()
   const t = ts.rendiconto.confronto
