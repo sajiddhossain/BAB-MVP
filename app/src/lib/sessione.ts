@@ -11,7 +11,7 @@ import type {
   Quando,
   Tipo,
 } from '../data/sessione'
-import { COMPARSA_DB, EFFETTO_DB, QUANDO_DB, RITMI } from '../data/sessione'
+import { COMPARSA_DB, EFFETTO_DB, PAROLE, QUANDO_DB, RITMI } from '../data/sessione'
 import { accoda, inSospeso, togliDallaCoda } from './coda'
 import type { Esito } from './conto'
 
@@ -502,4 +502,82 @@ async function scrivi(tipo: Tipo, d: Dati, ora: Date): Promise<Esito> {
   }
 
   return { ok: true }
+}
+
+/*
+ * ── LA RILETTURA ────────────────────────────────────────────────────────────
+ */
+
+/** Una riga di `body_signals`, con le sole colonne che servono a ridisegnarla. */
+export type RigaSegnale = {
+  id: string
+  region: string
+  region_free: string | null
+  sensation: string[] | null
+  words: string | null
+  one_side: boolean | null
+  intensity: number | null
+}
+
+/**
+ * Una riga del database rimessa nella forma di una sensazione.
+ *
+ * Tiene solo le parole che l'app conosce ancora: una parola tolta dall'elenco
+ * dopo che era stata salvata non ha una pastiglia da accendere, e lasciarla
+ * dentro vorrebbe dire un foglio che conta quattro parole e ne mostra tre.
+ * Le domande del "quando" restano vuote: rileggendo un check-in per il
+ * check-out non servono, e il check-out le chiede per conto suo.
+ */
+export function sensazioneDaSegnale(r: RigaSegnale): Sensazione {
+  const conosciute: readonly string[] = PAROLE
+  return {
+    id: r.id,
+    zona: r.region,
+    zonaLibera: r.region_free ?? '',
+    parole: (r.sensation ?? []).filter((p): p is Parola => conosciute.includes(p)),
+    sue: r.words ?? '',
+    unLato: r.one_side,
+    quando: null,
+    comparsa: null,
+    effetto: null,
+    // il centro della scala, come per una sensazione nuova
+    intensita: r.intensity ?? 5,
+  }
+}
+
+/**
+ * Le sensazioni del check-in di oggi, come le ha il database.
+ *
+ * Serve al check-out quando sul telefono non c'e' niente: check-in fatto su
+ * un altro telefono, o memoria del browser svuotata. Legge solo le righe
+ * sue — la regola "own rows" di `body_signals` e `check_ins` non ne lascia
+ * vedere altre — e non scrive niente.
+ *
+ * Qualsiasi cosa vada storta (niente rete, niente sessione, nessun check-in
+ * oggi) torna una lista vuota: il corpo resta da segnare come sempre, solo
+ * senza le zone chiare.
+ */
+export async function sensazioniCheckinDalDatabase(): Promise<Sensazione[]> {
+  if (!supabase) return []
+
+  const { data: sessione } = await supabase.auth.getSession()
+  const atleta = sessione.session?.user.id
+  if (!atleta) return []
+
+  const checkin = await supabase
+    .from('check_ins')
+    .select('id')
+    .eq('athlete_id', atleta)
+    .eq('kind', 'pre')
+    .eq('local_date', giornoAtleta())
+    .maybeSingle()
+  if (checkin.error || !checkin.data) return []
+
+  const { data, error } = await supabase
+    .from('body_signals')
+    .select('id,region,region_free,sensation,words,one_side,intensity')
+    .eq('check_in_id', checkin.data.id)
+  if (error || !data) return []
+
+  return (data as RigaSegnale[]).map(sensazioneDaSegnale)
 }

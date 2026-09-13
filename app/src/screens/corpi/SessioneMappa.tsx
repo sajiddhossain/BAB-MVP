@@ -8,7 +8,12 @@ import { Mappa, Riquadro } from '../../ui/sessione/Mappa'
 import { Foglio } from '../../ui/sessione/Foglio'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
-import { scriviSessione, useDatiSessione, vetrinaSenzaCorpo } from '../../lib/sessione'
+import {
+  scriviSessione,
+  sensazioniCheckinDalDatabase,
+  useDatiSessione,
+  vetrinaSenzaCorpo,
+} from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { Lato } from '../../data/sessione'
 import type { PropsSessione } from '../tipi'
@@ -54,9 +59,35 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
   const dati = useDatiSessione(tipo)
   // sempre letto, anche al check-in: un hook non puo' stare dentro a un if
   const datiPrima = useDatiSessione('checkin')
-  /* le sensazioni del check-in, ma solo al check-out e solo quelle sul corpo */
-  const prima =
-    tipo === 'checkout' ? datiPrima.sensazioni.filter((s) => s.zona !== 'altrove') : []
+  const [primaDalDatabase, setPrimaDalDatabase] = useState<Sensazione[]>([])
+
+  /*
+   * Il check-in puo' non essere su questo telefono: fatto su un altro, o con
+   * la memoria del browser svuotata nel frattempo. Allora si chiede al
+   * database, che le sensazioni di oggi le ha.
+   */
+  useEffect(() => {
+    if (tipo !== 'checkout') return
+    let viva = true
+    void sensazioniCheckinDalDatabase().then((s) => {
+      if (viva) setPrimaDalDatabase(s)
+    })
+    return () => {
+      viva = false
+    }
+  }, [tipo])
+
+  /*
+   * Le sensazioni del check-in, ma solo al check-out e solo quelle sul corpo.
+   *
+   * Se il telefono le ha, vincono le sue: sono le piu' fresche, e un check-in
+   * fatto in palestra senza rete puo' non essere ancora arrivato al database.
+   * Il database serve quando il telefono non ne ha nessuna. Non si mescolano:
+   * il check-in di oggi e' uno solo, e le due fonti lo raccontano intero
+   * tutt'e due.
+   */
+  const fontePrima = datiPrima.sensazioni.length > 0 ? datiPrima.sensazioni : primaDalDatabase
+  const prima = tipo === 'checkout' ? fontePrima.filter((s) => s.zona !== 'altrove') : []
   const { ts } = useLingua()
   const t = ts.mappa
   const [lato, setLato] = useState<Lato>('front')
