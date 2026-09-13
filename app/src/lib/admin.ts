@@ -174,7 +174,16 @@ export type Scheda = {
   parole: { checkins: Record<string, ParoleCheckIn>; segnali: Record<string, ParoleSegnale> } | null
 }
 
+/** nel banco di lavoro le atlete sono finte: vedi `gestione.ts` */
+async function prova() {
+  // scritto per intero e non con `SENZA_ACCESSO`: cosi' il compilatore vede
+  // un `false` e in produzione non genera nemmeno il file delle prove
+  return import.meta.env.DEV && import.meta.env.VITE_SENZA_ACCESSO === '1' ? await import('./adminProva') : null
+}
+
 export async function leggiAtlete(): Promise<Atleta[] | null> {
+  const p = await prova()
+  if (p) return p.atlete()
   if (!supabase) return null
   const { data, error } = await supabase.from('admin_athletes').select('*')
   if (error || !data) return null
@@ -182,6 +191,8 @@ export async function leggiAtlete(): Promise<Atleta[] | null> {
 }
 
 export async function leggiScheda(id: string): Promise<Scheda | null> {
+  const p = await prova()
+  if (p) return p.scheda(id)
   if (!supabase) return null
   const s = supabase
   const [c, b, e, l, w] = await Promise.all([
