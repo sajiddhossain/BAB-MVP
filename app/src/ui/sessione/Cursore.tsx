@@ -16,6 +16,7 @@ export function Cursore({
   destra,
   verso = 'bene',
   tacche = true,
+  parolaPerRiga = false,
   etichetta,
 }: {
   valore: number
@@ -25,8 +26,20 @@ export function Cursore({
   sinistra: string
   destra: string
   verso?: 'bene' | 'carico'
-  /** i numeri sotto alla pista. L'intensita' nel foglio non li ha */
+  /** i numeri sotto alla pista */
   tacche?: boolean
+  /**
+   * Le parole agli estremi una per riga: "No" sopra a "pain", e "Worst",
+   * "possible", "pain" una sotto l'altra. Lo usa l'intensita' nel foglio.
+   *
+   * Li' "Worst possible pain" non ci stava in due righe: il 10 sta a 28px dal
+   * bordo dello schermo e "possible pain" ne misura 58, quindi centrata sul
+   * 10 la sua ultima lettera finiva tagliata dal bordo. Una parola per riga
+   * tiene la piu' larga — "possible" — sotto i quaranta pixel, e restano
+   * dieci pixel d'aria. Due righe da una parte e tre dall'altra, ma centrate
+   * tutte e due, e intere.
+   */
+  parolaPerRiga?: boolean
   /** cosa si sta misurando: lo legge chi non vede lo schermo */
   etichetta: string
 }) {
@@ -48,6 +61,28 @@ export function Cursore({
    * il numero ha dal fondo della pista, lasciano ancora nove pixel di bordo.
    */
   const larghezza = `max(${passo}, 45px)`
+
+  /*
+   * Una parola d'estremo. Con `parolaPerRiga` ogni parola e' un blocco suo, e
+   * la scatola resta quella di sempre — stesso limite di larghezza, stessa
+   * sillabazione — cosi' anche li' una parola troppo lunga si spezza invece
+   * di uscire dallo schermo. Il centro resta sotto al numero: la scatola e'
+   * larga quanto la parola piu' lunga, e il `translate` la centra.
+   */
+  const estremo = (testo: string, posto: string) => (
+    <span
+      className={`${posto} text-center`}
+      style={{ maxWidth: larghezza, hyphens: 'auto', overflowWrap: 'break-word' }}
+    >
+      {parolaPerRiga
+        ? testo.split(' ').map((parola, i) => (
+            <span key={i} className="block">
+              {parola}
+            </span>
+          ))
+        : testo}
+    </span>
+  )
 
   return (
     <div>
@@ -117,18 +152,8 @@ export function Cursore({
         uscire dalla scheda.
       */}
       <div className="mt-[6px] flex justify-between gap-2 text-[9px] font-bold leading-[1.15] text-ink-mute">
-        <span
-          className="ml-3 -translate-x-1/2 text-center"
-          style={{ maxWidth: larghezza, hyphens: 'auto', overflowWrap: 'break-word' }}
-        >
-          {sinistra}
-        </span>
-        <span
-          className="mr-3 translate-x-1/2 text-center"
-          style={{ maxWidth: larghezza, hyphens: 'auto', overflowWrap: 'break-word' }}
-        >
-          {destra}
-        </span>
+        {estremo(sinistra, 'ml-3 -translate-x-1/2')}
+        {estremo(destra, 'mr-3 translate-x-1/2')}
       </div>
     </div>
   )

@@ -272,7 +272,7 @@ export function Foglio({
               onChange={(v) => setBozza((b) => ({ ...b, intensita: v }))}
               min={0}
               max={10}
-              tacche={false}
+              parolaPerRiga
               verso="carico"
               sinistra={t.lieve}
               destra={t.atroce}
