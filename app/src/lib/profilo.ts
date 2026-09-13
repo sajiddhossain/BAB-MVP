@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { supabase } from './supabase'
 
 /**
@@ -29,22 +29,54 @@ type Risposta = { profilo: Profilo; tutorial: Profilo }
 
 let risposta: Risposta = { profilo: null, tutorial: null }
 let inCorso: Promise<Risposta> | null = null
+/*
+ * Cresce a ogni `dimenticaProfilo`. Una domanda partita prima e arrivata dopo
+ * parla di una persona che nel frattempo e' cambiata (ha creato il profilo, e'
+ * uscita): la sua risposta si butta, invece di scrivere sopra a quella nuova.
+ */
+let generazione = 0
+
+/*
+ * Chi sta ascoltando la risposta: la guardia.
+ *
+ * ── PERCHE' SERVE AVVISARE ─────────────────────────────────────────────────
+ * La guardia sta attorno a tutte le rotte e non si smonta mai: dal tutorial a
+ * casa resta la stessa, con la risposta che si era letta all'inizio. Prima
+ * `segnaTutorialFatto` cambiava solo la variabile qui sopra, e nessuno lo
+ * diceva alla guardia: arrivata a `/casa` leggeva ancora "tutorial non
+ * finito" e la rimandava al primo schermo del tutorial. Dall'onboarding non
+ * si arrivava mai alla home.
+ */
+const ascoltatori = new Set<() => void>()
+
+function annuncia() {
+  for (const f of ascoltatori) f()
+}
 
 /** Da chiamare quando il profilo viene creato o cancellato. */
 export function dimenticaProfilo() {
   risposta = { profilo: null, tutorial: null }
   inCorso = null
+  generazione++
+  annuncia()
+}
+
+function iscrivi(f: () => void) {
+  ascoltatori.add(f)
+  return () => {
+    ascoltatori.delete(f)
+  }
 }
 
 /**
  * «Il tutorial è finito», detto senza richiederlo al database.
  *
- * Lo chiama chi l'ha appena finito. Senza, la guardia continuerebbe a
- * rimandarla nel tutorial finché la risposta in cache non scade — cioè fino
- * al prossimo avvio dell'app.
+ * Lo chiama chi l'ha appena finito, prima di andare a casa. La guardia viene
+ * avvisata subito, e a `/casa` la lascia entrare.
  */
 export function segnaTutorialFatto() {
   risposta = { ...risposta, tutorial: 'si' }
+  annuncia()
 }
 
 async function chiedi(): Promise<Risposta> {
@@ -94,28 +126,42 @@ async function chiedi(): Promise<Risposta> {
  * `null` finché la domanda è in volo: in quel momento non si decide niente.
  */
 function useRisposta(attivo: boolean): Risposta {
-  const [vista, setVista] = useState<Risposta>(risposta)
+  /*
+   * La risposta si legge dal negozio, non da una copia nello stato del
+   * componente. Con una copia, fra il momento in cui la risposta cambia e
+   * quello in cui la copia si aggiorna c'e' un giro di disegno con quella
+   * vecchia — e alla guardia basta quel giro per mandare qualcuna nel posto
+   * sbagliato (all'onboarding appena finito, al tutorial appena finito).
+   */
+  const attuale = useSyncExternalStore(iscrivi, () => risposta, () => risposta)
+  // un "boh" non entra nel negozio, cosi' la prossima volta si richiede
+  const [boh, setBoh] = useState<Risposta | null>(null)
 
   useEffect(() => {
-    if (!attivo) return
-    if (risposta.profilo !== null) {
-      setVista(risposta)
-      return
-    }
+    if (!attivo || attuale.profilo !== null) return
     let vivo = true
+    const mia = generazione
     inCorso ??= chiedi()
     void inCorso.then((r) => {
-      // un "boh" non si tiene: la prossima volta si richiede
-      risposta = r.profilo === 'boh' ? { profilo: null, tutorial: null } : r
-      if (r.profilo === 'boh') inCorso = null
-      if (vivo) setVista(r)
+      // arrivata tardi, per una persona che nel frattempo e' cambiata
+      if (mia !== generazione) return
+      if (r.profilo === 'boh') {
+        inCorso = null
+        if (vivo) setBoh(r)
+        return
+      }
+      if (risposta.profilo === null) {
+        risposta = r
+        annuncia()
+      }
     })
     return () => {
       vivo = false
     }
-  }, [attivo])
+  }, [attivo, attuale])
 
-  return attivo ? vista : { profilo: null, tutorial: null }
+  if (!attivo) return { profilo: null, tutorial: null }
+  return attuale.profilo === null && boh ? boh : attuale
 }
 
 /** Se questa persona ha già un profilo, cioè se ha già fatto l'onboarding. */
