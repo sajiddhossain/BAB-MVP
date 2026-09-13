@@ -13,6 +13,7 @@ import type {
 } from '../data/sessione'
 import { COMPARSA_DB, EFFETTO_DB, PAROLE, QUANDO_DB, RITMI } from '../data/sessione'
 import { accoda, inSospeso, togliDallaCoda } from './coda'
+import { giornoDiRiposo } from './finestre'
 import type { Esito } from './conto'
 
 /**
@@ -453,8 +454,10 @@ async function scrivi(tipo: Tipo, d: Dati, ora: Date): Promise<Esito> {
     // l'energia si chiede tutte e due le volte: e' la stessa domanda, ed e'
     // la differenza fra le due risposte che dice qualcosa
     energy: d.energia,
-    effort: tipo === 'checkout' ? d.sforzo : null,
-    satisfaction: tipo === 'checkout' ? d.soddisfazione : null,
+    // nei giorni di riposo sforzo e soddisfazione non si chiedono: vuoti, non
+    // il 5 di partenza del cursore spacciato per una risposta
+    effort: tipo === 'checkout' && !giornoDiRiposo(ora) ? d.sforzo : null,
+    satisfaction: tipo === 'checkout' && !giornoDiRiposo(ora) ? d.soddisfazione : null,
     brought_home: tipo === 'checkout' && d.bottino.length ? d.bottino : null,
     note: tipo === 'checkout' && d.bottinoMio.trim() ? d.bottinoMio.trim().slice(0, 500) : null,
     protective_pain: tipo === 'checkout' ? d.protettivo : null,

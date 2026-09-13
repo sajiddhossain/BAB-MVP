@@ -10,6 +10,7 @@ import type { Parola } from '../../data/sessione'
 import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
 import { useLingua } from '../../lib/lingua'
+import { giornoDiRiposo } from '../../lib/finestre'
 import { sensazioniCheckinDalDatabase, useDatiSessione } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
@@ -202,7 +203,11 @@ export function CorpoSegnali({
         <Scheda piatta className="px-[15px] py-[13px]">
           <p className="m-0 text-[13px] font-bold text-ink">{t.prova.titolo}</p>
           <ol className="m-0 mt-3 flex list-none flex-col gap-[10px] p-0">
-            {t.prova.passi.map((passoTesto, i) => (
+            {/* nei giorni di riposo il primo passo non parla di serie: gli altri restano */}
+            {(giornoDiRiposo()
+              ? [t.prova.primoPassoRiposo, ...t.prova.passi.slice(1)]
+              : t.prova.passi
+            ).map((passoTesto, i) => (
               <li key={passoTesto} className="flex gap-[8px]">
                 <span className="mt-[1px] flex size-[22px] shrink-0 items-center justify-center rounded-full bg-chip text-[11px] font-bold text-ink">
                   {i + 1}
@@ -316,6 +321,8 @@ export function CorpoRendiconto({
   const nomi = ts.comune.ritmi
   const previsto = mattina.ritmo
   const sentito = dati.ritmo
+  // nei giorni di riposo non si esce da un allenamento: "stasera", e una giornata e non una sessione
+  const riposo = giornoDiRiposo()
 
   /*
    * Il prima puo' non essere su questo telefono: check-in fatto su un altro,
@@ -338,7 +345,15 @@ export function CorpoRendiconto({
   const ordine = ['carica', 'costante', 'leggero']
   const scarto = previsto && sentito ? ordine.indexOf(sentito) - ordine.indexOf(previsto) : null
   const frase =
-    scarto === null ? null : scarto > 0 ? t.frase.piu : scarto < 0 ? t.frase.meno : t.frase.uguale
+    scarto === null
+      ? null
+      : scarto > 0
+        ? riposo
+          ? t.frase.piuRiposo
+          : t.frase.piu
+        : scarto < 0
+          ? t.frase.meno
+          : t.frase.uguale
 
   return (
     <Schermo
@@ -379,7 +394,7 @@ export function CorpoRendiconto({
             </span>
             <div className="flex min-w-0 flex-1 flex-col gap-[2px] rounded-[12px] border-[1.5px] border-lilla-cupo bg-lilla-fondo px-[10px] py-[5px]">
               <span className="text-[9px] font-bold tracking-[1px] text-lilla-cupo uppercase">
-                {t.dopo}
+                {riposo ? t.dopoRiposo : t.dopo}
               </span>
               <span className="text-[16px] font-bold text-ink">{nomi[sentito]}</span>
             </div>

@@ -278,6 +278,9 @@ const it = {
       etichetta: 'Allenamento oggi · {ora}',
       titolo: 'Facciamo il check-in.',
       corpo: 'Prima di iniziare la sessione, prenditi un momento per ascoltare il tuo corpo.',
+      /* nei giorni di riposo: niente allenamento, niente ora */
+      etichettaRiposo: 'Giorno di riposo',
+      corpoRiposo: 'Niente allenamento oggi, ma il tuo corpo merita comunque un minuto.',
       azione: 'Inizia check-in',
     },
 
@@ -287,6 +290,10 @@ const it = {
       etichettaSenzaCheckin: 'Check-in non fatto oggi',
       titolo: "Com'è andata?",
       corpo: 'Prenditi un minuto ora, a caldo — guarda come ne sei uscita e come si sente il tuo corpo.',
+      /* nei giorni di riposo non c'e' una sessione: si guarda la giornata */
+      etichettaRiposo: 'Check-in fatto oggi',
+      titoloRiposo: "Com'è andata la giornata?",
+      corpoRiposo: "Prenditi un minuto per guardare com'è andata la giornata e come si sente il tuo corpo.",
       previsto: 'Avevi previsto',
       azione: 'Check out',
     },
@@ -361,6 +368,7 @@ const it = {
       checkinRitardo: 'Il momento del check-in era stamattina, ma puoi ancora farlo.',
       checkinChiuso: 'Il check-in di oggi si è chiuso. Riapre domani alle {ora}.',
       checkoutPresto: 'Il check-out apre alle {ora}, dopo l’allenamento.',
+      checkoutPrestoRiposo: 'Il check-out apre alle {ora}.',
       checkoutRitardo: 'Il momento del check-out è passato, ma puoi ancora farlo.',
       /* trenta minuti dopo l'allenamento il check-out chiude, e per oggi non riapre */
       checkoutChiuso: 'Per oggi è andata. Ci vediamo al prossimo allenamento.',
@@ -671,6 +679,8 @@ const en: typeof it = {
       etichetta: 'Training today · {ora}',
       titolo: "Let's check in.",
       corpo: "Before the session starts, take a moment to listen to your body's signals.",
+      etichettaRiposo: 'Rest day',
+      corpoRiposo: "No training today, but your body's still worth a minute.",
       azione: "I'm ready",
     },
 
@@ -680,6 +690,9 @@ const en: typeof it = {
       titolo: 'How did it go?',
       corpo:
         "Before you move on, let's pause to look back and notice how you feel, while it's still fresh.",
+      etichettaRiposo: 'Checked in today',
+      titoloRiposo: 'How did the day go?',
+      corpoRiposo: 'Take a minute to look back on the day and notice how your body feels.',
       previsto: 'You predicted',
       azione: 'Check out',
     },
@@ -739,6 +752,7 @@ const en: typeof it = {
       checkinRitardo: 'The morning check-in has passed, but you can still do it.',
       checkinChiuso: 'Today’s check-in has closed. It opens again tomorrow at {ora}.',
       checkoutPresto: 'Check-out opens at {ora}, after training.',
+      checkoutPrestoRiposo: 'Check-out opens at {ora}.',
       checkoutRitardo: 'The check-out window has passed, but you can still do it.',
       checkoutChiuso: 'That’s it for today. See you at your next session.',
       fatto: 'Done for today.',

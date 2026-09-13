@@ -378,9 +378,12 @@ export function allenamentoDiOggi(quando = new Date()): { ce: boolean; ora: stri
  * check-in di domani.
  */
 export function statoDiOggi(g: Giornata, quando = new Date()): StatoGiornata {
-  // nei giorni di riposo c'e' un solo giro, ed e' quello del mattino
-  if (!allenamentoDiOggi(quando).ce) return 'riposo'
-
+  /*
+   * I giorni di riposo seguono lo stesso giro: check-in, check-out, fatto.
+   * Prima c'era solo il check-in del mattino. Senza allenamenti con gli orari
+   * valgono le finestre fisse (vedi `finestre.ts`), e il check-out salta le
+   * domande sulla sessione (vedi `giornoDiRiposo`).
+   */
   /*
    * `chiusa` e non `!siPuoFare`: prima delle cinque il check-in non si puo'
    * ancora fare, ma e' comunque la prossima cosa che succede, e la scheda

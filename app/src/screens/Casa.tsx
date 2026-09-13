@@ -20,7 +20,7 @@ import {
   statoDiOggi,
   useGiornata,
 } from '../lib/giornata'
-import { oraApertura, statoFinestra } from '../lib/finestre'
+import { giornoDiRiposo, oraApertura, statoFinestra } from '../lib/finestre'
 import type { TipoSessione } from '../lib/finestre'
 import { CAMPI_RIPOSO } from '../data/casa'
 import type { StatoGiornata, Tempo } from '../data/casa'
@@ -125,6 +125,15 @@ export function Casa() {
   const forzato = query.get('stato') as StatoGiornata | null
   const eForzato = !!forzato && ['checkin', 'checkout', 'fatto', 'riposo'].includes(forzato)
   const stato: StatoGiornata = eForzato && forzato ? forzato : statoDiOggi(giornata, adesso)
+  /*
+   * Nei giorni di riposo le schede sono quelle di tutti i giorni — check-in,
+   * check-out, fatto — ma sotto resta il riepilogo della settimana e non il
+   * percorso: e' il giorno in cui guardarsi indietro ha senso.
+   */
+  // `&riposo=si` nell'anteprima: le schede di tutti i giorni con i testi del riposo
+  const riposo = eForzato
+    ? stato === 'riposo' || query.get('riposo') === 'si'
+    : giornoDiRiposo(adesso)
 
   /*
    * Se il check-in di oggi c'e' davvero.
@@ -165,10 +174,15 @@ export function Casa() {
 
           <div className="mt-[15px]">
             {stato === 'checkin' && (
-              <Checkin ora={oraDaTesto(allenamento.ora, lingua)} adesso={adesso} />
+              <Checkin ora={oraDaTesto(allenamento.ora, lingua)} adesso={adesso} riposo={riposo} />
             )}
             {stato === 'checkout' && (
-              <Checkout previsto={giornata.previsto} adesso={adesso} checkinFatto={checkinFatto} />
+              <Checkout
+                previsto={giornata.previsto}
+                adesso={adesso}
+                checkinFatto={checkinFatto}
+                riposo={riposo}
+              />
             )}
             {stato === 'fatto' && <Fatto checkinFatto={checkinFatto} />}
             {stato === 'riposo' && <Riposo adesso={adesso} />}
@@ -189,7 +203,7 @@ export function Casa() {
             leggero sono una di troppo.
           */}
           <div className="mt-2">
-            {stato === 'riposo' ? (
+            {riposo ? (
               <Settimana />
             ) : stato === 'fatto' ? (
               <SchedaPercorso
@@ -231,10 +245,13 @@ export function Casa() {
 function Azione({
   tipo,
   adesso,
+  riposo = false,
   children,
 }: {
   tipo: TipoSessione
   adesso: Date
+  /** nei giorni di riposo il check-out non apre "dopo l'allenamento" */
+  riposo?: boolean
   children: ReactNode
 }) {
   const { t } = useLingua()
@@ -242,7 +259,8 @@ function Azione({
   const stato = statoFinestra(tipo, adesso)
 
   if (stato === 'presto') {
-    const modello = tipo === 'checkin' ? f.checkinPresto : f.checkoutPresto
+    const modello =
+      tipo === 'checkin' ? f.checkinPresto : riposo ? f.checkoutPrestoRiposo : f.checkoutPresto
     return <Riga>{riempi(modello, { ora: oraApertura(tipo, adesso) })}</Riga>
   }
 
@@ -286,7 +304,7 @@ function Riga({ children, sopra = false }: { children: ReactNode; sopra?: boolea
 }
 
 /* ── home-1: c'e' l'allenamento e il check-in e' da fare ─────────────────── */
-function Checkin({ ora, adesso }: { ora: string; adesso: Date }) {
+function Checkin({ ora, adesso, riposo }: { ora: string; adesso: Date; riposo: boolean }) {
   const { t } = useLingua()
   const vai = useNavigate()
   return (
@@ -297,10 +315,17 @@ function Checkin({ ora, adesso }: { ora: string; adesso: Date }) {
         fondo all'etichetta. Capita solo nell'anteprima, dove gli allenamenti
         dell'onboarding non ci sono — ma un puntino appeso e' un difetto in
         qualunque posto compaia.
+
+        Nei giorni di riposo "Allenamento oggi" direbbe il falso: l'etichetta
+        e il testo sono i loro.
       */
-      etichetta={riempi(t.casa.checkin.etichetta, { ora }).replace(/\s*·\s*$/, '')}
+      etichetta={
+        riposo
+          ? t.casa.checkin.etichettaRiposo
+          : riempi(t.casa.checkin.etichetta, { ora }).replace(/\s*·\s*$/, '')
+      }
       titolo={t.casa.checkin.titolo}
-      corpo={t.casa.checkin.corpo}
+      corpo={riposo ? t.casa.checkin.corpoRiposo : t.casa.checkin.corpo}
     >
       <div className="mt-[14px]">
         <Azione tipo="checkin" adesso={adesso}>
@@ -316,21 +341,27 @@ function Checkout({
   previsto,
   adesso,
   checkinFatto,
+  riposo,
 }: {
   previsto: Tempo | null
   adesso: Date
   checkinFatto: boolean
+  /** nei giorni di riposo non c'e' una sessione di cui chiedere com'e' andata */
+  riposo: boolean
 }) {
   const { t } = useLingua()
   const vai = useNavigate()
+  const c = t.casa.checkout
   return (
     <SchedaEroe
       stato="checkout"
       /* senza check-in niente spunta: l'icona direbbe "fatto" */
-      etichetta={checkinFatto ? t.casa.checkout.etichetta : t.casa.checkout.etichettaSenzaCheckin}
+      etichetta={
+        checkinFatto ? (riposo ? c.etichettaRiposo : c.etichetta) : c.etichettaSenzaCheckin
+      }
       senzaIcona={!checkinFatto}
-      titolo={t.casa.checkout.titolo}
-      corpo={t.casa.checkout.corpo}
+      titolo={riposo ? c.titoloRiposo : c.titolo}
+      corpo={riposo ? c.corpoRiposo : c.corpo}
     >
       {previsto && (
         <div className="mt-[22px] inline-flex h-[34px] items-center gap-2 rounded-[99px] bg-white/70 pl-[10px] pr-[14px]">
@@ -341,7 +372,7 @@ function Checkout({
       )}
 
       <div className="mt-[14px]">
-        <Azione tipo="checkout" adesso={adesso}>
+        <Azione tipo="checkout" adesso={adesso} riposo={riposo}>
           <Bottone onClick={() => vai('/sessione/checkout')}>{t.casa.checkout.azione}</Bottone>
         </Azione>
       </div>

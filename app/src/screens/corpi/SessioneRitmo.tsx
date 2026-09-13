@@ -8,6 +8,7 @@ import { Apri } from '../../ui/Apri'
 import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
 import { useLingua } from '../../lib/lingua'
+import { giornoDiRiposo } from '../../lib/finestre'
 import { datiSessione, scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
 
@@ -28,6 +29,8 @@ export function CorpoRitmo({ tipo, passo, verso, avanzamento, avanti, indietro }
   const prima = tipo === 'checkin'
   const { ts } = useLingua()
   const t = prima ? ts.ritmoPrima : ts.ritmoDopo
+  // nei giorni di riposo il confronto non e' con un allenamento ma con la sera
+  const occhio = giornoDiRiposo() ? t.occhioRiposo : t.occhio
 
   return (
     <Schermo
@@ -44,7 +47,7 @@ export function CorpoRitmo({ tipo, passo, verso, avanzamento, avanti, indietro }
     >
       <OcchielloSessione icona={prima ? 'stella' : 'rotazione'}>{t.occhiello}</OcchielloSessione>
       <Titolo>{t.titolo}</Titolo>
-      <Occhio>{t.occhio}</Occhio>
+      <Occhio>{occhio}</Occhio>
 
       {/*
         Lo stacco sopra ai ritmi e' diverso nei due giri perche' lo e' nel

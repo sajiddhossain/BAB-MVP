@@ -9,6 +9,7 @@ import { BOTTINO, FACCE } from '../../data/sessione'
 import type { Bottino } from '../../data/sessione'
 import { riempi } from '../../copy/riempi'
 import { useLingua } from '../../lib/lingua'
+import { giornoDiRiposo } from '../../lib/finestre'
 import { datiSessione, scriviSessione, useDatiSessione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
 
@@ -278,7 +279,8 @@ export function CorpoEnergia({ tipo, passo, verso, avanzamento, avanti, indietro
             <>
               <p className="m-0 text-[15.5px] font-bold text-ink">{riempi(t.nota.titolo, { prima: prima.energia })}</p>
               <p className="m-0 mt-[6px] text-[12.5px] leading-[1.5] tracking-[-0.25px] text-ink-medio">
-                {t.nota.corpo}
+                {/* nei giorni di riposo non c'e' una sessione dopo cui calare */}
+                {giornoDiRiposo() ? t.nota.corpoRiposo : t.nota.corpo}
               </p>
             </>
           ) : (

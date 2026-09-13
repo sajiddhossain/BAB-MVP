@@ -1,5 +1,6 @@
 import type { Tempo } from './casa'
 import type { Dati } from '../lib/sessione'
+import { giornoDiRiposo } from '../lib/finestre'
 import { FRONT_ZONES, BACK_ZONES } from '../ui/bodyZones'
 import type { BodyZone } from '../ui/bodyZones'
 
@@ -65,8 +66,12 @@ export const CHECKIN: PassoSessione[] = [
 /** Il check-out: quello che si guarda indietro, dopo. */
 export const CHECKOUT: PassoSessione[] = [
   { id: 'ritmo', corpo: 'ritmo', nodo: '3967:2238' },
-  { id: 'sforzo', corpo: 'sforzo', nodo: '3967:1864' },
-  { id: 'soddisfazione', corpo: 'soddisfazione', nodo: '3967:1903' },
+  /*
+   * Nei giorni di riposo non c'e' una sessione da giudicare: sforzo e
+   * soddisfazione si saltano, e nel database restano vuoti.
+   */
+  { id: 'sforzo', corpo: 'sforzo', nodo: '3967:1864', salta: () => giornoDiRiposo() },
+  { id: 'soddisfazione', corpo: 'soddisfazione', nodo: '3967:1903', salta: () => giornoDiRiposo() },
   { id: 'energia', corpo: 'energia', nodo: '3967:2005' },
   { id: 'mappa', corpo: 'mappa', nodo: '3967:2041' },
   { id: 'rendiconto', corpo: 'rendiconto', nodo: '3967:2184' },

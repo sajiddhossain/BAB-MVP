@@ -61,6 +61,9 @@ const it = {
     titolo: 'Qual è il ritmo di oggi?',
     occhio:
       "Il tuo ritmo è quanto il tuo corpo ha da dare oggi. Fai una stima ora e confrontala dopo l'allenamento per affinare la tua percezione interiore.",
+    /* nei giorni di riposo non c'e' un allenamento con cui confrontarla */
+    occhioRiposo:
+      'Il tuo ritmo è quanto il tuo corpo ha da dare oggi. Fai una stima ora e confrontala stasera per affinare la tua percezione interiore.',
     carta: {
       titolo: "Non c'è un ritmo giusto o sbagliato",
       corpo:
@@ -135,6 +138,8 @@ const it = {
         'Guarda se si scioglie, resta uguale o peggiora: te lo chiediamo al check-out, non adesso.',
         'Se una parola diventa pungente, trafittiva o formicolante, è un altro discorso: fermati con quel movimento e dillo a qualcuno.',
       ],
+      /* nei giorni di riposo il primo passo non parla di serie: gli altri tre restano */
+      primoPassoRiposo: 'Muovi piano quel punto, poi ricontrollalo più tardi.',
     },
     nota: 'Leggere il segnale è la bravura. Ignorarlo è da principianti. BAB non ti dice mai se allenarti o no, e non dà mai un nome a una malattia.',
     azione: 'Capito, si comincia',
@@ -147,6 +152,7 @@ const it = {
     titolo: 'Come si sentiva il tuo corpo?',
     occhio:
       "Ripensando all'allenamento, scegli il ritmo che il tuo corpo ha effettivamente seguito.",
+    occhioRiposo: 'Ripensando alla giornata, scegli il ritmo che il tuo corpo ha effettivamente seguito.',
     /*
      * Il disegno ha solo il primo caso. Gli altri due li abbiamo scritti noi:
      * senza, chi ci prende leggerebbe che si e' sbagliata.
@@ -211,6 +217,7 @@ const it = {
     nota: {
       titolo: 'Questa mattina eri a {prima}.',
       corpo: "L'energia che diminuisce dopo una sessione è normale.",
+      corpoRiposo: "L'energia che cala verso sera è normale.",
       /* quando non ha fatto il check-in, un confronto non c'e' */
       senzaPrima:
         'Non hai fatto il check-in stamattina, quindi oggi non c’è un prima da confrontare.',
@@ -231,8 +238,12 @@ const it = {
     titolo: "Ecco cos'hai imparato oggi.",
     prima: 'STAMATTINA',
     dopo: 'NE SEI USCITA',
+    /* nei giorni di riposo non si esce da nessun allenamento */
+    dopoRiposo: 'STASERA',
     frase: {
       piu: 'Sei entrata aspettandoti più di quanto il tuo corpo avesse oggi, e te ne sei accorta. È la lettura che si affina, non una sessione andata male.',
+      piuRiposo:
+        'Sei entrata aspettandoti più di quanto il tuo corpo avesse oggi, e te ne sei accorta. È la lettura che si affina, non una giornata andata male.',
       meno: 'Il tuo corpo aveva più da dare di quanto ti aspettassi entrando, e te ne sei accorta. È la lettura che si affina.',
       uguale: "L'avevi indovinato esattamente. È la lettura che si affina.",
     },
@@ -466,6 +477,8 @@ const en: typeof it = {
     titolo: 'What’s your tempo today?',
     occhio:
       'Your tempo is just how much your body’s got to give today. Take a guess now — you’ll check it again after training. Guessing first is how your inner read gets sharp.',
+    occhioRiposo:
+      'Your tempo is just how much your body’s got to give today. Take a guess now — you’ll check it again this evening. Guessing first is how your inner read gets sharp.',
     carta: {
       titolo: 'No tempo is good or bad.',
       corpo:
@@ -525,6 +538,7 @@ const en: typeof it = {
         'Notice whether it warms out, stays, or gets worse — you’ll answer that at check-out, not now.',
         'If any word changes to sharp, stabbing or tingling, that’s a different conversation — stop that movement and tell someone.',
       ],
+      primoPassoRiposo: 'Move that spot gently, then check it again later.',
     },
     nota: 'Reading the signal is the skill. Ignoring it is the amateur move. BAB never tells you to train or not to train — and never names a condition.',
     azione: 'Got it — start training',
@@ -536,6 +550,7 @@ const en: typeof it = {
     occhiello: 'STEP 1 · LOOK BACK',
     titolo: 'How did your body feel?',
     occhio: 'Thinking back on training, pick the tempo your body actually followed.',
+    occhioRiposo: 'Thinking back on the day, pick the tempo your body actually followed.',
     /*
      * La frase del frame va bene in tutte e due le direzioni, quindi qui
      * `piu` e `meno` sono la stessa: l'unica scritta da noi e' `uguale`.
@@ -600,6 +615,7 @@ const en: typeof it = {
     nota: {
       titolo: 'This morning you were at {prima}.',
       corpo: 'Energy dropping after a session is normal and expected.',
+      corpoRiposo: 'Energy dropping toward the evening is normal and expected.',
       senzaPrima:
         'You didn’t check in this morning, so there’s no before to compare today with.',
     },
@@ -611,8 +627,11 @@ const en: typeof it = {
     titolo: 'Here’s what today taught you.',
     prima: 'THIS MORNING',
     dopo: 'YOU CAME OUT',
+    dopoRiposo: 'THIS EVENING',
     frase: {
       piu: 'You went in expecting more than your body had today — and you noticed it. That’s the read getting sharper, not a session gone wrong.',
+      piuRiposo:
+        'You went in expecting more than your body had today — and you noticed it. That’s the read getting sharper, not a day gone wrong.',
       meno: 'Your body had more to give than you went in expecting — and you noticed it. That’s the read getting sharper.',
       uguale: 'You called it exactly. That’s the read getting sharper.',
     },

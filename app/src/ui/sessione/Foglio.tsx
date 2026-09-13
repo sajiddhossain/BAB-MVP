@@ -10,6 +10,7 @@ import { useLingua } from '../../lib/lingua'
 import { Pastiglia, Scelta, SiNo } from './Comandi'
 import { Apri } from '../Apri'
 import { useModale } from '../modale'
+import { giornoDiRiposo } from '../../lib/finestre'
 import giu from '../../assets/chevron-down.svg'
 
 const ICONE = import.meta.glob<string>('../../assets/sessione/p-*.svg', {
@@ -77,6 +78,8 @@ export function Foglio({
   }
 
   const altrove = bozza.zona === 'altrove'
+  // nei giorni di riposo non c'e' una sessione: niente "durante" e niente "cosa le ha fatto"
+  const riposo = giornoDiRiposo()
   /*
    * Per salvare serve almeno un modo di dire cosa si sente — una pastiglia o
    * le sue parole — e, se ha scelto "Altrove", anche dove. Un segnale senza
@@ -217,7 +220,7 @@ export function Foglio({
               </button>
             </Apri>
 
-            {tipo === 'checkout' && (
+            {tipo === 'checkout' && !riposo && (
               <>
                 <Domanda testo={t.comparsa.domanda}>
                   {COMPARSA.map((c) => (

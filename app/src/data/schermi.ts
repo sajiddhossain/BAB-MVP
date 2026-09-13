@@ -225,6 +225,37 @@ export const SCHERMI: GruppoScritte[] = [
         ],
       },
       {
+        /*
+         * I giorni di riposo hanno le stesse schede degli altri, con i testi
+         * del riposo e sotto il riepilogo della settimana. `&riposo=si` e'
+         * l'unico modo di vederle nella cornice, dove gli allenamenti non ci
+         * sono.
+         */
+        id: 'casa-checkin-riposo',
+        nome: '5 · Riposo: check-in da fare',
+        rotta: '/casa?stato=checkin&ora=08:00&riposo=si',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.checkin',
+          'testi.casa.finestra',
+          'testi.casa.sezioni.intanto',
+          'testi.casa.settimana',
+        ],
+      },
+      {
+        id: 'casa-checkout-riposo',
+        nome: '5b · Riposo: check-out da fare',
+        rotta: '/casa?stato=checkout&ora=19:10&riposo=si',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.tempi',
+          'testi.casa.checkout',
+          'testi.casa.finestra',
+          'testi.casa.sezioni.intanto',
+          'testi.casa.settimana',
+        ],
+      },
+      {
         id: 'casa-riposo',
         nome: '4 · Giorno di riposo',
         rotta: '/casa?stato=riposo&ora=08:00',

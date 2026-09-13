@@ -49,6 +49,7 @@
 
 import { tutte } from './risposte'
 import { minutiDaOra } from './ore'
+import { IN_ANTEPRIMA } from './sviluppo'
 
 export type TipoSessione = 'checkin' | 'checkout'
 
@@ -98,6 +99,29 @@ export function giornoDellaSettimana(quando = new Date()): number {
   const d = new Date(quando)
   if (d.getHours() < 4) d.setDate(d.getDate() - 1)
   return (d.getDay() + 6) % 7
+}
+
+/**
+ * Vero nei giorni senza allenamento e senza educazione fisica.
+ *
+ * E' la stessa regola di `allenamentoDiOggi` in `giornata.ts`. Sta qui perche'
+ * la usano anche il percorso del check-out e il foglio delle sensazioni, che
+ * da `giornata.ts` si tirerebbero dietro un giro di import.
+ *
+ * Nei giorni di riposo il check-out non chiede niente della sessione — sforzo,
+ * soddisfazione, quando e' comparsa, cosa le ha fatto — perche' una sessione
+ * non c'e' stata.
+ *
+ * Nell'anteprima dei testi e' sempre falso: li' gli allenamenti non ci sono,
+ * e senza questo gli schermi di sforzo e soddisfazione sparirebbero proprio
+ * dal posto in cui si guardano per scriverne i testi.
+ */
+export function giornoDiRiposo(quando = new Date()): boolean {
+  if (IN_ANTEPRIMA) return false
+  const giorno = giornoDellaSettimana(quando)
+  const r = tutte()
+  const seAllena = Object.values(r.allenamenti).some((a) => a.giorni.includes(giorno))
+  return !seAllena && !r.edFisica.includes(giorno)
 }
 
 /**
