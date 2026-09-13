@@ -1,3 +1,5 @@
+// per primo, prima di ogni modulo che legge le sue copie: vedi il file
+import './lib/azzeramento'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'

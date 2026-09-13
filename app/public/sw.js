@@ -24,7 +24,12 @@
  * tiene la app, in una coda sua, dove sa cosa sono.
  */
 
-const CACHE = 'bab-v1'
+/*
+ * Cambiando il nome, all'attivazione le cache vecchie si cancellano (vedi
+ * `activate`). v2 e' l'azzeramento del 13 settembre 2026: i telefoni buttano
+ * le copie di prima invece di tenerle come rete di sicurezza.
+ */
+const CACHE = 'bab-v2'
 
 /*
  * Una cosa sola si precarica: la pagina.
