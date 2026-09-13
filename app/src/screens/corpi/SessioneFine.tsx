@@ -6,7 +6,7 @@ import { OcchielloSessione } from '../../ui/sessione/Testo'
 import { Scheda, Nota } from '../../ui/sessione/Scheda'
 import { Scelta } from '../../ui/sessione/Comandi'
 import { TINTA_LIVELLO } from '../../ui/sessione/SchedaParola'
-import { LIVELLI, LIVELLO_DI, nomeCodice } from '../../data/sessione'
+import { LIVELLI, LIVELLO_DI, nomeCodice, zonaGemella } from '../../data/sessione'
 import type { Livello, Parola } from '../../data/sessione'
 import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
@@ -38,32 +38,57 @@ function nome(s: Sensazione, ts: TestiSessione): string {
   return nomeCodice(s.zona, ts.zone)
 }
 
+/** Una riga di "Cosa comunica il tuo corpo": un punto, o due gemelli uguali. */
+type RigaCorpo = {
+  chiave: string
+  nome: string
+  parole: Parola[]
+  sue: string
+  intensita: number
+}
+
+/** Due sensazioni dicono la stessa cosa: stesse parole, stesse sue parole, stessa intensita'. */
+function stessiValori(a: Sensazione, b: Sensazione): boolean {
+  return (
+    [...a.parole].sort().join() === [...b.parole].sort().join() &&
+    a.sue.trim() === b.sue.trim() &&
+    a.intensita === b.intensita
+  )
+}
+
+/** "Quadricipiti", dal codice di uno dei due: `front_quad_r` -> `quad`. */
+function nomeEntrambe(s: Sensazione, ts: TestiSessione): string {
+  const base = s.zona.split('_').slice(1, -1).join('-')
+  return ts.zoneEntrambe[base] ?? nome(s, ts)
+}
+
 /**
- * "Quadricipite destro: teso, indolenzito e bruciante, circa 4 su 10. La noto
- * solo quando mi muovo."
+ * I punti segnati, pronti per la scheda.
  *
- * Tre modelli e non uno: la coda del "quando" c'e' solo se ha risposto, e
- * l'elenco delle parole non c'e' se non ne ha scelta nessuna. La congiunzione
- * finale ("e", "and") e' un modello anche lei — in un'altra lingua l'elenco
- * potrebbe non funzionare cosi'.
+ * Due zone gemelle con gli stessi valori diventano una riga sola col nome al
+ * plurale: capita quando a "Solo da un lato?" ha risposto di no, e il corpo le
+ * ha segnate da solo tutte e due. Se ne ha cambiata una, restano due righe —
+ * unirle vorrebbe dire far sparire quello che ha cambiato.
  */
-function fraseDelGiorno(s: Sensazione, ts: TestiSessione): string {
-  const t = ts.segnali.frase
-  const parole = s.parole.map((p) => ts.foglio.parole[p])
-  const elenco =
-    parole.length > 1
-      ? `${parole.slice(0, -1).join(', ')} ${t.e} ${parole[parole.length - 1]}`
-      : parole.join('')
-  const zona = nome(s, ts)
-  const dove = { zona, zonaMinuscola: zona.toLowerCase() }
-  const base = elenco
-    ? riempi(t.testo, { ...dove, parole: elenco, intensita: s.intensita })
-    : riempi(t.senzaParole, { ...dove, intensita: s.intensita })
-  if (!s.quando) return base
-  const coda = riempi(t.coda, { quando: minuscola(ts.foglio.quando.voci[s.quando]) })
-  // la coda inglese comincia con una virgola: attaccarla vuol dire togliere
-  // il punto che la frase base ha gia' in fondo
-  return coda.startsWith(',') ? base.replace(/\.$/, '') + coda : base + coda
+function righeDelCorpo(sensazioni: Sensazione[], ts: TestiSessione): RigaCorpo[] {
+  const unite = new Set<string>()
+  const righe: RigaCorpo[] = []
+  for (const s of sensazioni) {
+    if (unite.has(s.id)) continue
+    const gemella = zonaGemella(s.zona)
+    const altra = gemella
+      ? sensazioni.find((x) => x.zona === gemella && !unite.has(x.id) && stessiValori(s, x))
+      : undefined
+    if (altra) unite.add(altra.id)
+    righe.push({
+      chiave: s.id,
+      nome: altra ? nomeEntrambe(s, ts) : nome(s, ts),
+      parole: s.parole,
+      sue: s.sue.trim(),
+      intensita: s.intensita,
+    })
+  }
+  return righe
 }
 
 /**
@@ -75,11 +100,6 @@ function fraseDelGiorno(s: Sensazione, ts: TestiSessione): string {
  */
 function zone(nome: string): Record<string, string> {
   return { zona: nome, zonaMinuscola: nome.toLowerCase() }
-}
-
-/** "Solo quando mi muovo" dentro a una frase diventa minuscolo. */
-function minuscola(s: string): string {
-  return s.charAt(0).toLowerCase() + s.slice(1)
 }
 
 /** "teso · indolenzito · bruciante", oppure le sue parole se non ne ha scelte. */
@@ -144,17 +164,21 @@ function MossaDiOggi({ livello }: { livello: Livello }) {
 }
 
 /**
- * L'ultimo schermo del check-in: cosa vuol dire quello che ha appena segnato.
+ * L'ultimo schermo del check-in: quello che ha appena segnato, in chiaro.
  *
- * Non dice cosa ha. Prende le parole che ha scelto e gliele rimanda
- * indietro — la frase che potrebbe dire a un adulto, cosa dice ogni parola,
- * come si legge un segnale qualsiasi — e poi rimanda a un adulto, che e' la
- * riga piu' importante di tutto lo schermo.
+ * Due schede sole. Prima cosa comunica il corpo — ogni punto segnato, con le
+ * sue parole e quanto forte — e poi cosa provare oggi. Il resto che c'era (la
+ * frase da dire a chi la allena, cosa dice ogni parola, come si legge un
+ * segnale, il "quando") e' stato tolto per semplificare: a fine check-in,
+ * appena prima dell'allenamento, serve poco e chiaro.
  *
- * Il blocco si ripete per ogni punto segnato. Il frame ne mostra uno solo
- * ("About that right quad") perche' il caso disegnato e' quello, ma tre
- * punti sono tre punti: mostrarne uno e nascondere gli altri due vorrebbe
- * dire far sparire proprio la cosa che le abbiamo chiesto di segnare.
+ * Non dice cosa ha: le rimanda indietro quello che ha scritto. La nota in
+ * fondo resta, perche' e' quella che dice che BAB non da' nomi alle malattie
+ * e non decide se allenarsi.
+ *
+ * Tutti i punti segnati ci sono, uno per riga: mostrarne uno e nascondere gli
+ * altri vorrebbe dire far sparire proprio la cosa che le abbiamo chiesto di
+ * segnare.
  */
 export function CorpoSegnali({
   passo,
@@ -166,9 +190,10 @@ export function CorpoSegnali({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkin')
-  const { ts, tp } = useLingua()
+  const { ts } = useLingua()
   const t = ts.segnali
   const sensazioni = dati.sensazioni
+  const righe = righeDelCorpo(sensazioni, ts)
 
   return (
     <Schermo
@@ -194,71 +219,39 @@ export function CorpoSegnali({
           : t.titoloPiu}
       </Titolo>
 
-      {sensazioni.map((s) => {
-        const livello = livelloDi(s.parole)
-        return (
-          <div key={s.id} className="mt-[18px] flex flex-col gap-[10px]">
-            <Scheda piatta className="px-[15px] py-[13px]">
-              <p className="m-0 text-[12px] font-bold tracking-[0.5px] text-ink-medio">
-                {t.frase.etichetta}
-              </p>
-              <p className="m-0 mt-[10px] text-[15px] leading-[1.5] font-bold text-ink">
-{fraseDelGiorno(s, ts)}
-              </p>
-            </Scheda>
-
-            {s.parole.length > 0 && (
-              <Scheda piatta className="px-[15px] py-[13px]">
-                <p className="m-0 text-[13px] font-bold text-ink">{t.parole.titolo}</p>
-                <p className="m-0 mt-1 text-[12px] leading-[1.4] text-ink-medio">
-                  {t.parole.occhio}
-                </p>
-                <ul className="m-0 mt-3 flex list-none flex-col gap-[10px] p-0">
-                  {s.parole.map((p) => {
-                    const scheda = tp.schede[p]
-                    const l = LIVELLO_DI[p]
-                    const tinta = TINTA_LIVELLO[l]
-                    return (
-                      <li key={p} className="flex items-start justify-between gap-3">
-                        <span className="min-w-0">
-                          <span className="block text-[13px] font-bold text-ink">
-                            {ts.foglio.parole[p]}
-                          </span>
-                          <span className="block text-[11px] text-ink-medio">
-                            {scheda.glossa ?? scheda.riga}
-                          </span>
-                        </span>
-                        <span
-                          className="inline-flex shrink-0 items-center gap-[6px] rounded-[10px] px-2 py-[3px] text-[10px] font-bold"
-                          style={{ background: tinta.fondo, color: tinta.testo }}
-                        >
-                          <span
-                            aria-hidden
-                            className="size-[5px] shrink-0 rounded-full"
-                            style={{ background: tinta.testo }}
-                          />
-                          {scheda.mossa ?? tp.livelli[l].nome}
-                        </span>
-                      </li>
-                    )
-                  })}
-                </ul>
-                {livello && (
-                  <>
-                    <div className="mt-3 h-px bg-riga" />
-                    <div className="mt-[10px]">
-                      <MossaDiOggi livello={livello} />
-                    </div>
-                  </>
-                )}
-              </Scheda>
-            )}
-          </div>
-        )
-      })}
-
       <div className="mt-[18px]">
-        <ComeLeggere />
+        <Scheda piatta className="px-[15px] py-[13px]">
+          <p className="m-0 text-[13px] font-bold text-ink">{t.corpo.titolo}</p>
+          <ul className="m-0 mt-1 list-none p-0">
+            {righe.map((r, i) => (
+              <li key={r.chiave} className={`py-[10px] ${i > 0 ? 'border-t border-riga' : ''}`}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="min-w-0 text-[14px] font-bold text-ink">{r.nome}</span>
+                  <span className="shrink-0 text-[12px] font-bold text-ink-medio">
+                    {riempi(t.corpo.intensita, { intensita: r.intensita })}
+                  </span>
+                </div>
+                {/* le sue parole contano come le pastiglie: se ha scritto e basta, si legge quello */}
+                {r.parole.length > 0 ? (
+                  <div className="mt-[6px] flex flex-wrap gap-[6px]">
+                    {r.parole.map((p) => (
+                      <span
+                        key={p}
+                        className="rounded-[10px] bg-lilla-fondo px-2 py-[3px] text-[11px] font-bold text-lilla-testo"
+                      >
+                        {ts.foglio.parole[p]}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  r.sue && (
+                    <p className="m-0 mt-1 text-[12px] leading-[1.45] text-ink-medio">“{r.sue}”</p>
+                  )
+                )}
+              </li>
+            ))}
+          </ul>
+        </Scheda>
       </div>
 
       <div className="mt-[18px]">
@@ -274,13 +267,6 @@ export function CorpoSegnali({
               </li>
             ))}
           </ol>
-        </Scheda>
-      </div>
-
-      <div className="mt-[18px]">
-        <Scheda piatta className="px-[15px] py-[13px]">
-          <p className="m-0 text-[13px] font-bold text-ink">{t.quando.titolo}</p>
-          <p className="m-0 mt-2 text-[12px] leading-[1.5] text-ink-medio">{t.quando.corpo}</p>
         </Scheda>
       </div>
 

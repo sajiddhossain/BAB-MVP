@@ -115,33 +115,15 @@ const it = {
     occhiello: 'PASSO 4 · DAGLI UN SENSO',
     titolo: 'Parliamo di: {zonaMinuscola}.',
     titoloPiu: 'Parliamo di quello che hai segnato.',
-    frase: {
-      etichetta: 'La tua frase di oggi',
-      /*
-       * `{zona}` e' il nome come si scrive ("Quadricipite destro"),
-       * `{zonaMinuscola}` lo stesso tutto minuscolo. Servono tutt'e due
-       * perche' in italiano la zona apre la frase e in inglese sta in mezzo:
-       * una lingua la vuole maiuscola, l'altra no, e non e' una cosa che il
-       * codice possa decidere per conto suo.
-       *
-       * La frase che potrebbe dire a chi la allena. Tre modelli e non uno:
-       * la coda del "quando" c'e' solo se ha risposto, e l'elenco delle
-       * parole non c'e' se non ne ha scelta nessuna.
-       *
-       * In italiano la frase non usa il possessivo ("il mio quadricipite")
-       * perche' meta' delle zone sono femminili e le parole sono tutte al
-       * maschile: sarebbe "la mia caviglia teso". Due punti e l'elenco lo
-       * evitano.
-       */
-      testo: '{zona}: {parole}, circa {intensita} su 10.',
-      senzaParole: '{zona}: circa {intensita} su 10.',
-      coda: ' La noto {quando}.',
-      /** la congiunzione dell'elenco: "teso, indolenzito e bruciante" */
-      e: 'e',
-    },
-    parole: {
-      titolo: 'Cosa dicono le tue parole',
-      occhio: 'Ognuna ha la sua mossa. Quella che grida più forte decide la mossa di oggi.',
+    /*
+     * La scheda con i punti segnati: uno per riga, con le sue parole e
+     * quanto forte. Due punti gemelli uguali — quelli nati da "Solo da un
+     * lato? No" — diventano una riga sola col nome al plurale, vedi
+     * `zoneEntrambe`.
+     */
+    corpo: {
+      titolo: 'Cosa comunica il tuo corpo',
+      intensita: '{intensita} su 10',
     },
     prova: {
       titolo: 'Prova questo oggi',
@@ -151,11 +133,6 @@ const it = {
         'Guarda se si scioglie, resta uguale o peggiora: te lo chiediamo al check-out, non adesso.',
         'Se una parola diventa pungente, trafittiva o formicolante, è un altro discorso: fermati con quel movimento e dillo a qualcuno.',
       ],
-    },
-    quando: {
-      titolo: 'Il "quando" non devi ancora saperlo',
-      corpo:
-        'Se questa cosa esce durante, subito dopo, il giorno dopo o intorno al ciclo è BAB a ricavarlo, leggendo lo stesso punto una sessione dopo l\'altra. Il tuo lavoro è solo dargli un nome ogni volta.',
     },
     nota: 'Leggere il segnale è la bravura. Ignorarlo è da principianti. BAB non ti dice mai se allenarti o no, e non dà mai un nome a una malattia.',
     azione: 'Capito, si comincia',
@@ -430,6 +407,37 @@ const it = {
     'heel-l': 'Tallone sinistro',
     'heel-r': 'Tallone destro',
   },
+
+  /*
+   * Le zone quando sono segnate tutte e due, uguali: "Quadricipiti" invece di
+   * "Quadricipite destro" e "Quadricipite sinistro" su due righe. La chiave e'
+   * l'id senza il lato (`quad-r` -> `quad`). La testa non c'e': sta nel mezzo.
+   */
+  zoneEntrambe: {
+    'trap': 'Trapezi',
+    'shoulder': 'Spalle',
+    'chest': 'Petto',
+    'upperarm': 'Braccia',
+    'ribs': 'Costole',
+    'elbow': 'Gomiti',
+    'abs': 'Addominali',
+    'forearm': 'Avambracci',
+    'hip': 'Anche',
+    'wrist': 'Polsi',
+    'hand': 'Mani',
+    'quad': 'Quadricipiti',
+    'knee': 'Ginocchia',
+    'shin': 'Tibie',
+    'ankle': 'Caviglie',
+    'foot': 'Piedi',
+    'upperback': 'Schiena alta',
+    'midback': 'Schiena media',
+    'lowback': 'Zona lombare',
+    'glute': 'Glutei',
+    'ham': 'Cosce posteriori',
+    'calf': 'Polpacci',
+    'heel': 'Talloni',
+  } as Record<string, string>,
 }
 
 const en: typeof it = {
@@ -498,16 +506,9 @@ const en: typeof it = {
     occhiello: 'STEP 4 · MAKE SENSE OF IT',
     titolo: 'About that {zonaMinuscola}.',
     titoloPiu: 'About what you flagged.',
-    frase: {
-      etichetta: 'Your sentence today',
-      testo: 'My {zonaMinuscola} feels {parole}, about {intensita} out of 10.',
-      senzaParole: 'My {zonaMinuscola} is about {intensita} out of 10.',
-      coda: ', and I notice it {quando}.',
-      e: 'and',
-    },
-    parole: {
-      titolo: 'What your words are saying',
-      occhio: 'Each one has its own move. The loudest one sets today’s call.',
+    corpo: {
+      titolo: 'What your body is telling you',
+      intensita: '{intensita} out of 10',
     },
     prova: {
       titolo: 'Try this today',
@@ -517,11 +518,6 @@ const en: typeof it = {
         'Notice whether it warms out, stays, or gets worse — you’ll answer that at check-out, not now.',
         'If any word changes to sharp, stabbing or tingling, that’s a different conversation — stop that movement and tell someone.',
       ],
-    },
-    quando: {
-      titolo: 'You don’t have to know the "when" yet',
-      corpo:
-        'Whether this shows up during, right after, the next day, or around your period is something BAB works out for you — by reading the same spot across sessions. Your job is just to name it each time.',
     },
     nota: 'Reading the signal is the skill. Ignoring it is the amateur move. BAB never tells you to train or not to train — and never names a condition.',
     azione: 'Got it — start training',
@@ -761,6 +757,32 @@ const en: typeof it = {
     'calf-r': 'Right calf',
     'heel-l': 'Left heel',
     'heel-r': 'Right heel',
+  },
+
+  zoneEntrambe: {
+    'trap': 'Traps',
+    'shoulder': 'Shoulders',
+    'chest': 'Chest',
+    'upperarm': 'Upper arms',
+    'ribs': 'Ribs',
+    'elbow': 'Elbows',
+    'abs': 'Abs',
+    'forearm': 'Forearms',
+    'hip': 'Hips',
+    'wrist': 'Wrists',
+    'hand': 'Hands',
+    'quad': 'Quads',
+    'knee': 'Knees',
+    'shin': 'Shins',
+    'ankle': 'Ankles',
+    'foot': 'Feet',
+    'upperback': 'Upper back',
+    'midback': 'Mid back',
+    'lowback': 'Lower back',
+    'glute': 'Glutes',
+    'ham': 'Hamstrings',
+    'calf': 'Calves',
+    'heel': 'Heels',
   },
 }
 

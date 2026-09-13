@@ -56,7 +56,10 @@ export type SchedaParola = {
   descrizione: string
   riquadri: Riquadro[]
   /*
-   * La riga corta e la mossa sullo schermo "cosa dicono le tue parole".
+   * La riga corta e la mossa che stavano sullo schermo "cosa dicono le tue
+   * parole", alla fine del check-in. Quella scheda e' stata tolta quando lo
+   * schermo e' stato semplificato, e oggi non le mostra nessuno: restano qui
+   * perche' vengono dal disegno, e rifarle costerebbe piu' che tenerle.
    *
    * Il disegno le da' per TRE parole su sedici, e sono queste: dove mancano
    * si usa `riga` per la prima e il nome del livello per la seconda. Non le
