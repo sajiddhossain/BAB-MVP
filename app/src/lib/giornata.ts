@@ -1,7 +1,7 @@
 import { useCallback, useSyncExternalStore } from 'react'
 import { supabase } from './supabase'
 import { giornoAtleta } from './sessione'
-import { statoFinestra } from './finestre'
+import { giornoDellaSettimana, statoFinestra } from './finestre'
 import { minutiDaOra } from './ore'
 import { fattoInCoda } from './coda'
 import { riempi } from '../copy/riempi'
@@ -327,12 +327,13 @@ function mezzogiorno(d: Date): Date {
 /**
  * Se oggi c'e' allenamento, e a che ora.
  *
- * Guarda gli allenamenti e l'educazione fisica messi nell'onboarding. I
- * giorni li' sono indicizzati da lunedi' = 0, mentre `getDay()` mette
- * domenica a 0: da qui il giro dei sette.
+ * Guarda gli allenamenti e l'educazione fisica messi nell'onboarding. Il
+ * giorno e' quello dell'atleta, che finisce alle quattro del mattino — lo
+ * stesso che usano le finestre, se no dopo mezzanotte la home e le finestre
+ * guarderebbero due giorni diversi.
  */
 export function allenamentoDiOggi(quando = new Date()): { ce: boolean; ora: string } {
-  const giorno = (quando.getDay() + 6) % 7
+  const giorno = giornoDellaSettimana(quando)
   const r = tutte()
 
   const seAllena = Object.values(r.allenamenti).some((a) => a.giorni.includes(giorno))

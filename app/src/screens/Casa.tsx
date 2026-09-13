@@ -240,16 +240,24 @@ function Azione({
 
   if (stato === 'presto') {
     const modello = tipo === 'checkin' ? f.checkinPresto : f.checkoutPresto
-    return <Riga>{riempi(modello, { ora: oraApertura(tipo) })}</Riga>
+    return <Riga>{riempi(modello, { ora: oraApertura(tipo, adesso) })}</Riga>
   }
 
   /*
-   * Chiusa capita solo al check-in: dopo le 15:30 la giornata e' passata al
-   * check-out. Il check-out invece non chiude mai davvero — alle quattro del
-   * mattino il giorno cambia, e con lui la scheda.
+   * Chiusa: il momento e' passato, e per oggi non si fa piu'.
+   *
+   * Il check-in chiuso si vede quasi solo nei giorni di riposo: negli altri,
+   * appena chiude, la giornata passa al check-out. L'ora in cui riapre e'
+   * quella di domani, che puo' non essere quella di oggi — domani magari si
+   * allena a un'altra ora, o riposa.
+   *
+   * Il check-out chiuso invece si vede: trenta minuti dopo l'allenamento, se
+   * non l'ha fatto, la scheda resta questa fino alle quattro del mattino.
    */
   if (stato === 'chiusa') {
-    return <Riga>{riempi(f.checkinChiuso, { ora: oraApertura('checkin') })}</Riga>
+    if (tipo === 'checkout') return <Riga>{f.checkoutChiuso}</Riga>
+    const domani = new Date(adesso.getTime() + 24 * 60 * 60 * 1000)
+    return <Riga>{riempi(f.checkinChiuso, { ora: oraApertura('checkin', domani) })}</Riga>
   }
 
   return (

@@ -362,6 +362,8 @@ const it = {
       checkinChiuso: 'Il check-in di oggi si è chiuso. Riapre domani alle {ora}.',
       checkoutPresto: 'Il check-out apre alle {ora}, dopo l’allenamento.',
       checkoutRitardo: 'Il momento del check-out è passato, ma puoi ancora farlo.',
+      /* trenta minuti dopo l'allenamento il check-out chiude, e per oggi non riapre */
+      checkoutChiuso: 'Per oggi è andata. Ci vediamo al prossimo allenamento.',
       fatto: 'Fatto per oggi.',
     },
 
@@ -738,6 +740,7 @@ const en: typeof it = {
       checkinChiuso: 'Today’s check-in has closed. It opens again tomorrow at {ora}.',
       checkoutPresto: 'Check-out opens at {ora}, after training.',
       checkoutRitardo: 'The check-out window has passed, but you can still do it.',
+      checkoutChiuso: 'That’s it for today. See you at your next session.',
       fatto: 'Done for today.',
     },
 
