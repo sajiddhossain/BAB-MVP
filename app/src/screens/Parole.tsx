@@ -24,7 +24,14 @@ import { BottoneTocco } from '../ui/tocco'
  * spiegazione vede alla fine del check-in, scritta in chiaro. Quello che BAB
  * mostra e quello che BAB sa sono la stessa cosa.
  */
-export function Parole({ onChiudi }: { onChiudi?: () => void } = {}) {
+export function Parole({
+  onChiudi,
+  onUsa,
+}: {
+  onChiudi?: () => void
+  /** c'e' solo quando l'elenco si apre dal foglio: accende la parola li' */
+  onUsa?: (p: Parola) => void
+} = {}) {
   const vai = useNavigate()
   const { ts, tp } = useLingua()
   const t = tp
@@ -38,96 +45,116 @@ export function Parole({ onChiudi }: { onChiudi?: () => void } = {}) {
    */
   const chiudi = onChiudi ?? (() => vai(-1))
 
-  const dentro = (
-    <>
-      <Schermo
-        nodo="4108:2"
-        verso="avanti"
-        avanzamento={1}
-        indietro={chiudi}
-        stacco={30}
-        margini={24}
-        azione={<Bottone onClick={chiudi}>{t.schermo.azione}</Bottone>}
-      >
-        <OcchielloSessione icona="scintilla">{t.schermo.occhiello}</OcchielloSessione>
-        <Titolo>{t.schermo.titolo}</Titolo>
-        <p className="m-0 mt-3 text-[14px] leading-[1.4] text-ink-mute">{t.schermo.intro}</p>
+  const schermo = (
+    <Schermo
+      nodo="4108:2"
+      verso="avanti"
+      avanzamento={1}
+      indietro={chiudi}
+      stacco={30}
+      margini={24}
+      azione={<Bottone onClick={chiudi}>{t.schermo.azione}</Bottone>}
+    >
+      <OcchielloSessione icona="scintilla">{t.schermo.occhiello}</OcchielloSessione>
+      <Titolo>{t.schermo.titolo}</Titolo>
+      <p className="m-0 mt-3 text-[14px] leading-[1.4] text-ink-mute">{t.schermo.intro}</p>
 
-        <div className="mt-6 flex flex-col gap-5">
-          {LIVELLI.map((livello) => {
-            const tinta = TINTA_LIVELLO[livello]
-            return (
-              <section key={livello}>
-                {/*
-                  La fascia: pastiglia col nome del livello, una riga che la
-                  allunga fino alla spiegazione, e la spiegazione a destra.
-                  La riga non e' decorazione — e' quello che lega il nome del
-                  livello alla frase che lo spiega, che altrimenti sembrano
-                  due cose diverse messe sulla stessa altezza.
-                */}
-                <div className="flex items-center gap-3">
+      <div className="mt-6 flex flex-col gap-5">
+        {LIVELLI.map((livello) => {
+          const tinta = TINTA_LIVELLO[livello]
+          return (
+            <section key={livello}>
+              {/*
+                La fascia: pastiglia col nome del livello, una riga che la
+                allunga fino alla spiegazione, e la spiegazione a destra.
+                La riga non e' decorazione — e' quello che lega il nome del
+                livello alla frase che lo spiega, che altrimenti sembrano
+                due cose diverse messe sulla stessa altezza.
+              */}
+              <div className="flex items-center gap-3">
+                <span
+                  className="inline-flex shrink-0 items-center gap-[6px] rounded-[12px] px-[10px] py-[4px] text-[11px] font-bold"
+                  style={{ background: tinta.fondo, color: tinta.testo }}
+                >
                   <span
-                    className="inline-flex shrink-0 items-center gap-[6px] rounded-[12px] px-[10px] py-[4px] text-[11px] font-bold"
-                    style={{ background: tinta.fondo, color: tinta.testo }}
-                  >
-                    <span
-                      aria-hidden
-                      className="size-[6px] rounded-full"
-                      style={{ background: 'currentColor' }}
-                    />
-                    {t.livelli[livello].nome}
-                  </span>
-                  <span className="h-px min-w-[10px] flex-1 bg-riga" aria-hidden />
-                  <span className="max-w-[58%] shrink-0 text-right text-[11px] leading-[1.25] text-ink-mute">
-                    {t.livelli[livello].spiega}
-                  </span>
-                </div>
+                    aria-hidden
+                    className="size-[6px] rounded-full"
+                    style={{ background: 'currentColor' }}
+                  />
+                  {t.livelli[livello].nome}
+                </span>
+                <span className="h-px min-w-[10px] flex-1 bg-riga" aria-hidden />
+                <span className="max-w-[58%] shrink-0 text-right text-[11px] leading-[1.25] text-ink-mute">
+                  {t.livelli[livello].spiega}
+                </span>
+              </div>
 
-                <ul className="m-0 mt-[10px] flex list-none flex-col gap-[6px] p-0">
-                  {paroleDi(livello).map((p) => (
-                    <li key={p}>
-                      <BottoneTocco
-                        onClick={() => setSpiega(p)}
-                        className="flex w-full items-center gap-[10px] rounded-[10px] border border-nebbia-bordo bg-nebbia py-[3px] pr-3 pl-[14px] text-left"
-                      >
-                        <span
-                          aria-hidden
-                          className="size-[7px] shrink-0 rounded-full"
-                          style={{ background: tinta.testo }}
-                        />
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[14px] font-bold text-ink">
-                            {parole[p]}
-                          </span>
-                          <span className="block truncate text-[11px] text-ink-mute">
-                            {t.schede[p].riga}
-                          </span>
+              <ul className="m-0 mt-[10px] flex list-none flex-col gap-[6px] p-0">
+                {paroleDi(livello).map((p) => (
+                  <li key={p}>
+                    <BottoneTocco
+                      onClick={() => setSpiega(p)}
+                      className="flex w-full items-center gap-[10px] rounded-[10px] border border-nebbia-bordo bg-nebbia py-[3px] pr-3 pl-[14px] text-left"
+                    >
+                      <span
+                        aria-hidden
+                        className="size-[7px] shrink-0 rounded-full"
+                        style={{ background: tinta.testo }}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[14px] font-bold text-ink">
+                          {parole[p]}
                         </span>
-                        <span aria-hidden className="text-[16px] font-bold text-ink-tenue">
-                          ›
+                        <span className="block truncate text-[11px] text-ink-mute">
+                          {t.schede[p].riga}
                         </span>
-                      </BottoneTocco>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )
-          })}
-        </div>
+                      </span>
+                      <span aria-hidden className="text-[16px] font-bold text-ink-tenue">
+                        ›
+                      </span>
+                    </BottoneTocco>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        })}
+      </div>
 
-        <div className="mt-6">
-          <Nota>{t.schermo.nota}</Nota>
-        </div>
-      </Schermo>
-
-      {spiega && <SchedaParola parola={spiega} onChiudi={() => setSpiega(null)} />}
-    </>
+      <div className="mt-6">
+        <Nota>{t.schermo.nota}</Nota>
+      </div>
+    </Schermo>
   )
 
-  if (!onChiudi) return dentro
+  const scheda = spiega && (
+    <SchedaParola
+      parola={spiega}
+      onChiudi={() => setSpiega(null)}
+      onUsa={onUsa && (() => onUsa(spiega))}
+    />
+  )
+
+  if (!onChiudi)
+    return (
+      <>
+        {schermo}
+        {scheda}
+      </>
+    )
+  /*
+   * La scheda sta FUORI dallo strato che scorre, non dentro. L'animazione che
+   * lo fa salire finisce con un `transform`, e un `transform` fa da cornice a
+   * ogni `fixed` che ci sta dentro: la scheda si ancorava all'elenco invece
+   * che allo schermo, e con l'elenco scorso a meta' si apriva mezza fuori —
+   * col bottone in fondo tagliato via.
+   */
   return (
-    <div className="bab-sale fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-paper">
-      {dentro}
-    </div>
+    <>
+      <div className="bab-sale fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-paper">
+        {schermo}
+      </div>
+      {scheda}
+    </>
   )
 }

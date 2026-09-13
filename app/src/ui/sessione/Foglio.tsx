@@ -69,6 +69,11 @@ export function Foglio({
     })
   }
 
+  /* dalla scheda si accende soltanto: toccare "usala" su una gia' accesa non la spegne */
+  function usa(p: Parola) {
+    if (!bozza.parole.includes(p)) commuta(p)
+  }
+
   const altrove = bozza.zona === 'altrove'
   /*
    * Per salvare serve almeno un modo di dire cosa si sente — una pastiglia o
@@ -317,12 +322,32 @@ export function Foglio({
 
       {/*
         La scheda della parola sta SOPRA al foglio, non al posto suo: chi la
-        chiude ritrova il foglio com'era, con quello che aveva gia' scelto —
-        e la parola la sceglie dalla fila qui dietro, che e' rimasta dov'era.
+        chiude ritrova il foglio com'era, con quello che aveva gia' scelto.
+        "Usa questa parola" la accende e torna al foglio in un gesto solo —
+        anche dall'elenco intero, che si chiude insieme alla scheda. Una
+        parola gia' accesa resta accesa: il bottone dice "usala", non
+        "cambiala".
       */}
-      {elenco && <Parole onChiudi={() => setElenco(false)} />}
+      {elenco && (
+        <Parole
+          onChiudi={() => setElenco(false)}
+          onUsa={(p) => {
+            usa(p)
+            setElenco(false)
+          }}
+        />
+      )}
 
-      {spiega && <SchedaParola parola={spiega} onChiudi={() => setSpiega(null)} />}
+      {spiega && (
+        <SchedaParola
+          parola={spiega}
+          onChiudi={() => setSpiega(null)}
+          onUsa={() => {
+            usa(spiega)
+            setSpiega(null)
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -48,22 +48,25 @@ const RIQUADRO: Record<Tono, { fondo: string; bordo: string; etichetta: string; 
  * per una scheda sola si paga in byte a ogni apertura, e la differenza fra i
  * due a queste misure non si vede.
  *
- * ── NON HA UN BOTTONE IN FONDO ─────────────────────────────────────────────
- * C'era "Usa questa parola", e accendeva la parola chiudendo la scheda. Era
- * una seconda strada per fare una cosa che si fa gia' toccando la parola
- * nella fila dietro, e in questo posto era anche una spinta: si apre la
- * scheda per capire se una parola e' quella giusta, e chiuderla con un
- * bottone verde che dice "usala" e' un modo di rispondere al posto suo.
+ * ── "USA QUESTA PAROLA" SOLO DENTRO A UNA SESSIONE ─────────────────────────
+ * Il bottone in fondo c'e' quando la scheda si apre durante un check-in o un
+ * check-out, cioe' quando chi la apre ha `onUsa` da passarle: accende la
+ * parola nel foglio e torna li' in un gesto solo.
  *
- * Adesso la scheda spiega e basta. Si chiude dalla ✕, trascinandola giu', o
- * toccando fuori — e la parola si sceglie dov'e' sempre stata.
+ * Quando le sedici parole si leggono e basta — dalla home, dal loro
+ * indirizzo — non c'e' niente da accendere, e il bottone non c'e': un "usala"
+ * che chiude e non fa altro sarebbe una bugia. Li' la scheda spiega, e si
+ * chiude dalla ✕ o toccando fuori.
  */
 export function SchedaParola({
   parola,
   onChiudi,
+  onUsa,
 }: {
   parola: Parola
   onChiudi: () => void
+  /** accende la parola nel foglio; senza, la scheda e' solo da leggere */
+  onUsa?: () => void
 }) {
   const { ts, tp } = useLingua()
   const t = tp
@@ -104,11 +107,15 @@ export function SchedaParola({
           </div>
 
           {/*
-            L'aria in fondo la mette lo scorrevole, adesso che sotto non c'e'
-            piu' il bottone: se no l'ultimo riquadro finirebbe appiccicato al
-            bordo dello schermo.
+            Senza bottone sotto, l'aria in fondo la mette lo scorrevole: se no
+            l'ultimo riquadro finirebbe appiccicato al bordo dello schermo.
+            Col bottone ci pensa lui.
           */}
-          <div className="flex-1 overflow-y-auto px-6 pt-[26px] pb-[calc(26px+env(safe-area-inset-bottom))]">
+          <div
+            className={`flex-1 overflow-y-auto px-6 pt-[26px] ${
+              onUsa ? '' : 'pb-[calc(26px+env(safe-area-inset-bottom))]'
+            }`}
+          >
             <div className="flex items-center justify-between gap-3">
               <h2 className="m-0 text-[24px] leading-none font-bold text-ink">{nome}</h2>
               {/*
@@ -170,6 +177,21 @@ export function SchedaParola({
               })}
             </div>
           </div>
+
+          {onUsa && (
+            <div className="shrink-0 px-6 pt-[21px] pb-[calc(24px+env(safe-area-inset-bottom))]">
+              <div className="relative h-[62px] w-full">
+                <div className="absolute inset-x-0 top-[6px] h-14 rounded-pill bg-black/8" />
+                <button
+                  type="button"
+                  onClick={onUsa}
+                  className="absolute inset-x-0 top-0 h-14 rounded-pill border-[1.5px] border-line bg-lime text-[16px] font-bold text-ink"
+                >
+                  {t.usa}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
