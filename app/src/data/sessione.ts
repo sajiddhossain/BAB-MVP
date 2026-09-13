@@ -297,6 +297,23 @@ function specchia(zone: readonly BodyZone[]): BodyZone[] {
 
 export const ZONE = { front: specchia(FRONT_ZONES), back: BACK_ZONES } as const
 
+/**
+ * La zona gemella dall'altro lato del corpo: `front_quad_r` -> `front_quad_l`.
+ *
+ * Serve quando a "Solo da un lato?" risponde di no: la sente da tutti e due i
+ * lati, e l'altra gamba si segna da sola. Torna `null` per le zone che non
+ * hanno un gemello — la testa, che sta nel mezzo, e "Altrove" — e per un
+ * gemello che il disegno non ha, cosi' non nasce mai una zona che non si puo'
+ * toccare.
+ */
+export function zonaGemella(codice: string): string | null {
+  const m = /^(front|back)_(.+)_(l|r)$/.exec(codice)
+  if (!m) return null
+  const lato = m[1] as Lato
+  const gemella = `${lato}_${m[2]}_${m[3] === 'l' ? 'r' : 'l'}`
+  return ZONE[lato].some((z) => codiceZona(lato, z.id) === gemella) ? gemella : null
+}
+
 /*
  * Il nome visibile di una zona.
  *

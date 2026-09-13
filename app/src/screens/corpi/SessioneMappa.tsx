@@ -16,6 +16,7 @@ import {
 } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { Lato } from '../../data/sessione'
+import { zonaGemella } from '../../data/sessione'
 import type { PropsSessione } from '../tipi'
 
 /** Una sensazione appena nata, prima che ci scriva dentro qualcosa. */
@@ -123,12 +124,25 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
     )
   }
 
+  /*
+   * Salvare, e con "Solo da un lato? No" anche la zona gemella.
+   *
+   * Se la sente da tutti e due i lati, l'altra gamba si segna da sola: una
+   * sensazione a parte, copia di questa, che poi si cambia o si toglie per
+   * conto suo. Nasce solo se la gemella e' ancora libera — se li' aveva gia'
+   * segnato qualcosa, quella resta sua e non si sovrascrive.
+   */
   function salva(s: Sensazione) {
-    scriviSessione(tipo, (d) => ({
-      sensazioni: d.sensazioni.some((x) => x.id === s.id)
+    scriviSessione(tipo, (d) => {
+      let sensazioni = d.sensazioni.some((x) => x.id === s.id)
         ? d.sensazioni.map((x) => (x.id === s.id ? s : x))
-        : [...d.sensazioni, s],
-    }))
+        : [...d.sensazioni, s]
+      const gemella = s.unLato === false ? zonaGemella(s.zona) : null
+      if (gemella && !sensazioni.some((x) => x.zona === gemella)) {
+        sensazioni = [...sensazioni, { ...s, id: crypto.randomUUID(), zona: gemella }]
+      }
+      return { sensazioni }
+    })
     setAperta(null)
   }
 
