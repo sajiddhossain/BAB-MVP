@@ -1,50 +1,23 @@
+import { useEffect, useState } from 'react'
 import { Schermo } from '../../ui/Schermo'
 import { Bottone } from '../../ui/Bottone'
 import { Titolo } from '../../ui/Testo'
 import { Errore } from '../../ui/Testo'
 import { OcchielloSessione } from '../../ui/sessione/Testo'
 import { Scheda, Nota } from '../../ui/sessione/Scheda'
-import { Scelta } from '../../ui/sessione/Comandi'
-import { TINTA_LIVELLO } from '../../ui/sessione/SchedaParola'
-import { LIVELLI, LIVELLO_DI, nomeCodice, zonaGemella } from '../../data/sessione'
-import type { Livello, Parola } from '../../data/sessione'
+import { nomeCodice, zonaGemella } from '../../data/sessione'
+import type { Parola } from '../../data/sessione'
 import { riempi } from '../../copy/riempi'
 import type { TestiSessione } from '../../copy/sessione'
 import { useLingua } from '../../lib/lingua'
-import { datiSessione, useDatiSessione, scriviSessione } from '../../lib/sessione'
+import { sensazioniCheckinDalDatabase, useDatiSessione } from '../../lib/sessione'
 import type { Sensazione } from '../../lib/sessione'
 import type { PropsSessione } from '../tipi'
-
-/**
- * Il livello che decide la mossa del punto: il piu' alto fra quelli delle
- * parole scelte.
- *
- * "Il piu' alto" e non "il piu' frequente": una parola che chiede una mano
- * non si annulla perche' accanto ce ne sono due che dicono di spingere. E'
- * la stessa regola che la scheda-parola usa per il colore del badge.
- */
-function livelloDi(parole: Parola[]): Livello | null {
-  let peggiore: Livello | null = null
-  for (const p of parole) {
-    const l = LIVELLO_DI[p]
-    if (peggiore === null || LIVELLI.indexOf(l) > LIVELLI.indexOf(peggiore)) peggiore = l
-  }
-  return peggiore
-}
 
 /** Il nome che si vede: la zona, o quello che ha scritto lei per "Altrove". */
 function nome(s: Sensazione, ts: TestiSessione): string {
   if (s.zona === 'altrove') return s.zonaLibera.trim() || ts.mappa.altrove
   return nomeCodice(s.zona, ts.zone)
-}
-
-/** Una riga di "Cosa comunica il tuo corpo": un punto, o due gemelli uguali. */
-type RigaCorpo = {
-  chiave: string
-  nome: string
-  parole: Parola[]
-  sue: string
-  intensita: number
 }
 
 /** Due sensazioni dicono la stessa cosa: stesse parole, stesse sue parole, stessa intensita'. */
@@ -60,6 +33,55 @@ function stessiValori(a: Sensazione, b: Sensazione): boolean {
 function nomeEntrambe(s: Sensazione, ts: TestiSessione): string {
   const base = s.zona.split('_').slice(1, -1).join('-')
   return ts.zoneEntrambe[base] ?? nome(s, ts)
+}
+
+/**
+ * I due buchi del nome della zona.
+ *
+ * Uno com'e' scritto e uno tutto minuscolo, perche' in italiano la zona apre
+ * la frase e in inglese sta in mezzo ("About that right quad"): quale delle
+ * due serve lo decide il testo, non il codice.
+ */
+function zone(nome: string): Record<string, string> {
+  return { zona: nome, zonaMinuscola: nome.toLowerCase() }
+}
+
+/**
+ * Le parole di un punto: le pastiglie di quelle scelte, oppure le sue parole
+ * fra virgolette se non ne ha scelta nessuna. E' la stessa nei due schermi,
+ * cosi' il prima e il dopo si leggono come la fine del check-in.
+ */
+function ParoleScelte({ parole, sue }: { parole: Parola[]; sue: string }) {
+  const { ts } = useLingua()
+  if (parole.length > 0) {
+    return (
+      <div className="flex flex-wrap gap-[6px]">
+        {parole.map((p) => (
+          <span
+            key={p}
+            className="rounded-[10px] bg-lilla-fondo px-2 py-[3px] text-[11px] font-bold text-lilla-testo"
+          >
+            {ts.foglio.parole[p]}
+          </span>
+        ))}
+      </div>
+    )
+  }
+  if (sue.trim()) {
+    return <p className="m-0 text-[12px] leading-[1.45] text-ink-medio">“{sue.trim()}”</p>
+  }
+  return null
+}
+
+/* ── la fine del check-in ─────────────────────────────────────────────────── */
+
+/** Una riga di "Cosa comunica il tuo corpo": un punto, o due gemelli uguali. */
+type RigaCorpo = {
+  chiave: string
+  nome: string
+  parole: Parola[]
+  sue: string
+  intensita: number
 }
 
 /**
@@ -89,78 +111,6 @@ function righeDelCorpo(sensazioni: Sensazione[], ts: TestiSessione): RigaCorpo[]
     })
   }
   return righe
-}
-
-/**
- * I due buchi del nome della zona.
- *
- * Uno com'e' scritto e uno tutto minuscolo, perche' in italiano la zona apre
- * la frase ("Quadricipite destro: teso…") e in inglese sta in mezzo ("About
- * that right quad"): quale delle due serve lo decide il testo, non il codice.
- */
-function zone(nome: string): Record<string, string> {
-  return { zona: nome, zonaMinuscola: nome.toLowerCase() }
-}
-
-/** "teso · indolenzito · bruciante", oppure le sue parole se non ne ha scelte. */
-function paroleViste(s: Sensazione, ts: TestiSessione): string {
-  const p = s.parole.map((x) => ts.foglio.parole[x])
-  if (p.length) return p.join(' · ')
-  return s.sue.trim()
-}
-
-/**
- * La scheda "come si legge un segnale".
- *
- * E' la stessa nei due schermi, e non e' un caso: e' la tabella che dice
- * cosa fa un segnale, e cambiarla fra il prima e il dopo vorrebbe dire
- * insegnare due cose diverse nello stesso giorno.
- */
-function ComeLeggere() {
-  const { tp } = useLingua()
-  return (
-    <Scheda piatta className="px-[15px] py-[13px]">
-      <p className="m-0 text-[13px] font-bold text-ink">{tp.comeLeggere}</p>
-      <div className="mt-3 flex flex-col gap-[10px]">
-        {LIVELLI.map((l) => {
-          const tinta = TINTA_LIVELLO[l]
-          return (
-            <div key={l} className="flex gap-[10px]">
-              <span
-                className="w-[52px] shrink-0 self-start rounded-[6px] px-2 py-[3px] text-center text-[11px] font-bold"
-                style={{ background: tinta.fondo, color: tinta.testo }}
-              >
-                {tp.segnali[l].nome}
-              </span>
-              <p className="m-0 text-[12px] leading-[1.45] text-ink-medio">{tp.segnali[l].testo}</p>
-            </div>
-          )
-        })}
-      </div>
-    </Scheda>
-  )
-}
-
-/** La pastiglia "La mossa di oggi · Spingi", col colore del livello. */
-function MossaDiOggi({ livello }: { livello: Livello }) {
-  const { tp } = useLingua()
-  const tinta = TINTA_LIVELLO[livello]
-  return (
-    <div className="flex flex-wrap items-center gap-x-[10px] gap-y-1">
-      <span
-        className="inline-flex items-center gap-[8px] rounded-[12px] px-3 py-[6px] text-[12px] font-bold"
-        style={{ background: tinta.fondo, color: tinta.testo }}
-      >
-        <span
-          aria-hidden
-          className="size-[6px] shrink-0 rounded-full"
-          style={{ background: tinta.testo }}
-        />
-        {tp.oggi} · {tp.livelli[livello].nome}
-      </span>
-      <span className="text-[11px] text-ink-medio">{tp.livelli[livello].spiega}</span>
-    </div>
-  )
 }
 
 /**
@@ -231,23 +181,9 @@ export function CorpoSegnali({
                     {riempi(t.corpo.intensita, { intensita: r.intensita })}
                   </span>
                 </div>
-                {/* le sue parole contano come le pastiglie: se ha scritto e basta, si legge quello */}
-                {r.parole.length > 0 ? (
-                  <div className="mt-[6px] flex flex-wrap gap-[6px]">
-                    {r.parole.map((p) => (
-                      <span
-                        key={p}
-                        className="rounded-[10px] bg-lilla-fondo px-2 py-[3px] text-[11px] font-bold text-lilla-testo"
-                      >
-                        {ts.foglio.parole[p]}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  r.sue && (
-                    <p className="m-0 mt-1 text-[12px] leading-[1.45] text-ink-medio">“{r.sue}”</p>
-                  )
-                )}
+                <div className="mt-[6px]">
+                  <ParoleScelte parole={r.parole} sue={r.sue} />
+                </div>
               </li>
             ))}
           </ul>
@@ -277,16 +213,84 @@ export function CorpoSegnali({
   )
 }
 
+/* ── la fine del check-out ────────────────────────────────────────────────── */
+
+/** Una riga del prima e dopo: lo stesso punto al check-in e al check-out. */
+type RigaPrimaDopo = {
+  chiave: string
+  nome: string
+  prima: Sensazione | null
+  dopo: Sensazione | null
+}
+
+/**
+ * Cosa fa incontrare lo stesso punto prima e dopo: il codice della zona.
+ *
+ * "Altrove" ha lo stesso codice per qualunque posto, quindi li' si incontra
+ * col nome che ha scritto lei — "testa" al check-in e "Testa" al check-out
+ * sono lo stesso punto, "testa" e "stomaco" no.
+ */
+function chiaveDi(s: Sensazione): string {
+  return s.zona === 'altrove' ? `altrove:${s.zonaLibera.trim().toLowerCase()}` : s.zona
+}
+
+/** Uguali anche quando mancano tutt'e due: nessun prima e nessun prima sono la stessa cosa. */
+function uguali(a: Sensazione | null, b: Sensazione | null): boolean {
+  if (!a || !b) return a === b
+  return stessiValori(a, b)
+}
+
+/**
+ * I punti del check-in e del check-out, uno per riga.
+ *
+ * Ci sono tutti: quelli segnati solo prima (il dopo dice "non segnata", e
+ * quel "non c'e' piu'" e' un'informazione), quelli nuovi del check-out, e
+ * quelli segnati tutte e due le volte. L'ordine e' quello della giornata:
+ * prima i punti del check-in, poi i nuovi.
+ *
+ * Due gemelle si uniscono al plurale solo se sono uguali sia prima sia dopo:
+ * se una delle due e' cambiata, unirle nasconderebbe proprio il cambiamento.
+ */
+function righePrimaDopo(
+  prima: Sensazione[],
+  dopo: Sensazione[],
+  ts: TestiSessione,
+): RigaPrimaDopo[] {
+  const chiavi: string[] = []
+  for (const s of [...prima, ...dopo]) {
+    const k = chiaveDi(s)
+    if (!chiavi.includes(k)) chiavi.push(k)
+  }
+  const trova = (lista: Sensazione[], k: string) => lista.find((s) => chiaveDi(s) === k) ?? null
+
+  const unite = new Set<string>()
+  const righe: RigaPrimaDopo[] = []
+  for (const k of chiavi) {
+    if (unite.has(k)) continue
+    const p = trova(prima, k)
+    const d = trova(dopo, k)
+    const s = (p ?? d) as Sensazione
+    const g = zonaGemella(k)
+    const unisci =
+      !!g &&
+      chiavi.includes(g) &&
+      !unite.has(g) &&
+      uguali(p, trova(prima, g)) &&
+      uguali(d, trova(dopo, g))
+    if (unisci && g) unite.add(g)
+    righe.push({ chiave: k, nome: unisci ? nomeEntrambe(s, ts) : nome(s, ts), prima: p, dopo: d })
+  }
+  return righe
+}
+
 /**
  * L'ultimo schermo del check-out: il confronto fra la previsione e l'esito.
  *
- * E' lo schermo per cui esiste tutto il resto. Le due caselle in cima sono
- * l'unica cosa che il check-in di stamattina e il check-out di adesso hanno
- * da dirsi, e sono affiancate apposta.
- *
- * Sotto, lo stesso confronto punto per punto: prima e dopo, con le stesse
- * sedici parole. E' quello che le rende confrontabili, ed e' anche il motivo
- * per cui le parole sono sedici e non "descrivilo come vuoi".
+ * In cima le due caselle del ritmo, previsto e sentito. Sotto una scheda
+ * sola, fatta come quella della fine del check-in, con ogni punto segnato e
+ * il suo prima e dopo: stesse sedici parole, ed e' quello che le rende
+ * confrontabili. "Come si legge un segnale" e la domanda sulla colonna rossa
+ * sono state tolte per semplificare lo schermo.
  */
 export function CorpoRendiconto({
   passo,
@@ -298,12 +302,30 @@ export function CorpoRendiconto({
   erroreSalvataggio,
 }: PropsSessione) {
   const dati = useDatiSessione('checkout')
+  const mattina = useDatiSessione('checkin')
   const { ts } = useLingua()
   const t = ts.rendiconto
   const nomi = ts.comune.ritmi
-  const mattina = datiSessione('checkin')
   const previsto = mattina.ritmo
   const sentito = dati.ritmo
+
+  /*
+   * Il prima puo' non essere su questo telefono: check-in fatto su un altro,
+   * o memoria del browser svuotata. Allora si chiede al database, come fa la
+   * mappa del check-out. Se il telefono le ha, vincono le sue.
+   */
+  const [primaDalDatabase, setPrimaDalDatabase] = useState<Sensazione[]>([])
+  useEffect(() => {
+    let viva = true
+    void sensazioniCheckinDalDatabase().then((s) => {
+      if (viva) setPrimaDalDatabase(s)
+    })
+    return () => {
+      viva = false
+    }
+  }, [])
+  const prima = mattina.sensazioni.length > 0 ? mattina.sensazioni : primaDalDatabase
+  const righe = righePrimaDopo(prima, dati.sensazioni, ts)
 
   const ordine = ['carica', 'costante', 'leggero']
   const scarto = previsto && sentito ? ordine.indexOf(sentito) - ordine.indexOf(previsto) : null
@@ -331,9 +353,9 @@ export function CorpoRendiconto({
       <Titolo>{t.titolo}</Titolo>
 
       {/*
-        Il confronto c'e' solo se stamattina ha fatto il check-in. Senza,
-        mostrare una casella "Stamattina" vuota direbbe che ha sbagliato
-        qualcosa, quando invece semplicemente non c'era.
+        Il confronto c'e' solo se prima dell'allenamento ha fatto il check-in.
+        Senza, una casella del prima vuota direbbe che ha sbagliato qualcosa,
+        quando invece semplicemente non c'era.
       */}
       {previsto && sentito && (
         <div className="mt-[22px]">
@@ -358,80 +380,22 @@ export function CorpoRendiconto({
         </div>
       )}
 
-      {dati.sensazioni.map((s) => {
-        const prima = mattina.sensazioni.find((x) => x.zona === s.zona)
-        const livello = livelloDi(s.parole)
-        return (
-          <div key={s.id} className="mt-[18px]">
-            <Scheda piatta className="px-[15px] py-[13px]">
-              <p className="m-0 text-[13px] font-bold text-ink">{riempi(t.confronto.titolo, zone(nome(s, ts)))}</p>
-              <p className="m-0 mt-2 text-[12px] leading-[1.4] text-ink-medio">
-                {t.confronto.occhio}
-              </p>
-
-              <div className="mt-3 flex flex-col gap-2">
-                {prima ? (
-                  <RigaConfronto
-                    etichetta={t.confronto.prima}
-                    parole={paroleViste(prima, ts)}
-                    intensita={prima.intensita}
-                  />
-                ) : (
-                  <p className="m-0 text-[11px] text-ink-medio">{t.confronto.senzaPrima}</p>
-                )}
-                <RigaConfronto
-                  etichetta={t.confronto.dopo}
-                  parole={paroleViste(s, ts)}
-                  intensita={s.intensita}
-                />
-              </div>
-
-              {livello && (
-                <>
-                  <div className="mt-3 h-px bg-riga" />
-                  <div className="mt-[10px]">
-                    <MossaDiOggi livello={livello} />
-                  </div>
-                </>
-              )}
-
-              {/*
-                Cosa le ha fatto la sessione lo ha detto lei nel foglio: qui
-                si rimette la sua risposta, non una frase nostra su cosa
-                quella risposta vorrebbe dire.
-              */}
-              {s.effetto && (
-                <p className="m-0 mt-[10px] text-[11px] leading-[1.45] text-ink-medio">
-                  {ts.foglio.effetto.voci[s.effetto]}
-                </p>
-              )}
-            </Scheda>
-          </div>
-        )
-      })}
-
-      <div className="mt-[18px]">
-        <ComeLeggere />
-      </div>
-
-      <div className="mt-[18px]">
-        <Scheda piatta className="px-[15px] py-[13px]">
-          <p className="m-0 text-[14px] font-bold text-ink">{t.domanda}</p>
-          <div className="mt-[10px] flex gap-2" role="radiogroup" aria-label={t.domanda}>
-            {[true, false].map((v) => (
-              <Scelta
-                key={String(v)}
-                accesa={dati.protettivo === v}
-                onClick={() => scriviSessione('checkout', { protettivo: v })}
-              >
-                <span className="block w-[130px] text-center">
-                  {v ? ts.comune.si : ts.comune.no}
-                </span>
-              </Scelta>
-            ))}
-          </div>
-        </Scheda>
-      </div>
+      {righe.length > 0 && (
+        <div className="mt-[18px]">
+          <Scheda piatta className="px-[15px] py-[13px]">
+            <p className="m-0 text-[13px] font-bold text-ink">{t.confronto.titolo}</p>
+            <ul className="m-0 mt-1 list-none p-0">
+              {righe.map((r, i) => (
+                <li key={r.chiave} className={`py-[10px] ${i > 0 ? 'border-t border-riga' : ''}`}>
+                  <p className="m-0 text-[14px] font-bold text-ink">{r.nome}</p>
+                  <RigaMomento etichetta={t.confronto.prima} s={r.prima} />
+                  <RigaMomento etichetta={t.confronto.dopo} s={r.dopo} />
+                </li>
+              ))}
+            </ul>
+          </Scheda>
+        </div>
+      )}
 
       <div className="mt-[18px]">
         <Nota>{t.nota}</Nota>
@@ -440,23 +404,27 @@ export function CorpoRendiconto({
   )
 }
 
-/** "PRIMA   teso · indolenzito · bruciante        4/10" */
-function RigaConfronto({
-  etichetta,
-  parole,
-  intensita,
-}: {
-  etichetta: string
-  parole: string
-  intensita: number
-}) {
+/** "PRIMA   [teso] [indolenzito]        4 su 10", oppure "DOPO   non segnata". */
+function RigaMomento({ etichetta, s }: { etichetta: string; s: Sensazione | null }) {
+  const { ts } = useLingua()
+  const t = ts.rendiconto.confronto
   return (
-    <div className="flex items-baseline gap-3">
-      <span className="w-[60px] shrink-0 text-[10px] font-bold tracking-[1px] text-ink-medio">
+    <div className="mt-[6px] flex items-center gap-2">
+      <span className="w-[52px] shrink-0 text-[10px] font-bold tracking-[1px] text-ink-medio">
         {etichetta}
       </span>
-      <span className="min-w-0 flex-1 text-[13px] font-bold text-ink">{parole}</span>
-      <span className="shrink-0 text-[11px] font-bold text-ink-medio">{intensita}/10</span>
+      {s ? (
+        <>
+          <div className="min-w-0 flex-1">
+            <ParoleScelte parole={s.parole} sue={s.sue} />
+          </div>
+          <span className="shrink-0 text-[12px] font-bold text-ink-medio">
+            {riempi(t.intensita, { intensita: s.intensita })}
+          </span>
+        </>
+      ) : (
+        <span className="min-w-0 flex-1 text-[12px] text-ink-tenue">{t.nonSegnata}</span>
+      )}
     </div>
   )
 }

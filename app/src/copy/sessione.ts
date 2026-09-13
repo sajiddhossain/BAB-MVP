@@ -234,15 +234,18 @@ const it = {
       meno: 'Il tuo corpo aveva più da dare di quanto ti aspettassi entrando, e te ne sei accorta. È la lettura che si affina.',
       uguale: "L'avevi indovinato esattamente. È la lettura che si affina.",
     },
+    /*
+     * La scheda dei punti segnati, come quella della fine del check-in ma
+     * con il prima e il dopo. `nonSegnata` sta al posto dei valori quando un
+     * punto c'era solo prima o solo dopo.
+     */
     confronto: {
-      titolo: '{zona}, da stamattina a ora',
-      occhio: 'Stesso punto, stesse sedici parole: è questo che li rende confrontabili.',
+      titolo: 'Cosa comunica il tuo corpo',
       prima: 'PRIMA',
       dopo: 'DOPO',
-      /* quando stamattina quel punto non l'aveva segnato non c'e' un prima */
-      senzaPrima: 'Stamattina questo punto non c’era.',
+      intensita: '{intensita} su 10',
+      nonSegnata: 'non segnata',
     },
-    domanda: "C'è qualcosa nella colonna rossa oggi?",
     nota: 'Leggere il segnale è la bravura. Ignorarlo è da principianti. Sostegno non vuol mai dire una diagnosi: vuol dire dirlo a chi ti allena, a un fisioterapista, a un genitore o a un medico.',
     azione: 'Fatto per oggi',
   },
@@ -610,13 +613,12 @@ const en: typeof it = {
       uguale: 'You called it exactly. That’s the read getting sharper.',
     },
     confronto: {
-      titolo: 'Your {zonaMinuscola}, morning to now',
-      occhio: 'Same spot, same 16 words — that’s what makes them comparable.',
+      titolo: 'What your body is telling you',
       prima: 'BEFORE',
       dopo: 'AFTER',
-      senzaPrima: 'This spot wasn’t there this morning.',
+      intensita: '{intensita} out of 10',
+      nonSegnata: 'not marked',
     },
-    domanda: 'Anything in the red column today?',
     nota: 'Reading the signal is the skill. Ignoring it is the amateur move. Support never means a diagnosis — it means tell a coach, a physio, a parent or a doctor.',
     azione: 'Done for today',
   },
