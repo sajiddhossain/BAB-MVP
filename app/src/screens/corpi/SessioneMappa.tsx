@@ -38,9 +38,25 @@ function nuovaSensazione(zona: string): Sensazione {
  * Toccare un punto gia' segnato riapre quella sensazione invece di farne una
  * seconda sullo stesso posto — se no la stessa coscia comparirebbe tre volte
  * e nessuno saprebbe piu' quale delle tre e' quella vera.
+ *
+ * ── AL CHECK-OUT SI VEDE ANCORA IL CHECK-IN ─────────────────────────────────
+ * Il check-in e' prima dell'allenamento e il check-out dopo: quello che
+ * sentiva prima conta ancora. Le zone segnate al check-in restano sul corpo,
+ * in corallo chiaro, e diventano piene solo se le segna di nuovo.
+ *
+ * Toccarne una apre un foglio nuovo del check-out, ma con gia' accese le
+ * parole, le sue parole, il lato e l'intensita' di prima: da confermare o da
+ * cambiare. "Quando la senti" invece resta vuoto, perche' e' una domanda del
+ * check-in: al check-out si chiede quando e' comparsa, e cosa le ha fatto
+ * l'allenamento.
  */
 export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }: PropsSessione) {
   const dati = useDatiSessione(tipo)
+  // sempre letto, anche al check-in: un hook non puo' stare dentro a un if
+  const datiPrima = useDatiSessione('checkin')
+  /* le sensazioni del check-in, ma solo al check-out e solo quelle sul corpo */
+  const prima =
+    tipo === 'checkout' ? datiPrima.sensazioni.filter((s) => s.zona !== 'altrove') : []
   const { ts } = useLingua()
   const t = ts.mappa
   const [lato, setLato] = useState<Lato>('front')
@@ -60,7 +76,20 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
   function tocca(codice: string) {
     const gia = dati.sensazioni.find((s) => s.zona === codice)
     setENuova(!gia)
-    setAperta(gia ?? nuovaSensazione(codice))
+    if (gia) return setAperta(gia)
+
+    const diPrima = prima.find((s) => s.zona === codice)
+    setAperta(
+      diPrima
+        ? {
+            ...nuovaSensazione(codice),
+            parole: diPrima.parole,
+            sue: diPrima.sue,
+            unLato: diPrima.unLato,
+            intensita: diPrima.intensita,
+          }
+        : nuovaSensazione(codice),
+    )
   }
 
   function salva(s: Sensazione) {
@@ -142,7 +171,12 @@ export function CorpoMappa({ tipo, passo, verso, avanzamento, avanti, indietro }
 
         <div className="mt-4">
           <Riquadro>
-            <Mappa lato={lato} scelte={segnate} onTocca={tocca} />
+            <Mappa
+              lato={lato}
+              scelte={segnate}
+              prima={prima.map((s) => s.zona)}
+              onTocca={tocca}
+            />
           </Riquadro>
         </div>
 

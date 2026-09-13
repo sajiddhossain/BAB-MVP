@@ -8,6 +8,16 @@ import type { Lato } from '../../data/sessione'
 /** Il corallo delle zone segnate, misurato sul disegno. */
 const SEGNATA = '#f36b5b'
 
+/**
+ * Lo stesso corallo, schiarito: le zone segnate al check-in, viste dal
+ * check-out.
+ *
+ * E' il corallo al trenta per cento sul bianco del riquadro, scritto pieno e
+ * non con l'opacita': cosi' il tratto del disegno, che sta sopra, resta nero
+ * uguale sopra a tutte e due.
+ */
+const SEGNATA_PRIMA = '#fbd3ce'
+
 /*
  * `onClick` e non `onPointerUp`: il click e' quello che il browser emette
  * dopo un tocco vero, gia' ripulito — un dito che parte sul ginocchio e
@@ -39,11 +49,18 @@ const VICINO = 60
 export function Mappa({
   lato,
   scelte,
+  prima = [],
   onTocca,
 }: {
   lato: Lato
   /** i codici zona gia' segnati, nella forma `front_quad_r` */
   scelte: string[]
+  /**
+   * Le zone segnate al check-in, quando la mappa e' quella del check-out.
+   * Si colorano piu' chiare; se la stessa zona e' anche in `scelte`, vince il
+   * colore pieno.
+   */
+  prima?: string[]
   onTocca: (codice: string) => void
 }) {
   const svg = useRef<SVGSVGElement>(null)
@@ -106,11 +123,12 @@ export function Mappa({
       {zone.map((z) => {
         const codice = codiceZona(lato, z.id)
         const segnata = scelte.includes(codice)
+        const segnataPrima = prima.includes(codice)
         return (
           <path
             key={z.id}
             d={z.d}
-            fill={segnata ? SEGNATA : 'transparent'}
+            fill={segnata ? SEGNATA : segnataPrima ? SEGNATA_PRIMA : 'transparent'}
             /*
               Col tasto tab la zona si segna col suo stesso contorno invece
               che con l'alone di sistema: un outline su un <path> disegna il
