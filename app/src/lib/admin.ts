@@ -48,6 +48,8 @@ export type Strumenti = {
  * problema che non c'e'.
  */
 export async function leggiPolso(): Promise<Polso | null> {
+  const p = await prova()
+  if (p) return p.polso()
   if (!supabase) return null
   const { data, error } = await supabase.from('admin_pulse').select('*').maybeSingle()
   if (error || !data) return null

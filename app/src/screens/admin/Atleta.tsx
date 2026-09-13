@@ -23,9 +23,11 @@ import { CICLO, CONTRACCETTIVO, GIORNI, IMPEGNO, useVocabolario } from './vocabo
 import type { Vocabolario } from './vocabolario'
 import { Andamento, Calendario, MappaCorpo, PrevistoSentito, Sforzo } from './grafici'
 import {
+  BLOCCO,
   CAMPO,
   Chip,
   ConfermaCancella,
+  Iniziale,
   Finestra,
   Numero,
   Riquadro,
@@ -185,6 +187,7 @@ export function Atleta() {
   return (
     <Telaio
       nome={chi.display_name}
+      segno={<Iniziale id={chi.id} nome={chi.display_name} grande />}
       sotto={[chi.email, chi.team_name, chi.sport, `${chi.age} anni`].filter(Boolean).join(' · ')}
       destra={
         <div className="flex shrink-0 items-center gap-2">
@@ -213,8 +216,10 @@ export function Atleta() {
                 role="tab"
                 aria-selected={vista === x.id}
                 onClick={() => cambia('vista', x.id)}
-                className={`h-8 cursor-pointer rounded-pill px-3 text-[12.5px] font-bold ${
-                  vista === x.id ? 'bg-ink text-surface' : 'text-ink-medio hover:bg-chip'
+                className={`h-8 cursor-pointer rounded-pill border-[1.5px] px-3 text-[12.5px] font-bold ${
+                  vista === x.id
+                    ? 'border-ink bg-lime text-ink shadow-[2px_2px_0_rgba(44,44,58,0.9)]'
+                    : 'border-transparent text-ink-medio hover:bg-chip'
                 }`}
               >
                 {x.nome}
@@ -330,11 +335,28 @@ function Panoramica({ chi, scheda }: { chi: Riga; scheda: Scheda | null }) {
     return { uguali: due.filter((q) => q.p === q.s).length, su: due.length }
   }, [scheda])
 
+  /* le lineette dei numeri: gli ultimi quattordici giorni, un punto al giorno */
+  const serie = useMemo(() => {
+    if (!scheda) return null
+    const giorni = Array.from({ length: 14 }, (_, i) => giornoFa(13 - i))
+    const cade = doveCade(scheda.checkins)
+    return {
+      attiva: giorni.map((g) => (scheda.checkins.some((c) => c.local_date === g) ? 1 : 0)),
+      checkin: giorni.map((g) => scheda.checkins.filter((c) => c.local_date === g && c.kind === 'pre').length),
+      segnali: giorni.map((g) => scheda.segnali.filter((s) => cade(s).giorno === g).length),
+    }
+  }, [scheda])
+
   return (
     <>
-      <div className="flex flex-wrap gap-2">
-        <Numero quanto={chi.days_7d} cosa="giorni attivi negli ultimi 7" nota={`${chi.days_30d} negli ultimi 30`} />
-        <Numero quanto={chi.checkins_pre} cosa="check-in" nota={`${chi.checkins_post} check-out`} />
+      <div className="flex flex-wrap gap-3">
+        <Numero
+          quanto={chi.days_7d}
+          cosa="giorni attivi negli ultimi 7"
+          nota={`${chi.days_30d} negli ultimi 30`}
+          andamento={serie?.attiva}
+        />
+        <Numero quanto={chi.checkins_pre} cosa="check-in" nota={`${chi.checkins_post} check-out`} andamento={serie?.checkin} />
         <Numero quanto={percento(chi.checkins_post, chi.checkins_pre)} cosa="check-in chiusi col check-out" />
         <Numero
           quanto={confronto ? percento(confronto.uguali, confronto.su) : '—'}
@@ -344,6 +366,7 @@ function Panoramica({ chi, scheda }: { chi: Riga; scheda: Scheda | null }) {
         <Numero
           quanto={chi.signals}
           cosa="sensazioni sul corpo"
+          andamento={serie?.segnali}
           nota={`${chi.signals_flagged} protettive`}
           allarme={chi.signals_flagged > 0}
         />
@@ -629,7 +652,7 @@ function Giorno({ g, v, scheda }: { g: Giornata; v: Vocabolario; scheda: Scheda 
     .filter((t): t is string => !!t && t.trim() !== '')
 
   return (
-    <div className="rounded-[14px] border-[1.5px] border-line bg-surface p-4">
+    <div className={`${BLOCCO} p-4`}>
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <p className="m-0 text-[14px] font-bold">{dataLunga(g.giorno)}</p>
         {g.pre?.on_period && <Pillola>ciclo</Pillola>}
@@ -817,7 +840,7 @@ function Note({ id }: { id: string }) {
       <div className="mt-4 flex flex-col gap-2">
         {note?.length === 0 && <p className="m-0 text-[13px] text-ink-medio">Ancora nessuna nota.</p>}
         {note?.map((n) => (
-          <article key={n.id} className="rounded-[14px] border-[1.5px] border-line bg-surface p-4">
+          <article key={n.id} className={`${BLOCCO} p-4`}>
             <p className="m-0 text-[13px] leading-[1.55] whitespace-pre-wrap text-ink">{n.body}</p>
             <div className="mt-2 flex items-center justify-between gap-3 border-t border-riga pt-2">
               <span className="text-[11px] text-ink-mute">

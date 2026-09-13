@@ -3,6 +3,7 @@ import { SEZIONI } from '../../data/sezioni'
 import type { StatoSezione } from '../../data/sezioni'
 import { cambiaSezione, caricaSezioni, statiDiAdesso } from '../../lib/sezioni'
 import { Telaio } from './Telaio'
+import { BLOCCO } from './pezzi'
 
 
 /**
@@ -67,7 +68,7 @@ export function Sezioni() {
 
         <ul className="m-0 mt-5 flex list-none flex-col gap-3 p-0">
           {SEZIONI.map((s) => (
-            <li key={s.id} className="rounded-[14px] border border-line bg-surface p-4">
+            <li key={s.id} className={`${BLOCCO} p-4`}>
               <p className="m-0 text-[14px] font-bold">{s.nome}</p>
               <p className="m-0 mt-1 text-[12px] leading-[1.5] text-ink-medio">{s.cosa}</p>
               <div className="mt-3 flex flex-wrap gap-1 rounded-pill bg-chip p-1">
@@ -79,7 +80,7 @@ export function Sezioni() {
                     title={v.cosa}
                     className={`bab-tocco flex-1 rounded-pill px-3 py-[6px] text-[12.5px] font-bold ${
                       stati[s.id] === v.id
-                        ? 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.10)]'
+                        ? 'bg-lime text-ink shadow-[0_0_0_1.5px_#2c2c3a]'
                         : 'text-ink-medio hover:text-ink'
                     }`}
                   >

@@ -106,6 +106,14 @@ export function scaricaFile(nome: string, testo: string, tipo = 'text/csv;charse
 
 /* ── riquadri e numeri ────────────────────────────────────────────────────── */
 
+/**
+ * Il riquadro di BAB: bordo d'inchiostro e ombra netta, come le porte
+ * dell'atrio e la landing. Le tabelle no: piene di dati si leggono meglio
+ * con righe sottili, e cento bordi scuri uno sotto l'altro fanno rumore.
+ */
+export const BLOCCO =
+  'rounded-[14px] border-[1.5px] border-ink bg-surface shadow-[4px_4px_0_rgba(44,44,58,0.18)]'
+
 export function Riquadro({
   titolo,
   destra,
@@ -118,7 +126,7 @@ export function Riquadro({
   className?: string
 }) {
   return (
-    <section className={`rounded-[14px] border-[1.5px] border-line bg-surface p-4 ${className}`}>
+    <section className={`${BLOCCO} p-4 ${className}`}>
       <div className="mb-2 flex items-center justify-between gap-3">
         <h2 className="m-0 text-[10.5px] font-bold tracking-[0.5px] text-ink-mute uppercase">{titolo}</h2>
         {destra}
@@ -137,28 +145,112 @@ export function Voce({ nome, v, allarme }: { nome: string; v: ReactNode; allarme
   )
 }
 
-/** lo stesso numero dell'atrio: cifra grande, cosa conta sotto */
+/**
+ * Il numero in cima a una stanza: cifra grande, cosa conta sotto e, quando
+ * ha una storia, la sua lineetta degli ultimi quattordici giorni.
+ *
+ * La lineetta c'e' solo dove il numero cambia nel tempo. «Tutorial non
+ * finito» non ha un ieri da confrontare, e una riga piatta inventata direbbe
+ * che non e' cambiato niente.
+ */
 export function Numero({
   quanto,
   cosa,
   nota,
   allarme,
+  andamento,
 }: {
   quanto: ReactNode
   cosa: string
   nota?: string
   allarme?: boolean
+  andamento?: (number | null)[]
 }) {
   return (
     <div
-      className={`min-w-[120px] flex-1 rounded-[14px] border-[1.5px] px-4 py-3 ${
-        allarme ? 'border-rosso-bordo bg-allarme-fondo' : 'border-line bg-surface'
+      className={`flex min-w-[140px] flex-1 flex-col rounded-[14px] border-[1.5px] border-ink px-4 py-3 shadow-[4px_4px_0_rgba(44,44,58,0.18)] ${
+        allarme ? 'bg-allarme-fondo' : 'bg-surface'
       }`}
     >
-      <p className="m-0 text-[22px] leading-none font-bold">{quanto}</p>
-      <p className="m-0 mt-[6px] text-[11.5px] leading-[1.3] text-ink-medio">{cosa}</p>
+      <p className="bab-display m-0 text-[30px] leading-none font-bold">{quanto}</p>
+      <p className="m-0 mt-[7px] text-[11.5px] leading-[1.3] text-ink-medio">{cosa}</p>
       {nota && <p className="m-0 mt-[2px] text-[11px] text-ink-mute">{nota}</p>}
+      {andamento && (
+        <div className="mt-auto pt-2">
+          <Lineetta valori={andamento} />
+        </div>
+      )}
     </div>
+  )
+}
+
+/** una linea sottile e un punto sull'ultimo giorno: dove sta andando, non quanto */
+export function Lineetta({ valori }: { valori: (number | null)[] }) {
+  const numeri = valori.filter((n): n is number => n !== null)
+  if (numeri.length === 0) return null
+  const min = Math.min(...numeri)
+  const max = Math.max(...numeri)
+  const n = valori.length
+  const x = (i: number) => (n > 1 ? (i / (n - 1)) * 100 : 50)
+  const y = (v: number) => (max === min ? 50 : 10 + ((max - v) / (max - min)) * 80)
+  let d = ''
+  valori.forEach((v, i) => {
+    if (v === null) return
+    d += `${i > 0 && valori[i - 1] !== null ? 'L' : 'M'}${x(i)} ${y(v)}`
+  })
+  let ultimo = n - 1
+  while (valori[ultimo] === null) ultimo--
+
+  return (
+    <div
+      role="img"
+      aria-label={`Ultimi 14 giorni: ${valori.map((v) => v ?? '—').join(', ')}`}
+      title={`Ultimi 14 giorni: ${valori.map((v) => v ?? '—').join(' · ')}`}
+      className="relative h-[22px]"
+    >
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden className="absolute inset-0 size-full overflow-visible">
+        <path
+          d={d}
+          fill="none"
+          stroke="#b0aba6"
+          strokeWidth={2}
+          vectorEffect="non-scaling-stroke"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+      </svg>
+      <span
+        aria-hidden
+        className="absolute size-[8px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink ring-2 ring-surface"
+        style={{ left: `${x(ultimo)}%`, top: `${y(valori[ultimo]!)}%` }}
+      />
+    </div>
+  )
+}
+
+/**
+ * L'iniziale di una persona in un tondo colorato.
+ *
+ * Il colore viene dall'id e non dalla posizione in elenco: la stessa atleta
+ * ha lo stesso colore in ogni ordine e dopo ogni filtro. Sono tinte chiare
+ * con la lettera in inchiostro, e nessuna e' rossa: un tondo rosso accanto a
+ * un nome sembrerebbe un allarme.
+ */
+const FONDI = ['#d4f369', '#dcd7fb', '#f3d9a4', '#bfe8d9']
+
+export function Iniziale({ id, nome, grande }: { id: string; nome: string; grande?: boolean }) {
+  let h = 0
+  for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0
+  return (
+    <span
+      aria-hidden
+      className={`bab-display inline-flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-ink font-bold text-ink ${
+        grande ? 'size-9 text-[16px]' : 'size-8 text-[13px]'
+      }`}
+      style={{ background: FONDI[h % FONDI.length] }}
+    >
+      {(nome.trim()[0] ?? '?').toUpperCase()}
+    </span>
   )
 }
 
@@ -184,7 +276,7 @@ export function Chip({
       aria-pressed={acceso}
       onClick={onClick}
       className={`bab-tocco h-8 shrink-0 cursor-pointer rounded-pill border px-3 text-[12px] font-bold ${
-        acceso ? 'border-ink bg-ink text-surface' : 'border-line bg-chip text-ink-medio'
+        acceso ? 'border-ink bg-lime text-ink' : 'border-line bg-chip text-ink-medio'
       }`}
     >
       {children}
@@ -208,7 +300,7 @@ export function Tasto({
 }) {
   const colori = {
     primo: 'border-ink bg-lime text-ink shadow-[2px_2px_0_rgba(44,44,58,0.9)]',
-    secondo: 'border-line bg-surface text-ink',
+    secondo: 'border-ink bg-surface text-ink',
     pericolo: 'border-rosso bg-rosso text-white shadow-[2px_2px_0_rgba(44,44,58,0.9)]',
   }[tipo]
   return (

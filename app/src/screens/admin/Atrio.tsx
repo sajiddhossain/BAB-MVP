@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { leggiPolso } from '../../lib/admin'
 import type { Polso } from '../../lib/admin'
+import { Numero } from './pezzi'
 
 /**
  * L'atrio: la prima cosa che si vede entrando in /admin.
@@ -36,12 +37,12 @@ export function Atrio() {
   }, [])
 
   return (
-    <div className="min-h-dvh bg-paper text-ink">
+    <div className="min-h-full bg-paper text-ink">
       <div className="mx-auto max-w-[920px] px-6 py-10">
         <p className="m-0 text-[11px] font-bold tracking-[1.2px] text-ink-mute uppercase">
           BAB · amministrazione
         </p>
-        <h1 className="m-0 mt-[6px] text-[28px] leading-[1.15] font-bold">Cosa vuoi fare?</h1>
+        <h1 className="bab-display m-0 mt-[6px] text-[34px] leading-[1.1] font-bold">Cosa vuoi fare?</h1>
 
         <Polsi polso={polso} letto={letto} />
 
@@ -99,30 +100,6 @@ function Polsi({ polso, letto }: { polso: Polso | null; letto: boolean }) {
       {polso.consents_refused > 0 && (
         <Numero quanto={polso.consents_refused} cosa="consensi rifiutati" allarme />
       )}
-    </div>
-  )
-}
-
-function Numero({
-  quanto,
-  cosa,
-  nota,
-  allarme,
-}: {
-  quanto: number
-  cosa: string
-  nota?: string
-  allarme?: boolean
-}) {
-  return (
-    <div
-      className={`rounded-[14px] border-[1.5px] px-4 py-3 ${
-        allarme ? 'border-rosso-bordo bg-allarme-fondo' : 'border-line bg-surface'
-      }`}
-    >
-      <p className="m-0 text-[22px] leading-none font-bold tabular-nums">{quanto}</p>
-      <p className="m-0 mt-[6px] text-[11.5px] leading-[1.3] text-ink-medio">{cosa}</p>
-      {nota && <p className="m-0 mt-[2px] text-[11px] text-ink-mute">{nota}</p>}
     </div>
   )
 }

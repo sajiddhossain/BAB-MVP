@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import type { Lingua } from '../../lib/lingua'
 
 /**
@@ -34,14 +33,8 @@ export function Barra({
   onBozze: () => void
 }) {
   return (
-    <header className="flex shrink-0 items-center gap-4 border-b border-line bg-surface px-4 py-[10px]">
-      <Link
-        to="/admin"
-        className="bab-tocco shrink-0 rounded-pill border border-line bg-chip px-3 py-[5px] text-[12px] font-bold text-ink-medio no-underline"
-      >
-        ← Pannello
-      </Link>
-      <p className="m-0 shrink-0 text-[14px] font-bold">Le parole</p>
+    <header className="flex min-h-[60px] shrink-0 items-center gap-4 border-b-[1.5px] border-ink bg-surface px-5 py-[10px]">
+      <h1 className="bab-display m-0 shrink-0 text-[20px] leading-none font-bold">Le parole</h1>
 
       <div className="flex shrink-0 gap-1 rounded-pill bg-chip p-[3px]">
         {(['it', 'en'] as const).map((l) => (
@@ -51,7 +44,7 @@ export function Barra({
             onClick={() => onLingua(l)}
             aria-pressed={lingua === l}
             className={`bab-tocco rounded-pill px-3 py-1 text-[12px] font-bold ${
-              lingua === l ? 'bg-surface shadow-[0_1px_3px_rgba(0,0,0,0.10)]' : 'text-ink-medio'
+              lingua === l ? 'bg-lime text-ink shadow-[0_0_0_1.5px_#2c2c3a]' : 'text-ink-medio'
             }`}
           >
             {l === 'it' ? 'Italiano' : 'English'}

@@ -1,5 +1,5 @@
 import { ZONE, PAROLE, codiceZona } from '../data/sessione'
-import type { Atleta, CheckIn, Scheda, Segnale } from './admin'
+import type { Atleta, CheckIn, Polso, Scheda, Segnale } from './admin'
 import type { Esito, Modifica, Nota, Squadra } from './gestione'
 
 /**
@@ -209,6 +209,24 @@ function segnale(id: string, c: CheckIn, preferite: string[]): Segnale {
 const TUTTE: Dentro[] = NOMI.map((n, i) => inventa(i, n))
 const trova = (id: string) => TUTTE.find((a) => a.riga.id === id)
 const fatto: Esito = { ok: true, dato: undefined }
+
+export function polso(): Polso {
+  const oggi = iso(new Date())
+  const sette = iso(giorniFa(7))
+  const c = TUTTE.flatMap((a) => a.scheda.checkins)
+  const s = TUTTE.flatMap((a) => a.scheda.segnali)
+  return {
+    athletes: TUTTE.length,
+    athletes_new_7d: TUTTE.filter((a) => a.riga.created_at.slice(0, 10) >= sette).length,
+    teams: SQUADRE.length,
+    checkins_today: c.filter((x) => x.local_date === oggi).length,
+    athletes_today: new Set(c.filter((x) => x.local_date === oggi).map((x) => x.athlete_id)).size,
+    checkins_7d: c.filter((x) => x.local_date >= sette).length,
+    posts_7d: c.filter((x) => x.local_date >= sette && x.kind === 'post').length,
+    signals_7d: s.filter((x) => x.created_at.slice(0, 10) >= sette).length,
+    consents_refused: 0,
+  }
+}
 
 export function atlete(): Atleta[] {
   return TUTTE.map((a) => ({ ...a.riga }))

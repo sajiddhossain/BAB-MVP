@@ -4,7 +4,7 @@ import type { CheckIn, Impegno, Segnale } from '../../lib/admin'
 import { ZONE, codiceZona } from '../../data/sessione'
 import { BACK_INK, FRONT_INK, OUTLINE } from '../../ui/bodyZones'
 import type { Ink } from '../../ui/bodyZones'
-import { dataBreve, dataLunga, giorniTra, iso } from './pezzi'
+import { BLOCCO, dataBreve, dataLunga, giorniTra, iso } from './pezzi'
 import type { Vocabolario } from './vocabolario'
 
 /**
@@ -55,7 +55,7 @@ export function Grafico({
 }) {
   const [vista, setVista] = useState<'grafico' | 'tabella'>('grafico')
   return (
-    <section className="rounded-[14px] border-[1.5px] border-line bg-surface p-4">
+    <section className={`${BLOCCO} p-4`}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <h3 className="m-0 text-[14px] font-bold">{titolo}</h3>
@@ -69,7 +69,7 @@ export function Grafico({
               aria-pressed={vista === q}
               onClick={() => setVista(q)}
               className={`h-7 cursor-pointer rounded-pill px-3 text-[11.5px] font-bold ${
-                vista === q ? 'bg-surface text-ink shadow-[0_0_0_1px_rgba(44,44,58,0.25)]' : 'text-ink-mute'
+                vista === q ? 'bg-lime text-ink shadow-[0_0_0_1.5px_#2c2c3a]' : 'text-ink-mute'
               }`}
             >
               {q === 'grafico' ? 'Grafico' : 'Tabella'}

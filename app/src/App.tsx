@@ -13,6 +13,7 @@ import { Scritte } from './screens/admin/Scritte'
 import { Atlete } from './screens/admin/Atlete'
 import { Atleta } from './screens/admin/Atleta'
 import { Sezioni } from './screens/admin/Sezioni'
+import { Stanze } from './screens/admin/Telaio'
 import { Guardia } from './screens/Guardia'
 import { Sezione } from './screens/Sezione'
 import { AccessoAdmin } from './screens/AccessoAdmin'
@@ -51,11 +52,14 @@ export function App() {
           rotta sola e tutto quello che serviva doveva entrare li' dentro.
         */}
         <Route path="/admin" element={<Amministrazione />}>
-          <Route index element={<Atrio />} />
-          <Route path="scritte" element={<Scritte />} />
-          <Route path="atlete" element={<Atlete />} />
-          <Route path="atlete/:id" element={<Atleta />} />
-          <Route path="sezioni" element={<Sezioni />} />
+          {/* tutte le stanze dentro alla stessa barra laterale */}
+          <Route element={<Stanze />}>
+            <Route index element={<Atrio />} />
+            <Route path="scritte" element={<Scritte />} />
+            <Route path="atlete" element={<Atlete />} />
+            <Route path="atlete/:id" element={<Atleta />} />
+            <Route path="sezioni" element={<Sezioni />} />
+          </Route>
         </Route>
         {/*
           Il percorso, la sua mappa e le sue lezioni stanno tutti dentro alla

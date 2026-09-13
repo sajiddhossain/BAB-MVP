@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { leggiAtlete } from '../../lib/admin'
 import type { Atleta, CheckIn } from '../../lib/admin'
 import { cancellaAtleta, leggiAmministratori, leggiTutto } from '../../lib/gestione'
+import type { Tutto } from '../../lib/gestione'
 import { Telaio } from './Telaio'
 import { normalizza } from './comune'
 import { useVocabolario } from './vocabolario'
@@ -12,6 +13,7 @@ import {
   CAMPO,
   Chip,
   ConfermaCancella,
+  Iniziale,
   Numero,
   Tasto,
   csv,
@@ -107,6 +109,7 @@ export function Atlete() {
   const [giro, setGiro] = useState(0)
   const [admin, setAdmin] = useState<Set<string>>(new Set())
   const [strisce, setStrisce] = useState<Map<string, Map<string, { pre: boolean; post: boolean }>>>(new Map())
+  const [recenti, setRecenti] = useState<Tutto | null>(null)
   const [scelte, setScelte] = useState<Set<string>>(new Set())
   const [cancella, setCancella] = useState<Atleta[] | null>(null)
   const [avviso, setAvviso] = useState<{ testo: string; male?: boolean } | null>(null)
@@ -147,6 +150,7 @@ export function Atlete() {
         m.set(c.athlete_id, di)
       }
       setStrisce(m)
+      setRecenti(tutto)
       setLetto(true)
     })()
     return () => {
@@ -274,6 +278,26 @@ export function Atlete() {
 
   const giorni14 = useMemo(() => Array.from({ length: 14 }, (_, i) => giornoFa(13 - i)), [])
 
+  /*
+   * Le lineette sotto ai numeri, sulle stesse righe filtrate dei numeri: se
+   * il numero parla di una squadra, anche la sua linea.
+   */
+  const andamenti = useMemo(() => {
+    const ids = new Set(viste.map((a) => a.id))
+    const c = (recenti?.checkins ?? []).filter((x) => ids.has(x.athlete_id))
+    const s = (recenti?.segnali ?? []).filter((x) => ids.has(x.athlete_id))
+    const attive = giorni14.map((g) => new Set(c.filter((x) => x.local_date === g).map((x) => x.athlete_id)).size)
+    return {
+      atlete: giorni14.map((g) => viste.filter((a) => a.created_at.slice(0, 10) <= g).length),
+      attive,
+      chiusi: giorni14.map((g) => {
+        const quanti = c.filter((x) => x.local_date === g && x.kind === 'pre').length
+        return quanti ? Math.round((c.filter((x) => x.local_date === g && x.kind === 'post').length / quanti) * 100) : null
+      }),
+      protettive: giorni14.map((g) => s.filter((x) => x.is_red_flag && x.created_at.slice(0, 10) === g).length),
+    }
+  }, [viste, recenti, giorni14])
+
   return (
     <Telaio
       nome="Le atlete"
@@ -305,16 +329,27 @@ export function Atlete() {
         )}
         {letto && righe && righe.length > 0 && (
           <>
-            <div className="flex flex-wrap gap-2">
-              <Numero quanto={viste.length} cosa={filtri ? 'in questo elenco' : 'atlete'} nota={filtri ? `su ${righe.length}` : undefined} />
-              <Numero quanto={viste.filter((a) => a.days_7d > 0).length} cosa="attive negli ultimi 7 giorni" />
-              <Numero quanto={viste.filter((a) => a.last_day === oggi).length} cosa="hanno fatto qualcosa oggi" />
+            <div className="flex flex-wrap gap-3">
+              <Numero
+                quanto={viste.length}
+                cosa={filtri ? 'in questo elenco' : 'atlete'}
+                nota={filtri ? `su ${righe.length}` : undefined}
+                andamento={andamenti.atlete}
+              />
+              <Numero quanto={viste.filter((a) => a.days_7d > 0).length} cosa="attive negli ultimi 7 giorni" andamento={andamenti.attive} />
+              <Numero quanto={viste.filter((a) => a.last_day === oggi).length} cosa="hanno fatto qualcosa oggi" andamento={andamenti.attive} />
               <Numero
                 quanto={pre > 0 ? `${Math.round((somma((a) => a.checkins_post) / pre) * 100)}%` : '—'}
                 cosa="check-in chiusi col check-out"
                 nota={`${somma((a) => a.checkins_post)} su ${pre}`}
+                andamento={andamenti.chiusi}
               />
-              <Numero quanto={protettive} cosa="sensazioni segnate protettive" allarme={protettive > 0} />
+              <Numero
+                quanto={protettive}
+                cosa="sensazioni segnate protettive"
+                allarme={protettive > 0}
+                andamento={andamenti.protettive}
+              />
               <Numero quanto={viste.filter((a) => !a.tutorial_done).length} cosa="tutorial non finito" />
             </div>
 
@@ -573,9 +608,12 @@ function Riga({
         />
       </td>
       <td className={td}>
-        <Link to={`/admin/atlete/${a.id}`} className="text-ink no-underline hover:underline">
-          <span className="block font-bold">{a.display_name}</span>
-          <span className="block text-[11px] text-ink-mute">{a.email ?? a.athlete_code ?? a.id.slice(0, 8)}</span>
+        <Link to={`/admin/atlete/${a.id}`} className="group flex items-center gap-[10px] text-ink no-underline">
+          <Iniziale id={a.id} nome={a.display_name} />
+          <span className="min-w-0">
+            <span className="block font-bold group-hover:underline">{a.display_name}</span>
+            <span className="block text-[11px] text-ink-mute">{a.email ?? a.athlete_code ?? a.id.slice(0, 8)}</span>
+          </span>
         </Link>
       </td>
       <td className={`${td} text-right tabular-nums`}>{a.age}</td>
