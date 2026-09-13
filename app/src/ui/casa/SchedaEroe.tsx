@@ -26,12 +26,19 @@ export function SchedaEroe({
   etichetta,
   titolo,
   corpo,
+  senzaIcona = false,
   children,
 }: {
   stato: StatoGiornata
   etichetta: string
   titolo: string
   corpo?: string
+  /**
+   * L'etichetta senza la sua icona. Serve quando l'icona direbbe il falso: al
+   * check-out la spunta vuol dire "check-in fatto", e se non l'ha fatto non ci
+   * puo' stare.
+   */
+  senzaIcona?: boolean
   children?: ReactNode
 }) {
   const tinta = TINTE[stato]
@@ -46,8 +53,12 @@ export function SchedaEroe({
       {/* il div attorno serve: un inline-flex da solo si porta dietro una
           riga di testo piu' alta di lui, e la scheda parte 4px piu' in basso */}
       <div className="flex">
-        <span className="inline-flex h-[26px] items-center gap-[5px] rounded-[99px] bg-white/60 pl-[9px] pr-[11px]">
-          <img src={ICONE[tinta.icona]} alt="" className="size-3" aria-hidden />
+        <span
+          className={`inline-flex h-[26px] items-center gap-[5px] rounded-[99px] bg-white/60 pr-[11px] ${
+            senzaIcona ? 'pl-[11px]' : 'pl-[9px]'
+          }`}
+        >
+          {!senzaIcona && <img src={ICONE[tinta.icona]} alt="" className="size-3" aria-hidden />}
           <span
             className="text-[11px] font-bold leading-none tracking-[0.8px]"
             style={{ color: tinta.etichetta }}

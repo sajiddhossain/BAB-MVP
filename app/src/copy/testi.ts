@@ -283,6 +283,8 @@ const it = {
 
     checkout: {
       etichetta: 'Check-in fatto prima della sessione',
+      /* quando il check-in di oggi non c'e': dopo le 15:30 la home va avanti lo stesso */
+      etichettaSenzaCheckin: 'Check-in non fatto oggi',
       titolo: "Com'è andata?",
       corpo: 'Prenditi un minuto ora, a caldo — guarda come ne sei uscita e come si sente il tuo corpo.',
       previsto: 'Avevi previsto',
@@ -299,6 +301,8 @@ const it = {
      */
     fatto: {
       etichetta: 'Streak +1 · brava!',
+      /* senza check-in la streak non sale: non si promette il +1 */
+      etichettaSenzaCheckin: 'Check-out fatto · brava!',
       titolo: 'Brava, hai ascoltato il tuo corpo!',
       consigli: {
         dolore:
@@ -670,6 +674,7 @@ const en: typeof it = {
 
     checkout: {
       etichetta: 'Checked in before your session',
+      etichettaSenzaCheckin: 'No check-in today',
       titolo: 'How did it go?',
       corpo:
         "Before you move on, let's pause to look back and notice how you feel, while it's still fresh.",
@@ -679,6 +684,7 @@ const en: typeof it = {
 
     fatto: {
       etichetta: 'Streak +1 · nice work',
+      etichettaSenzaCheckin: 'Checked out · nice work',
       titolo: 'Well done reading your body!',
       consigli: {
         dolore:

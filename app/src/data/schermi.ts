@@ -186,9 +186,37 @@ export const SCHERMI: GruppoScritte[] = [
         ],
       },
       {
+        /*
+         * Lo stesso check-out, ma senza il check-in del mattino: dopo le 15:30
+         * la home ci arriva lo stesso, e l'etichetta cambia. `?checkin=no` e'
+         * l'unico modo di vederla nella cornice.
+         */
+        id: 'casa-checkout-senza-checkin',
+        nome: '2b · Check-out senza check-in',
+        rotta: '/casa?stato=checkout&ora=19:10&checkin=no',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.checkout',
+          'testi.casa.finestra',
+          'testi.casa.sezioni.intanto',
+          'testi.casa.percorsoCard',
+        ],
+      },
+      {
         id: 'casa-fatto',
         nome: '3 · Giornata finita',
         rotta: '/casa?stato=fatto&ora=20:02',
+        rami: [
+          ...TESTATA_CASA,
+          'testi.casa.fatto',
+          'testi.casa.sezioni.nientaltro',
+          'testi.casa.percorsoCard',
+        ],
+      },
+      {
+        id: 'casa-fatto-senza-checkin',
+        nome: '3b · Giornata finita senza check-in',
+        rotta: '/casa?stato=fatto&ora=20:02&checkin=no',
         rami: [
           ...TESTATA_CASA,
           'testi.casa.fatto',

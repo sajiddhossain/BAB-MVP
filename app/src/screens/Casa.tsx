@@ -122,10 +122,21 @@ export function Casa() {
   const adesso = oraFinta(query.get('ora')) ?? new Date()
 
   const forzato = query.get('stato') as StatoGiornata | null
-  const stato: StatoGiornata =
-    forzato && ['checkin', 'checkout', 'fatto', 'riposo'].includes(forzato)
-      ? forzato
-      : statoDiOggi(giornata, adesso)
+  const eForzato = !!forzato && ['checkin', 'checkout', 'fatto', 'riposo'].includes(forzato)
+  const stato: StatoGiornata = eForzato && forzato ? forzato : statoDiOggi(giornata, adesso)
+
+  /*
+   * Se il check-in di oggi c'e' davvero.
+   *
+   * Dopo le 15:30 la home passa al check-out anche se il check-in non l'ha
+   * fatto, e le etichette non possono dare per scontato che ci sia: "check-in
+   * fatto prima della sessione" e "Streak +1" direbbero il falso. Conta anche
+   * un check-in rimasto in coda senza rete — `fattoCheckin` lo include.
+   *
+   * Con `?stato=` forzato (l'anteprima dei testi) il check-in si da' per fatto,
+   * che e' il caso disegnato; `?checkin=no` mostra le etichette di quando manca.
+   */
+  const checkinFatto = eForzato ? query.get('checkin') !== 'no' : giornata.fattoCheckin
 
   const allenamento = allenamentoDiOggi(adesso)
   const nome = risposte.nome
@@ -155,8 +166,10 @@ export function Casa() {
             {stato === 'checkin' && (
               <Checkin ora={oraDaTesto(allenamento.ora, lingua)} adesso={adesso} />
             )}
-            {stato === 'checkout' && <Checkout previsto={giornata.previsto} adesso={adesso} />}
-            {stato === 'fatto' && <Fatto />}
+            {stato === 'checkout' && (
+              <Checkout previsto={giornata.previsto} adesso={adesso} checkinFatto={checkinFatto} />
+            )}
+            {stato === 'fatto' && <Fatto checkinFatto={checkinFatto} />}
             {stato === 'riposo' && <Riposo adesso={adesso} />}
           </div>
 
@@ -288,13 +301,23 @@ function Checkin({ ora, adesso }: { ora: string; adesso: Date }) {
 }
 
 /* ── home-2: la sessione e' finita, manca il check-out ───────────────────── */
-function Checkout({ previsto, adesso }: { previsto: Tempo | null; adesso: Date }) {
+function Checkout({
+  previsto,
+  adesso,
+  checkinFatto,
+}: {
+  previsto: Tempo | null
+  adesso: Date
+  checkinFatto: boolean
+}) {
   const { t } = useLingua()
   const vai = useNavigate()
   return (
     <SchedaEroe
       stato="checkout"
-      etichetta={t.casa.checkout.etichetta}
+      /* senza check-in niente spunta: l'icona direbbe "fatto" */
+      etichetta={checkinFatto ? t.casa.checkout.etichetta : t.casa.checkout.etichettaSenzaCheckin}
+      senzaIcona={!checkinFatto}
       titolo={t.casa.checkout.titolo}
       corpo={t.casa.checkout.corpo}
     >
@@ -326,7 +349,7 @@ function Checkout({ previsto, adesso }: { previsto: Tempo | null; adesso: Date }
  * anche due pastiglie: l'ha appena visto alla fine del check-out, e
  * rifarglielo vedere dieci secondi dopo non gli aggiunge niente.
  */
-function Fatto() {
+function Fatto({ checkinFatto }: { checkinFatto: boolean }) {
   const { t, ts } = useLingua()
   const g = useGiornata()
   // non si tiene da parte: cambierebbe lingua e resterebbe indietro
@@ -335,7 +358,8 @@ function Fatto() {
   return (
     <SchedaEroe
       stato="fatto"
-      etichetta={t.casa.fatto.etichetta}
+      // la streak conta i giorni con un check-in: senza, il +1 non arriva
+      etichetta={checkinFatto ? t.casa.fatto.etichetta : t.casa.fatto.etichettaSenzaCheckin}
       titolo={t.casa.fatto.titolo}
       corpo={riassunto || undefined}
     >
