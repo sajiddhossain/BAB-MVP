@@ -29,6 +29,7 @@ import {
   ConfermaCancella,
   Iniziale,
   Finestra,
+  Menu,
   Numero,
   Riquadro,
   Tasto,
@@ -190,7 +191,8 @@ export function Atleta() {
       segno={<Iniziale id={chi.id} nome={chi.display_name} grande />}
       sotto={[chi.email, chi.team_name, chi.sport, `${chi.age} anni`].filter(Boolean).join(' · ')}
       destra={
-        <div className="flex shrink-0 items-center gap-2">
+        <>
+        <div className="hidden shrink-0 items-center gap-2 md:flex">
           <Tasto piccolo onClick={() => setAperta('modifica')}>
             Modifica
           </Tasto>
@@ -204,11 +206,27 @@ export function Atleta() {
             Cancella
           </Tasto>
         </div>
+        <div className="md:hidden">
+          <Menu
+            voci={[
+              { nome: 'Modifica', onClick: () => setAperta('modifica') },
+              { nome: 'Rifai tutorial', onClick: () => setAperta('tutorial'), spenta: !chi.tutorial_done },
+              { nome: 'Scarica dati', onClick: () => void scarica() },
+              { nome: 'Cancella', onClick: () => setAperta('cancella'), pericolo: true, spenta: amministra },
+            ]}
+          />
+        </div>
+        </>
       }
     >
       <div className="sticky top-0 z-20 border-b border-line bg-paper/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-[1080px] flex-wrap items-center justify-between gap-2 px-6 py-2">
-          <div role="tablist" aria-label="Viste della scheda" className="flex flex-wrap gap-1">
+        <div className="mx-auto flex max-w-[1080px] flex-wrap items-center justify-between gap-2 px-4 py-2 md:px-6">
+          {/* sul telefono le cinque viste scorrono di lato invece di andare a capo una per riga */}
+          <div
+            role="tablist"
+            aria-label="Viste della scheda"
+            className="-mx-4 flex w-[calc(100%+32px)] gap-1 overflow-x-auto px-4 py-[3px] md:mx-0 md:w-auto md:flex-wrap md:overflow-visible md:px-0"
+          >
             {VISTE.map((x) => (
               <button
                 key={x.id}
@@ -216,7 +234,7 @@ export function Atleta() {
                 role="tab"
                 aria-selected={vista === x.id}
                 onClick={() => cambia('vista', x.id)}
-                className={`h-8 cursor-pointer rounded-pill border-[1.5px] px-3 text-[12.5px] font-bold ${
+                className={`h-9 shrink-0 cursor-pointer rounded-pill border-[1.5px] px-3 text-[13px] font-bold whitespace-nowrap md:h-8 md:text-[12.5px] ${
                   vista === x.id
                     ? 'border-ink bg-lime text-ink shadow-[2px_2px_0_rgba(44,44,58,0.9)]'
                     : 'border-transparent text-ink-medio hover:bg-chip'
@@ -241,13 +259,13 @@ export function Atleta() {
       {avviso && (
         <div
           role="status"
-          className={`mx-auto mt-3 max-w-[1080px] px-6 text-[12.5px] font-bold ${avviso.male ? 'text-rosso' : 'text-verde-acceso'}`}
+          className={`mx-auto mt-3 max-w-[1080px] px-4 text-[12.5px] md:px-6 font-bold ${avviso.male ? 'text-rosso' : 'text-verde-acceso'}`}
         >
           {avviso.testo}
         </div>
       )}
 
-      <div className="mx-auto max-w-[1080px] p-6">
+      <div className="mx-auto max-w-[1080px] p-4 md:p-6">
         {!scheda && vista !== 'panoramica' && vista !== 'note' && (
           <p className="m-0 text-[13px] text-ink-medio">Non riesco a leggere le sue risposte.</p>
         )}
@@ -349,7 +367,7 @@ function Panoramica({ chi, scheda }: { chi: Riga; scheda: Scheda | null }) {
 
   return (
     <>
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
         <Numero
           quanto={chi.days_7d}
           cosa="giorni attivi negli ultimi 7"

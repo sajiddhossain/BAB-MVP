@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { leggiPolso } from '../../lib/admin'
 import type { Polso } from '../../lib/admin'
 import { Numero } from './pezzi'
+import { Tessera } from './Telaio'
 
 /**
  * L'atrio: la prima cosa che si vede entrando in /admin.
@@ -38,11 +39,15 @@ export function Atrio() {
 
   return (
     <div className="min-h-full bg-paper text-ink">
-      <div className="mx-auto max-w-[920px] px-6 py-10">
+      <div className="mx-auto max-w-[920px] px-4 py-6 md:px-6 md:py-10">
+        {/* sul telefono l'atrio non ha ne' intestazione ne' barra laterale: il logo sta qui */}
+        <div className="mb-4 md:hidden">
+          <Tessera />
+        </div>
         <p className="m-0 text-[11px] font-bold tracking-[1.2px] text-ink-mute uppercase">
           BAB · amministrazione
         </p>
-        <h1 className="bab-display m-0 mt-[6px] text-[34px] leading-[1.1] font-bold">Cosa vuoi fare?</h1>
+        <h1 className="bab-display m-0 mt-[6px] text-[28px] leading-[1.1] font-bold md:text-[34px]">Cosa vuoi fare?</h1>
 
         <Polsi polso={polso} letto={letto} />
 
@@ -92,7 +97,7 @@ function Polsi({ polso, letto }: { polso: Polso | null; letto: boolean }) {
     )
   }
   return (
-    <div className="mt-6 flex flex-wrap gap-2">
+    <div className="mt-6 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
       <Numero quanto={polso.athletes} cosa="atlete" nota={`+${polso.athletes_new_7d} in sette giorni`} />
       <Numero quanto={polso.athletes_today} cosa="hanno fatto qualcosa oggi" />
       <Numero quanto={polso.checkins_7d} cosa="check-in in sette giorni" nota={`${polso.posts_7d} sono check-out`} />

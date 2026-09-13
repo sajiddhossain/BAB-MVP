@@ -10,9 +10,11 @@ import { normalizza } from './comune'
 import { useVocabolario } from './vocabolario'
 import { SERIE } from './grafici'
 import {
+  BLOCCO,
   CAMPO,
   Chip,
   ConfermaCancella,
+  Finestra,
   Iniziale,
   Numero,
   Tasto,
@@ -40,6 +42,12 @@ import { COLONNE_RISPOSTE, COLONNE_SENSAZIONI, doveCade, rigaRisposta, rigaSensa
  *
  * I filtri e l'ordine stanno nell'indirizzo, cosi' un elenco filtrato si
  * manda a un'altra persona com'e'.
+ *
+ * ── SUL TELEFONO ───────────────────────────────────────────────────────────
+ * Una tabella da quattordici colonne in 375 pixel si legge solo scorrendo di
+ * lato, e scorrendo di lato si perde il nome. Li' ogni atleta e' una scheda,
+ * e i filtri — che occuperebbero mezzo schermo — stanno in un foglio dal
+ * basso dietro a un bottone che dice quanti sono accesi.
  *
  * ── PERCHE' L'ULTIMA VOLTA E NON IL TOTALE ─────────────────────────────────
  * Perche' un totale alto non dice se e' ancora qui. Una che ha fatto quaranta
@@ -81,6 +89,21 @@ type Colonna =
   | 'lezioni'
   | 'ultima'
 
+const NOMI_COLONNE: Record<Colonna, string> = {
+  nome: 'Chi',
+  eta: 'Età',
+  squadra: 'Squadra',
+  sport: 'Sport',
+  pre: 'Pre',
+  post: 'Post',
+  chiusi: 'Chiusi',
+  giorni7: 'Giorni 7',
+  giorni30: 'Giorni 30',
+  corpo: 'Corpo',
+  lezioni: 'Lezioni',
+  ultima: 'Ultima volta',
+}
+
 const chiusi = (a: Atleta) => (a.checkins_pre > 0 ? a.checkins_post / a.checkins_pre : -1)
 
 const CONFRONTA: Record<Colonna, (x: Atleta, y: Atleta) => number> = {
@@ -102,18 +125,21 @@ const CONFRONTA: Record<Colonna, (x: Atleta, y: Atleta) => number> = {
 /** le colonne che hanno senso lette dalla piu' alta: si aprono al contrario */
 const PRIMA_ALTO = new Set<Colonna>(['pre', 'post', 'chiusi', 'giorni7', 'giorni30', 'corpo', 'lezioni', 'ultima'])
 
+type Striscia = Map<string, { pre: boolean; post: boolean }>
+
 export function Atlete() {
   const v = useVocabolario()
   const [righe, setRighe] = useState<Atleta[] | null>(null)
   const [letto, setLetto] = useState(false)
   const [giro, setGiro] = useState(0)
   const [admin, setAdmin] = useState<Set<string>>(new Set())
-  const [strisce, setStrisce] = useState<Map<string, Map<string, { pre: boolean; post: boolean }>>>(new Map())
+  const [strisce, setStrisce] = useState<Map<string, Striscia>>(new Map())
   const [recenti, setRecenti] = useState<Tutto | null>(null)
   const [scelte, setScelte] = useState<Set<string>>(new Set())
   const [cancella, setCancella] = useState<Atleta[] | null>(null)
   const [avviso, setAvviso] = useState<{ testo: string; male?: boolean } | null>(null)
   const [esporto, setEsporto] = useState(false)
+  const [foglioFiltri, setFoglioFiltri] = useState(false)
 
   const [query, setQuery] = useSearchParams()
   const cerca = query.get('cerca') ?? ''
@@ -141,9 +167,9 @@ export function Atlete() {
       if (!vivo) return
       setRighe(a)
       setAdmin(adm)
-      const m = new Map<string, Map<string, { pre: boolean; post: boolean }>>()
+      const m = new Map<string, Striscia>()
       for (const c of tutto?.checkins ?? []) {
-        const di = m.get(c.athlete_id) ?? new Map()
+        const di: Striscia = m.get(c.athlete_id) ?? new Map()
         const q = di.get(c.local_date) ?? { pre: false, post: false }
         q[c.kind] = true
         di.set(c.local_date, q)
@@ -186,12 +212,20 @@ export function Atlete() {
     return base.filter(vale).sort((x, y) => f(x, y) * verso || x.display_name.localeCompare(y.display_name, 'it'))
   }, [base, stato, ordine, verso])
 
-  const tuttiSport = useMemo(() => [...new Set((righe ?? []).flatMap((a) => a.sports ?? [a.sport]).filter((s): s is string => !!s))].sort(), [righe])
-  const tutteSquadre = useMemo(() => [...new Set((righe ?? []).map((a) => a.team_name).filter((s): s is string => !!s))].sort(), [righe])
+  const tuttiSport = useMemo(
+    () => [...new Set((righe ?? []).flatMap((a) => a.sports ?? [a.sport]).filter((s): s is string => !!s))].sort(),
+    [righe],
+  )
+  const tutteSquadre = useMemo(
+    () => [...new Set((righe ?? []).map((a) => a.team_name).filter((s): s is string => !!s))].sort(),
+    [righe],
+  )
 
   const scelteViste = viste.filter((a) => scelte.has(a.id))
   const tutteScelte = viste.length > 0 && scelteViste.length === viste.length
   const filtri = !!(cerca || stato !== 'tutte' || sport || squadra || eta)
+  /** quanti filtri sono accesi nel foglio: la ricerca sta fuori, e non conta */
+  const accesi = [stato !== 'tutte', sport, squadra, eta].filter(Boolean).length
 
   function ordina(c: Colonna) {
     setQuery(
@@ -206,6 +240,29 @@ export function Atlete() {
       },
       { replace: true },
     )
+  }
+
+  /** dal menu del foglio: la colonna scelta, nel suo verso naturale */
+  function ordinaPer(c: Colonna) {
+    setQuery(
+      (q) => {
+        const n = new URLSearchParams(q)
+        n.set('ordine', c)
+        if (PRIMA_ALTO.has(c)) n.delete('verso')
+        else n.set('verso', 'su')
+        return n
+      },
+      { replace: true },
+    )
+  }
+
+  function scegli(id: string) {
+    setScelte((s) => {
+      const n = new Set(s)
+      if (n.has(id)) n.delete(id)
+      else n.add(id)
+      return n
+    })
   }
 
   /* ── i file ── */
@@ -298,14 +355,78 @@ export function Atlete() {
     }
   }, [viste, recenti, giorni14])
 
+  /* i filtri: gli stessi nella riga del computer e nel foglio del telefono */
+  const controlli = (nelFoglio: boolean) => (
+    <>
+      <div role="group" aria-label="Stato" className="flex flex-wrap gap-1">
+        {STATI.map((s) => (
+          <Chip
+            key={s.id}
+            acceso={stato === s.id}
+            onClick={() => imposta('stato', s.id === 'tutte' ? '' : s.id)}
+            conta={base.filter(s.vale).length}
+          >
+            {s.nome}
+          </Chip>
+        ))}
+      </div>
+      <select value={sport} onChange={(e) => imposta('sport', e.target.value)} aria-label="Sport" className={`${CAMPO} ${nelFoglio ? 'w-full' : ''}`}>
+        <option value="">Ogni sport</option>
+        {tuttiSport.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+      </select>
+      <select value={squadra} onChange={(e) => imposta('squadra', e.target.value)} aria-label="Squadra" className={`${CAMPO} ${nelFoglio ? 'w-full' : ''}`}>
+        <option value="">Ogni squadra</option>
+        {tutteSquadre.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
+        <option value="-">Senza squadra</option>
+      </select>
+      <select value={eta} onChange={(e) => imposta('eta', e.target.value)} aria-label="Età" className={`${CAMPO} ${nelFoglio ? 'w-full' : ''}`}>
+        <option value="">Ogni età</option>
+        {ETA.map((e) => (
+          <option key={e.id} value={e.id}>
+            {e.nome}
+          </option>
+        ))}
+      </select>
+      {nelFoglio && (
+        <select
+          value={ordine}
+          onChange={(e) => ordinaPer(e.target.value as Colonna)}
+          aria-label="Come ordinare l’elenco"
+          className={`${CAMPO} w-full`}
+        >
+          {(Object.keys(NOMI_COLONNE) as Colonna[]).map((c) => (
+            <option key={c} value={c}>
+              {NOMI_COLONNE[c]}
+            </option>
+          ))}
+        </select>
+      )}
+    </>
+  )
+
+  const togli = () => {
+    const n = new URLSearchParams()
+    if (query.get('ordine')) n.set('ordine', query.get('ordine')!)
+    if (query.get('verso')) n.set('verso', query.get('verso')!)
+    setQuery(n, { replace: true })
+  }
+
   return (
     <Telaio
       nome="Le atlete"
       sotto={letto && righe ? `${righe.length} in tutto` : undefined}
       destra={
         letto && righe && righe.length > 0 ? (
-          <div className="flex shrink-0 items-center gap-2">
-            <span className="text-[11.5px] text-ink-mute">{filtri ? 'Scarica le filtrate:' : 'Scarica:'}</span>
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <span className="hidden text-[11.5px] text-ink-mute lg:inline">{filtri ? 'Scarica le filtrate:' : 'Scarica:'}</span>
             <Tasto piccolo onClick={() => scaricaElenco(viste)} disabled={viste.length === 0}>
               Elenco CSV
             </Tasto>
@@ -319,7 +440,7 @@ export function Atlete() {
         ) : undefined
       }
     >
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         {!letto && <p className="m-0 text-[13px] text-ink-mute">Leggo…</p>}
         {letto && !righe && <Manca />}
         {letto && righe && righe.length === 0 && (
@@ -329,7 +450,7 @@ export function Atlete() {
         )}
         {letto && righe && righe.length > 0 && (
           <>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
               <Numero
                 quanto={viste.length}
                 cosa={filtri ? 'in questo elenco' : 'atlete'}
@@ -360,45 +481,26 @@ export function Atlete() {
                 onChange={(e) => imposta('cerca', e.target.value)}
                 placeholder="Nome, mail, sport…"
                 aria-label="Cerca un’atleta"
-                className={`${CAMPO} w-[200px]`}
+                className={`${CAMPO} min-w-0 flex-1 md:w-[200px] md:flex-none`}
               />
-              <div role="group" aria-label="Stato" className="flex flex-wrap gap-1">
-                {STATI.map((s) => (
-                  <Chip key={s.id} acceso={stato === s.id} onClick={() => imposta('stato', s.id === 'tutte' ? '' : s.id)} conta={base.filter(s.vale).length}>
-                    {s.nome}
-                  </Chip>
-                ))}
-              </div>
-              <select value={sport} onChange={(e) => imposta('sport', e.target.value)} aria-label="Sport" className={CAMPO}>
-                <option value="">Ogni sport</option>
-                {tuttiSport.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-              <select value={squadra} onChange={(e) => imposta('squadra', e.target.value)} aria-label="Squadra" className={CAMPO}>
-                <option value="">Ogni squadra</option>
-                {tutteSquadre.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-                <option value="-">Senza squadra</option>
-              </select>
-              <select value={eta} onChange={(e) => imposta('eta', e.target.value)} aria-label="Età" className={CAMPO}>
-                <option value="">Ogni età</option>
-                {ETA.map((e) => (
-                  <option key={e.id} value={e.id}>
-                    {e.nome}
-                  </option>
-                ))}
-              </select>
+              <div className="contents max-md:hidden">{controlli(false)}</div>
+              <button
+                type="button"
+                onClick={() => setFoglioFiltri(true)}
+                className={`bab-tocco flex h-10 shrink-0 cursor-pointer items-center gap-2 rounded-pill border-[1.5px] border-ink px-4 text-[14px] font-bold text-ink md:hidden ${
+                  accesi > 0 ? 'bg-lime' : 'bg-surface'
+                }`}
+              >
+                Filtri
+                {accesi > 0 && (
+                  <span className="flex size-5 items-center justify-center rounded-full bg-ink text-[11px] text-lime">{accesi}</span>
+                )}
+              </button>
               {filtri && (
                 <button
                   type="button"
-                  onClick={() => setQuery(new URLSearchParams(), { replace: true })}
-                  className="h-8 cursor-pointer rounded-pill px-2 text-[12px] font-bold text-ink-medio underline"
+                  onClick={togli}
+                  className="h-8 cursor-pointer rounded-pill px-2 text-[12px] font-bold text-ink-medio underline max-md:hidden"
                 >
                   Togli i filtri
                 </button>
@@ -412,7 +514,7 @@ export function Atlete() {
             )}
 
             {scelteViste.length > 0 && (
-              <div className="sticky top-0 z-20 mt-3 flex flex-wrap items-center gap-2 rounded-[14px] border-[1.5px] border-ink bg-lime px-4 py-2 shadow-[3px_3px_0_rgba(44,44,58,0.9)]">
+              <div className="sticky top-2 z-20 mt-3 flex flex-wrap items-center gap-2 rounded-[14px] border-[1.5px] border-ink bg-lime px-3 py-2 shadow-[3px_3px_0_rgba(44,44,58,0.9)] md:px-4">
                 <span className="mr-1 text-[13px] font-bold">
                   {scelteViste.length} {scelteViste.length === 1 ? 'selezionata' : 'selezionate'}
                 </span>
@@ -425,17 +527,23 @@ export function Atlete() {
                 <Tasto piccolo onClick={() => void scaricaRisposte(scelteViste, 'sensazioni')} disabled={esporto}>
                   Sensazioni CSV
                 </Tasto>
-                <Tasto piccolo tipo="pericolo" onClick={() => setCancella(scelteViste.filter((a) => !admin.has(a.id)))} disabled={scelteViste.every((a) => admin.has(a.id))}>
+                <Tasto
+                  piccolo
+                  tipo="pericolo"
+                  onClick={() => setCancella(scelteViste.filter((a) => !admin.has(a.id)))}
+                  disabled={scelteViste.every((a) => admin.has(a.id))}
+                >
                   Cancella
                 </Tasto>
                 <span className="flex-1" />
-                <button type="button" onClick={() => setScelte(new Set())} className="cursor-pointer text-[12px] font-bold text-ink underline">
+                <button type="button" onClick={() => setScelte(new Set())} className="h-9 cursor-pointer text-[12px] font-bold text-ink underline">
                   Deseleziona
                 </button>
               </div>
             )}
 
-            <div className="mt-3 overflow-x-auto rounded-[14px] border-[1.5px] border-line bg-surface">
+            {/* dal tablet in su: la tabella */}
+            <div className="mt-3 hidden overflow-x-auto rounded-[14px] border-[1.5px] border-line bg-surface md:block">
               <table className="w-full border-collapse text-[12.5px]">
                 <thead>
                   <tr className="text-left text-[10.5px] tracking-[0.5px] text-ink-mute uppercase">
@@ -451,19 +559,20 @@ export function Atlete() {
                         className="size-4 cursor-pointer accent-ink"
                       />
                     </th>
-                    <Th c="nome" ordine={ordine} verso={verso} onOrdina={ordina}>Chi</Th>
-                    <Th c="eta" ordine={ordine} verso={verso} onOrdina={ordina} numero>Età</Th>
-                    <Th c="squadra" ordine={ordine} verso={verso} onOrdina={ordina}>Squadra</Th>
-                    <Th c="sport" ordine={ordine} verso={verso} onOrdina={ordina}>Sport</Th>
+                    {(['nome', 'eta', 'squadra', 'sport'] as Colonna[]).map((c) => (
+                      <Th key={c} c={c} ordine={ordine} verso={verso} onOrdina={ordina} numero={c === 'eta'}>
+                        {NOMI_COLONNE[c]}
+                      </Th>
+                    ))}
                     <th className="border-b border-line px-2 py-2 font-bold whitespace-nowrap">Ultimi 14 giorni</th>
-                    <Th c="pre" ordine={ordine} verso={verso} onOrdina={ordina} numero>Pre</Th>
-                    <Th c="post" ordine={ordine} verso={verso} onOrdina={ordina} numero>Post</Th>
-                    <Th c="chiusi" ordine={ordine} verso={verso} onOrdina={ordina} numero>Chiusi</Th>
-                    <Th c="giorni7" ordine={ordine} verso={verso} onOrdina={ordina} numero>Giorni 7</Th>
-                    <Th c="giorni30" ordine={ordine} verso={verso} onOrdina={ordina} numero>Giorni 30</Th>
-                    <Th c="corpo" ordine={ordine} verso={verso} onOrdina={ordina} numero>Corpo</Th>
-                    <Th c="lezioni" ordine={ordine} verso={verso} onOrdina={ordina} numero>Lezioni</Th>
-                    <Th c="ultima" ordine={ordine} verso={verso} onOrdina={ordina}>Ultima volta</Th>
+                    {(['pre', 'post', 'chiusi', 'giorni7', 'giorni30', 'corpo', 'lezioni'] as Colonna[]).map((c) => (
+                      <Th key={c} c={c} ordine={ordine} verso={verso} onOrdina={ordina} numero>
+                        {NOMI_COLONNE[c]}
+                      </Th>
+                    ))}
+                    <Th c="ultima" ordine={ordine} verso={verso} onOrdina={ordina}>
+                      {NOMI_COLONNE.ultima}
+                    </Th>
                   </tr>
                 </thead>
                 <tbody>
@@ -472,14 +581,7 @@ export function Atlete() {
                       key={a.id}
                       a={a}
                       scelta={scelte.has(a.id)}
-                      onScegli={() =>
-                        setScelte((s) => {
-                          const n = new Set(s)
-                          if (n.has(a.id)) n.delete(a.id)
-                          else n.add(a.id)
-                          return n
-                        })
-                      }
+                      onScegli={() => scegli(a.id)}
                       striscia={strisce.get(a.id)}
                       giorni14={giorni14}
                     />
@@ -488,7 +590,23 @@ export function Atlete() {
               </table>
               {viste.length === 0 && <p className="m-0 p-4 text-[13px] text-ink-medio">Nessuna con questi filtri.</p>}
             </div>
-            <p className="m-0 mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-mute">
+
+            {/* sul telefono: una scheda per atleta */}
+            <ul className="m-0 mt-3 flex list-none flex-col gap-3 p-0 md:hidden">
+              {viste.map((a) => (
+                <SchedaAtleta
+                  key={a.id}
+                  a={a}
+                  scelta={scelte.has(a.id)}
+                  onScegli={() => scegli(a.id)}
+                  striscia={strisce.get(a.id)}
+                  giorni14={giorni14}
+                />
+              ))}
+              {viste.length === 0 && <li className="text-[13px] text-ink-medio">Nessuna con questi filtri.</li>}
+            </ul>
+
+            <p className="m-0 mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-ink-mute">
               <span className="inline-flex items-center gap-[6px]">
                 <Cella pre post={false} /> check-in
               </span>
@@ -503,6 +621,26 @@ export function Atlete() {
           </>
         )}
       </div>
+
+      {foglioFiltri && (
+        <Finestra
+          titolo="Filtri"
+          sotto={`${viste.length} su ${righe?.length ?? 0}`}
+          onChiudi={() => setFoglioFiltri(false)}
+          piede={
+            <>
+              <Tasto onClick={togli} disabled={accesi === 0}>
+                Togli i filtri
+              </Tasto>
+              <Tasto tipo="primo" onClick={() => setFoglioFiltri(false)}>
+                Fatto
+              </Tasto>
+            </>
+          }
+        >
+          <div className="flex flex-col gap-3">{controlli(true)}</div>
+        </Finestra>
+      )}
 
       {cancella && (
         <ConfermaCancella
@@ -580,21 +718,46 @@ function Cella({ pre, post }: { pre: boolean; post: boolean }) {
   )
 }
 
-function Riga({
-  a,
-  scelta,
-  onScegli,
-  striscia,
-  giorni14,
-}: {
+function Strisciolina({ nome, striscia, giorni14 }: { nome: string; striscia?: Striscia; giorni14: string[] }) {
+  const quanti = giorni14.filter((g) => striscia?.has(g)).length
+  return (
+    <span
+      role="img"
+      aria-label={`${nome}: ${quanti} giorni su 14 con BAB aperta`}
+      title={giorni14
+        .map((g) => {
+          const q = striscia?.get(g)
+          return `${dataLunga(g)}: ${q ? [q.pre && 'check-in', q.post && 'check-out'].filter(Boolean).join(' e ') : '—'}`
+        })
+        .join('\n')}
+      className="inline-flex gap-[2px]"
+    >
+      {giorni14.map((g) => (
+        <Cella key={g} pre={!!striscia?.get(g)?.pre} post={!!striscia?.get(g)?.post} />
+      ))}
+    </span>
+  )
+}
+
+function UltimaVolta({ a }: { a: Atleta }) {
+  const ferma = a.last_day ? giorniDa(a.last_day) : null
+  return (
+    <span title={a.last_day ? data(a.last_day) : undefined} className="whitespace-nowrap">
+      {a.last_day ? <span className={ferma !== null && ferma > 13 ? 'text-ink-mute' : ''}>{quando(ferma)}</span> : <span className="text-ink-mute">mai</span>}
+      {!a.tutorial_done && <span className="ml-2 rounded-pill bg-chip px-[6px] py-[1px] text-[10px] font-bold text-ink-medio">tutorial</span>}
+    </span>
+  )
+}
+
+type PropsRiga = {
   a: Atleta
   scelta: boolean
   onScegli: () => void
-  striscia?: Map<string, { pre: boolean; post: boolean }>
+  striscia?: Striscia
   giorni14: string[]
-}) {
-  const ferma = a.last_day ? giorniDa(a.last_day) : null
-  const quanti = giorni14.filter((g) => striscia?.has(g)).length
+}
+
+function Riga({ a, scelta, onScegli, striscia, giorni14 }: PropsRiga) {
   const td = 'px-2 py-[7px]'
   return (
     <tr className={`border-b border-riga align-middle last:border-b-0 hover:bg-chip ${scelta ? 'bg-chip' : ''}`}>
@@ -620,16 +783,7 @@ function Riga({
       <td className={`${td} whitespace-nowrap text-ink-medio`}>{a.team_name ?? '—'}</td>
       <td className={`${td} text-ink-medio`}>{(a.sports ?? [a.sport]).filter(Boolean).join(', ') || '—'}</td>
       <td className={td}>
-        <span
-          role="img"
-          aria-label={`${quanti} giorni su 14 con BAB aperta`}
-          title={giorni14.map((g) => `${dataLunga(g)}: ${striscia?.get(g) ? [striscia.get(g)!.pre && 'check-in', striscia.get(g)!.post && 'check-out'].filter(Boolean).join(' e ') : '—'}`).join('\n')}
-          className="inline-flex gap-[2px]"
-        >
-          {giorni14.map((g) => (
-            <Cella key={g} pre={!!striscia?.get(g)?.pre} post={!!striscia?.get(g)?.post} />
-          ))}
-        </span>
+        <Strisciolina nome={a.display_name} striscia={striscia} giorni14={giorni14} />
       </td>
       <td className={`${td} text-right tabular-nums`}>{a.checkins_pre}</td>
       {/*
@@ -645,19 +799,72 @@ function Riga({
       <td className={`${td} text-right tabular-nums`}>{a.days_7d}</td>
       <td className={`${td} text-right tabular-nums`}>{a.days_30d}</td>
       <td className={`${td} text-right tabular-nums whitespace-nowrap`}>
-        {a.signals}
-        {a.signals_flagged > 0 && (
-          <span className="ml-1 text-rosso" title={`${a.signals_flagged} segnate come dolore protettivo`}>
-            ● {a.signals_flagged}
-          </span>
-        )}
+        <Corpo a={a} />
       </td>
       <td className={`${td} text-right tabular-nums text-ink-medio`}>{a.lessons_done}/8</td>
-      <td className={`${td} whitespace-nowrap`} title={a.last_day ? data(a.last_day) : undefined}>
-        {a.last_day ? <span className={ferma !== null && ferma > 13 ? 'text-ink-mute' : ''}>{quando(ferma)}</span> : <span className="text-ink-mute">mai</span>}
-        {!a.tutorial_done && <span className="ml-2 rounded-pill bg-chip px-[6px] py-[1px] text-[10px] font-bold text-ink-medio">tutorial</span>}
+      <td className={td}>
+        <UltimaVolta a={a} />
       </td>
     </tr>
+  )
+}
+
+function Corpo({ a }: { a: Atleta }) {
+  return (
+    <>
+      {a.signals}
+      {a.signals_flagged > 0 && (
+        <span className="ml-1 text-rosso" title={`${a.signals_flagged} segnate come dolore protettivo`}>
+          ● {a.signals_flagged}
+        </span>
+      )}
+    </>
+  )
+}
+
+/** la stessa riga, sul telefono: il nome in cima, i numeri sotto in quattro caselle */
+function SchedaAtleta({ a, scelta, onScegli, striscia, giorni14 }: PropsRiga) {
+  const numeri: [string, ReactNode][] = [
+    [NOMI_COLONNE.pre, a.checkins_pre],
+    [NOMI_COLONNE.post, a.checkins_post],
+    [NOMI_COLONNE.chiusi, a.checkins_pre > 0 ? `${Math.round((a.checkins_post / a.checkins_pre) * 100)}%` : '—'],
+    [NOMI_COLONNE.corpo, <Corpo key="corpo" a={a} />],
+  ]
+  return (
+    <li className={`${BLOCCO} p-3 ${scelta ? 'outline-[3px] outline-offset-2 outline-lime' : ''}`}>
+      <div className="flex items-start gap-3">
+        <Link to={`/admin/atlete/${a.id}`} className="flex min-w-0 flex-1 items-center gap-[10px] text-ink no-underline">
+          <Iniziale id={a.id} nome={a.display_name} grande />
+          <span className="min-w-0">
+            <span className="block truncate text-[15px] font-bold">{a.display_name}</span>
+            <span className="block truncate text-[12px] text-ink-mute">
+              {[a.team_name, (a.sports ?? [a.sport]).filter(Boolean).join(', '), `${a.age} anni`].filter(Boolean).join(' · ')}
+            </span>
+          </span>
+        </Link>
+        <label className="-m-2 flex size-11 shrink-0 cursor-pointer items-center justify-center">
+          <input
+            type="checkbox"
+            checked={scelta}
+            onChange={onScegli}
+            aria-label={`Seleziona ${a.display_name}`}
+            className="size-5 cursor-pointer accent-ink"
+          />
+        </label>
+      </div>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[12.5px]">
+        <Strisciolina nome={a.display_name} striscia={striscia} giorni14={giorni14} />
+        <UltimaVolta a={a} />
+      </div>
+      <dl className="m-0 mt-3 grid grid-cols-4 gap-2 border-t border-riga pt-2 text-center">
+        {numeri.map(([k, n]) => (
+          <div key={k}>
+            <dt className="text-[10px] font-bold tracking-[0.4px] text-ink-mute uppercase">{k}</dt>
+            <dd className="m-0 mt-[2px] text-[15px] font-bold tabular-nums">{n}</dd>
+          </div>
+        ))}
+      </dl>
+    </li>
   )
 }
 

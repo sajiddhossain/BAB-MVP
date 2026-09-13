@@ -1,33 +1,32 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import type { ReactNode } from 'react'
+import logo from '../../assets/logo-bab.svg'
 
 /**
  * La cornice di tutte le stanze del pannello.
  *
- * ── LA BARRA A SINISTRA ────────────────────────────────────────────────────
- * Prima da ogni stanza si tornava all'atrio con «← Pannello», e da li' si
- * sceglieva un'altra stanza: due click per passare dalle atlete alle parole.
- * Adesso le stanze stanno in una colonna fissa, e quella in cui sei e' accesa.
- *
- * Sugli schermi stretti la colonna tiene solo i segni: le parole hanno tre
- * colonne sue, e duecento pixel di barra gliene porterebbero via una.
+ * ── DUE BARRE, UNA PER SCHERMO ─────────────────────────────────────────────
+ * Dal tablet in su le stanze stanno in una colonna a sinistra, che si
+ * comprime ai soli segni. Sul telefono una colonna si mangia meta' schermo:
+ * li' le stanze scendono in una barra in fondo, a portata di pollice, come
+ * nell'app delle atlete.
  *
  * `Stanze` e' la rotta che contiene tutte le altre; `Telaio` e' l'intestazione
  * di una stanza, dentro.
  */
 
-const STANZE: { a: string; nome: string; segno: string; fine?: boolean }[] = [
-  { a: '/admin', nome: 'Atrio', segno: '◧', fine: true },
-  { a: '/admin/atlete', nome: 'Le atlete', segno: '◍' },
-  { a: '/admin/scritte', nome: 'Le parole', segno: 'Aa' },
-  { a: '/admin/sezioni', nome: 'Le sezioni dell’app', segno: '◑' },
+const STANZE: { a: string; nome: string; corto: string; segno: string; fine?: boolean }[] = [
+  { a: '/admin', nome: 'Atrio', corto: 'Atrio', segno: '◧', fine: true },
+  { a: '/admin/atlete', nome: 'Le atlete', corto: 'Atlete', segno: '◍' },
+  { a: '/admin/scritte', nome: 'Le parole', corto: 'Parole', segno: 'Aa' },
+  { a: '/admin/sezioni', nome: 'Le sezioni dell’app', corto: 'Sezioni', segno: '◑' },
 ]
 
 /**
  * Aperta o compressa la decide chi guarda, e la barra se lo ricorda su questo
  * browser. La prima volta parte aperta sugli schermi larghi e compressa su
- * quelli stretti, dove le parole hanno bisogno di tutta la larghezza.
+ * quelli piu' stretti, dove le parole hanno bisogno di tutta la larghezza.
  */
 const CHIAVE_BARRA = 'bab.adminBarra'
 
@@ -40,6 +39,26 @@ function compressaAllInizio(): boolean {
     // senza memoria del browser si decide dalla larghezza
   }
   return !window.matchMedia('(min-width: 1280px)').matches
+}
+
+/**
+ * Il logo giallo su una tessera d'inchiostro: sul bianco il giallo non si legge.
+ *
+ * Tre misure: `piccola` per la barra compressa (42 pixel, quanti ne ha),
+ * `media` per l'intestazione del telefono — dove una tessera stretta
+ * rimpicciolisce il logo fino a non riconoscerlo — e quella intera.
+ */
+export function Tessera({ misura = 'intera' }: { misura?: 'piccola' | 'media' | 'intera' }) {
+  const forma = {
+    piccola: ['h-9 w-[42px] px-[6px]', 'h-auto w-full'],
+    media: ['h-9 px-[10px]', 'h-[19px] w-auto'],
+    intera: ['h-10 px-3', 'h-[22px] w-auto'],
+  }[misura]
+  return (
+    <span className={`flex shrink-0 items-center justify-center rounded-[10px] border-[1.5px] border-ink bg-ink ${forma[0]}`}>
+      <img src={logo} alt="" className={forma[1]} />
+    </span>
+  )
 }
 
 export function Stanze() {
@@ -57,17 +76,15 @@ export function Stanze() {
   }
 
   return (
-    <div className="flex h-dvh bg-paper text-ink">
+    <div className="flex h-dvh flex-col bg-paper text-ink md:flex-row">
       <nav
         aria-label="Stanze del pannello"
-        className={`flex shrink-0 flex-col gap-1 overflow-hidden border-r-[1.5px] border-ink bg-surface py-3 transition-[width] duration-200 motion-reduce:transition-none ${
+        className={`hidden shrink-0 flex-col gap-1 overflow-hidden border-r-[1.5px] border-ink bg-surface py-3 transition-[width] duration-200 motion-reduce:transition-none md:flex ${
           compressa ? 'w-[64px] px-2' : 'w-[204px] px-3'
         }`}
       >
         <Link to="/admin" aria-label="BAB · amministrazione" className="mb-4 flex items-center gap-[10px] px-[3px] text-ink no-underline">
-          <span className="bab-display flex h-9 w-[42px] shrink-0 items-center justify-center rounded-[10px] border-[1.5px] border-ink bg-ink text-[13px] font-bold text-lime">
-            BAB
-          </span>
+          <Tessera misura={compressa ? 'piccola' : 'intera'} />
           {!compressa && (
             <span className="text-[10px] leading-[1.25] font-bold tracking-[1px] whitespace-nowrap text-ink-mute uppercase">
               amministrazione
@@ -108,9 +125,44 @@ export function Stanze() {
           <span aria-hidden>{compressa ? '»' : '«'}</span>
         </button>
       </nav>
-      <div className="min-w-0 flex-1 overflow-y-auto">
+
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto">
         <Outlet />
       </div>
+
+      <nav
+        aria-label="Stanze del pannello"
+        className="shrink-0 border-t-[1.5px] border-ink bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
+      >
+        <div className="flex h-[64px]">
+          {STANZE.map((s) => (
+            <NavLink
+              key={s.a}
+              to={s.a}
+              end={s.fine}
+              className={({ isActive }) =>
+                `bab-tocco flex flex-1 flex-col items-center justify-center gap-[3px] no-underline ${
+                  isActive ? 'text-ink' : 'text-ink-mute'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span
+                    aria-hidden
+                    className={`flex h-7 w-12 items-center justify-center rounded-pill border-[1.5px] text-[14px] font-bold ${
+                      isActive ? 'border-ink bg-lime' : 'border-transparent'
+                    }`}
+                  >
+                    {s.segno}
+                  </span>
+                  <span className="text-[10.5px] font-bold">{s.corto}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
+      </nav>
     </div>
   )
 }
@@ -128,7 +180,7 @@ export function Telaio({
   segno?: ReactNode
   /** una riga che dice a cosa serve questa stanza, se non e' ovvio */
   sotto?: string
-  /** i bottoni di questa stanza: stanno nella stessa riga, in fondo */
+  /** i bottoni di questa stanza: stanno nella stessa riga, in fondo, e sul telefono vanno a capo */
   destra?: ReactNode
   /**
    * se la stanza si scorre tutta insieme, o se dentro ha colonne che si
@@ -138,12 +190,16 @@ export function Telaio({
   children: ReactNode
 }) {
   return (
-    <div className="flex h-dvh flex-col bg-paper text-ink">
-      <header className="flex min-h-[60px] shrink-0 items-center gap-3 border-b-[1.5px] border-ink bg-surface px-5 py-[10px]">
+    <div className="flex h-full flex-col bg-paper text-ink">
+      <header className="flex min-h-[60px] shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b-[1.5px] border-ink bg-surface px-4 py-[10px] md:px-5">
+        {/* sul telefono la barra laterale non c'e': il logo torna in cima */}
+        <Link to="/admin" aria-label="BAB · amministrazione" className="md:hidden">
+          <Tessera misura="media" />
+        </Link>
         {segno}
-        <h1 className="bab-display m-0 shrink-0 text-[20px] leading-none font-bold">{nome}</h1>
-        {sotto && <p className="m-0 min-w-0 flex-1 truncate text-[12px] text-ink-medio">{sotto}</p>}
-        {!sotto && <span className="min-w-0 flex-1" />}
+        <h1 className="bab-display m-0 min-w-0 shrink truncate text-[18px] leading-none font-bold md:text-[20px]">{nome}</h1>
+        {sotto && <p className="m-0 hidden min-w-0 flex-1 truncate text-[12px] text-ink-medio sm:block">{sotto}</p>}
+        <span className={`min-w-0 flex-1 ${sotto ? 'sm:hidden' : ''}`} />
         {destra}
       </header>
       {scorre ? (

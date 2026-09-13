@@ -451,7 +451,21 @@ export function Scritte() {
   })).filter((g) => g.schermi.length > 0)
 
   return (
-    <div className="flex h-dvh flex-col bg-paper text-ink">
+    <div className="flex h-full flex-col bg-paper text-ink max-md:[&>*:not([data-telefono])]:hidden">
+      {/*
+        Sul telefono la scrivania non ci sta: tre colonne affiancate in 375
+        pixel diventano tre colonne da cui non si legge niente. Al suo posto
+        un avviso, e la scrivania resta intera per chi apre da un computer.
+      */}
+      <div data-telefono className="flex flex-1 flex-col items-center justify-center p-6 text-center md:hidden">
+        <p className="bab-display m-0 max-w-[320px] text-[24px] leading-[1.15] font-bold">
+          Le parole si correggono dal computer
+        </p>
+        <p className="m-0 mt-3 max-w-[300px] text-[14px] leading-[1.5] text-ink-medio">
+          Qui ci sono tre colonne insieme — gli schermi, l’anteprima e i testi — e sul telefono non
+          ci stanno. Apri questa stanza da un computer o da un tablet.
+        </p>
+      </div>
       <Barra
         lingua={lingua}
         onLingua={(l) => {

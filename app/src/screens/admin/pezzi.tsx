@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { useModale } from '../../ui/modale'
 
@@ -168,11 +168,11 @@ export function Numero({
 }) {
   return (
     <div
-      className={`flex min-w-[140px] flex-1 flex-col rounded-[14px] border-[1.5px] border-ink px-4 py-3 shadow-[4px_4px_0_rgba(44,44,58,0.18)] ${
+      className={`flex min-w-0 flex-1 flex-col rounded-[14px] border-[1.5px] border-ink px-3 py-[10px] shadow-[3px_3px_0_rgba(44,44,58,0.18)] sm:min-w-[140px] sm:px-4 sm:py-3 sm:shadow-[4px_4px_0_rgba(44,44,58,0.18)] ${
         allarme ? 'bg-allarme-fondo' : 'bg-surface'
       }`}
     >
-      <p className="bab-display m-0 text-[30px] leading-none font-bold">{quanto}</p>
+      <p className="bab-display m-0 text-[24px] leading-none font-bold sm:text-[30px]">{quanto}</p>
       <p className="m-0 mt-[7px] text-[11.5px] leading-[1.3] text-ink-medio">{cosa}</p>
       {nota && <p className="m-0 mt-[2px] text-[11px] text-ink-mute">{nota}</p>}
       {andamento && (
@@ -256,8 +256,12 @@ export function Iniziale({ id, nome, grande }: { id: string; nome: string; grand
 
 /* ── comandi ──────────────────────────────────────────────────────────────── */
 
+/*
+ * Sul telefono i campi sono piu' alti (si toccano col dito) e la scritta e'
+ * a 16px: sotto, iPhone ingrandisce tutta la pagina appena ci si tocca dentro.
+ */
 export const CAMPO =
-  'h-8 rounded-pill border border-line bg-chip px-3 text-[12px] text-ink outline-none placeholder:text-ink-mute focus:border-verde-acceso focus:bg-surface'
+  'h-10 rounded-pill border border-line bg-chip px-3 text-[16px] text-ink outline-none placeholder:text-ink-mute focus:border-verde-acceso focus:bg-surface sm:h-8 sm:text-[12px]'
 
 export function Chip({
   acceso,
@@ -275,7 +279,7 @@ export function Chip({
       type="button"
       aria-pressed={acceso}
       onClick={onClick}
-      className={`bab-tocco h-8 shrink-0 cursor-pointer rounded-pill border px-3 text-[12px] font-bold ${
+      className={`bab-tocco h-9 shrink-0 cursor-pointer rounded-pill border px-3 text-[13px] font-bold sm:h-8 sm:text-[12px] ${
         acceso ? 'border-ink bg-lime text-ink' : 'border-line bg-chip text-ink-medio'
       }`}
     >
@@ -309,11 +313,80 @@ export function Tasto({
       onClick={onClick}
       disabled={disabled}
       className={`bab-tocco shrink-0 cursor-pointer rounded-pill border-[1.5px] font-bold disabled:cursor-not-allowed disabled:opacity-45 disabled:shadow-none ${
-        piccolo ? 'h-8 px-3 text-[12px]' : 'h-10 px-4 text-[13px]'
+        piccolo ? 'h-9 px-3 text-[13px] sm:h-8 sm:text-[12px]' : 'h-11 px-4 text-[14px] sm:h-10 sm:text-[13px]'
       } ${colori}`}
     >
       {children}
     </button>
+  )
+}
+
+/**
+ * Il menu ⋯: le azioni che sul telefono non stanno in una riga.
+ *
+ * Si chiude toccando fuori, con Esc, o scegliendo una voce.
+ */
+export function Menu({
+  voci,
+}: {
+  voci: { nome: string; onClick: () => void; pericolo?: boolean; spenta?: boolean }[]
+}) {
+  const [aperto, setAperto] = useState(false)
+  const radice = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!aperto) return
+    const fuori = (e: PointerEvent) => {
+      if (!radice.current?.contains(e.target as Node)) setAperto(false)
+    }
+    const esc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAperto(false)
+    }
+    document.addEventListener('pointerdown', fuori)
+    window.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('pointerdown', fuori)
+      window.removeEventListener('keydown', esc)
+    }
+  }, [aperto])
+
+  return (
+    <div ref={radice} className="relative">
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={aperto}
+        aria-label="Altre azioni"
+        onClick={() => setAperto((a) => !a)}
+        className="bab-tocco flex size-10 cursor-pointer items-center justify-center rounded-pill border-[1.5px] border-ink bg-surface text-[18px] leading-none font-bold text-ink"
+      >
+        ⋯
+      </button>
+      {aperto && (
+        <div
+          role="menu"
+          className="absolute top-[calc(100%+6px)] right-0 z-40 min-w-[200px] overflow-hidden rounded-[12px] border-[1.5px] border-ink bg-surface py-1 shadow-[4px_4px_0_rgba(44,44,58,0.9)]"
+        >
+          {voci.map((v) => (
+            <button
+              key={v.nome}
+              type="button"
+              role="menuitem"
+              disabled={v.spenta}
+              onClick={() => {
+                setAperto(false)
+                v.onClick()
+              }}
+              className={`block h-11 w-full cursor-pointer px-4 text-left text-[14px] font-bold hover:bg-chip disabled:cursor-not-allowed disabled:opacity-40 ${
+                v.pericolo ? 'text-rosso' : 'text-ink'
+              }`}
+            >
+              {v.nome}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -352,7 +425,7 @@ export function Finestra({
   }, [onChiudi, bloccata])
 
   return (
-    <div ref={modale} className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div ref={modale} className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <button
         type="button"
         aria-label="Chiudi"
@@ -360,23 +433,27 @@ export function Finestra({
         onClick={() => {
           if (!bloccata) onChiudi()
         }}
-        className="absolute inset-0 cursor-default bg-black/40"
+        className="bab-affiora absolute inset-0 cursor-default bg-black/40"
       />
+      {/* sul telefono sale dal basso come i fogli dell'app; dal tablet in su sta nel mezzo */}
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={id}
         tabIndex={-1}
-        className="relative flex max-h-full w-full max-w-[520px] flex-col rounded-[16px] border-[1.5px] border-ink bg-surface text-ink shadow-[4px_4px_0_rgba(44,44,58,0.9)] outline-none"
+        className="bab-sale relative flex max-h-[92dvh] w-full max-w-[520px] flex-col rounded-t-[20px] border-t-[1.5px] border-ink bg-surface text-ink outline-none sm:max-h-full sm:rounded-[16px] sm:border-[1.5px] sm:shadow-[4px_4px_0_rgba(44,44,58,0.9)] sm:[animation:none]"
       >
-        <div className="shrink-0 border-b border-riga px-5 pt-4 pb-3">
+        <div className="shrink-0 border-b border-riga px-5 pt-3 pb-3 sm:pt-4">
+          <div aria-hidden className="mx-auto mb-3 h-1 w-9 rounded-sm bg-line/60 sm:hidden" />
           <h2 id={id} className="m-0 text-[17px] leading-[1.2] font-bold">
             {titolo}
           </h2>
           {sotto && <div className="m-0 mt-1 text-[12.5px] leading-[1.5] text-ink-medio">{sotto}</div>}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">{children}</div>
-        <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-riga px-5 py-3">{piede}</div>
+        <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-riga px-5 pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] max-sm:[&>*]:flex-1 sm:pb-3">
+          {piede}
+        </div>
       </div>
     </div>
   )

@@ -59,7 +59,7 @@ export function Sezioni() {
       sotto="Cosa è acceso e cosa no"
       destra={<span className="text-[12px] text-ink-medio">{stato}</span>}
     >
-      <div className="max-w-[640px] p-6">
+      <div className="max-w-[640px] p-4 md:p-6">
         <p className="m-0 text-[13px] leading-[1.6] text-ink-medio">
           Non è una bozza: quello che scegli qui vale subito, senza pubblicare. Nell’anteprima
           delle scritte le sezioni restano sempre aperte, se no spegnendone una non potresti
