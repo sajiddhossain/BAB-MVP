@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import type { Parola } from '../../data/sessione'
-import { LIVELLO_DI } from '../../data/sessione'
 import type { Livello } from '../../data/sessione'
 import type { Tono } from '../../copy/parole'
 import { TONI_NASCOSTI } from '../../copy/parole'
@@ -10,15 +9,24 @@ import { useLingua } from '../../lib/lingua'
  * Il colore del livello.
  *
  * E' l'unica cosa che dice se una parola vuol dire "sto lavorando" o "mi
- * serve una mano", e sta in un posto solo: la stessa terna colora il badge
- * qui, i pallini nell'elenco delle sedici parole, e le fasce che le
- * raggruppano.
+ * serve una mano", e sta in un posto solo: la stessa terna colora i pallini
+ * nell'elenco delle sedici parole e le fasce che le raggruppano.
  */
 export const TINTA_LIVELLO: Record<Livello, { fondo: string; testo: string }> = {
   push: { fondo: 'var(--color-verde-fondo)', testo: 'var(--color-verde-scuro)' },
   calibra: { fondo: 'var(--color-ritmo-fondo)', testo: 'var(--color-ambra-testo)' },
   sostegno: { fondo: 'var(--color-allarme-fondo)', testo: 'var(--color-rosso)' },
 }
+
+/*
+ * La pastiglia in cima alla scheda e' verde per tutte e sedici le parole.
+ *
+ * Prima prendeva il colore del livello — verde, giallo, rosso — ma per ora la
+ * distinzione sulla scheda non la vogliamo: la pastiglia dice cosa notare,
+ * non quanto preoccuparsi. I livelli restano colorati nell'elenco. Per
+ * tornare indietro basta rimettere `TINTA_LIVELLO[LIVELLO_DI[parola]]`.
+ */
+const BADGE = TINTA_LIVELLO.push
 
 const RIQUADRO: Record<Tono, { fondo: string; bordo: string; etichetta: string; testo: string }> = {
   prova: {
@@ -75,8 +83,6 @@ export function SchedaParola({
   // `parola` e' l'identificativo, e in inglese si leggeva "intorpidito"
   const nome = ts.foglio.parole[parola]
   const scheda = t.schede[parola]
-  const livello = LIVELLO_DI[parola]
-  const tinta = TINTA_LIVELLO[livello]
 
   useEffect(() => {
     const f = (e: KeyboardEvent) => {
@@ -137,7 +143,7 @@ export function SchedaParola({
             <div className="mt-5 flex flex-col gap-[10px]">
               <span
                 className="inline-flex w-fit items-center gap-[6px] rounded-pill px-[10px] py-1 text-[10.5px] font-bold tracking-[0.5px] uppercase"
-                style={{ background: tinta.fondo, color: tinta.testo }}
+                style={{ background: BADGE.fondo, color: BADGE.testo }}
               >
                 <span
                   aria-hidden
