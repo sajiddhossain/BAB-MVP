@@ -307,11 +307,18 @@ export function Foglio({
                 {altrove && bozza.zonaLibera.trim().length === 0 ? t.mancaDove : t.manca}
               </p>
             )}
+            {/*
+              Togliere una zona gia' salvata. Era un link piccolo e
+              sottolineato sotto al bottone grande, e non lo trovava nessuno:
+              adesso e' un bottone vero, largo quanto l'altro. Resta secondario
+              — bianco, senza l'ombra — perche' la cosa da fare di solito e'
+              salvare, non togliere.
+            */}
             {!nuova && (
               <button
                 type="button"
                 onClick={onTogli}
-                className="mx-auto mt-3 block text-[14px] font-bold text-ink-soft underline underline-offset-[3px]"
+                className="mt-3 h-12 w-full rounded-pill border-[1.5px] border-line bg-surface text-[15px] font-bold text-ink"
               >
                 {t.togli}
               </button>
