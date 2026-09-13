@@ -422,7 +422,18 @@ function Riposo({ adesso }: { adesso: Date }) {
  *
  * Il verde e' l'unico colore della scheda, e non e' un voto: e' lo stesso
  * verde delle cose fatte in tutto il resto dell'app. Se la settimana e'
- * andata male i numeri lo dicono da soli, senza bisogno del rosso.
+ * andata male i numeri lo dicono da soli, senza bisogno del rosso. Il bordo
+ * invece e' quello delle altre schede della home, non uno piu' chiaro solo
+ * per lei.
+ *
+ * ── DUE RIQUADRI, NON DUE RIGHE ─────────────────────────────────────────────
+ * Prima erano due righe con l'etichetta a sinistra e il valore a destra. Su
+ * un telefono "0 su 4 giorni di allenamento" non ci stava e andava a capo,
+ * restando da solo sulla destra; e i due valori avevano due vesti diverse,
+ * uno testo e uno pastiglia. Adesso sono due riquadri uguali, fatti come i
+ * campi della scheda di riposo appena sopra: icona, cosa si misura in
+ * piccolo, e quanto in grande. Si leggono dall'alto in basso, e se una
+ * scritta va a capo va a capo dentro al suo riquadro.
  */
 function Settimana() {
   const { t, ts } = useLingua()
@@ -431,12 +442,11 @@ function Settimana() {
   const allenamenti = new Set(Object.values(r.allenamenti).flatMap((a) => a.giorni)).size
   const facce = ts.soddisfazione.facce
   const sentita = settimana.sentita
-  const faccia =
-    sentita && sentita in facce ? facce[sentita as keyof typeof facce] : t.casa.settimana.nessuna
+  const faccia = sentita && sentita in facce ? facce[sentita as keyof typeof facce] : null
 
   return (
     <div
-      className="overflow-hidden rounded-[22px] border border-riga p-4"
+      className="overflow-hidden rounded-[22px] border border-line p-4"
       style={{
         background:
           'linear-gradient(90deg, rgba(16,185,129,0.09) 0%, rgba(16,185,129,0) 100%), #faf9f5',
@@ -449,47 +459,45 @@ function Settimana() {
         <span className="text-[13px] font-bold text-ink">{t.casa.settimana.titolo}</span>
       </div>
 
-      <RigaSettimana icona={spunta} nome={t.casa.settimana.ascoltato}>
-        <span className="text-[13px] font-bold text-ink">
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <RiquadroSettimana icona={spunta} nome={t.casa.settimana.ascoltato}>
           {riempi(t.casa.settimana.giorni, { fatti: settimana.fatti, su: allenamenti })}
-        </span>
-      </RigaSettimana>
-
-      <div className="my-[10px] h-px bg-riga" />
-
-      <RigaSettimana icona={sorriso} nome={t.casa.settimana.sentita}>
-        <span className="rounded-pill bg-verde-vivo/10 px-[10px] py-1 text-[13px] font-bold text-ink">
-          {faccia}
-        </span>
-      </RigaSettimana>
+        </RiquadroSettimana>
+        <RiquadroSettimana icona={sorriso} nome={t.casa.settimana.sentita} vuoto={!faccia}>
+          {faccia ?? t.casa.settimana.nessuna}
+        </RiquadroSettimana>
+      </div>
     </div>
   )
 }
 
 /**
- * Una riga del riepilogo: a sinistra cosa si misura, a destra quanto.
+ * Un riquadro del riepilogo: l'icona, cosa si misura, e quanto.
  *
- * Le due meta' vanno a capo invece di stringersi: su uno schermo stretto
- * "Hai ascoltato il tuo corpo" tagliato a meta' non dice piu' niente, mentre
- * su due righe dice ancora tutto.
+ * `vuoto` e' la settimana in cui non c'e' ancora un check-out: il trattino
+ * resta, ma nel grigio tenue delle cose che non ci sono, invece che nel nero
+ * pieno di un valore vero.
  */
-function RigaSettimana({
+function RiquadroSettimana({
   icona,
   nome,
+  vuoto = false,
   children,
 }: {
   icona: string
   nome: string
+  vuoto?: boolean
   children: ReactNode
 }) {
   return (
-    <div className="mt-[10px] flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
-      <span className="flex items-center gap-2">
-        <img src={icona} alt="" className="size-4 shrink-0" aria-hidden />
-        <span className="text-[13px] font-medium text-ink-medio">{nome}</span>
-      </span>
-      {/* `ml-auto` per quando la riga va a capo: il valore resta a destra */}
-      <span className="ml-auto">{children}</span>
+    <div className="min-w-0 rounded-[13px] bg-white/70 p-[10px]">
+      <img src={icona} alt="" className="size-4" aria-hidden />
+      <p className="m-0 mt-[6px] text-[12px] leading-[1.3] font-medium text-ink-medio">{nome}</p>
+      <p
+        className={`m-0 mt-1 text-[15px] leading-[1.25] font-bold ${vuoto ? 'text-ink-tenue' : 'text-ink'}`}
+      >
+        {children}
+      </p>
     </div>
   )
 }
