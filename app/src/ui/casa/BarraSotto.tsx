@@ -81,7 +81,27 @@ function Voce({ dove, icona, nome }: { dove: string; icona: string; nome: string
               aria-hidden
             />
           )}
-          <img src={icona} alt="" className="size-[22px]" aria-hidden />
+          {/*
+            L'icona e' la stessa, ma il colore lo decide la voce accesa.
+            Prima era un'immagine con il colore dentro: la casa era verde nel
+            file, e restava verde anche guardando il percorso. Adesso la forma
+            fa da maschera e il colore sta qui — verde come il puntino quando
+            la voce e' accesa, grigio come le scritte quando no — e cambia con
+            la stessa dissolvenza della scritta sotto.
+          */}
+          <span
+            aria-hidden
+            className="size-[22px] transition-colors duration-200 motion-reduce:transition-none"
+            style={{
+              backgroundColor: isActive ? '#0FBA82' : '#9E9A93',
+              maskImage: `url("${icona}")`,
+              WebkitMaskImage: `url("${icona}")`,
+              maskSize: '100% 100%',
+              WebkitMaskSize: '100% 100%',
+              maskRepeat: 'no-repeat',
+              WebkitMaskRepeat: 'no-repeat',
+            }}
+          />
           <span
             className={`mt-[5px] text-[10px] tracking-[0.3px] transition-colors duration-200 motion-reduce:transition-none ${
               isActive ? 'font-bold text-ink' : 'font-medium text-[#9e9a93]'
