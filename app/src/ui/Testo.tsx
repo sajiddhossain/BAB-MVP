@@ -1,4 +1,6 @@
+import { useId } from 'react'
 import type { ReactNode } from 'react'
+import { EtichettaDelGruppo } from './etichetta'
 
 /**
  * L'occhiello sopra al titolo: 16px in nero su una pastiglia verde chiara.
@@ -32,21 +34,29 @@ export function Occhio({ children }: { children: ReactNode }) {
 }
 
 /** L'etichetta di un campo: 11px, grigia, lettere larghe. */
-export function Etichetta({ children }: { children: ReactNode }) {
+export function Etichetta({ children, id }: { children: ReactNode; id?: string }) {
   return (
-    <p className="m-0 text-[11px] font-bold uppercase tracking-[1px] text-ink-soft">{children}</p>
+    <p id={id} className="m-0 text-[11px] font-bold uppercase tracking-[1px] text-ink-soft">
+      {children}
+    </p>
   )
 }
 
 /**
  * Etichetta piu' quello che etichetta, con lo stacco giusto in mezzo.
  * Nel disegno fra le due cose ci sono 6px, sempre.
+ *
+ * I campi che ci stanno dentro prendono l'etichetta come nome da soli: vedi
+ * `EtichettaDelGruppo`.
  */
 export function Gruppo({ etichetta, children }: { etichetta: ReactNode; children: ReactNode }) {
+  const id = useId()
   return (
     <div>
-      <Etichetta>{etichetta}</Etichetta>
-      <div className="mt-[6px]">{children}</div>
+      <Etichetta id={id}>{etichetta}</Etichetta>
+      <div className="mt-[6px]">
+        <EtichettaDelGruppo.Provider value={id}>{children}</EtichettaDelGruppo.Provider>
+      </div>
     </div>
   )
 }

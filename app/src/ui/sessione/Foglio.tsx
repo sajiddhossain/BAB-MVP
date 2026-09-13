@@ -9,6 +9,7 @@ import { Parole } from '../../screens/Parole'
 import { useLingua } from '../../lib/lingua'
 import { Pastiglia, Scelta, SiNo } from './Comandi'
 import { Apri } from '../Apri'
+import { useModale } from '../modale'
 import giu from '../../assets/chevron-down.svg'
 
 const ICONE = import.meta.glob<string>('../../assets/sessione/p-*.svg', {
@@ -49,6 +50,7 @@ export function Foglio({
   const [elenco, setElenco] = useState(false)
   const { ts, tp } = useLingua()
   const t = ts.foglio
+  const modale = useModale<HTMLDivElement>()
 
   // Esc chiude, come ogni cosa che sta sopra a un'altra
   useEffect(() => {
@@ -85,7 +87,7 @@ export function Foglio({
     (!altrove || bozza.zonaLibera.trim().length > 0)
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center">
+    <div ref={modale} className="fixed inset-0 z-50 flex justify-center">
       <div className="relative flex w-full max-w-[402px] flex-col justify-end">
         <button
           type="button"
@@ -97,8 +99,9 @@ export function Foglio({
         <div
           role="dialog"
           aria-modal="true"
+          tabIndex={-1}
           aria-label={altrove ? ts.mappa.altrove : nomeCodice(bozza.zona, ts.zone)}
-          className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[20px] bg-surface"
+          className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[20px] bg-surface outline-none"
           style={{ boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)' }}
         >
           <div className="shrink-0 pt-3">

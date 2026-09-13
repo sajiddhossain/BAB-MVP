@@ -4,6 +4,7 @@ import type { Livello } from '../../data/sessione'
 import type { Tono } from '../../copy/parole'
 import { TONI_NASCOSTI } from '../../copy/parole'
 import { useLingua } from '../../lib/lingua'
+import { useModale } from '../modale'
 
 /**
  * Il colore del livello.
@@ -92,8 +93,10 @@ export function SchedaParola({
     return () => window.removeEventListener('keydown', f)
   }, [onChiudi])
 
+  const modale = useModale<HTMLDivElement>()
+
   return (
-    <div className="fixed inset-0 z-60 flex justify-center">
+    <div ref={modale} className="fixed inset-0 z-60 flex justify-center">
       <div className="relative flex w-full max-w-[402px] flex-col justify-end">
         <button
           type="button"
@@ -105,8 +108,9 @@ export function SchedaParola({
         <div
           role="dialog"
           aria-modal="true"
+          tabIndex={-1}
           aria-label={nome}
-          className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[26px] bg-surface"
+          className="bab-sale relative flex max-h-[88dvh] flex-col rounded-t-[26px] bg-surface outline-none"
           style={{ boxShadow: '0px -4px 10px 0px rgba(0,0,0,0.15)' }}
         >
           <div className="shrink-0 pt-3">

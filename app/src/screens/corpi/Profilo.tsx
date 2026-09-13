@@ -231,7 +231,12 @@ export function CorpoSport({ nodo, verso, avanzamento, avanti, indietro }: Props
                   type="button"
                   aria-label={`${nomeSport(t.sport.nomi, id)} ✕`}
                   onClick={() => togli(id)}
-                  className="flex size-5 items-center justify-center rounded-full text-ink-soft"
+                  /*
+                    Il cerchio resta di venti, ma quello che si tocca e' grande
+                    quanto la pastiglia: venti pixel sono meno di un polpastrello,
+                    e mancandolo si toccava il nome, che fa un'altra cosa.
+                  */
+                  className="relative flex size-5 items-center justify-center rounded-full text-ink-soft after:absolute after:-inset-y-[10px] after:-right-[10px] after:-left-[6px] after:content-['']"
                 >
                   ✕
                 </button>

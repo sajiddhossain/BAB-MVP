@@ -10,6 +10,7 @@ import { LIVELLI, paroleDi } from '../data/sessione'
 import type { Parola } from '../data/sessione'
 import { useLingua } from '../lib/lingua'
 import { BottoneTocco } from '../ui/tocco'
+import { useModale } from '../ui/modale'
 
 /**
  * L'elenco delle sedici parole, raggruppate per livello.
@@ -37,6 +38,8 @@ export function Parole({
   const t = tp
   const parole = ts.foglio.parole
   const [spiega, setSpiega] = useState<Parola | null>(null)
+  // solo da strato sopra al foglio: da indirizzo e' uno schermo, e non c'e' niente sotto
+  const modale = useModale<HTMLDivElement>()
   /*
    * Con `onChiudi` questo schermo e' uno strato sopra a quello che c'era —
    * si arriva qui dal foglio delle sensazioni, e tornare indietro davvero
@@ -151,7 +154,11 @@ export function Parole({
    */
   return (
     <>
-      <div className="bab-sale fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-paper">
+      <div
+        ref={modale}
+        tabIndex={-1}
+        className="bab-sale fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-paper outline-none"
+      >
         {schermo}
       </div>
       {scheda}

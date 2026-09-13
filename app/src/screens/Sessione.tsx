@@ -4,7 +4,7 @@ import { useNavigate, useNavigationType, useParams } from 'react-router-dom'
 import { PERCORSI, percorsoSessione } from '../data/sessione'
 import type { CorpoSessione, Tipo } from '../data/sessione'
 import { datiSessione, salvaSessione, scriviSessione, useDatiSessione } from '../lib/sessione'
-import { segna } from '../lib/giornata'
+import { giornataAdesso, segna } from '../lib/giornata'
 import { siPuoFare } from '../lib/finestre'
 import { IN_ANTEPRIMA, SENZA_ACCESSO } from '../lib/sviluppo'
 import type { PropsSessione } from './tipi'
@@ -67,9 +67,17 @@ export function Sessione() {
    * L'anteprima dell'amministrazione e' fuori: li' gli schermi si guardano a
    * qualunque ora, e non c'e' nessuna giornata vera da rovinare.
    */
+  /*
+   * E lo stesso per un giro gia' finito oggi. Rientrando dall'indirizzo il
+   * giro ripartiva sopra alle risposte salvate e le cambiava in silenzio: il
+   * ritmo nuovo finiva nella sessione, quello vecchio restava nella giornata,
+   * e da li' in poi le due dicevano cose diverse.
+   */
   useEffect(() => {
     if (IN_ANTEPRIMA || SENZA_ACCESSO) return
-    if (!siPuoFare(buono)) vai('/casa', { replace: true })
+    const g = giornataAdesso()
+    const fatto = buono === 'checkin' ? g.fattoCheckin : g.fattoCheckout
+    if (fatto || !siPuoFare(buono)) vai('/casa', { replace: true })
   }, [buono, vai])
 
   // l'ora in cui ha cominciato: finisce in `started_at`, che e' come si

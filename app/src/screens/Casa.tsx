@@ -99,6 +99,7 @@ export function Casa() {
   const risposte = useRisposte()
   const giornata = useGiornata()
   const [query] = useSearchParams()
+  const vai = useNavigate()
 
   /*
    * Ogni volta che si torna qui si richiede al database cos'e' stato fatto
@@ -200,6 +201,8 @@ export function Casa() {
                 occhiello={t.casa.percorsoCard.occhiello}
                 titolo={t.casa.percorsoCard.titolo}
                 sotto={t.casa.percorsoCard.sotto}
+                // la freccia prometteva un posto e il tocco non portava da nessuna parte
+                onClick={() => vai('/percorso')}
               />
             )}
           </div>

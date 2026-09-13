@@ -136,7 +136,19 @@ export function CorpoLink({ nodo, verso, avanti }: PropsSchermo) {
   }
 
   function scriviCifra(i: number, v: string) {
-    const c = v.replace(/\D/g, '').slice(-1)
+    const tutte = v.replace(/\D/g, '')
+    /*
+     * Piu' cifre in una casella sola: il codice riempito dal telefono (sopra
+     * alla tastiera dell'iPhone compare gia' pronto) o incollato dalla mail.
+     * Prima restava solo l'ultima cifra nella prima casella, e il codice
+     * giusto sembrava sbagliato. Due cifre in una casella gia' piena invece
+     * sono una cifra riscritta, e vale quella nuova.
+     */
+    if (tutte.length > 2 || (tutte.length === 2 && cifre[i] === '')) {
+      distribuisci(i, tutte)
+      return
+    }
+    const c = tutte.slice(-1)
     const copia = [...cifre]
     copia[i] = c
     setCifre(copia)
@@ -144,6 +156,22 @@ export function CorpoLink({ nodo, verso, avanti }: PropsSchermo) {
     if (c && i < 5) fuoco(i + 1)
     // sei cifre sono una risposta completa: non serve un bottone di conferma
     if (copia.every((x) => x !== '')) void controlla(copia.join(''))
+  }
+
+  /* le cifre una per casella; un codice intero parte sempre dalla prima */
+  function distribuisci(da: number, testo: string) {
+    const nuove = testo.replace(/\D/g, '')
+    if (!nuove) return
+    const inizio = nuove.length >= 6 ? 0 : da
+    const copia = [...cifre]
+    for (let k = 0; k < nuove.length && inizio + k < 6; k++) copia[inizio + k] = nuove[k]
+    setCifre(copia)
+    setErrore('')
+    if (copia.every((x) => x !== '')) {
+      void controlla(copia.join(''))
+      return
+    }
+    fuoco(Math.min(inizio + nuove.length, 5))
   }
 
   async function controlla(codice: string) {
@@ -196,8 +224,13 @@ export function CorpoLink({ nodo, verso, avanti }: PropsSchermo) {
               id={`cifra-${i}`}
               inputMode="numeric"
               autoComplete="one-time-code"
+              aria-label={`${t.linkMandato.etichettaCodice} ${i + 1}/6`}
               value={c}
               onChange={(e) => scriviCifra(i, e.target.value)}
+              onPaste={(e) => {
+                e.preventDefault()
+                distribuisci(i, e.clipboardData.getData('text'))
+              }}
               onKeyDown={(e) => {
                 if (e.key === 'Backspace' && cifre[i] === '' && i > 0) fuoco(i - 1)
               }}

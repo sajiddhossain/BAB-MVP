@@ -90,7 +90,8 @@ export function Onboarding() {
     if (visibile) return
     const da = PERCORSO.indexOf(passo)
     const dopo = PERCORSO.slice(da + 1).find((p) => percorso.includes(p))
-    vai(dopo ? `/onboarding/${dopo.id}` : '/casa', { replace: true })
+    // finito l'onboarding viene il tutorial, come in fondo ad `avanti`
+    vai(dopo ? `/onboarding/${dopo.id}` : '/tutorial', { replace: true })
   })
 
   if (!passo) return null
@@ -163,7 +164,14 @@ export function Onboarding() {
       setNonSalvato(true)
       return
     }
-    vai('/casa')
+    /*
+     * Dopo l'onboarding viene il tutorial, e ci si va direttamente. Prima si
+     * andava a `/casa` e ci pensava la guardia a rimandare nel tutorial: ma la
+     * guardia non decide quando la risposta e' "boh" (rete storta) ne' quando
+     * l'accesso e' spento, e in quei casi il tutorial saltava. Se l'avesse gia'
+     * visto, e' la guardia a mandarla a casa da li'.
+     */
+    vai('/tutorial', { replace: true })
   }
 
   const Corpo = CORPI[passo.corpo]

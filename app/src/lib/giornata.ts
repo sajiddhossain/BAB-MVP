@@ -135,6 +135,11 @@ export function segna(campi: Partial<Giornata>) {
   annuncia()
 }
 
+/** La giornata di adesso, fuori da un componente o dentro a un effetto. */
+export function giornataAdesso(): Giornata {
+  return stato
+}
+
 export function useGiornata(): Giornata {
   return useSyncExternalStore(
     iscrivi,

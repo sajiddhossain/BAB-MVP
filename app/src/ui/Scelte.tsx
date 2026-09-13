@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { BottoneTocco } from './tocco'
+import { useEtichettaDelGruppo } from './etichetta'
 import giu from '../assets/chevron-down.svg'
 
 /**
@@ -53,9 +54,11 @@ export function Selettore({
   segnaposto: string
   voci: { valore: number; testo: string }[]
 }) {
+  const etichetta = useEtichettaDelGruppo()
   return (
     <div className="relative">
       <select
+        aria-labelledby={etichetta}
         value={valore ?? ''}
         onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
         className={`h-12 w-full appearance-none rounded-chip border-[1.5px] border-[rgba(209,201,196,0.7)] bg-surface px-[14.5px] pr-10 text-[15px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.04)] outline-none focus:border-violet ${
