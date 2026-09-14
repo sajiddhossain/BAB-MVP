@@ -1,5 +1,7 @@
 import { supabase } from './supabase'
 import type { CheckIn, ParoleCheckIn, ParoleSegnale, Scheda, Segnale } from './admin'
+import { mieDaRiga, pulisciOrari } from './impostazioni'
+import type { Mie, Orari } from './impostazioni'
 
 /**
  * Quello che il pannello fa alle atlete, oltre a guardarle.
@@ -20,11 +22,11 @@ import type { CheckIn, ParoleCheckIn, ParoleSegnale, Scheda, Segnale } from './a
  */
 export type Esito<T = undefined> = { ok: true; dato: T } | { ok: false; perche: string }
 
-function male(error: { code?: string; message?: string } | null): string {
+function male(error: { code?: string; message?: string } | null, migrazione = 'migrazione-gestione.sql'): string {
   if (!error) return 'Non so cosa sia successo.'
   // funzione o tabella che non c'e': la migrazione non e' stata lanciata
   if (error.code === 'PGRST202' || error.code === '42883' || error.code === '42P01' || error.code === 'PGRST205') {
-    return 'Manca migrazione-gestione.sql nel database.'
+    return `Manca ${migrazione} nel database.`
   }
   return error.message || 'Il database ha detto di no.'
 }
@@ -157,6 +159,60 @@ export async function cancellaNota(nota: string): Promise<Esito> {
   if (!supabase) return scollegata
   const { error } = await supabase.from('admin_notes').delete().eq('id', nota)
   return error ? { ok: false, perche: male(error) } : { ok: true, dato: undefined }
+}
+
+/* ── impostazioni ─────────────────────────────────────────────────────────── */
+
+const IMPOSTAZIONI = 'migrazione-impostazioni.sql'
+
+/** gli orari di tutte; se la riga non c'e' ancora, quelli di partenza */
+export async function leggiOrari(): Promise<Esito<Orari>> {
+  const p = await prova()
+  if (p) return { ok: true, dato: p.orari() }
+  if (!supabase) return scollegata
+  const { data, error } = await supabase.from('app_settings').select('value').eq('id', 'orari').maybeSingle()
+  return error ? { ok: false, perche: male(error, IMPOSTAZIONI) } : { ok: true, dato: pulisciOrari(data?.value) }
+}
+
+export async function salvaOrari(o: Orari): Promise<Esito> {
+  const p = await prova()
+  if (p) return p.salvaOrari(o)
+  if (!supabase) return scollegata
+  const { error } = await supabase
+    .from('app_settings')
+    .upsert({ id: 'orari', value: o, aggiornato: new Date().toISOString() }, { onConflict: 'id' })
+  return error ? { ok: false, perche: male(error, IMPOSTAZIONI) } : { ok: true, dato: undefined }
+}
+
+/** le eccezioni di un'atleta; nessuna riga vuol dire nessuna eccezione */
+export async function leggiImpostazioniAtleta(id: string): Promise<Esito<Mie>> {
+  const p = await prova()
+  if (p) return { ok: true, dato: p.mie(id) }
+  if (!supabase) return scollegata
+  const { data, error } = await supabase
+    .from('athlete_settings')
+    .select('is_test,checkin_before,checkout_after,late_minutes')
+    .eq('athlete_id', id)
+    .maybeSingle()
+  return error ? { ok: false, perche: male(error, IMPOSTAZIONI) } : { ok: true, dato: mieDaRiga(data) }
+}
+
+export async function salvaImpostazioniAtleta(id: string, m: Mie): Promise<Esito> {
+  const p = await prova()
+  if (p) return p.salvaMie(id, m)
+  if (!supabase) return scollegata
+  const { error } = await supabase.from('athlete_settings').upsert(
+    {
+      athlete_id: id,
+      is_test: m.prova,
+      checkin_before: m.prima,
+      checkout_after: m.dopo,
+      late_minutes: m.ritardo,
+      aggiornato: new Date().toISOString(),
+    },
+    { onConflict: 'athlete_id' },
+  )
+  return error ? { ok: false, perche: male(error, IMPOSTAZIONI) } : { ok: true, dato: undefined }
 }
 
 /* ── letture per tutte insieme ────────────────────────────────────────────── */

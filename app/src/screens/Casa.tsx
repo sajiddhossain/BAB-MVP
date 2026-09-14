@@ -11,16 +11,20 @@ import { SchedaPercorso } from '../ui/casa/SchedaPercorso'
 import { useLingua } from '../lib/lingua'
 import { ora as formattaOra, oraDaTesto } from '../lib/ore'
 import { useRisposte } from '../lib/risposte'
-import { svuotaCoda } from '../lib/sessione'
+import { VUOTI, scriviSessione, svuotaCoda } from '../lib/sessione'
 import {
   allenamentoDiOggi,
   caricaGiornata,
   consiglioDelGiorno,
   riassuntoDelGiorno,
+  segna,
   statoDiOggi,
   useGiornata,
 } from '../lib/giornata'
 import { giornoDiRiposo, oraApertura, statoFinestra } from '../lib/finestre'
+import { caricaImpostazioni, useImpostazioni } from '../lib/impostazioni'
+import { IN_ANTEPRIMA } from '../lib/sviluppo'
+import { PERCORSI } from '../data/sessione'
 import type { TipoSessione } from '../lib/finestre'
 import { CAMPI_RIPOSO } from '../data/casa'
 import type { StatoGiornata, Tempo } from '../data/casa'
@@ -65,6 +69,50 @@ function oraFinta(testo: string | null): Date | null {
   return d
 }
 
+/**
+ * L'avviso di un account di prova.
+ *
+ * Lo vede solo chi il pannello ha messo in prova — chi mostra l'app, chi la
+ * prova — mai un'atleta vera. Dice perche' qui check-in e check-out sono
+ * sempre aperti, e da' i due bottoni per rifarli: il giro salvato in locale
+ * si svuota prima di ripartire, se no il nuovo comincerebbe con le risposte
+ * del vecchio gia' dentro.
+ */
+function AvvisoProva() {
+  const { t } = useLingua()
+  const vai = useNavigate()
+  const p = t.casa.prova
+
+  function rifai(tipo: TipoSessione) {
+    scriviSessione(tipo, VUOTI)
+    segna(tipo === 'checkin' ? { fattoCheckin: false } : { fattoCheckout: false })
+    vai(`/sessione/${tipo}/${PERCORSI[tipo][0].id}`)
+  }
+
+  return (
+    <div className="mt-[15px] rounded-[14px] border-[1.5px] border-dashed border-ink/40 bg-surface/70 px-4 py-3">
+      <p className="m-0 text-[11px] leading-[14px] font-bold tracking-[1.2px] text-ink-mute">{p.etichetta}</p>
+      <p className="m-0 mt-1 text-[13px] leading-[1.45] text-ink">{p.testo}</p>
+      <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+        <button
+          type="button"
+          onClick={() => rifai('checkin')}
+          className="bab-tocco min-h-[36px] cursor-pointer p-0 text-[13px] font-bold text-ink underline"
+        >
+          {p.rifaiCheckin}
+        </button>
+        <button
+          type="button"
+          onClick={() => rifai('checkout')}
+          className="bab-tocco min-h-[36px] cursor-pointer p-0 text-[13px] font-bold text-ink underline"
+        >
+          {p.rifaiCheckout}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 /** L'etichetta della sezione fra la scheda grande e quella sotto. */
 function Sezione({ children }: { children: string }) {
   return (
@@ -98,6 +146,8 @@ export function Casa() {
   const { t, lingua } = useLingua()
   const risposte = useRisposte()
   const giornata = useGiornata()
+  // gli orari e l'account di prova: quando arrivano dal database la home si ridisegna
+  const { mie } = useImpostazioni()
   const [query] = useSearchParams()
   const vai = useNavigate()
 
@@ -105,11 +155,13 @@ export function Casa() {
    * Ogni volta che si torna qui si richiede al database cos'e' stato fatto
    * oggi. E' la stessa query dell'avvio, e serve al caso piu' banale: la
    * sessione l'ha finita da un altro telefono, o l'aveva finita ieri sera e
-   * l'app e' rimasta aperta in tasca fino a stamattina.
+   * l'app e' rimasta aperta in tasca fino a stamattina. Con lei si rileggono
+   * gli orari, che il pannello puo' aver spostato nel frattempo.
    */
   useEffect(() => {
     void svuotaCoda()
     void caricaGiornata()
+    void caricaImpostazioni()
   }, [])
 
   /*
@@ -171,6 +223,8 @@ export function Casa() {
             nome={nome}
             streak={giornata.striscia}
           />
+
+          {mie.prova && !eForzato && !IN_ANTEPRIMA && <AvvisoProva />}
 
           <div className="mt-[15px]">
             {stato === 'checkin' && (

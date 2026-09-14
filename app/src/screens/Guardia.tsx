@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { acceso, caricaProfilo, useSessione } from '../lib/conto'
+import { caricaImpostazioni } from '../lib/impostazioni'
 import { useProfilo, useTutorialFatto } from '../lib/profilo'
 import { CHIAVI } from '../data/tutorial'
 import { IN_ANTEPRIMA, SENZA_ACCESSO } from '../lib/sviluppo'
@@ -34,9 +35,12 @@ export function Guardia({ children }: { children: ReactNode }) {
   const profilo = useProfilo(dentro)
   const tutorial = useTutorialFatto(dentro)
 
-  // il profilo c'e' nel database ma non in questo telefono: si rilegge
+  // il profilo c'e' nel database ma non in questo telefono: si rilegge,
+  // e con lui gli orari e l'account di prova decisi dal pannello
   useEffect(() => {
-    if (profilo === 'si') void caricaProfilo()
+    if (profilo !== 'si') return
+    void caricaProfilo()
+    void caricaImpostazioni()
   }, [profilo])
 
   /*

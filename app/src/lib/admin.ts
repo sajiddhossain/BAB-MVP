@@ -105,6 +105,8 @@ export type Atleta = {
   lessons_done: number
   cycle_marks: number
   consent_ok: boolean | null
+  /** account di prova: arriva con `migrazione-impostazioni.sql`, prima manca */
+  is_test?: boolean
 }
 
 export type CheckIn = {

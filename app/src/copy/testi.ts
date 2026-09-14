@@ -375,6 +375,14 @@ const it = {
       fatto: 'Fatto per oggi.',
     },
 
+    /* solo sugli account che il pannello ha messo in prova: mai un'atleta vera */
+    prova: {
+      etichetta: 'ACCOUNT DI PROVA',
+      testo: 'Check-in e check-out sono sempre aperti, e rifarli sostituisce quelli di oggi.',
+      rifaiCheckin: 'Rifai il check-in',
+      rifaiCheckout: 'Rifai il check-out',
+    },
+
     sezioni: {
       intanto: 'INTANTO CHE SEI QUI',
       nientaltro: "NIENT'ALTRO PER OGGI",
@@ -766,6 +774,13 @@ const en: typeof it = {
       checkoutRitardo: 'The check-out window has passed, but you can still do it.',
       checkoutChiuso: 'That’s it for today. See you at your next session.',
       fatto: 'Done for today.',
+    },
+
+    prova: {
+      etichetta: 'TEST ACCOUNT',
+      testo: 'Check-in and check-out are always open, and redoing one replaces today’s.',
+      rifaiCheckin: 'Redo check-in',
+      rifaiCheckout: 'Redo check-out',
     },
 
     sezioni: {

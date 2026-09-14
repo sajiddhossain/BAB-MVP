@@ -1,6 +1,8 @@
 import { ZONE, PAROLE, codiceZona } from '../data/sessione'
 import type { Atleta, CheckIn, Polso, Scheda, Segnale } from './admin'
 import type { Esito, Modifica, Nota, Squadra } from './gestione'
+import { NESSUNA_ECCEZIONE, ORARI_DI_PARTENZA } from './impostazioni'
+import type { Mie, Orari } from './impostazioni'
 
 /**
  * Le atlete finte del banco di lavoro.
@@ -229,7 +231,7 @@ export function polso(): Polso {
 }
 
 export function atlete(): Atleta[] {
-  return TUTTE.map((a) => ({ ...a.riga }))
+  return TUTTE.map((a) => ({ ...a.riga, is_test: MIE.get(a.riga.id)?.prova ?? false }))
 }
 export function scheda(id: string): Scheda | null {
   return trova(id)?.scheda ?? null
@@ -276,5 +278,24 @@ export function scriviNota(id: string, testo: string): Esito {
 }
 export function cancellaNota(nota: string): Esito {
   for (const a of TUTTE) a.note = a.note.filter((n) => n.id !== nota)
+  return fatto
+}
+
+/* le impostazioni: Alice (mai partita) e' l'account di prova delle prove */
+let ORARI: Orari = ORARI_DI_PARTENZA
+const MIE = new Map<string, Mie>([['prova-6', { ...NESSUNA_ECCEZIONE, prova: true }]])
+
+export function orari(): Orari {
+  return ORARI
+}
+export function salvaOrari(o: Orari): Esito {
+  ORARI = o
+  return fatto
+}
+export function mie(id: string): Mie {
+  return MIE.get(id) ?? NESSUNA_ECCEZIONE
+}
+export function salvaMie(id: string, m: Mie): Esito {
+  MIE.set(id, m)
   return fatto
 }

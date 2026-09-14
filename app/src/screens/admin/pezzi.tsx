@@ -322,6 +322,111 @@ export function Tasto({
 }
 
 /**
+ * Un interruttore acceso/spento, con il suo nome e cosa fa.
+ *
+ * `role="switch"`: chi usa un lettore dello schermo sente «acceso» o
+ * «spento», non «premuto».
+ */
+export function Interruttore({
+  nome,
+  aiuto,
+  acceso,
+  onCambia,
+}: {
+  nome: string
+  aiuto?: string
+  acceso: boolean
+  onCambia: (acceso: boolean) => void
+}) {
+  const id = useId()
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <span className="min-w-0">
+        <span id={id} className="block text-[13px] font-bold text-ink">
+          {nome}
+        </span>
+        {aiuto && <span className="mt-[2px] block text-[12px] leading-[1.45] text-ink-medio">{aiuto}</span>}
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={acceso}
+        aria-labelledby={id}
+        onClick={() => onCambia(!acceso)}
+        className={`bab-tocco relative h-7 w-12 shrink-0 cursor-pointer rounded-pill border-[1.5px] border-ink transition-colors duration-200 motion-reduce:transition-none ${
+          acceso ? 'bg-lime' : 'bg-chip'
+        }`}
+      >
+        <span
+          aria-hidden
+          className={`absolute top-[3px] size-[18px] rounded-full border-[1.5px] border-ink bg-surface transition-[left] duration-200 motion-reduce:transition-none ${
+            acceso ? 'left-[24px]' : 'left-[3px]'
+          }`}
+        />
+      </button>
+    </div>
+  )
+}
+
+/**
+ * Un numero di minuti.
+ *
+ * Con `generale` il campo si puo' lasciare vuoto, e vuoto vuol dire «vale
+ * l'impostazione generale», che si legge in grigio dentro al campo. Senza,
+ * un campo vuoto e' un numero che manca.
+ */
+export function CampoMinuti({
+  nome,
+  dopo,
+  valore,
+  onCambia,
+  generale,
+  max,
+}: {
+  nome: string
+  /** la parola dopo il numero: «minuti prima dell'allenamento» */
+  dopo: string
+  valore: number | null
+  onCambia: (v: number | null) => void
+  generale?: number
+  max: number
+}) {
+  const id = useId()
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1 block text-[12px] font-bold text-ink">
+        {nome}
+      </label>
+      <div className="flex items-center gap-2">
+        <input
+          id={id}
+          type="number"
+          inputMode="numeric"
+          min={0}
+          max={max}
+          step={5}
+          value={valore === null || !Number.isFinite(valore) ? '' : valore}
+          placeholder={generale !== undefined ? String(generale) : undefined}
+          onChange={(e) => {
+            const t = e.target.value
+            if (t === '') return onCambia(null)
+            const n = Number(t)
+            // niente tetto qui: tagliare mentre si scrive trasforma «300» in «240»
+            // senza dirlo. Un numero troppo alto si vede rosso e non si salva.
+            onCambia(Number.isFinite(n) ? Math.max(0, Math.round(n)) : null)
+          }}
+          aria-invalid={valore !== null && valore > max}
+          className={`${CAMPO} w-[92px] text-right tabular-nums ${
+            valore !== null && valore > max ? 'border-rosso text-rosso' : ''
+          }`}
+        />
+        <span className="text-[12px] leading-[1.3] text-ink-medio">{dopo}</span>
+      </div>
+    </div>
+  )
+}
+
+/**
  * Il menu ⋯: le azioni che sul telefono non stanno in una riga.
  *
  * Si chiude toccando fuori, con Esc, o scegliendo una voce.

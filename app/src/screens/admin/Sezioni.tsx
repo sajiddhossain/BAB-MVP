@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import { SEZIONI } from '../../data/sezioni'
 import type { StatoSezione } from '../../data/sezioni'
 import { cambiaSezione, caricaSezioni, statiDiAdesso } from '../../lib/sezioni'
-import { Telaio } from './Telaio'
-import { BLOCCO } from './pezzi'
 
 
 /**
@@ -32,7 +30,13 @@ const STATI: { id: StatoSezione; nome: string; cosa: string }[] = [
   },
 ]
 
-export function Sezioni() {
+/**
+ * Le sezioni, dentro alla stanza delle impostazioni.
+ *
+ * Prima erano una stanza a se'; adesso stanno con le altre cose che si
+ * cambiano al volo. `/admin/sezioni` porta li'.
+ */
+export function ElencoSezioni() {
   const [stati, setStati] = useState(statiDiAdesso)
   const [stato, setStato] = useState('')
 
@@ -54,12 +58,7 @@ export function Sezioni() {
   }
 
   return (
-    <Telaio
-      nome="Sezioni dell’app"
-      sotto="Cosa è acceso e cosa no"
-      destra={<span className="text-[12px] text-ink-medio">{stato}</span>}
-    >
-      <div className="max-w-[640px] p-4 md:p-6">
+    <div>
         <p className="m-0 text-[13px] leading-[1.6] text-ink-medio">
           Non è una bozza: quello che scegli qui vale subito, senza pubblicare. Nell’anteprima
           delle scritte le sezioni restano sempre aperte, se no spegnendone una non potresti
@@ -68,7 +67,7 @@ export function Sezioni() {
 
         <ul className="m-0 mt-5 flex list-none flex-col gap-3 p-0">
           {SEZIONI.map((s) => (
-            <li key={s.id} className={`${BLOCCO} p-4`}>
+            <li key={s.id} className="rounded-[12px] border-[1.5px] border-line bg-surface p-4">
               <p className="m-0 text-[14px] font-bold">{s.nome}</p>
               <p className="m-0 mt-1 text-[12px] leading-[1.5] text-ink-medio">{s.cosa}</p>
               <div className="mt-3 flex flex-wrap gap-1 rounded-pill bg-chip p-1">
@@ -94,8 +93,12 @@ export function Sezioni() {
             </li>
           ))}
         </ul>
-      </div>
-    </Telaio>
+      {stato && (
+        <p role="status" className="m-0 mt-3 text-[12.5px] text-ink-medio">
+          {stato}
+        </p>
+      )}
+    </div>
   )
 }
 

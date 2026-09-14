@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { leggiAtlete, leggiScheda } from '../../lib/admin'
 import type { Atleta as Riga, CheckIn, Scheda, Segnale } from '../../lib/admin'
@@ -8,14 +8,19 @@ import {
   cancellaNota,
   esportaAtleta,
   leggiAmministratori,
+  leggiImpostazioniAtleta,
   leggiNote,
+  leggiOrari,
   leggiSquadre,
   modificaAtleta,
   rifaiTutorial,
+  salvaImpostazioniAtleta,
   scriviNota,
   squadraDi,
 } from '../../lib/gestione'
 import type { Nota, Squadra } from '../../lib/gestione'
+import { MINUTI_MAX, ORARI_DI_PARTENZA } from '../../lib/impostazioni'
+import type { Mie, Orari } from '../../lib/impostazioni'
 import { SPORT, nomeSport } from '../../data/sport'
 import { useLingua } from '../../lib/lingua'
 import { Telaio } from './Telaio'
@@ -30,6 +35,8 @@ import {
   Iniziale,
   Finestra,
   Menu,
+  CampoMinuti,
+  Interruttore,
   Numero,
   Riquadro,
   Tasto,
@@ -189,7 +196,9 @@ export function Atleta() {
     <Telaio
       nome={chi.display_name}
       segno={<Iniziale id={chi.id} nome={chi.display_name} grande />}
-      sotto={[chi.email, chi.team_name, chi.sport, `${chi.age} anni`].filter(Boolean).join(' · ')}
+      sotto={[chi.is_test ? 'account di prova' : null, chi.email, chi.team_name, chi.sport, `${chi.age} anni`]
+        .filter(Boolean)
+        .join(' · ')}
       destra={
         <>
         <div className="hidden shrink-0 items-center gap-2 md:flex">
@@ -270,7 +279,7 @@ export function Atleta() {
           <p className="m-0 text-[13px] text-ink-medio">Non riesco a leggere le sue risposte.</p>
         )}
 
-        {vista === 'panoramica' && <Panoramica chi={chi} scheda={scheda} />}
+        {vista === 'panoramica' && <Panoramica chi={chi} scheda={scheda} onCambiato={() => setGiro((g) => g + 1)} />}
 
         {vista === 'grafici' && tagliata && (
           <div className="flex flex-col gap-4">
@@ -339,7 +348,7 @@ function percento(parte: number, tutto: number): string {
   return tutto > 0 ? `${Math.round((parte / tutto) * 100)}%` : '—'
 }
 
-function Panoramica({ chi, scheda }: { chi: Riga; scheda: Scheda | null }) {
+function Panoramica({ chi, scheda, onCambiato }: { chi: Riga; scheda: Scheda | null; onCambiato: () => void }) {
   const confronto = useMemo(() => {
     if (!scheda) return null
     const per = new Map<string, { p?: string | null; s?: string | null }>()
@@ -445,7 +454,117 @@ function Panoramica({ chi, scheda }: { chi: Riga; scheda: Scheda | null }) {
           <Percorso chi={chi} scheda={scheda} />
         </div>
       )}
+
+      <div className="mt-4">
+        <ImpostazioniAtleta id={chi.id} onCambiato={onCambiato} />
+      </div>
     </>
+  )
+}
+
+/**
+ * Le eccezioni di questa atleta: l'account di prova e gli orari solo suoi.
+ *
+ * Un campo vuoto vuol dire «come tutte», e il valore di tutte si legge in
+ * grigio dentro al campo: cosi' si vede cosa vale per lei senza dover
+ * aprire un'altra stanza.
+ */
+function ImpostazioniAtleta({ id, onCambiato }: { id: string; onCambiato: () => void }) {
+  const [mie, setMie] = useState<Mie | null>(null)
+  const [salvate, setSalvate] = useState<Mie | null>(null)
+  const [generali, setGenerali] = useState<Orari>(ORARI_DI_PARTENZA)
+  const [errore, setErrore] = useState<string | null>(null)
+  const [avviso, setAvviso] = useState<string | null>(null)
+  const [salvo, setSalvo] = useState(false)
+
+  useEffect(() => {
+    let vivo = true
+    void Promise.all([leggiImpostazioniAtleta(id), leggiOrari()]).then(([m, o]) => {
+      if (!vivo) return
+      if (m.ok) {
+        setMie(m.dato)
+        setSalvate(m.dato)
+      } else setErrore(m.perche)
+      if (o.ok) setGenerali(o.dato)
+    })
+    return () => {
+      vivo = false
+    }
+  }, [id])
+
+  const cambiate = !!mie && !!salvate && JSON.stringify(mie) !== JSON.stringify(salvate)
+  const troppi = !!mie && [mie.prima, mie.dopo, mie.ritardo].some((n) => n !== null && n > MINUTI_MAX)
+
+  async function salva() {
+    if (!mie || salvo || troppi) return
+    setSalvo(true)
+    setErrore(null)
+    const e = await salvaImpostazioniAtleta(id, mie)
+    setSalvo(false)
+    if (!e.ok) return setErrore(e.perche)
+    setSalvate(mie)
+    setAvviso('Salvato. Vale dalla prossima volta che apre l’app.')
+    if (mie.prova !== salvate?.prova) onCambiato()
+  }
+
+  return (
+    <Riquadro
+      titolo="Impostazioni solo per lei"
+      destra={
+        <Link to="/admin/impostazioni" className="text-[11.5px] font-bold text-ink-medio underline">
+          Quelle di tutte
+        </Link>
+      }
+    >
+      {errore && <p className="m-0 mb-2 text-[12.5px] font-bold text-rosso">{errore}</p>}
+      {mie && (
+        <>
+          <Interruttore
+            nome="Account di prova"
+            aiuto="Check-in e check-out sempre aperti e rifattibili. I suoi dati si salvano ma restano fuori dai numeri e dai file di tutte."
+            acceso={mie.prova}
+            onCambia={(v) => setMie({ ...mie, prova: v })}
+          />
+          <div className="mt-4 grid grid-cols-1 gap-3 border-t border-riga pt-3 sm:grid-cols-3">
+            <CampoMinuti
+              nome="Il check-in apre"
+              dopo="minuti prima dell’allenamento"
+              valore={mie.prima}
+              generale={generali.prima}
+              onCambia={(v) => setMie({ ...mie, prima: v })}
+              max={MINUTI_MAX}
+            />
+            <CampoMinuti
+              nome="Il check-out resta aperto"
+              dopo="minuti dopo la fine"
+              valore={mie.dopo}
+              generale={generali.dopo}
+              onCambia={(v) => setMie({ ...mie, dopo: v })}
+              max={MINUTI_MAX}
+            />
+            <CampoMinuti
+              nome="Si può recuperare"
+              dopo="minuti dopo, in ritardo"
+              valore={mie.ritardo}
+              generale={generali.ritardo}
+              onCambia={(v) => setMie({ ...mie, ritardo: v })}
+              max={MINUTI_MAX}
+            />
+          </div>
+          <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
+            <p className={`m-0 mr-auto text-[11.5px] ${troppi ? 'font-bold text-rosso' : 'text-ink-mute'}`}>
+              {troppi ? `I minuti vanno da 0 a ${MINUTI_MAX}.` : (avviso ?? 'Vuoto vuol dire che per lei vale quello di tutte.')}
+            </p>
+            <Tasto piccolo onClick={() => salvate && setMie(salvate)} disabled={!cambiate || salvo}>
+              Annulla
+            </Tasto>
+            <Tasto tipo="primo" piccolo onClick={() => void salva()} disabled={!cambiate || salvo || troppi}>
+              {salvo ? 'Salvo…' : 'Salva'}
+            </Tasto>
+          </div>
+        </>
+      )}
+    </Riquadro>
   )
 }
 

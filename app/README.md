@@ -68,6 +68,7 @@ funziona tutta ma resta nel telefono, e la schermata finale lo dice.
    | `migrazione-testi.sql` | no | `/admin` non salva: le scritte restano quelle compilate |
    | `migrazione-pannello.sql` | **sì** | `/admin/atlete` non vede nessuna atleta |
    | `migrazione-gestione.sql` | **sì** | in `/admin/atlete` non si cancella, non si modifica, non si scaricano i dati e le note non salvano |
+   | `migrazione-impostazioni.sql` | **sì** | gli orari restano quelli del codice, gli account di prova non esistono e `/admin/impostazioni` non salva |
 2. Authentication → Sign In / Providers → Email: acceso, e in cima alla
    pagina "Allow new users to sign up" acceso. Email OTP length: 6.
 3. **Authentication → Emails**: nei due modelli `Magic Link` e

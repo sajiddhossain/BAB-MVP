@@ -59,10 +59,10 @@ export function Atrio() {
             segno="Aa"
           />
           <Stanza
-            a="/admin/sezioni"
-            nome="Le sezioni dell’app"
-            cosa="Cosa è acceso e cosa no: il percorso, le sedici parole, lo storico, il profilo. Vale subito."
-            segno="◑"
+            a="/admin/impostazioni"
+            nome="Impostazioni"
+            cosa="Gli orari di check-in e check-out, gli account di prova, le sezioni dell’app accese e spente. Vale subito."
+            segno="⚙︎"
           />
           <Stanza
             a="/admin/atlete"

@@ -50,14 +50,43 @@
 import { tutte } from './risposte'
 import { minutiDaOra } from './ore'
 import { IN_ANTEPRIMA } from './sviluppo'
+import { impostazioniDiAdesso, minutiDalRisveglio } from './impostazioni'
 
 export type TipoSessione = 'checkin' | 'checkout'
 
 /** Le quattro del mattino, in minuti da mezzanotte. */
 const INIZIO = 4 * 60
 
-/** Quanto dura il momento: il check-in prima dell'allenamento, il check-out dopo. */
-const MARGINE = 30
+/*
+ * ── I NUMERI LI DECIDE IL PANNELLO ─────────────────────────────────────────
+ * I trenta minuti e le ore qui sopra sono quelli di partenza. Da settembre
+ * 2026 si cambiano da /admin/impostazioni, per tutte o per una sola atleta
+ * (vedi `impostazioni.ts`), e questo file li legge da li'. Quale valore vince
+ * si decide qui e da nessun'altra parte: la home, il check-in e la giornata
+ * chiedono tutti a questo file, e cosi' non possono non essere d'accordo.
+ */
+
+/**
+ * I margini attorno all'allenamento: quelli suoi se il pannello li ha
+ * cambiati per lei, se no quelli di tutte.
+ */
+function margini(): { prima: number; dopo: number; ritardo: number } {
+  const { orari, mie } = impostazioniDiAdesso()
+  return {
+    prima: mie.prima ?? orari.prima,
+    dopo: mie.dopo ?? orari.dopo,
+    ritardo: mie.ritardo ?? orari.ritardo,
+  }
+}
+
+/**
+ * Vero sugli account di prova: check-in e check-out sempre aperti, e un giro
+ * gia' fatto si puo' rifare. Nell'anteprima dei testi non vale — li' le
+ * finestre non contano gia'.
+ */
+export function diProva(): boolean {
+  return !IN_ANTEPRIMA && impostazioniDiAdesso().mie.prova
+}
 
 /**
  * Quanti minuti sono passati dall'inizio del giorno DELL'ATLETA.
@@ -79,12 +108,20 @@ type Finestra = {
   ultimo: number
 }
 
-/** Le finestre fisse: valgono nei giorni senza orari. */
-export const FINESTRE: Record<TipoSessione, Finestra> = {
-  //          05:00      12:00       15:30
-  checkin: { apre: 60, chiude: 480, ultimo: 690 },
-  //           15:30       23:30        04:00
-  checkout: { apre: 690, chiude: 1170, ultimo: 1440 },
+/**
+ * Le finestre fisse: valgono nei giorni senza orari.
+ *
+ * Arrivano come ore sull'orologio (`05:00`) e qui diventano minuti dalle
+ * quattro del mattino. Le quattro come fine vogliono dire la fine del giorno,
+ * 1440, e non l'inizio: `04:00` in «si recupera fino alle» e' la notte dopo.
+ * Un'ora messa prima della precedente non rovescia la finestra: la chiude.
+ */
+function fissa(tipo: TipoSessione): Finestra {
+  const o = impostazioniDiAdesso().orari.fisse[tipo]
+  const apre = minutiDalRisveglio(o.apre)
+  const chiude = Math.max(apre, minutiDalRisveglio(o.chiude) || 1440)
+  const ultimo = Math.max(chiude, minutiDalRisveglio(o.ultimo) || 1440)
+  return { apre, chiude, ultimo }
 }
 
 /**
@@ -150,21 +187,23 @@ function allenamentiDelGiorno(quando: Date): { inizio: number; fine: number }[] 
 /**
  * La finestra di oggi per il check-in o il check-out.
  *
- * Trenta minuti prima del primo allenamento, trenta dopo l'ultimo, e niente
- * recupero: `ultimo` coincide con `chiude`. Senza orari, quelle fisse.
+ * Qualche minuto prima del primo allenamento, qualche minuto dopo l'ultimo
+ * (trenta e trenta, di partenza), e il recupero che decide il pannello — di
+ * partenza nessuno: `ultimo` coincide con `chiude`. Senza orari, quelle fisse.
  */
 export function finestraDi(tipo: TipoSessione, quando = new Date()): Finestra {
   const allenamenti = allenamentiDelGiorno(quando)
-  if (allenamenti.length === 0) return FINESTRE[tipo]
+  if (allenamenti.length === 0) return fissa(tipo)
+  const { prima, dopo, ritardo } = margini()
 
   if (tipo === 'checkin') {
     const primo = Math.min(...allenamenti.map((a) => a.inizio))
-    return { apre: Math.max(0, primo - MARGINE), chiude: primo, ultimo: primo }
+    return { apre: Math.max(0, primo - prima), chiude: primo, ultimo: Math.min(1440, primo + ritardo) }
   }
   // il giorno dell'atleta finisce alle quattro: oltre, non si va
   const ultima = Math.min(1440, Math.max(...allenamenti.map((a) => a.fine)))
-  const chiude = Math.min(1440, ultima + MARGINE)
-  return { apre: ultima, chiude, ultimo: chiude }
+  const chiude = Math.min(1440, ultima + dopo)
+  return { apre: ultima, chiude, ultimo: Math.min(1440, chiude + ritardo) }
 }
 
 export type StatoFinestra =
@@ -178,6 +217,7 @@ export type StatoFinestra =
   | 'chiusa'
 
 export function statoFinestra(tipo: TipoSessione, quando = new Date()): StatoFinestra {
+  if (diProva()) return 'aperta'
   const m = minutiDelGiorno(quando)
   const f = finestraDi(tipo, quando)
   if (m < f.apre) return 'presto'

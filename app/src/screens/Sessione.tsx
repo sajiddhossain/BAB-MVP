@@ -5,7 +5,7 @@ import { PERCORSI, percorsoSessione } from '../data/sessione'
 import type { CorpoSessione, Tipo } from '../data/sessione'
 import { datiSessione, salvaSessione, scriviSessione, useDatiSessione } from '../lib/sessione'
 import { giornataAdesso, segna } from '../lib/giornata'
-import { siPuoFare } from '../lib/finestre'
+import { diProva, siPuoFare } from '../lib/finestre'
 import { IN_ANTEPRIMA, SENZA_ACCESSO } from '../lib/sviluppo'
 import type { PropsSessione } from './tipi'
 import { CorpoRitmo } from './corpi/SessioneRitmo'
@@ -73,11 +73,15 @@ export function Sessione() {
    * ritmo nuovo finiva nella sessione, quello vecchio restava nella giornata,
    * e da li' in poi le due dicevano cose diverse.
    */
+  /*
+   * Gli account di prova sono l'eccezione: li' un giro gia' fatto si rifa',
+   * e il nuovo sostituisce quello di oggi (vedi `diProva`).
+   */
   useEffect(() => {
     if (IN_ANTEPRIMA || SENZA_ACCESSO) return
     const g = giornataAdesso()
     const fatto = buono === 'checkin' ? g.fattoCheckin : g.fattoCheckout
-    if (fatto || !siPuoFare(buono)) vai('/casa', { replace: true })
+    if ((fatto && !diProva()) || !siPuoFare(buono)) vai('/casa', { replace: true })
   }, [buono, vai])
 
   // l'ora in cui ha cominciato: finisce in `started_at`, che e' come si

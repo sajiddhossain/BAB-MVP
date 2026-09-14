@@ -12,7 +12,7 @@ import { Atrio } from './screens/admin/Atrio'
 import { Scritte } from './screens/admin/Scritte'
 import { Atlete } from './screens/admin/Atlete'
 import { Atleta } from './screens/admin/Atleta'
-import { Sezioni } from './screens/admin/Sezioni'
+import { Impostazioni } from './screens/admin/Impostazioni'
 import { Stanze } from './screens/admin/Telaio'
 import { Guardia } from './screens/Guardia'
 import { Sezione } from './screens/Sezione'
@@ -58,7 +58,9 @@ export function App() {
             <Route path="scritte" element={<Scritte />} />
             <Route path="atlete" element={<Atlete />} />
             <Route path="atlete/:id" element={<Atleta />} />
-            <Route path="sezioni" element={<Sezioni />} />
+            <Route path="impostazioni" element={<Impostazioni />} />
+            {/* le sezioni adesso stanno dentro alle impostazioni */}
+            <Route path="sezioni" element={<Navigate to="/admin/impostazioni" replace />} />
           </Route>
         </Route>
         {/*

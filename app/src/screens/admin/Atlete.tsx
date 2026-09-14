@@ -329,7 +329,9 @@ export function Atlete() {
 
   /* ── i numeri in cima, sulle righe filtrate ── */
 
-  const somma = (f: (a: Atleta) => number) => viste.reduce((s, a) => s + f(a), 0)
+  /* gli account di prova si vedono in elenco, ma non contano: ne' nei numeri ne' nei file di tutte */
+  const vere = useMemo(() => viste.filter((a) => !a.is_test), [viste])
+  const somma = (f: (a: Atleta) => number) => vere.reduce((s, a) => s + f(a), 0)
   const pre = somma((a) => a.checkins_pre)
   const protettive = somma((a) => a.signals_flagged)
 
@@ -340,12 +342,12 @@ export function Atlete() {
    * il numero parla di una squadra, anche la sua linea.
    */
   const andamenti = useMemo(() => {
-    const ids = new Set(viste.map((a) => a.id))
+    const ids = new Set(vere.map((a) => a.id))
     const c = (recenti?.checkins ?? []).filter((x) => ids.has(x.athlete_id))
     const s = (recenti?.segnali ?? []).filter((x) => ids.has(x.athlete_id))
     const attive = giorni14.map((g) => new Set(c.filter((x) => x.local_date === g).map((x) => x.athlete_id)).size)
     return {
-      atlete: giorni14.map((g) => viste.filter((a) => a.created_at.slice(0, 10) <= g).length),
+      atlete: giorni14.map((g) => vere.filter((a) => a.created_at.slice(0, 10) <= g).length),
       attive,
       chiusi: giorni14.map((g) => {
         const quanti = c.filter((x) => x.local_date === g && x.kind === 'pre').length
@@ -353,7 +355,7 @@ export function Atlete() {
       }),
       protettive: giorni14.map((g) => s.filter((x) => x.is_red_flag && x.created_at.slice(0, 10) === g).length),
     }
-  }, [viste, recenti, giorni14])
+  }, [vere, recenti, giorni14])
 
   /* i filtri: gli stessi nella riga del computer e nel foglio del telefono */
   const controlli = (nelFoglio: boolean) => (
@@ -427,13 +429,13 @@ export function Atlete() {
         letto && righe && righe.length > 0 ? (
           <div className="flex shrink-0 flex-wrap items-center gap-2">
             <span className="hidden text-[11.5px] text-ink-mute lg:inline">{filtri ? 'Scarica le filtrate:' : 'Scarica:'}</span>
-            <Tasto piccolo onClick={() => scaricaElenco(viste)} disabled={viste.length === 0}>
+            <Tasto piccolo onClick={() => scaricaElenco(vere)} disabled={vere.length === 0}>
               Elenco CSV
             </Tasto>
-            <Tasto piccolo onClick={() => void scaricaRisposte(viste, 'risposte')} disabled={viste.length === 0 || esporto}>
+            <Tasto piccolo onClick={() => void scaricaRisposte(vere, 'risposte')} disabled={vere.length === 0 || esporto}>
               Risposte CSV
             </Tasto>
-            <Tasto piccolo onClick={() => void scaricaRisposte(viste, 'sensazioni')} disabled={viste.length === 0 || esporto}>
+            <Tasto piccolo onClick={() => void scaricaRisposte(vere, 'sensazioni')} disabled={vere.length === 0 || esporto}>
               Sensazioni CSV
             </Tasto>
           </div>
@@ -452,13 +454,13 @@ export function Atlete() {
           <>
             <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
               <Numero
-                quanto={viste.length}
+                quanto={vere.length}
                 cosa={filtri ? 'in questo elenco' : 'atlete'}
-                nota={filtri ? `su ${righe.length}` : undefined}
+                nota={filtri ? `su ${righe.filter((a) => !a.is_test).length}` : undefined}
                 andamento={andamenti.atlete}
               />
-              <Numero quanto={viste.filter((a) => a.days_7d > 0).length} cosa="attive negli ultimi 7 giorni" andamento={andamenti.attive} />
-              <Numero quanto={viste.filter((a) => a.last_day === oggi).length} cosa="hanno fatto qualcosa oggi" andamento={andamenti.attive} />
+              <Numero quanto={vere.filter((a) => a.days_7d > 0).length} cosa="attive negli ultimi 7 giorni" andamento={andamenti.attive} />
+              <Numero quanto={vere.filter((a) => a.last_day === oggi).length} cosa="hanno fatto qualcosa oggi" andamento={andamenti.attive} />
               <Numero
                 quanto={pre > 0 ? `${Math.round((somma((a) => a.checkins_post) / pre) * 100)}%` : '—'}
                 cosa="check-in chiusi col check-out"
@@ -471,8 +473,15 @@ export function Atlete() {
                 allarme={protettive > 0}
                 andamento={andamenti.protettive}
               />
-              <Numero quanto={viste.filter((a) => !a.tutorial_done).length} cosa="tutorial non finito" />
+              <Numero quanto={vere.filter((a) => !a.tutorial_done).length} cosa="tutorial non finito" />
             </div>
+            {viste.length > vere.length && (
+              <p className="m-0 mt-2 text-[11.5px] text-ink-mute">
+                {viste.length - vere.length === 1
+                  ? '1 account di prova in elenco: non entra nei numeri né nei file.'
+                  : `${viste.length - vere.length} account di prova in elenco: non entrano nei numeri né nei file.`}
+              </p>
+            )}
 
             <div className="mt-5 flex flex-wrap items-center gap-2">
               <input
@@ -774,7 +783,10 @@ function Riga({ a, scelta, onScegli, striscia, giorni14 }: PropsRiga) {
         <Link to={`/admin/atlete/${a.id}`} className="group flex items-center gap-[10px] text-ink no-underline">
           <Iniziale id={a.id} nome={a.display_name} />
           <span className="min-w-0">
-            <span className="block font-bold group-hover:underline">{a.display_name}</span>
+            <span className="block font-bold">
+              <span className="group-hover:underline">{a.display_name}</span>
+              {a.is_test && <Prova />}
+            </span>
             <span className="block text-[11px] text-ink-mute">{a.email ?? a.athlete_code ?? a.id.slice(0, 8)}</span>
           </span>
         </Link>
@@ -836,7 +848,10 @@ function SchedaAtleta({ a, scelta, onScegli, striscia, giorni14 }: PropsRiga) {
         <Link to={`/admin/atlete/${a.id}`} className="flex min-w-0 flex-1 items-center gap-[10px] text-ink no-underline">
           <Iniziale id={a.id} nome={a.display_name} grande />
           <span className="min-w-0">
-            <span className="block truncate text-[15px] font-bold">{a.display_name}</span>
+            <span className="block truncate text-[15px] font-bold">
+              {a.display_name}
+              {a.is_test && <Prova />}
+            </span>
             <span className="block truncate text-[12px] text-ink-mute">
               {[a.team_name, (a.sports ?? [a.sport]).filter(Boolean).join(', '), `${a.age} anni`].filter(Boolean).join(' · ')}
             </span>
@@ -865,6 +880,15 @@ function SchedaAtleta({ a, scelta, onScegli, striscia, giorni14 }: PropsRiga) {
         ))}
       </dl>
     </li>
+  )
+}
+
+/** l'etichetta di un account di prova, accanto al nome */
+function Prova() {
+  return (
+    <span className="ml-[6px] inline-block rounded-pill border border-ink bg-lime px-[6px] py-[1px] align-[2px] text-[9.5px] font-bold tracking-[0.4px] text-ink uppercase">
+      prova
+    </span>
   )
 }
 

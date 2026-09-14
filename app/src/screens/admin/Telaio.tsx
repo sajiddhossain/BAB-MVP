@@ -20,7 +20,7 @@ const STANZE: { a: string; nome: string; corto: string; segno: string; fine?: bo
   { a: '/admin', nome: 'Atrio', corto: 'Atrio', segno: '◧', fine: true },
   { a: '/admin/atlete', nome: 'Le atlete', corto: 'Atlete', segno: '◍' },
   { a: '/admin/scritte', nome: 'Le parole', corto: 'Parole', segno: 'Aa' },
-  { a: '/admin/sezioni', nome: 'Le sezioni dell’app', corto: 'Sezioni', segno: '◑' },
+  { a: '/admin/impostazioni', nome: 'Impostazioni', corto: 'Impostazioni', segno: '⚙︎' },
 ]
 
 /**
