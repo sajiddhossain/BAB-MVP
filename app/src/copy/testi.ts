@@ -447,6 +447,17 @@ const it = {
         quando: 'Arriva insieme allo storico.',
       },
     },
+    /* uscire dall'account: non cancella niente, e per rientrare basta la mail */
+    esci: {
+      bottone: 'Esci',
+      titolo: 'Uscire da BAB?',
+      testo: 'I tuoi dati restano salvati. Per rientrare ti basta la tua email.',
+      conferma: 'Esci',
+      annulla: 'Annulla',
+      inCorso: 'Esco…',
+      /* un check-in fatto senza rete e non ancora partito: uscendo andrebbe perso */
+      inCoda: 'Hai un check-in non ancora inviato. Collegati a internet e riprova, così non lo perdi.',
+    },
     /* il foglio che chiede prima di "Ricomincia da capo": cancella davvero */
     ricomincia: {
       titolo: 'Ricominciare da capo?',
@@ -836,6 +847,15 @@ const en: typeof it = {
         cosa: 'Your sports, your training, your language — and what BAB knows about you, with the way to change it or to take it with you.',
         quando: 'It arrives together with your history.',
       },
+    },
+    esci: {
+      bottone: 'Log out',
+      titolo: 'Log out of BAB?',
+      testo: 'Your data stays saved. To come back, just use your email.',
+      conferma: 'Log out',
+      annulla: 'Cancel',
+      inCorso: 'Logging out…',
+      inCoda: "You have a check-in that hasn't been sent yet. Connect to the internet and try again, so you don't lose it.",
     },
     ricomincia: {
       titolo: 'Start over?',

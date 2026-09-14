@@ -8,7 +8,7 @@ import { BottoneTocco } from '../ui/tocco'
 import { BarraSotto } from '../ui/casa/BarraSotto'
 import { Riga, Scheda } from '../ui/percorso/pezzi'
 import { useLingua } from '../lib/lingua'
-import { cancellaAccount } from '../lib/conto'
+import { cancellaAccount, esci } from '../lib/conto'
 import { SEZIONI } from '../data/sezioni'
 import scintille from '../assets/icon-sparkles.svg'
 
@@ -31,7 +31,7 @@ import scintille from '../assets/icon-sparkles.svg'
 export function Prossimamente({ id, profilo = false }: { id: string; profilo?: boolean }) {
   const { t, lingua, cambia } = useLingua()
   const vai = useNavigate()
-  const [conferma, setConferma] = useState(false)
+  const [foglio, setFoglio] = useState<null | 'esci' | 'ricomincia'>(null)
 
   const tp = t.prossimamente
   const detto = (tp.sezioni as Record<string, { cosa: string; quando: string }>)[id]
@@ -120,10 +120,22 @@ export function Prossimamente({ id, profilo = false }: { id: string; profilo?: b
                 ))}
               </div>
 
+              {/*
+                Uscire sta sopra: e' il gesto normale, e non cancella niente.
+                Il ricomincia, che cancella, resta in fondo, dove non si tocca
+                passando.
+              */}
+              <BottoneTocco
+                onClick={() => setFoglio('esci')}
+                className="mt-4 h-11 w-full rounded-[12px] border-[1.5px] border-line bg-surface text-[13px] font-bold text-ink"
+              >
+                {tp.esci.bottone}
+              </BottoneTocco>
+
               {/* cancella davvero, quindi prima chiede: vedi `ConfermaRicomincia` */}
               <BottoneTocco
-                onClick={() => setConferma(true)}
-                className="mt-4 h-11 w-full rounded-[12px] border-[1.5px] border-line bg-surface text-[13px] font-bold text-ink"
+                onClick={() => setFoglio('ricomincia')}
+                className="mt-3 h-11 w-full rounded-[12px] border-[1.5px] border-line bg-surface text-[13px] font-bold text-ink"
               >
                 {lingua === 'it' ? 'Ricomincia da capo' : 'Start over'}
               </BottoneTocco>
@@ -134,7 +146,8 @@ export function Prossimamente({ id, profilo = false }: { id: string; profilo?: b
         <BarraSotto />
       </div>
 
-      {conferma && <ConfermaRicomincia onChiudi={() => setConferma(false)} />}
+      {foglio === 'esci' && <ConfermaEsci onChiudi={() => setFoglio(null)} />}
+      {foglio === 'ricomincia' && <ConfermaRicomincia onChiudi={() => setFoglio(null)} />}
     </div>
   )
 }
@@ -157,9 +170,71 @@ export function Prossimamente({ id, profilo = false }: { id: string; profilo?: b
 function ConfermaRicomincia({ onChiudi }: { onChiudi: () => void }) {
   const { t } = useLingua()
   const c = t.prossimamente.ricomincia
+  return (
+    <Foglio
+      id="ricomincia-titolo"
+      testi={c}
+      onChiudi={onChiudi}
+      onConferma={async () => {
+        const esito = await cancellaAccount()
+        if (!esito.ok) {
+          console.error('[ricomincia]', esito.errore)
+          return c.errore
+        }
+        window.location.replace('/onboarding/accesso')
+        return null
+      }}
+    />
+  )
+}
+
+/**
+ * «Uscire da BAB?» — lo stesso foglio, per un gesto che non cancella niente.
+ *
+ * Chiede lo stesso, ma per un'altra ragione: rientrare vuol dire farsi
+ * mandare un codice via mail, e un tocco per sbaglio non deve costare quello.
+ * Uscito, la pagina si ricarica sull'accesso come dopo il ricomincia, cosi'
+ * nessuna copia in memoria resta a chi prende il telefono dopo.
+ */
+function ConfermaEsci({ onChiudi }: { onChiudi: () => void }) {
+  const { t } = useLingua()
+  const c = t.prossimamente.esci
+  return (
+    <Foglio
+      id="esci-titolo"
+      testi={c}
+      onChiudi={onChiudi}
+      onConferma={async () => {
+        const esito = await esci()
+        if (!esito.ok) return c.inCoda
+        window.location.replace('/onboarding/accesso')
+        return null
+      }}
+    />
+  )
+}
+
+/**
+ * Il foglio dal basso che chiede prima di fare una cosa che non si fa al volo.
+ *
+ * `onConferma` torna la frase da mostrare se non e' andata, o `null` se e'
+ * andata: in quel caso ci pensa lei a portare altrove.
+ */
+function Foglio({
+  id,
+  testi,
+  onChiudi,
+  onConferma,
+}: {
+  id: string
+  testi: { titolo: string; testo: string; conferma: string; annulla: string; inCorso: string }
+  onChiudi: () => void
+  onConferma: () => Promise<string | null>
+}) {
+  const c = testi
   const modale = useModale<HTMLDivElement>()
   const [inCorso, setInCorso] = useState(false)
-  const [errore, setErrore] = useState(false)
+  const [errore, setErrore] = useState<string | null>(null)
 
   useEffect(() => {
     const f = (e: KeyboardEvent) => {
@@ -169,18 +244,15 @@ function ConfermaRicomincia({ onChiudi }: { onChiudi: () => void }) {
     return () => window.removeEventListener('keydown', f)
   }, [onChiudi, inCorso])
 
-  async function cancella() {
+  async function conferma() {
     if (inCorso) return
     setInCorso(true)
-    setErrore(false)
-    const esito = await cancellaAccount()
-    if (!esito.ok) {
-      console.error('[ricomincia]', esito.errore)
+    setErrore(null)
+    const e = await onConferma()
+    if (e) {
       setInCorso(false)
-      setErrore(true)
-      return
+      setErrore(e)
     }
-    window.location.replace('/onboarding/accesso')
   }
 
   return (
@@ -198,7 +270,7 @@ function ConfermaRicomincia({ onChiudi }: { onChiudi: () => void }) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-labelledby="ricomincia-titolo"
+          aria-labelledby={id}
           tabIndex={-1}
           className="bab-sale relative rounded-t-[20px] bg-surface px-6 pt-3 pb-[calc(20px+env(safe-area-inset-bottom))] outline-none"
           style={{ boxShadow: '0px -4px 20px 0px rgba(0,0,0,0.15)' }}
@@ -206,7 +278,7 @@ function ConfermaRicomincia({ onChiudi }: { onChiudi: () => void }) {
           <div className="mx-auto h-1 w-9 rounded-sm bg-line/60" aria-hidden />
 
           <h2
-            id="ricomincia-titolo"
+            id={id}
             className="bab-display m-0 mt-[18px] text-[26px] leading-[1.12] font-bold text-ink"
           >
             {c.titolo}
@@ -214,10 +286,10 @@ function ConfermaRicomincia({ onChiudi }: { onChiudi: () => void }) {
           <p className="m-0 mt-3 text-[14px] leading-[1.5] text-ink-soft">{c.testo}</p>
 
           <div className="mt-6">
-            <Bottone attivo={!inCorso} onClick={() => void cancella()}>
+            <Bottone attivo={!inCorso} onClick={() => void conferma()}>
               {inCorso ? c.inCorso : c.conferma}
             </Bottone>
-            {errore && <Errore>{c.errore}</Errore>}
+            {errore && <Errore>{errore}</Errore>}
           </div>
 
           {/* secondario come il "togli" del foglio: la cosa da fare di solito e' tornare indietro */}

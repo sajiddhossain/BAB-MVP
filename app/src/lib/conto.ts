@@ -5,7 +5,8 @@ import { dimenticaProfilo } from './profilo'
 import type { Risposte } from './risposte'
 import { azzera, scrivi, tutte, ORARIO_PREDEFINITO } from './risposte'
 import { durataInMinuti, minutiDaOra, oraDaMinuti } from './ore'
-import { dimenticaSessione } from './sessione'
+import { dimenticaSessione, svuotaCoda } from './sessione'
+import { inSospeso } from './coda'
 import type { Lingua } from './lingua'
 
 /**
@@ -116,17 +117,42 @@ export async function verificaCodice(email: string, codice: string): Promise<Esi
  * sessione scade da sola: li' cancellare vorrebbe dire buttare via venti
  * risposte a qualcuno che si e' solo distratto per un'ora.
  */
-export async function esci() {
+export async function esci(): Promise<{ ok: true } | { ok: false; inCoda: true }> {
+  /*
+   * Prima si prova a mandare quello che e' rimasto in coda senza rete.
+   *
+   * La coda salva con l'account collegato nel momento in cui parte: lasciata
+   * li', al prossimo accesso su questo telefono finirebbe dentro l'account di
+   * un'altra persona. Buttarla via vorrebbe dire perdere un check-in fatto
+   * davvero. Quindi se non parte non si esce, e il foglio dice perche'.
+   */
+  await svuotaCoda()
+  if (inSospeso().length > 0) return { ok: false, inCoda: true }
+
   dimenticaProfilo()
   azzera()
   dimenticaSessione()
+  /*
+   * Tutto quello di BAB che sta su questo telefono, come fa `cancellaAccount`:
+   * giornata, tutorial, percorso, impostazioni — un account di prova non deve
+   * restare acceso per chi entra dopo. Restano la lingua e le preferenze del
+   * telefono, che non sono di nessuna persona.
+   */
   try {
-    localStorage.removeItem('bab.giornata')
+    for (const chiave of Object.keys(localStorage)) {
+      if (chiave.startsWith('bab.') && !TENUTE.includes(chiave)) localStorage.removeItem(chiave)
+    }
   } catch {
     // niente da fare: non e' un motivo per non uscire
   }
-  await supabase?.auth.signOut()
+  // solo da questo telefono, e funziona anche senza rete: gli altri
+  // dispositivi dove e' entrata restano com'erano
+  await supabase?.auth.signOut({ scope: 'local' })
+  return { ok: true }
 }
+
+/** le chiavi che uscendo restano: sono del telefono, non della persona */
+const TENUTE = ['bab.lingua', 'bab.azzeramento', 'bab.adminBarra']
 
 /**
  * Ricominciare da capo: l'account e tutto quello che c'e' dentro se ne vanno.
